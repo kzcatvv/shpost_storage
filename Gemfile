@@ -40,13 +40,13 @@ end
 gem 'twitter-bootstrap-rails'
 
 #maybe not work in Windows
-gem "less-rails"
+gem 'less-rails'
 
-gem "devise"
+gem 'devise'
 
-gem "devise-i18n-views"
+gem 'devise-i18n-views'
 
-gem "cancan"
+gem 'cancan'
 
 gem 'wice_grid'
 
@@ -54,18 +54,18 @@ gem 'jquery-ui-rails'
 
 gem 'pry', :group => :development
 
-gem "spreadsheet"
+gem 'spreadsheet'
 
 gem 'yomu'
 
 group :test, :development do
-  gem "rspec", "~> 2.0"
-  gem "rspec-rails", "~> 2.0"
+  gem 'rspec', '~> 2.0'
+  gem 'rspec-rails', '~> 2.0'
 end
 
-# Use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.1.2'
+gem 'minitest'
 
+gem 'roo'
 # Use unicorn as the app server
 # gem 'unicorn'
 
