@@ -1,6 +1,4 @@
 ShpostBlank::Application.routes.draw do
-  resources :events
-
   root 'welcome#index'
 
   devise_for :users

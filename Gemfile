@@ -37,7 +37,7 @@ group :doc do
   gem 'sdoc', require: false
 end
 
-gem 'twitter-bootstrap-rails'
+gem 'twitter-bootstrap-rails', git: 'https://github.com/seyhunak/twitter-bootstrap-rails.git', branch: 'bootstrap3'
 
 #maybe not work in Windows
 gem 'less-rails'
@@ -46,7 +46,7 @@ gem 'devise'
 
 gem 'devise-i18n-views'
 
-gem 'cancan'
+gem 'cancan', git: 'https://github.com/francocatena/cancan'
 
 gem 'wice_grid'
 
@@ -64,6 +64,8 @@ group :test, :development do
 end
 
 gem 'minitest'
+
+gem 'dynamic_form'
 
 gem 'roo'
 # Use unicorn as the app server
