@@ -9,4 +9,18 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-ShpostStorage::Application.config.secret_key_base = '8ecc99c11e209f765120cb7a8279c30202457f9cc3b7b85e167ac1deb0f17d5873d736adb9b86d586d1d8f2d992ed52f52f948bcccf0a700f864e8816924853b'
+#ShpostStorage::Application.config.secret_key_base = '8ecc99c11e209f765120cb7a8279c30202457f9cc3b7b85e167ac1deb0f17d5873d736adb9b86d586d1d8f2d992ed52f52f948bcccf0a700f864e8816924853b'
+def secure_token
+  token_file = Rails.root.join('.secret')
+  if File.exist?(token_file)
+    # Use the existing token.
+    File.read(token_file).chomp
+  else
+    # Generate a new token and store it in token_file.
+    token = SecureRandom.hex(64)
+    File.write(token_file, token)
+    token
+  end
+end
+
+ShpostStorage::Application.config.secret_key_base = secure_token
