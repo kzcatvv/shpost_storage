@@ -6,7 +6,7 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
 
-module ShpostBlank
+module ShpostStorage
   class Application < Rails::Application
     config.filter_parameters += [:password]
     # Settings in config/environments/* take precedence over those specified here.

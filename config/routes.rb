@@ -1,4 +1,4 @@
-ShpostBlank::Application.routes.draw do
+ShpostStorage::Application.routes.draw do
   root 'welcome#index'
 
   devise_for :users
