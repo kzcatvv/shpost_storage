@@ -7,8 +7,8 @@ describe UserLogsController do
       get("/user_logs").should route_to("user_logs#index")
     end
 
-    it "routes to #new" do
-      get("/user_logs/new").should route_to("user_logs#new")
+    it "routes to #show" do
+      get("/user_logs/1").should route_to("user_logs#show", id: "1")
     end
   end
 end

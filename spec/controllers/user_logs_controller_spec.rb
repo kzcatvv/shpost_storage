@@ -23,26 +23,47 @@ describe UserLogsController do
   # This should return the minimal set of attributes required to create a valid
   # UserLog. As you add validations to UserLog, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "user_id" => "MyString" } }
+  let(:valid_attributes) { {} }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # UserLogsController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
-  describe "GET index" do
-    it "assigns all user_logs as @user_logs" do
-      user_log = UserLog.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:user_logs).should eq([user_log])
-    end
-  end
+  describe "admin access" do
+    before :each do 
+      @user_log1 = FactoryGirl.create(:user_log)
+      @user_log2 = FactoryGirl.create(:user_log)
+      @user_log3 = FactoryGirl.create(:user_log)
 
-  describe "GET show" do
-    it "assigns the requested user_log as @user_log" do
-      user_log = UserLog.create! valid_attributes
-      get :show, {:id => user_log.to_param}, valid_session
-      assigns(:user_log).should eq(user_log)
+       @user = FactoryGirl.create(:superadmin)
+      #@user = User.first
+      
+      sign_in @user
+    end
+
+    describe "GET index" do
+      it "assigns all user_logs as @user_logs" do
+        get :index
+        expect(assigns(:user_logs)).to eq([@user_log1, @user_log2, @user_log3])
+      end
+
+      it "renders the index view" do
+        get :index
+        expect(response).to render_template :index
+      end
+    end
+
+    describe "GET show" do
+      it "assigns the requested user_log as @user_log" do
+        get :show, id: @user_log1
+        expect(assigns(:user_log)).to eq(@user_log1)
+      end
+
+      it "renders the show view" do
+        get :show, id: @user_log1
+        expect(response).to render_template :show
+      end
     end
   end
 end
