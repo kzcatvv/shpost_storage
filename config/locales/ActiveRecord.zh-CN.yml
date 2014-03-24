@@ -226,6 +226,9 @@ zh-CN:
       user:
         one: 用户管理
         other: 用户管理
+      user_log:
+        one: 用户日志查询
+        other: 用户日志查询
     attributes:
       user:
         email: "电子邮件"
@@ -237,6 +240,14 @@ zh-CN:
         sign_in_count: "登入次数"
         role: "角色"
         role_name: "角色"
+      user_log:
+        user_id: "用户编号"
+        username: "用户名"
+        operation: "操作"
+        object_class: "对象名称"
+        object_id: "对象主键"
+        object_no: "对象编号"
+        created_at: "创建时间"
       filetemp:
         filename: "文档"
         rename: "文件名"

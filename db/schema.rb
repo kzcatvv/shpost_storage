@@ -11,12 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140311191528) do
+ActiveRecord::Schema.define(version: 20140324123155) do
 
   create_table "events", force: true do |t|
     t.string   "name"
     t.text     "description"
     t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "user_logs", force: true do |t|
+    t.integer  "user_id",      default: 0,  null: false
+    t.string   "operation",    default: "", null: false
+    t.string   "object_class"
+    t.integer  "object_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
