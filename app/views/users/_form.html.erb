@@ -36,19 +36,13 @@
       <%= f.text_field :email, :class => 'text_field' %>
     </div>
   </div>
-  <% if can? :role, @user %>
+
   <div class="control-group">
-    <%= f.label :role, :class => 'control-label' %>
+    <%= f.label :unit_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:role, User::ROLE.invert.select{|k, v| v.to_s.size() < current_user.role.size() })%>
+      <%= f.select(:unit_id, Unit.all.map{|u| [u.name,u.id]})%>
     </div>
   </div>
-  <% else %>
-    <dl class="dl-horizontal">
-      <dt><strong><%= f.label :role%></strong></dt>
-      <dd><%= @user.rolename %></dd>
-    </dl>
-  <% end %>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
