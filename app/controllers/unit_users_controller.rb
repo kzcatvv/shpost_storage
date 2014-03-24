@@ -1,42 +1,32 @@
 class UnitUsersController < ApplicationController
   # before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
   load_and_authorize_resource :unit
-  load_and_authorize_resource :user, through: :unit
-  skip_load_resource :user, :only => :create
+  load_and_authorize_resource :user, through: :unit, parent: false
+  #skip_load_resource :user, :only => :create
 
   # GET /users
   # GET /users.json
   def index
     #@users = User.all
-    
-    @users_grid = initialize_grid(User, :conditions => ['unit_id = ?', @unit.id])
+    @users_grid = initialize_grid(@users)
   end
 
   # GET /users/1
   # GET /users/1.json
   def show
-    #binding.pry
-    @unit = Unit.find(params[:unit_id])
-    @user = @unit.users.find(params[:id]) 
   end
 
   # GET /users/new
   def new
-   #@user = User.new 
-   @user = @unit.users.build 
   end
 
   # GET /users/1/edit
   def edit
-    @unit = Unit.find(params[:unit_id])
-    @user = @unit.users.find(params[:id]) 
   end
 
   # POST /users
   # POST /users.json
   def create
-    @user = @unit.users.build(unituser_params) 
-
     respond_to do |format|
       if @user.save
         format.html { redirect_to unit_user_path(@unit,@user), notice: I18n.t('controller.create_success_notice', model: '用户') }
@@ -51,8 +41,6 @@ class UnitUsersController < ApplicationController
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
-    @unit = Unit.find(params[:unit_id])
-    @user = @unit.users.find(params[:id])
     respond_to do |format|
       if @user.update(unituser_params)
         format.html { redirect_to unit_user_path(@unit,@user), notice: I18n.t('controller.update_success_notice', model: '用户') }
@@ -67,8 +55,6 @@ class UnitUsersController < ApplicationController
   # DELETE /users/1
   # DELETE /users/1.json
   def destroy
-    @unit = Unit.find(params[:unit_id])
-    @user = User.find(params[:id])
     @user.destroy
     respond_to do |format|
       format.html { redirect_to unit_users_path(@unit) }
@@ -87,7 +73,7 @@ class UnitUsersController < ApplicationController
     #   @unit = Unit.find(params[:unit_id])
     # end 
     
-    def unituser_params
-      params[:user].permit(:username, :name, :password, :email)
+    def user_params
+      params[:user].permit(:username, :name, :password, :email, :role)
     end 
 end

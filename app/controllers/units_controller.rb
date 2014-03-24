@@ -1,6 +1,5 @@
 class UnitsController < ApplicationController
   load_and_authorize_resource :unit
-  skip_load_resource  :only => :create
 
   # GET /units
   # GET /units.json
@@ -26,8 +25,6 @@ class UnitsController < ApplicationController
   # POST /units
   # POST /units.json
   def create
-    @unit = Unit.new(unit_params)
-
     respond_to do |format|
       if @unit.save
         format.html { redirect_to @unit, notice: 'Unit was successfully created.' }

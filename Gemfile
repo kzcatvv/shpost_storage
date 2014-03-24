@@ -46,7 +46,8 @@ gem 'devise'
 
 gem 'devise-i18n-views'
 
-gem 'cancan', git: 'https://github.com/francocatena/cancan'
+#gem 'cancan', git: 'https://github.com/francocatena/cancan'
+gem 'cancancan'
 
 gem 'wice_grid'
 

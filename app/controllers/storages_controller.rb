@@ -2,8 +2,8 @@ class StoragesController < ApplicationController
   #before_action :set_storage, only: [:show, :edit, :update, :destroy]
   #before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
   load_and_authorize_resource :unit
-  load_and_authorize_resource :storage, through: :unit
-  skip_load_resource :storage, :only => :create
+  load_and_authorize_resource :storage, through: :unit, parent: false
+  #skip_load_resource :storage, :only => :create
   # GET /storages
   # GET /storages.json
   def index
@@ -31,9 +31,8 @@ class StoragesController < ApplicationController
   # POST /storages
   # POST /storages.json
   def create
-
     #@unit = Unit.find(params[:unit_id])
-    @storage = @unit.storages.build(storage_params)
+    #@storage = @unit.storages.build(storage_params)
 
     respond_to do |format|
       if @storage.save
