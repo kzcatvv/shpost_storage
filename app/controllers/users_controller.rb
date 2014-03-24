@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
   load_and_authorize_resource :user
-
   # GET /users
   # GET /users.json
   def index
