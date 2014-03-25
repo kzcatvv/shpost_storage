@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140327061650) do
+ActiveRecord::Schema.define(version: 20140327061651) do
 
   create_table "events", force: true do |t|
     t.string   "name"
@@ -30,6 +30,20 @@ ActiveRecord::Schema.define(version: 20140327061650) do
   end
 
   add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
+
+  create_table "stock_logs", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "stock_id"
+    t.string   "operation",          default: "", null: false
+    t.string   "status"
+    t.string   "object_class"
+    t.integer  "object_primary_key"
+    t.string   "object_symbol"
+    t.integer  "amount",             default: 0,  null: false
+    t.datetime "checked_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "storages", force: true do |t|
     t.string   "name"

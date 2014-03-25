@@ -234,6 +234,9 @@ zh-CN:
       user_log:
         one: 用户日志
         other: 用户日志
+      stock_log:
+        one: 库存日志
+        other: 库存日志
     attributes:
       user:
         email: "电子邮件"
@@ -254,13 +257,25 @@ zh-CN:
         desc: "仓库描述"
         unit_id: "所属单位"
       user_log:
-        user_id: "用户编号"
+        user_id: "用户"
         username: "操作用户"
         operation: "操作"
         object_class: "对象名称"
         object_id: "对象主键"
-        object_symbol: "操作对象"
+        object_symbol: "对象标识"
         created_at: "创建时间"
+      stock_log:
+        user_id: "用户"
+        username: "操作用户"
+        operation: "操作"
+        stock_id: "库存"
+        status: "状态"
+        amount: "数量"
+        object_class: "对象名称"
+        object_id: "对象主键"
+        object_symbol: "对象标识"
+        created_at: "创建时间"
+        checked_at: "确认时间"
       filetemp:
         filename: "文档"
         rename: "文件名"

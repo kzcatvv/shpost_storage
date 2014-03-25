@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :stock_logs, only: [:index, :show]
+
   resources :user_logs, only: [:index, :show]
 
   root 'welcome#index'
