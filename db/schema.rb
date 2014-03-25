@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140324123155) do
+ActiveRecord::Schema.define(version: 20140325052834) do
 
   create_table "events", force: true do |t|
     t.string   "name"
@@ -39,12 +39,13 @@ ActiveRecord::Schema.define(version: 20140324123155) do
   add_index "units", ["name"], name: "index_units_on_name", unique: true
 
   create_table "user_logs", force: true do |t|
-    t.integer  "user_id",      default: 0,  null: false
-    t.string   "operation",    default: "", null: false
+    t.integer  "user_id",       default: 0,  null: false
+    t.string   "operation",     default: "", null: false
     t.string   "object_class"
     t.integer  "object_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "object_symbol"
   end
 
   create_table "users", force: true do |t|
