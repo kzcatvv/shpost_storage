@@ -1,4 +1,5 @@
 ShpostStorage::Application.routes.draw do
+
   resources :user_logs, only: [:index, :show]
 
   root 'welcome#index'
@@ -17,6 +18,10 @@ ShpostStorage::Application.routes.draw do
 
   resources :units do
      resources :users, :controller => 'unit_users'
+  end
+
+  resources :users do
+     resources :roles, only: [:index, :new, :create, :show, :destroy]
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

@@ -17,9 +17,11 @@ FactoryGirl.define do
     end
 
 	factory :update_user do
-    	email "update_user@example.com"
     	username "update_username_test"
-    	name "update_name"
+        name "update_name"
+        password "11111111"
+    	email "update_user@example.com"
+        role "user"
     end
 
     factory :superadmin do

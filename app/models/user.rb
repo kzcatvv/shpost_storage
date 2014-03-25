@@ -3,6 +3,8 @@ class User < ActiveRecord::Base
   # :confirmable, :lockable, :timeoutable and :omniauthable
   belongs_to :unit
   has_many :user_logs
+  has_many :roles
+  #has_many :storages, through: :roles
 
   devise :database_authenticatable, #:registerable,
          :recoverable, :rememberable, :trackable, :validatable

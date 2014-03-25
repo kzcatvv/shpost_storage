@@ -21,7 +21,8 @@
     g.column do |user|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_unit_user_path(@unit,user), :class => 'btn btn-xs btn-primary' if can? :update, user) << ' ' <<
-        (link_to t('.destroy', :default => t("helpers.links.destroy")), unit_user_path(@unit,user), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, user)
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), unit_user_path(@unit,user), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, user)<< ' ' <<
+        (link_to t('.roles', :default => t("helpers.links.roles")), user_roles_path(user), :class => 'btn btn-xs btn-primary' if can? :roles, user)
     end
   end 
 %>
