@@ -1,0 +1,24 @@
+<%- model_class = Goodstype -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.new', 'New %{model}'], :model => model_class.model_name.human.titleize %></h1>
+</div>
+<%= form_for @goodstype, :url => unit_goodstypes_path(@unit), :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="form-group">
+    <%= f.label :gtno, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :gtno, :class => 'form-control' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'form-control' %>
+    </div>
+  </div>
+
+  
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+            unit_goodstypes_path(@unit), :class => 'btn btn-default' %>
+ 
+<% end %>

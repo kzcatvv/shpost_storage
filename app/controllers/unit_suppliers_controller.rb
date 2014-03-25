@@ -4,7 +4,7 @@ class UnitSuppliersController < ApplicationController
   # GET /suppliers
   # GET /suppliers.json
   def index
-    @suppliers = @unit.suppliers
+    @suppliers = initialize_grid(@unit.suppliers)
   end
 
   # GET /suppliers/1
@@ -56,11 +56,10 @@ class UnitSuppliersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_unit
-      @unit = Unit.find(params[:id])
+      params.permit!
+      @unit = Unit.find(params[:unit_id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def unit_params
-      params.require(:unit).permit!
-    end
+    
 end

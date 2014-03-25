@@ -7,9 +7,12 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 User.destroy_all()
+Unit.destroy_all()
 
-superadmin = User.create(email: 'superadmin@examples.com', username: 'superadmin', password: '11111111', name: 'superadmin', role: 'superadmin')
-unitadmin = User.create(email: 'unitadmin@examples.com', username: 'unitadmin', password: '11111111', name: 'unitadmin', role: 'unitadmin')
-user1 = User.create(email: 'gaohelie@examples.com', username: 'gaohelie', password: '11111111', name: 'gaohelie', role: 'user')
-Unit.create(name: '闸北')
-User.create(email: '111@examples.com', username: 'unit', password: '111', name: 'asd', role: 'unitadmin', unit_id: 1)
+
+unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc')
+
+superadmin = User.create(email: 'superadmin@examples.com', username: 'superadmin', password: '11111111', name: 'superadmin', role: 'superadmin', unit: unit1)
+unitadmin = User.create(email: 'unitadmin@examples.com', username: 'unitadmin', password: '11111111', name: 'unitadmin', role: 'unitadmin', unit: unit1)
+user1 = User.create(email: 'gaohelie@examples.com', username: 'gaohelie', password: '11111111', name: 'gaohelie', role: 'user', unit: unit1)
+

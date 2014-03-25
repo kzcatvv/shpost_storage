@@ -21,6 +21,10 @@ describe User do
   	expect(FactoryGirl.build(:user, role: nil)).to have(1).errors_on(:role)
   end
 
+  it "is invalid without a unit" do
+    expect(FactoryGirl.build(:user, unit_id: nil)).to have(1).errors_on(:unit_id)
+  end
+
   describe "superadmin check" do
   	context "is superadmin" do
   		it "return true" do
@@ -37,5 +41,19 @@ describe User do
   	end
   end
 
+  describe "unitadmin check" do
+    context "is unitadmin" do
+      it "return true" do
+        superadmin = FactoryGirl.build(:unitadmin)
+        expect(superadmin.unitadmin?).to be_true
+      end
+    end
 
+    context "isn't unitadmin" do
+      it "return false" do
+        user = FactoryGirl.build(:user)
+        expect(user.unitadmin?).to_not be_true
+      end
+    end
+  end
 end

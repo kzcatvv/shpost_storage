@@ -18,7 +18,13 @@
 
     g.column name: model_class.human_attribute_name(:email), attribute: 'email'
 
-    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id' ,custom_filter: Unit.all.map{|u| [u.name,u.id]}
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id' ,custom_filter: Unit.all.map{|u| [u.name,u.id]} do |user|
+      user.unit.name
+    end
+
+    g.column name: model_class.human_attribute_name(:role), attribute: 'role' ,custom_filter: User::ROLE.invert do |user| 
+      user.rolename
+    end
 
     g.column do |user|
       ((can? :update, user) ?
