@@ -13,14 +13,6 @@
 
 ActiveRecord::Schema.define(version: 20140311191528) do
 
-  create_table "events", force: true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.boolean  "is_public"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "users", force: true do |t|
     t.string   "email"
     t.string   "encrypted_password",     default: "", null: false
