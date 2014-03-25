@@ -1,11 +1,13 @@
 class UsersController < ApplicationController
-  load_and_authorize_resource
-  skip_load_resource :only => :create
+  load_and_authorize_resource :unit
+  load_and_authorize_resource :user, through: :unit, :shallow => true
+  skip_load_resource :user, :only => :create
 
   # GET /users
   # GET /users.json
   def index
     #@users = User.all
+
     @users_grid = initialize_grid(@users)
   end
 
@@ -71,6 +73,6 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params[:user].permit(:username, :name, :password, :role, :email)
+      params[:user].permit(:username, :name, :password, :unit_id, :email)
     end
 end

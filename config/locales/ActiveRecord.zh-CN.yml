@@ -259,7 +259,7 @@ zh-CN:
       submenu:
         supplier:
           name: "供应商管理"
-          link: "/suppliers"
+          link: "unit/suppliers"
     filetemp:
       name: "模板管理"
       needrole: 

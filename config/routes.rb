@@ -6,6 +6,20 @@ ShpostStorage::Application.routes.draw do
   devise_for :users
 
   resources :users
+  
+  resources :storages
+
+  resources :units
+ 
+  resources :units do
+     resources :storages
+  end
+
+  resources :units do
+     resources :users, :controller => 'unit_users'
+     resources :suppliers, :controller => 'unit_suppliers'
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
