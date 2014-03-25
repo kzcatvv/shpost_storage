@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-ShpostBlank::Application.routes.draw do
-
-=======
 ShpostStorage::Application.routes.draw do
->>>>>>> f546dc09b6755519a648775bb5c3d59cca5eaa27
   root 'welcome#index'
 
   devise_for :users
