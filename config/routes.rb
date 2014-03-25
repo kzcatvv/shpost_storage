@@ -1,10 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
-<<<<<<< HEAD
   resources :businesses
 
-=======
->>>>>>> e8985c6f80b4d0e211260628e6002cbeccf850ef
   resources :stock_logs, only: [:index, :show]
 
   resources :commodities
