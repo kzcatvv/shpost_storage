@@ -13,4 +13,8 @@ class Role < ActiveRecord::Base
   def sorter?
     (role.eql? 'sorter') ? true : false
   end
+
+  def self.get_storages_by_user_id(user_id)
+    Role.where("user_id = ?", user_id).group(:storage_id)
+  end
 end

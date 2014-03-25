@@ -11,14 +11,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20140327061651) do
+=======
+ActiveRecord::Schema.define(version: 20140328071000) do
+>>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
 
-  create_table "events", force: true do |t|
+  create_table "commodities", force: true do |t|
+    t.string   "cno"
     t.string   "name"
-    t.text     "description"
-    t.boolean  "is_public"
+    t.integer  "goodstype_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "unit_id"
+  end
+
+  create_table "goodstypes", force: true do |t|
+    t.string   "gtno"
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "unit_id"
   end
 
   create_table "roles", force: true do |t|
@@ -31,6 +44,7 @@ ActiveRecord::Schema.define(version: 20140327061651) do
 
   add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
 
+<<<<<<< HEAD
   create_table "stock_logs", force: true do |t|
     t.integer  "user_id"
     t.integer  "stock_id"
@@ -41,6 +55,13 @@ ActiveRecord::Schema.define(version: 20140327061651) do
     t.string   "object_symbol"
     t.integer  "amount",             default: 0,  null: false
     t.datetime "checked_at"
+=======
+  create_table "specifications", force: true do |t|
+    t.integer  "commodity_id"
+    t.string   "model"
+    t.string   "size"
+    t.string   "color"
+>>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -51,6 +72,16 @@ ActiveRecord::Schema.define(version: 20140327061651) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "suppliers", force: true do |t|
+    t.string   "sno"
+    t.string   "name"
+    t.string   "address"
+    t.string   "phone"
+    t.integer  "unit_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "units", force: true do |t|

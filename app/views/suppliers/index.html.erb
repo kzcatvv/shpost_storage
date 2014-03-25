@@ -1,0 +1,35 @@
+<%- model_class = Supplier -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human %></h1>
+<div style="float:right">
+    <% if can? :new, Supplier %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_supplier_path,
+            :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+<%= grid(@suppliers, :show_filters => :always) do |g|
+
+    g.column name: model_class.human_attribute_name(:id), attribute: 'id', filter_type: :range
+
+    g.column name: model_class.human_attribute_name(:sno), attribute: 'sno'
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:address), attribute: 'address'
+
+    g.column name: model_class.human_attribute_name(:phone), attribute: 'phone'
+
+    g.column do |supplier|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_supplier_path(supplier), :class => 'btn btn-xs btn-primary' if can? :update, supplier) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      supplier_path(supplier),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, supplier)
+      end
+  end 
+%>
+
+

@@ -26,10 +26,10 @@ describe UnitUsersController do
         { :get => "/units/1/users" }.should route_to("action"=>"index", "controller"=>"unit_users", "unit_id"=>"1")
       end
 
-      #it " get the index users" do
-          #get :index , unit_id: 1
-          #expect(assigns(:users_grid)).to eq()
-      #end
+      it " get the index users" do
+          get :index , unit_id: 1
+          expect(assigns(:users)).to eq([@user11,@user12,@user])
+      end
 
       it " get the new route action" do
         { :get => "/units/1/users/new" }.should route_to("action"=>"new", "controller"=>"unit_users", "unit_id"=>"1")
@@ -45,7 +45,7 @@ describe UnitUsersController do
       end
 
       it " get the create user" do
-          expect { post :create, unit_id: 1, user: FactoryGirl.attributes_for(:new_user) }.to change(User, :count).by(1)
+          expect { post :create, unit_id: 1, user: FactoryGirl.attributes_for(:user) }.to change(User, :count).by(1)
       end
 
       it " get the edit route action" do

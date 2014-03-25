@@ -148,6 +148,7 @@ zh-CN:
       back: 返回
       storages: 管理仓库
       users: 管理用户
+      roles: 角色管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -234,9 +235,25 @@ zh-CN:
       user_log:
         one: 用户日志
         other: 用户日志
+<<<<<<< HEAD
       stock_log:
         one: 库存日志
         other: 库存日志
+=======
+      role:
+        one: 角色管理
+        other: 角色管理
+      supplier:
+        one: 供应商管理
+        other: 供应商管理
+      goodstype:
+        one: 商品类型管理
+        other: 商品类型管理
+      commodity:
+        one: 商品管理
+        other: 商品管理
+
+>>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
     attributes:
       user:
         email: "电子邮件"
@@ -256,6 +273,10 @@ zh-CN:
         name: "仓库名"
         desc: "仓库描述"
         unit_id: "所属单位"
+      role:
+        user_id: "用户"
+        storage_id: "仓库"
+        role: "角色"
       user_log:
         user_id: "用户"
         username: "操作用户"
@@ -264,6 +285,7 @@ zh-CN:
         object_id: "对象主键"
         object_symbol: "对象标识"
         created_at: "创建时间"
+<<<<<<< HEAD
       stock_log:
         user_id: "用户"
         username: "操作用户"
@@ -276,6 +298,22 @@ zh-CN:
         object_symbol: "对象标识"
         created_at: "创建时间"
         checked_at: "确认时间"
+=======
+      supplier:
+        sno: "供应商编号"
+        name: "名称"
+        address: "地址"
+        phone: "电话"
+        unit: "所属机构"
+      goodstype:
+        gtno: "商品类型编号"
+        name: "类型名称"
+        unit: "所属机构"
+      commodity:
+        cno: "商品编号"
+        name: "商品名称"
+        goodstype_id: "商品类型"
+>>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -299,6 +337,21 @@ zh-CN:
           needrole:
             can: :read
             role: :User
+    suppliers:
+      name: "采购与供应商管理"
+      submenu:
+        supplier:
+          name: "供应商管理"
+          link: "/suppliers"
+    goodstypes:
+      name: "商品与规格管理"
+      submenu:
+        goodstype:
+          name: "商品类型管理"
+          link: "/goodstypes"
+        commodity:
+          name: "商品管理"
+          link: "/commodities"
     filetemp:
       name: "模板管理"
       needrole: 

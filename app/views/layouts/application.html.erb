@@ -89,6 +89,18 @@
                   <li><%= link_to t('devise.navigation.sign_out'), destroy_user_session_path, :method => :delete %></li>
                 </ul>
               </li>
+              <% if !session[:current_storage].nil? %>
+              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前storage:  <%= session[:current_storage].name %><b class="caret"></b></a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                  <% roles = Role.get_storages_by_user_id(current_user.id) %>
+                  <% roles.each do |role| %>
+                    <li>
+                      <%= link_to role.storage.name, 'javascript:void(0)', onclick: "alert (#{role.storage.name});" %>
+                    </li>
+                  <% end %>
+                </ul>
+              </li>
+              <% end %>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
