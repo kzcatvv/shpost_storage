@@ -254,6 +254,12 @@ zh-CN:
           needrole:
             can: :read
             role: :User
+    suppliers:
+      name: "采购与供应商管理"
+      submenu:
+        supplier:
+          name: "供应商管理"
+          link: "/suppliers"
     filetemp:
       name: "模板管理"
       needrole: 

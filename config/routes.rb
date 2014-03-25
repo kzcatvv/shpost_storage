@@ -1,4 +1,6 @@
 ShpostStorage::Application.routes.draw do
+  resources :suppliers
+
   root 'welcome#index'
 
   devise_for :users
