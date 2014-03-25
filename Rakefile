@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-ShpostBlank::Application.load_tasks
+ShpostStorage::Application.load_tasks
