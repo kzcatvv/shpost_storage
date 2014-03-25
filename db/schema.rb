@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140311191528) do
+ActiveRecord::Schema.define(version: 20140321082109) do
 
   create_table "events", force: true do |t|
     t.string   "name"
@@ -20,6 +20,23 @@ ActiveRecord::Schema.define(version: 20140311191528) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "storages", force: true do |t|
+    t.string   "name"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "unit_id"
+  end
+
+  create_table "units", force: true do |t|
+    t.string   "name"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "units", ["name"], name: "index_units_on_name", unique: true
 
   create_table "users", force: true do |t|
     t.string   "email"
@@ -37,6 +54,7 @@ ActiveRecord::Schema.define(version: 20140311191528) do
     t.string   "username",               default: "", null: false
     t.string   "role",                   default: "", null: false
     t.string   "name"
+    t.integer  "unit_id"
   end
 
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
