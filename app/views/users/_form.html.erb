@@ -49,13 +49,13 @@
   <div class="control-group">
     <%= f.label :role, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:role, User::ROLE.invert.select{|k, v| v.to_s.size() <= current_user.role.size()}) %>
+      <%= f.select(:role, User::ROLE.invert.select{|k, v| v.to_s.size() < current_user.role.size()}) %>
     </div>
   </div>
   <% else %>
     <dl class="dl-horizontal">
       <dt><strong><%= f.label :unit_id%></strong></dt>
-      <dd><%= @user.unit.name %></dd>
+      <dd><%= @user.unit.try :name %></dd>
     </dl>
 
     <dl class="dl-horizontal">

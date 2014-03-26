@@ -1,12 +1,9 @@
 class UsersController < ApplicationController
   load_and_authorize_resource :user
-  skip_load_resource :user, :only => :create
-
   # GET /users
   # GET /users.json
   def index
     #@users = User.all
-
     @users_grid = initialize_grid(@users)
   end
 
@@ -27,8 +24,6 @@ class UsersController < ApplicationController
   # POST /users
   # POST /users.json
   def create
-    @user = User.new(user_params)
-
     respond_to do |format|
       if @user.save
         format.html { redirect_to @user, notice: I18n.t('controller.create_success_notice', model: '用户') }

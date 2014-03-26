@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   rescue_from Exception, with: :get_errors if Rails.env.production?
 
-  rescue_from CanCan::AccessDenied, with: :access_denied
+  rescue_from CanCan::AccessDenied, with: :access_denied if Rails.env.production?
 
   protect_from_forgery with: :exception
 
