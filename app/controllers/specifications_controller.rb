@@ -6,7 +6,7 @@ class SpecificationsController < ApplicationController
   # GET /specifications.json
   def index
     #@specifications = Specification.all
-    @rspecifications_grid = initialize_grid(@specifications)
+    @rspecifications_grid = initialize_grid(@specifications, include: :commodity)
   end
 
   # GET /specifications/1

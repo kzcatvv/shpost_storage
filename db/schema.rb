@@ -42,6 +42,14 @@ ActiveRecord::Schema.define(version: 20140401064102) do
     t.integer  "unit_id"
   end
 
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "goodstypes", force: true do |t|
     t.string   "gtno"
     t.string   "name"
