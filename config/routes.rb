@@ -2,14 +2,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :shelves
 
-<<<<<<< HEAD
   resources :purchasedetails
 
   resources :purchases
 
-=======
   resources :stocks
->>>>>>> d52d1cd3bac7f67bdb469ab402db42576d114096
 
   resources :purchases
 

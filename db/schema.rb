@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
 ActiveRecord::Schema.define(version: 20140402015156) do
-
-#ActiveRecord::Schema.define(version: 20140401064102) do
-
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
