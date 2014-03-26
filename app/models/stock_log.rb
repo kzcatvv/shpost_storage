@@ -12,6 +12,6 @@ class StockLog < ActiveRecord::Base
   before_save :set_desc
 
   def set_desc
-    self.desc = "#{OPERATION_TYPE[operation_type.to_sym]}#{stock.specification.try(:commodity).try :name}-#{stock.specification.try :desc}共计#{stock.actual_amount}，批次：#{stock.batch_no}，商户：#{stock.business.try :name}，供应商：#{stock.supplier.try :name}，货架：stock.shelf.try :no"
+    self.desc = "#{OPERATION_TYPE[operation_type.to_sym]}#{stock.specification.try(:commodity).try :name}-#{stock.specification.try :model}共计#{stock.actual_amount}，批次：#{stock.batch_no}，商户：#{stock.business.try :name}，供应商：#{stock.supplier.try :name}，货架：#{stock.shelf.try :shelf_code}"
   end
 end
