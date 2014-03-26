@@ -1,4 +1,5 @@
 zh-CN:
+  title: "上海邮政仓库管理系统"
   welcome: "欢迎登陆"
   date:
     abbr_day_names:
@@ -359,6 +360,12 @@ zh-CN:
         supplier:
           name: "供应商管理"
           link: "/suppliers"
+    business:
+      name: "商户与订单管理"
+      submenu:
+        supplier:
+          name: "商户管理"
+          link: "/businesses"
     goodstypes:
       name: "商品与规格管理"
       submenu:
@@ -368,6 +375,24 @@ zh-CN:
         commodity:
           name: "商品管理"
           link: "/commodities"
+    stocks:
+      name: "库存管理"
+      submenu:
+        stock:
+          name: "库存管理"
+          link: "/stocks"
+        stock_log:
+          name: "库存操作查询"
+          link: "/stock_logs"
+    logs:
+      name: "日志查询"
+      submenu:
+        user_log:
+          name: "日志查询"
+          link: "/user_logs"
+        stock_log:
+          name: "库存操作查询"
+          link: "/stock_logs"
     filetemp:
       name: "模板管理"
       needrole: 
