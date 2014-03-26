@@ -4,12 +4,13 @@ class Ability
   def initialize(user)
     if user.superadmin?
         can :manage, :all
-        cannot [:create, :destroy, :role], User, role: 'superadmin'
+        cannot [:create, :destroy, :update], User, role: 'superadmin'
         #can :manage, User
-    elsif user.admin?
+    elsif user.unitadmin?
         can :manage, :all
-        cannot [:create, :destroy, :role], User, role: ['admin', 'superadmin']
+        cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
     else
+        can :update, User, id: user.id
         can :read, :all
     end
 

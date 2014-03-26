@@ -13,6 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20140321082109) do
 
+
   create_table "events", force: true do |t|
     t.string   "name"
     t.text     "description"
