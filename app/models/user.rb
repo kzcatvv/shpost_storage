@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   belongs_to :unit
   has_many :user_logs
   has_many :roles
-  #has_many :storages, through: :roles
+  has_many :storages, through: :roles, uniq: true
 
   devise :database_authenticatable, #:registerable,
          :recoverable, :rememberable, :trackable, :validatable
@@ -34,4 +34,5 @@ class User < ActiveRecord::Base
   def password_required?
     encrypted_password.blank? ? true : false
   end
+
 end
