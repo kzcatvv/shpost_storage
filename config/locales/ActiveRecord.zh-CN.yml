@@ -260,6 +260,13 @@ zh-CN:
       purchase:
         one: 采购单管理
         other: 采购单管理
+<<<<<<< HEAD
+      purchasedetail:
+        one: 采购单明细管理
+        other: 采购单明细管理
+
+=======
+>>>>>>> d52d1cd3bac7f67bdb469ab402db42576d114096
       area:
         one: 区域管理
         other: 区域管理
@@ -348,6 +355,24 @@ zh-CN:
         sum: "合计金额"
         desc: "备注"
         status: "状态"
+
+
+      purchasedetail:
+        name: "编号"
+        purchase_id: "所属机构"
+        supplier_id: "所属商户"
+        spec_id: "规格号"
+        qg_period: "保质期"
+        batch_no: "批次号"
+        amount: "数量"
+        sum: "单价金额"
+        desc: "备注"
+        status: "状态"
+
+
+
+
+
       area:
         current_storage: "当前仓库"
         area_code: "区域编号"
