@@ -1,10 +1,12 @@
 class UnitsController < ApplicationController
-  before_action :set_unit, only: [:show, :edit, :update, :destroy]
+  load_and_authorize_resource :unit
+  skip_load_resource  :only => :create
 
   # GET /units
   # GET /units.json
   def index
-    @units = Unit.all
+    #@unit = Unit.all
+    @units_grid = initialize_grid(@units)
   end
 
   # GET /units/1
@@ -14,7 +16,7 @@ class UnitsController < ApplicationController
 
   # GET /units/new
   def new
-    @unit = Unit.new
+    #@unit = Unit.new
   end
 
   # GET /units/1/edit
@@ -63,9 +65,9 @@ class UnitsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_unit
-      @unit = Unit.find(params[:id])
-    end
+    #def set_unit
+      #@unit = Unit.find(params[:id])
+    #end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def unit_params

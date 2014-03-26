@@ -1,7 +1,7 @@
 class UnitUsersController < ApplicationController
   # before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
   load_and_authorize_resource :unit
-  load_and_authorize_resource :user, through: :unit, :shallow => true
+  load_and_authorize_resource :user, through: :unit
   skip_load_resource :user, :only => :create
 
   # GET /users
@@ -9,7 +9,7 @@ class UnitUsersController < ApplicationController
   def index
     #@users = User.all
     
-    #@users_grid = initialize_grid(@users)
+    @users_grid = initialize_grid(User, :conditions => ['unit_id = ?', @unit.id])
   end
 
   # GET /users/1

@@ -8,6 +8,7 @@ class StoragesController < ApplicationController
   # GET /storages.json
   def index
     #@storages = Storage.all
+    @storages_grid = initialize_grid(@storages)
   end
 
   # GET /storages/1
