@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 20140331030833) do
+ActiveRecord::Schema.define(version: 20140331030834) do
 
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false
@@ -25,9 +24,6 @@ ActiveRecord::Schema.define(version: 20140331030833) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-=======
-ActiveRecord::Schema.define(version: 20140328071000) do
->>>>>>> e8985c6f80b4d0e211260628e6002cbeccf850ef
 
   create_table "commodities", force: true do |t|
     t.string   "cno"
@@ -36,6 +32,14 @@ ActiveRecord::Schema.define(version: 20140328071000) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "goodstypes", force: true do |t|
@@ -75,6 +79,19 @@ ActiveRecord::Schema.define(version: 20140328071000) do
     t.string   "object_symbol"
     t.integer  "amount",             default: 0,  null: false
     t.datetime "checked_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "stocks", force: true do |t|
+    t.integer  "shelf_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.string   "batch_no"
+    t.integer  "specification_id",             null: false
+    t.integer  "actual_amount",    default: 0, null: false
+    t.integer  "virtual_amount",   default: 0, null: false
+    t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
