@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
-  load_and_authorize_resource :unit
-  load_and_authorize_resource :user, through: :unit, :shallow => true
+  load_and_authorize_resource :user
   skip_load_resource :user, :only => :create
 
   # GET /users

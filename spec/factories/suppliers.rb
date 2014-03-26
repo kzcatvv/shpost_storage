@@ -2,5 +2,10 @@
 
 FactoryGirl.define do
   factory :supplier do
+  	association :unit
+  	sno "test"
+  	name "test"
+  	address "test"
+  	phone "test"
   end
 end

@@ -1,40 +1,37 @@
 <%- model_class = Unit -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Unit %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_unit_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
 </div>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th><%= model_class.human_attribute_name(:name) %></th>
-      <th><%= model_class.human_attribute_name(:desc) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @units.each do |unit| %>
-      <tr>
-        <td><%= unit.name %></td>
-        <td><%= unit.desc %></td>
-        <td><%=l unit.created_at %></td>
-        <td>
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_unit_path(unit), :class => 'btn btn-default btn-xs' %>
-          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+
+<%= grid(@units_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column do |unit|
+      ((can? :update, unit) ?
+        (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_unit_path(unit), :class => 'btn btn-mini') : '') <<
+      ((can? :destroy, unit) ?
+        (link_to t('.destroy', :default => t("helpers.links.destroy")),
                       unit_path(unit),
                       :method => :delete,
-                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
-          <%= link_to t('.storages', :default => t("helpers.links.storages")),
-                      unit_storages_path(unit), :class => 'btn btn-default btn-xs' %>
-          <%= link_to t('.users', :default => t("helpers.links.users")),
-                      unit_users_path(unit), :class => 'btn btn-default btn-xs' %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<%= link_to t('.new', :default => t("helpers.links.new")),
-            new_unit_path,
-            :class => 'btn btn-primary' %>
+                      :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-mini btn-danger') : '')<<
+      ((can? :storage, unit) ?
+        (link_to t('.storages', :default => t("helpers.links.storages")),
+                    unit_storages_path(unit), :class => 'btn btn-mini') : '') <<
+      ((can? :user, unit) ?
+        (link_to t('.users', :default => t("helpers.links.users")),
+                    unit_users_path(unit), :class => 'btn btn-mini') : '') 
+    end
+  end 
+%>
