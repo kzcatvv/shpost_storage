@@ -1,16 +1,10 @@
 ShpostStorage::Application.routes.draw do
 
-<<<<<<< HEAD
   resources :stocks
-=======
 
   resources :purchases
 
-
-
   resources :areas
-
->>>>>>> 1b82867e9f224755e8f9f27243963057a99254c8
 
   resources :businesses
 

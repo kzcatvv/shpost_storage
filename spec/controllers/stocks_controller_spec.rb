@@ -102,6 +102,7 @@ describe StocksController do
           expect(assigns(:stock_log).operation).to eq "create_stock"
           expect(assigns(:stock_log).operation_type).to eq "in"
           expect(assigns(:stock_log).status).to eq "checked"
+          expect(assigns(:stock_log).desc).not_to be_blank
         end
 
 
@@ -142,6 +143,20 @@ describe StocksController do
           patch :update, id: @stock, stock: FactoryGirl.attributes_for(:update_stock)
           expect(response).to redirect_to @stock
         end
+
+        it "assigns a newly created stock_log as @stock with updating stock " do
+          expect { patch :update, id: @stock, stock: FactoryGirl.attributes_for(:update_stock)  }.to change(StockLog, :count).by(1)
+
+          expect(assigns(:stock_log)).to be_a(StockLog)
+          expect(assigns(:stock_log)).to be_persisted
+          expect(assigns(:stock_log).user).to eq @superadmin
+          expect(assigns(:stock_log).stock).to eq assigns(:stock)
+          expect(assigns(:stock_log).amount).to eq assigns(:stock).actual_amount
+          expect(assigns(:stock_log).operation).to eq "update_stock"
+          expect(assigns(:stock_log).operation_type).to eq "reset"
+          expect(assigns(:stock_log).status).to eq "checked"
+          expect(assigns(:stock_log).desc).not_to be_blank
+        end
       end
 
       context "with invalid params" do
@@ -181,6 +196,7 @@ describe StocksController do
           expect(assigns(:stock_log).operation).to eq "destroy_stock"
           expect(assigns(:stock_log).operation_type).to eq "out"
           expect(assigns(:stock_log).status).to eq "checked"
+          expect(assigns(:stock_log).desc).not_to be_blank
         end
 
     end

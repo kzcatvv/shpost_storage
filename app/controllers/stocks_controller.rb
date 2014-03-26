@@ -25,7 +25,7 @@ class StocksController < ApplicationController
   def create
     respond_to do |format|
       if @stock.save
-        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'create_stock', status: 'checked', operation_type: 'in', amount: @stock.actual_amount, checked_at: Time.now, desc: "新增库存#{@stock.specification.try(:commodity).try :name}-#{@stock.specification.try :desc}共计#{@stock.actual_amount}，批次：#{@stock.batch_no}，商户：#{@stock.business.try :name}，供应商：#{@stock.supplier.try :name}，货架：@stock.shelf.try :no")
+        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'create_stock', status: 'checked', operation_type: 'in', amount: @stock.actual_amount, checked_at: Time.now)
         format.html { redirect_to @stock, notice: 'Stock was successfully created.' }
         format.json { render action: 'show', status: :created, location: @stock }
       else
@@ -39,7 +39,17 @@ class StocksController < ApplicationController
   # PATCH/PUT /stocks/1.json
   def update
     respond_to do |format|
+      # before_amount = @stock.actual_amount
       if @stock.update(stock_params)
+        # if before_amount <= @stock.actual_amount
+        #   operation_type = 'in'
+        #   amount = @stock.actual_amount - before_amount
+        # else
+        #   operation_type = 'out'
+        #   amount = before_amount - @stock.actual_amount
+        # end
+        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'update_stock', status: 'checked', operation_type: 'reset', amount: @stock.actual_amount, checked_at: Time.now)
+
         format.html { redirect_to @stock, notice: 'Stock was successfully updated.' }
         format.json { head :no_content }
       else
@@ -53,7 +63,7 @@ class StocksController < ApplicationController
   # DELETE /stocks/1.json
   def destroy
     @stock.destroy
-    @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'destroy_stock', status: 'checked', operation_type: 'out', amount: @stock.actual_amount, checked_at: Time.now, desc: "新增库存#{@stock.specification.try(:commodity).try :name}-#{@stock.specification.try :desc}共计#{@stock.actual_amount}，批次：#{@stock.batch_no}，商户：#{@stock.business.try :name}，供应商：#{@stock.supplier.try :name}，货架：@stock.shelf.try :no")
+    @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'destroy_stock', status: 'checked', operation_type: 'out', amount: @stock.actual_amount, checked_at: Time.now)
     respond_to do |format|
       format.html { redirect_to stocks_url }
       format.json { head :no_content }

@@ -11,13 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 20140331030837) do
-=======
-
 ActiveRecord::Schema.define(version: 20140331082426) do
-
-#ActiveRecord::Schema.define(version: 20140331060106) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -26,8 +20,6 @@ ActiveRecord::Schema.define(version: 20140331082426) do
     t.datetime "updated_at"
     t.string   "area_code",  default: "", null: false
   end
-
->>>>>>> 1b82867e9f224755e8f9f27243963057a99254c8
 
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false

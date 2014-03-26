@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   load_and_authorize_resource :user
 
-  save_user_logs_filter only: [:create, :destroy], symbol: :username#, object: :user, operation: '新增用户'
+  user_logs_filter only: [:create, :destroy], symbol: :username#, object: :user, operation: '新增用户'
 
   # GET /users
   # GET /users.json
