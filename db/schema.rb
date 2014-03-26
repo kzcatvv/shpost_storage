@@ -11,7 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20140331030837) do
+=======
+
+ActiveRecord::Schema.define(version: 20140331082426) do
+
+#ActiveRecord::Schema.define(version: 20140331060106) do
+
+  create_table "areas", force: true do |t|
+    t.integer  "storage_id"
+    t.string   "desc",       default: "", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "area_code",  default: "", null: false
+  end
+
+>>>>>>> 1b82867e9f224755e8f9f27243963057a99254c8
 
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false
@@ -48,6 +64,18 @@ ActiveRecord::Schema.define(version: 20140331030837) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "purchases", force: true do |t|
+    t.string   "no",          default: "", null: false
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.integer  "amount"
+    t.float    "sum"
+    t.string   "desc"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "roles", force: true do |t|

@@ -31,3 +31,7 @@ role_u11_s11_2 = Role.create(user: user11, storage: storage11, role: 'purchase')
 role_u11_s12_1 = Role.create(user: user11, storage: storage12, role: 'purchase')
 role_u11_s12_2 = Role.create(user: user11, storage: storage12, role: 'sorter')
 role_u22_s21_1 = Role.create(user: user22, storage: storage21, role: 'admin')
+
+area111 = Area.create(storage: storage11, desc: '退货区', area_code: 'A1')
+area112 = Area.create(storage: storage11, desc: '发货区', area_code: 'A2')
+area121 = Area.create(storage: storage12, desc: '退货区', area_code: 'B1')
