@@ -5,10 +5,12 @@ class Ability
     if user.superadmin?
         can :manage, :all
         cannot [:create, :destroy, :update], User, role: 'superadmin'
+        can :update, User, id: user.id
         #can :manage, User
     elsif user.unitadmin?
         can :manage, :all
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
+        can :update, User, id: user.id
     else
         can :update, User, id: user.id
         can :read, :all

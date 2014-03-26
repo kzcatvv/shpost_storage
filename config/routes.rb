@@ -1,4 +1,6 @@
 ShpostStorage::Application.routes.draw do
+  resources :user_logs, only: [:index, :show]
+
   root 'welcome#index'
 
   devise_for :users

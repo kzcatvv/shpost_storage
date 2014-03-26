@@ -11,15 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140321082109) do
 
-  create_table "events", force: true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.boolean  "is_public"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+ActiveRecord::Schema.define(version: 20140324123155) do
 
   create_table "storages", force: true do |t|
     t.string   "name"
@@ -37,6 +30,15 @@ ActiveRecord::Schema.define(version: 20140321082109) do
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true
+
+  create_table "user_logs", force: true do |t|
+    t.integer  "user_id",      default: 0,  null: false
+    t.string   "operation",    default: "", null: false
+    t.string   "object_class"
+    t.integer  "object_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "email"

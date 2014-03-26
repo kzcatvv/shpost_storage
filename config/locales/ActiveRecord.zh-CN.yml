@@ -234,6 +234,9 @@ zh-CN:
       storage:
         one: 仓库管理
         other: 仓库管理
+      user_log:
+        one: 用户日志查询
+        other: 用户日志查询
     attributes:
       user:
         email: "电子邮件"
@@ -253,6 +256,14 @@ zh-CN:
         name: "仓库名"
         desc: "仓库描述"
         unit_id: "所属单位"
+      user_log:
+        user_id: "用户编号"
+        username: "用户名"
+        operation: "操作"
+        object_class: "对象名称"
+        object_id: "对象主键"
+        object_no: "对象编号"
+        created_at: "创建时间"
       filetemp:
         filename: "文档"
         rename: "文件名"
