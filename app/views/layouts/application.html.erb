@@ -61,13 +61,9 @@
                       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                       <% sm.keys.each do |sk| %>
                         <% if sm[sk][:needrole].blank? || can?(sm[sk][:needrole][:can], sm[sk][:needrole][:role].is_a?(Symbol) ? Module.const_get(sm[sk][:needrole][:role]) : sm[sk][:needrole][:role]) %>
-                          <% if(sm[sk][:link]=="unit/suppliers") %>
-                          <li><%= link_to sm[sk][:name], unit_suppliers_path(Unit.find(current_user.unit)) %></li>
-                          <% elsif(sm[sk][:link]=="unit/goodstypes") %>
-                          <li><%= link_to sm[sk][:name], unit_goodstypes_path(Unit.find(current_user.unit)) %></li>
-                          <% else %>
+                          
                           <li><%= link_to sm[sk][:name], sm[sk][:link] %></li>
-                          <% end %>
+                          
                         <% end %>
                       <% end %>
                       </ul>

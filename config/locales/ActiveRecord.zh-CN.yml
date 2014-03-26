@@ -292,13 +292,13 @@ zh-CN:
       submenu:
         supplier:
           name: "供应商管理"
-          link: "unit/suppliers"
+          link: "/suppliers"
     goodstypes:
       name: "商品与规格管理"
       submenu:
         goodstype:
           name: "商品类型管理"
-          link: "unit/goodstypes"
+          link: "/goodstypes"
     filetemp:
       name: "模板管理"
       needrole: 

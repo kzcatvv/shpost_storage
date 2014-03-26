@@ -8,7 +8,9 @@ class Ability
         can :update, User, id: user.id
         #can :manage, User
     elsif user.unitadmin?
-        can :manage, :all
+        #can :manage, :all
+        can :manage, Supplier, unit_id: user.unit_id
+        can :manage, Goodstype, unit_id: user.unit_id
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
     else

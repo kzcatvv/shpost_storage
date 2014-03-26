@@ -1,10 +1,11 @@
 class SuppliersController < ApplicationController
-  before_action :set_supplier, only: [:show, :edit, :update, :destroy]
+  load_and_authorize_resource
 
   # GET /suppliers
   # GET /suppliers.json
   def index
-    @suppliers = Supplier.all
+    #@suppliers = Supplier.all
+    @suppliers = initialize_grid(@suppliers)
   end
 
   # GET /suppliers/1
@@ -14,7 +15,9 @@ class SuppliersController < ApplicationController
 
   # GET /suppliers/new
   def new
-    @supplier = Supplier.new
+    #@supplier = Supplier.new
+    #@supplier.unit_id=2
+    #@supplier.build(unit_id: current_user.unit)
   end
 
   # GET /suppliers/1/edit
@@ -24,7 +27,7 @@ class SuppliersController < ApplicationController
   # POST /suppliers
   # POST /suppliers.json
   def create
-    @supplier = Supplier.new(supplier_params)
+    
 
     respond_to do |format|
       if @supplier.save
@@ -69,6 +72,6 @@ class SuppliersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def supplier_params
-      params[:supplier]
+      params[:supplier].permit!
     end
 end

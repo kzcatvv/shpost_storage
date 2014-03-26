@@ -1,10 +1,10 @@
 class GoodstypesController < ApplicationController
-  before_action :set_goodstype, only: [:show, :edit, :update, :destroy]
+  load_and_authorize_resource
 
   # GET /goodstypes
   # GET /goodstypes.json
   def index
-    @goodstypes = Goodstype.all
+    @goodstypes = initialize_grid(@goodstypes)
   end
 
   # GET /goodstypes/1
@@ -14,7 +14,7 @@ class GoodstypesController < ApplicationController
 
   # GET /goodstypes/new
   def new
-    @goodstype = Goodstype.new
+    #@goodstype = Goodstype.new
   end
 
   # GET /goodstypes/1/edit
@@ -24,7 +24,7 @@ class GoodstypesController < ApplicationController
   # POST /goodstypes
   # POST /goodstypes.json
   def create
-    @goodstype = Goodstype.new(goodstype_params)
+    #@goodstype = Goodstype.new(goodstype_params)
 
     respond_to do |format|
       if @goodstype.save
@@ -69,6 +69,6 @@ class GoodstypesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def goodstype_params
-      params.require(:goodstype).permit(:gtno, :name)
+      params[:goodstype].permit!
     end
 end

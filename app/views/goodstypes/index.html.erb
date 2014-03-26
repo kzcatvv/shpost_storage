@@ -2,38 +2,29 @@
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 </div>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
-      <th><%= model_class.human_attribute_name(:gtno) %></th>
-      <th><%= model_class.human_attribute_name(:name) %></th>
-      <th><%= model_class.human_attribute_name(:unit_id) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @goodstypes.each do |goodstype| %>
-      <tr>
-        <td><%= link_to goodstype.id, goodstype_path(goodstype) %></td>
-        <td><%= goodstype.gtno %></td>
-        <td><%= goodstype.name %></td>
-        <td><%= supplier.unit_id %></td>
-        <td><%=l goodstype.created_at %></td>
-        <td>
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_goodstype_path(goodstype), :class => 'btn btn-default btn-xs' %>
-          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+<%= grid(@goodstypes, :show_filters => :always) do |g|
+
+    g.column name: model_class.human_attribute_name(:id), attribute: 'id', filter_type: :range
+
+    g.column name: model_class.human_attribute_name(:gtno), attribute: 'gtno'
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id', filter_type: :range
+
+    g.column do |goodstype|
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_goodstype_path(goodstype), :class => 'btn btn-default btn-xs')+
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
                       goodstype_path(goodstype),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+                      :class => 'btn btn-xs btn-danger')
+      end
+  end 
+%>
+
+        
 
 <%= link_to t('.new', :default => t("helpers.links.new")),
             new_goodstype_path,

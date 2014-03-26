@@ -21,8 +21,6 @@ ShpostStorage::Application.routes.draw do
 
   resources :units do
      resources :users, :controller => 'unit_users'
-     resources :suppliers, :controller => 'unit_suppliers'
-     resources :goodstypes, :controller => 'unit_goodstypes'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.
