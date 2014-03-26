@@ -12,22 +12,22 @@
 
 <%= grid(@stocks_grid) do |g|
 
-    g.column name: model_class.human_attribute_name(:shelf_id), attribute: 'shelf_id', model: 'Shelf' do |stock|
-        stock.shelf.try :no
-      end
+    # g.column name: model_class.human_attribute_name(:shelf_id), attribute: 'shelf_id', model: 'Shelf' do |stock|
+    #     stock.shelf.try :no
+    #   end
 
-    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'specification_id', model: 'Specification' do |stock|
-      stock.specification.try :desc
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'model', model: 'Specification' do |stock|
+      stock.specification.try :model
     end
 
     g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
 
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id', model: 'Business' do |stock|
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |stock|
       stock.business.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:suplier_id), attribute: 'suplier_id', model: 'Suplier' do |stock|
-      stock.suplier.try :name
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |stock|
+      stock.supplier.try :name
     end
 
     g.column name: model_class.human_attribute_name(:actual_amount), attribute: 'actual_amount'
