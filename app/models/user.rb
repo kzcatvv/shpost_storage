@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, #:registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  validates_presence_of :username, :name, :unit_id, :message => '不能为空字符'#,
+  validates_presence_of :username, :name, :unit_id, :role, :message => '不能为空字符'#,
 
   validates_uniqueness_of :username, :message => '该用户已存在'
 

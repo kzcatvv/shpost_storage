@@ -30,14 +30,7 @@ describe UsersController do
   # UsersController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
-  describe "admin access" do
-    before :each do 
-      @user = FactoryGirl.create(:user)
-      @superadmin = FactoryGirl.create(:superadmin)
-      @unitadmin = FactoryGirl.create(:unitadmin)
-      sign_in @superadmin
-    end
-
+  shared_examples("user/admin access to users") do
     describe "GET index" do
       it "assigns all users as @users" do
         get :index
@@ -126,7 +119,7 @@ describe UsersController do
         it "changes @user's attributes" do
           patch :update, id: @user, user: FactoryGirl.attributes_for(:update_user)
           @user.reload
-          expect(@user.username).to eq("update_username")
+          expect(@user.username).to eq("update_username_test")
           expect(@user.name).to eq("update_name")
           expect(@user.email).to eq("update_user@example.com")
         end
@@ -165,5 +158,80 @@ describe UsersController do
         expect(response).to redirect_to(users_url)
       end
     end
+  end
+
+  shared_examples("guest access to users") do
+    describe "GET index" do
+      it "should login" do
+        get :index
+        expect(response).to redirect_to "/users/sign_in"
+      end
+    end
+
+    describe "GET show" do
+      it "should login" do
+        get :show, id: @user
+        expect(response).to redirect_to "/users/sign_in"
+      end
+    end
+
+    describe "GET new" do
+      it "should login" do
+        get :new
+        expect(response).to redirect_to "/users/sign_in"
+      end
+    end
+
+    describe "GET edit" do
+      it "should login" do
+        get :edit, id: @user
+        expect(response).to redirect_to "/users/sign_in"
+      end
+    end
+
+    describe "POST create" do
+        it "should login" do
+          post :create, user: FactoryGirl.attributes_for(:new_user)
+          expect(response).to redirect_to "/users/sign_in"
+        end
+    end
+
+    describe "PATCH update" do
+        it "should login" do
+          patch :update, id: @user, user: FactoryGirl.attributes_for(:user)
+          expect(response).to redirect_to "/users/sign_in"
+        end
+    end
+
+    describe "DELETE destroy" do
+      it "should login" do
+        delete :destroy, id: @user
+        expect(response).to redirect_to "/users/sign_in"
+      end
+    end
+  end
+
+  describe "admin access" do
+    before :each do 
+      FactoryGirl.create(:unit)
+      @user = FactoryGirl.create(:user)
+      @superadmin = FactoryGirl.create(:superadmin)
+      @unitadmin = FactoryGirl.create(:unitadmin)
+      sign_in @superadmin
+    end
+
+    it_behaves_like "user/admin access to users"
+    
+  end
+
+  describe "guess access" do
+    before :each do 
+      FactoryGirl.create(:unit)
+      @user = FactoryGirl.create(:user)
+      @superadmin = FactoryGirl.create(:superadmin)
+      @unitadmin = FactoryGirl.create(:unitadmin)
+    end
+
+    it_behaves_like "guest access to users"
   end
 end
