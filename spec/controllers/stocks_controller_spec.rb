@@ -23,7 +23,7 @@ describe StocksController do
   # This should return the minimal set of attributes required to create a valid
   # Stock. As you add validations to Stock, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { {  } }
+  let(:valid_attributes) { {} }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
@@ -91,6 +91,21 @@ describe StocksController do
           expect(assigns(:stock)).to be_persisted
         end
 
+        it "assigns a newly created stock_log as @stock with creating stock " do
+          expect { post :create, stock: FactoryGirl.attributes_for(:stock)}.to change(StockLog, :count).by(1)
+
+          expect(assigns(:stock_log)).to be_a(StockLog)
+          expect(assigns(:stock_log)).to be_persisted
+          expect(assigns(:stock_log).user).to eq @superadmin
+          expect(assigns(:stock_log).stock).to eq assigns(:stock)
+          expect(assigns(:stock_log).amount).to eq assigns(:stock).actual_amount
+          expect(assigns(:stock_log).operation).to eq "create_stock"
+          expect(assigns(:stock_log).operation_type).to eq "in"
+          expect(assigns(:stock_log).status).to eq "checked"
+        end
+
+
+
         it "redirects to the created stock" do
           post :create, stock: FactoryGirl.attributes_for(:stock)
           expect(response).to redirect_to(Stock.last)
@@ -147,15 +162,26 @@ describe StocksController do
     describe "DELETE destroy" do
 
       it "destroys the requested stock" do
-        expect {
-          delete :destroy, id: @stock
-        }.to change(Stock, :count).by(-1)
+        expect {delete :destroy, id: @stock}.to change(Stock, :count).by(-1)
       end
 
       it "redirects to the stocks list" do
         delete :destroy, id: @stock
         expect(response).to redirect_to(stocks_url)
       end
+
+      it "assigns a newly created stock_log as @stock with destroying stock " do
+          expect { delete :destroy, id: @stock}.to change(StockLog, :count).by(1)
+
+          expect(assigns(:stock_log)).to be_a(StockLog)
+          expect(assigns(:stock_log)).to be_persisted
+          expect(assigns(:stock_log).user).to eq @superadmin
+          expect(assigns(:stock_log).stock).to eq @stock
+          expect(assigns(:stock_log).amount).to eq @stock.actual_amount
+          expect(assigns(:stock_log).operation).to eq "destroy_stock"
+          expect(assigns(:stock_log).operation_type).to eq "out"
+          expect(assigns(:stock_log).status).to eq "checked"
+        end
 
     end
   end

@@ -14,7 +14,6 @@ class StocksController < ApplicationController
 
   # GET /stocks/new
   def new
-    @stock = Stock.new
   end
 
   # GET /stocks/1/edit
@@ -24,10 +23,9 @@ class StocksController < ApplicationController
   # POST /stocks
   # POST /stocks.json
   def create
-    @stock = Stock.new(stock_params)
-
     respond_to do |format|
       if @stock.save
+        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'create_stock', status: 'checked', operation_type: 'in', amount: @stock.actual_amount, checked_at: Time.now, desc: "新增库存#{@stock.specification.try(:commodity).try :name}-#{@stock.specification.try :desc}共计#{@stock.actual_amount}，批次：#{@stock.batch_no}，商户：#{@stock.business.try :name}，供应商：#{@stock.supplier.try :name}，货架：@stock.shelf.try :no")
         format.html { redirect_to @stock, notice: 'Stock was successfully created.' }
         format.json { render action: 'show', status: :created, location: @stock }
       else
@@ -55,6 +53,7 @@ class StocksController < ApplicationController
   # DELETE /stocks/1.json
   def destroy
     @stock.destroy
+    @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'destroy_stock', status: 'checked', operation_type: 'out', amount: @stock.actual_amount, checked_at: Time.now, desc: "新增库存#{@stock.specification.try(:commodity).try :name}-#{@stock.specification.try :desc}共计#{@stock.actual_amount}，批次：#{@stock.batch_no}，商户：#{@stock.business.try :name}，供应商：#{@stock.supplier.try :name}，货架：@stock.shelf.try :no")
     respond_to do |format|
       format.html { redirect_to stocks_url }
       format.json { head :no_content }
@@ -63,9 +62,9 @@ class StocksController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_stock
-      @stock = Stock.find(params[:id])
-    end
+    # def set_stock
+    #   @stock = Stock.find(params[:id])
+    # end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def stock_params
