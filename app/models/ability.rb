@@ -1,7 +1,7 @@
 class Ability
   include CanCan::Ability
 
-  def initialize(user)
+  def initialize(user,storage)
     if user.superadmin?
         can :manage, :all
         # can :role, :unitadmin
@@ -26,10 +26,11 @@ class Ability
     else
         can :update, User, id: user.id
         can :manage, Area
+        can :manage, Shelf
         
         can :read, :all
-        can :change, Storage do |storage|
-            user.storages.include? storage
+        can :change, Storage do |s|
+            user.storages.include? s
         end
     end
 

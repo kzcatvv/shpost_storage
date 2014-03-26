@@ -263,6 +263,9 @@ zh-CN:
       area:
         one: 区域管理
         other: 区域管理
+      shelf:
+        one: 货架管理
+        other: 货架管理
     attributes:
       user:
         email: "电子邮件"
@@ -347,8 +350,14 @@ zh-CN:
         status: "状态"
       area:
         current_storage: "当前仓库"
-        area_code: "区域码"
+        area_code: "区域编号"
         desc: "区域描述"
+      shelf:
+        current_storage: "当前仓库"
+        area_code: "区域编号"
+        area: "区域"
+        shelf_code: "货架编号"
+        desc: "货架描述"
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -381,6 +390,12 @@ zh-CN:
           needrole:
             can: :read
             role: "area"
+        shelf:
+          name: "货架管理"
+          link: "/shelves/"
+          needrole:
+            can: :read
+            role: "shelf"
     suppliers:
       name: "采购与供应商管理"
       submenu:

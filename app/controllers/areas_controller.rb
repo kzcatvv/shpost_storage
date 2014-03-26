@@ -1,12 +1,14 @@
 class AreasController < ApplicationController
+  before_filter :find_current_storage
   load_and_authorize_resource :area
+
+  def find_current_storage
+    @areas = Area.where("storage_id = ?", session[:current_storage].id)
+  end
 
   # GET /areas
   # GET /areas.json
   def index
-    if !session[:current_storage].nil?
-      @areas = Area.where("storage_id = ?", session[:current_storage].id)
-    end
     @areas_grid = initialize_grid(@areas)
   end
 
