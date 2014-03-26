@@ -253,6 +253,9 @@ zh-CN:
       business:
         one: 商户管理
         other: 商户管理
+      stock:
+        one: 库存管理
+        other: 库存管理
     attributes:
       user:
         email: "电子邮件"
@@ -284,6 +287,15 @@ zh-CN:
         object_id: "对象主键"
         object_symbol: "对象标识"
         created_at: "创建时间"
+      stock:
+        shelf_id: 所属货架
+        business_id: 所属商户
+        supplier_id: 供应商
+        batch_no: 批次
+        specification_id: 商品规格
+        actual_amount: 实际库存
+        virtual_amount: 预计库存
+        desc: 备注
       stock_log:
         user_id: "用户"
         username: "操作用户"
