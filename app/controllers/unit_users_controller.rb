@@ -1,4 +1,5 @@
-class UsersController < ApplicationController
+class UnitUsersController < ApplicationController
+  # before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
   load_and_authorize_resource :unit
   load_and_authorize_resource :user, through: :unit, :shallow => true
   skip_load_resource :user, :only => :create
@@ -7,32 +8,38 @@ class UsersController < ApplicationController
   # GET /users.json
   def index
     #@users = User.all
-
-    @users_grid = initialize_grid(@users)
+    
+    #@users_grid = initialize_grid(@users)
   end
 
   # GET /users/1
   # GET /users/1.json
   def show
+    #binding.pry
+    @unit = Unit.find(params[:unit_id])
+    @user = @unit.users.find(params[:id]) 
   end
 
   # GET /users/new
   def new
-    #@user = User.new
+   #@user = User.new 
+   @user = @unit.users.build 
   end
 
   # GET /users/1/edit
   def edit
+    @unit = Unit.find(params[:unit_id])
+    @user = @unit.users.find(params[:id]) 
   end
 
   # POST /users
   # POST /users.json
   def create
-    @user = User.new(user_params)
+    @user = @unit.users.build(unituser_params) 
 
     respond_to do |format|
       if @user.save
-        format.html { redirect_to @user, notice: I18n.t('controller.create_success_notice', model: '用户') }
+        format.html { redirect_to unit_user_path(@unit,@user), notice: I18n.t('controller.create_success_notice', model: '用户') }
         format.json { render action: 'show', status: :created, location: @user }
       else
         format.html { render action: 'new' }
@@ -44,9 +51,11 @@ class UsersController < ApplicationController
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
+    @unit = Unit.find(params[:unit_id])
+    @user = @unit.users.find(params[:id])
     respond_to do |format|
-      if @user.update(user_params)
-        format.html { redirect_to @user, notice: I18n.t('controller.update_success_notice', model: '用户') }
+      if @user.update(unituser_params)
+        format.html { redirect_to unit_user_path(@unit,@user), notice: I18n.t('controller.update_success_notice', model: '用户') }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -58,9 +67,11 @@ class UsersController < ApplicationController
   # DELETE /users/1
   # DELETE /users/1.json
   def destroy
+    @unit = Unit.find(params[:unit_id])
+    @user = User.find(params[:id])
     @user.destroy
     respond_to do |format|
-      format.html { redirect_to users_url }
+      format.html { redirect_to unit_users_path(@unit) }
       format.json { head :no_content }
     end
   end
@@ -72,7 +83,11 @@ class UsersController < ApplicationController
     # end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def user_params
-      params[:user].permit(:username, :name, :password, :unit_id, :email)
-    end
+    # def find_unit
+    #   @unit = Unit.find(params[:unit_id])
+    # end 
+    
+    def unituser_params
+      params[:user].permit(:username, :name, :password, :email)
+    end 
 end

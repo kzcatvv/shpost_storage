@@ -27,6 +27,8 @@
                       :class => 'btn btn-xs btn-danger' %>
           <%= link_to t('.storages', :default => t("helpers.links.storages")),
                       unit_storages_path(unit), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.users', :default => t("helpers.links.users")),
+                      unit_users_path(unit), :class => 'btn btn-default btn-xs' %>
         </td>
       </tr>
     <% end %>

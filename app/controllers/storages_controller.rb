@@ -1,7 +1,9 @@
 class StoragesController < ApplicationController
-  before_action :set_storage, only: [:show, :edit, :update, :destroy]
-  before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
-
+  #before_action :set_storage, only: [:show, :edit, :update, :destroy]
+  #before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
+  load_and_authorize_resource :unit
+  load_and_authorize_resource :storage, through: :unit
+  skip_load_resource :storage, :only => :create
   # GET /storages
   # GET /storages.json
   def index
@@ -11,22 +13,25 @@ class StoragesController < ApplicationController
   # GET /storages/1
   # GET /storages/1.json
   def show
-    @storage = @unit.storages.find(params[:id])
+    #@storage = @unit.storages.find(params[:id])
   end
 
   # GET /storages/new
   def new
-    @storage = @unit.storages.build
+    #@unit = Unit.find(params[:unit_id])
+    #@storage = @unit.storages.build
   end
 
   # GET /storages/1/edit
   def edit
-    @storage = @unit.storages.find(params[:id])
+    #@storage = @unit.storages.find(params[:id])
   end
 
   # POST /storages
   # POST /storages.json
   def create
+
+    #@unit = Unit.find(params[:unit_id])
     @storage = @unit.storages.build(storage_params)
 
     respond_to do |format|
@@ -70,9 +75,9 @@ class StoragesController < ApplicationController
       @storage = Storage.find(params[:id])
     end
 
-    def find_unit
-      @unit = Unit.find(params[:unit_id])
-    end
+    #def find_unit
+      #@unit = Unit.find(params[:unit_id])
+    #end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def storage_params
