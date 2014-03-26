@@ -49,7 +49,7 @@
   <div class="control-group">
     <%= f.label :role, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:role, User::ROLE.invert.select{|k, v| v.to_s.size() <= 9}) %>
+      <%= f.select(:role, User::ROLE.invert.select{|k, v| v.to_s.size() <= current_user.role.size()}) %>
     </div>
   </div>
   <% else %>
