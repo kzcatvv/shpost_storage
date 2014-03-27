@@ -19,18 +19,10 @@
     g.column name: model_class.human_attribute_name(:email), attribute: 'email'
 
     g.column do |user|
-      ((can? :update, user) ?
-        (link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_unit_user_path(@unit,user), :class => 'btn btn-mini') : '') <<
-      ((can? :destroy, user) ?
-        (link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      unit_user_path(@unit,user),
-                      :method => :delete,
-                      :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-mini btn-danger') : '') <<
-      ((can? :roles, user) ?
-        (link_to t('.roles', :default => t("helpers.links.roles")),
-                    user_roles_path(user), :class => 'btn btn-mini') : '')
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")), edit_unit_user_path(@unit,user), :class => 'btn btn-xs btn-primary' if can? :update, user) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), unit_user_path(@unit,user), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, user)<< ' ' <<
+        (link_to t('.roles', :default => t("helpers.links.roles")), user_roles_path(user), :class => 'btn btn-xs btn-primary' if can? :roles, user)
     end
   end 
 %>
