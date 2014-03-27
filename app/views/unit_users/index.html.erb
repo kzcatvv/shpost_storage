@@ -27,7 +27,10 @@
                       unit_user_path(@unit,user),
                       :method => :delete,
                       :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-mini btn-danger') : '')
+                      :class => 'btn btn-mini btn-danger') : '') <<
+      ((can? :roles, user) ?
+        (link_to t('.roles', :default => t("helpers.links.roles")),
+                    user_roles_path(user), :class => 'btn btn-mini') : '')
     end
   end 
 %>
