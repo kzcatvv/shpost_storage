@@ -3,11 +3,11 @@ require 'spec_helper'
 describe UnitUsersController do
 
     before :each do 
-      @unit1 = Unit.create(id: 1,name: "unit1",desc: "unit1")
-      @unit2 = Unit.create(id: 2,name: "unit2",desc: "unit2")
-      @user1 = User.create(id: 1,name: "user1",email: "user1@111.com",username: "user1",unit_id: 1)
-      @user2 = User.create(id: 2,name: "user2",email: "user2@111.com",username: "user2",unit_id: 1)
-      @user3 = User.create(id: 3,name: "user3",email: "user3@111.com",username: "user3",unit_id: 2)
+      @unit1 = Unit.create(name: "unit1",desc: "unit1")
+      @unit2 = Unit.create(name: "unit2",desc: "unit2")
+      @user2 = User.create(name: "user1",email: "user1@111.com",username: "user1",unit_id: 1,password: "11111111",password_confirmation: "11111111",role: "user")
+      @user3 = User.create(name: "user2",email: "user2@111.com",username: "user2",unit_id: 1,password: "11111111",password_confirmation: "11111111",role: "user")
+      @user4 = User.create(name: "user3",email: "user3@111.com",username: "user3",unit_id: 2,password: "11111111",password_confirmation: "11111111",role: "user")
 
 
       #@user = User.first
@@ -26,7 +26,7 @@ describe UnitUsersController do
 
       it " get the index users" do
           get :index , unit_id: 1
-          expect(assigns(:users_grid)).to eq([@user1,@user2])
+          expect(assigns(:users_grid)).to eq([@user2,@user3])
       end
 
       it " get the create route action" do
@@ -46,8 +46,8 @@ describe UnitUsersController do
       end
 
       it " get the show user" do
-          get :index , unit_id: 1, id: 1
-          expect(assigns(:user)).to eq(@user1)
+          get :show , unit_id: 1, id: 2
+          expect(assigns(:user)).to eq(@user2)
       end
 
       it " get the update route action" do
