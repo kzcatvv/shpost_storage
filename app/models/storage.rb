@@ -4,4 +4,9 @@ class Storage < ActiveRecord::Base
 
    validates_presence_of :name, :unit_id, :message => '不能为空字符'
 
+   def self.get_default_storage(unit_id)
+   	# todo: add a column to show which storage is default in the unit.
+   	Storage.where("unit_id = ?",unit_id).first
+   end
+
 end
