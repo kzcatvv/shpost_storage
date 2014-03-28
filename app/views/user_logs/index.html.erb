@@ -5,15 +5,13 @@
 
 <%= grid(@user_logs_grid) do |g|
 
-    g.column name: model_class.human_attribute_name(:user_id), attribute: 'user_id'
-
     g.column name: model_class.human_attribute_name(:username), attribute: 'name', model: 'User' do |user_log|
-        user_log.user.name if user_log.user
+        user_log.user.try :name
       end
 
-    g.column name: model_class.human_attribute_name(:object_class), attribute: 'object_class'
+    g.column name: model_class.human_attribute_name(:operation), attribute: 'operation'
 
-    g.column name: model_class.human_attribute_name(:object_id), attribute: 'object_id'
+    g.column name: model_class.human_attribute_name(:object_symbol), attribute: 'object_symbol'
 
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |user_log|
         user_log.created_at.to_s(:db)

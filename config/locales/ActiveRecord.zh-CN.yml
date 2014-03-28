@@ -146,9 +146,6 @@ zh-CN:
       destroy: 删除
       cancel: 取消
       back: 返回
-      exercise1: 练习一
-      exercise2: 进阶练习二
-      exercise3: 模拟考试
       storages: 管理仓库
       users: 管理用户
       roles: 角色管理
@@ -227,17 +224,17 @@ zh-CN:
       <<: *errors
     models:
       user:
-        one: 用户管理
-        other: 用户管理
+        one: 用户
+        other: 用户
       unit:
-        one: 单位管理
-        other: 单位管理
+        one: 单位
+        other: 单位
       storage:
-        one: 仓库管理
-        other: 仓库管理
+        one: 仓库
+        other: 仓库
       user_log:
-        one: 用户日志查询
-        other: 用户日志查询
+        one: 用户日志
+        other: 用户日志
       role:
         one: 角色管理
         other: 角色管理
@@ -266,11 +263,11 @@ zh-CN:
         role: "角色"
       user_log:
         user_id: "用户编号"
-        username: "用户名"
+        username: "操作用户"
         operation: "操作"
         object_class: "对象名称"
         object_id: "对象主键"
-        object_no: "对象编号"
+        object_symbol: "操作对象"
         created_at: "创建时间"
       filetemp:
         filename: "文档"
@@ -312,3 +309,9 @@ zh-CN:
   user_navigation:
     update_self: "个人信息"
     show_unit: "单位信息"
+  action_2_operation:
+    index: 遍历
+    show: 查看
+    create: 新增
+    update: 更新
+    destroy: 删除
