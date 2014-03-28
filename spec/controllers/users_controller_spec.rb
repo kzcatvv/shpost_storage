@@ -95,6 +95,15 @@ describe UsersController do
           post :create, user: FactoryGirl.attributes_for(:new_user)
           expect(response).to redirect_to(User.last)
         end
+
+        it "assigns a newly created user_log with create user as @user_log" do
+          post :create, user: FactoryGirl.attributes_for(:new_user)
+          expect(assigns(:user_log)).to be_a(UserLog)
+          expect(assigns(:user_log)).to be_persisted
+          expect(assigns(:user_log).object_class).to eq 'User'
+          expect(assigns(:user_log).object_id).to eq assigns(:user).id
+          expect(assigns(:user_log).operation).to eq '新增用户'
+        end
       end
 
       context "with invalid params" do
@@ -156,6 +165,15 @@ describe UsersController do
       it "redirects to the users list" do
         delete :destroy, id: @user
         expect(response).to redirect_to(users_url)
+      end
+
+      it "assigns a newly created user_log with destorys the request user as @user_log" do
+        delete :destroy, id: @user
+        expect(assigns(:user_log)).to be_a(UserLog)
+        expect(assigns(:user_log)).to be_persisted
+        expect(assigns(:user_log).object_class).to eq 'User'
+        expect(assigns(:user_log).object_id).to eq assigns(:user).id
+        expect(assigns(:user_log).operation).to eq '删除用户'
       end
     end
   end

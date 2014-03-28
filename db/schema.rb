@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140328050717) do
+
+ActiveRecord::Schema.define(version: 20140328071000) do
 
   create_table "commodities", force: true do |t|
     t.string   "cno"
@@ -28,6 +29,25 @@ ActiveRecord::Schema.define(version: 20140328050717) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "roles", force: true do |t|
+    t.integer  "user_id"
+    t.integer  "storage_id"
+    t.string   "role"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
+
+  create_table "specifications", force: true do |t|
+    t.integer  "commodity_id"
+    t.string   "model"
+    t.string   "size"
+    t.string   "color"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "storages", force: true do |t|
@@ -58,12 +78,13 @@ ActiveRecord::Schema.define(version: 20140328050717) do
   add_index "units", ["name"], name: "index_units_on_name", unique: true
 
   create_table "user_logs", force: true do |t|
-    t.integer  "user_id",      default: 0,  null: false
-    t.string   "operation",    default: "", null: false
+    t.integer  "user_id",       default: 0,  null: false
+    t.string   "operation",     default: "", null: false
     t.string   "object_class"
     t.integer  "object_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "object_symbol"
   end
 
   create_table "users", force: true do |t|
