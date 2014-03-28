@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :commodities
+
   resources :goodstypes
 
   resources :suppliers

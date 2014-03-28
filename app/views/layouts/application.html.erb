@@ -61,29 +61,26 @@
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= m[k][:name] %><b class="caret"></b></a>
               <% 
-                m = t(:menu)
-                m.keys.each do |k| %>
-                <% if m[k][:needrole].blank? || can?(m[k][:needrole][:can], m[k][:needrole][:role].is_a?(Symbol) ? Module.const_get(m[k][:needrole][:role]) : m[k][:needrole][:role]) %>
-                  <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= m[k][:name] %><b class="caret"></b></a>
-                    <% 
-                      sm = m[k][:submenu]
-                      if !sm.blank? 
-                    %>
-                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                      <% sm.keys.each do |sk| %>
-                        <% if sm[sk][:needrole].blank? || can?(sm[sk][:needrole][:can], sm[sk][:needrole][:role].is_a?(Symbol) ? Module.const_get(sm[sk][:needrole][:role]) : sm[sk][:needrole][:role]) %>
-                          
-                          <li><%= link_to sm[sk][:name], sm[sk][:link] %></li>
-                          
-                        <% end %>
-                      <% end %>
-                      </ul>
-                    <% end %>
-                  </li>
-                <% end %>
-
+                sm = m[k][:submenu]
+                if !sm.blank? 
+              %>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <% 
+                  sm.keys.each do |sk| 
+                    if sm[sk][:needrole].blank? || can?(sm[sk][:needrole][:can], sm[sk][:needrole][:role].is_a?(Symbol) ? Module.const_get(sm[sk][:needrole][:role]) : sm[sk][:needrole][:role]) 
+                %>
+                <li><%= link_to sm[sk][:name], sm[sk][:link] %></li>
+                <% 
+                    end 
+                  end 
+                %>
+              </ul>
               <% end %>
-            
+            </li>
+            <% 
+                end 
+              end 
+            %>
             </ul>
             <ul class="nav navbar-nav pull-right">
               <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前用户:  <%= current_user.name %><b class="caret"></b></a>

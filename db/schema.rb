@@ -11,7 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140325213847) do
+ActiveRecord::Schema.define(version: 20140328050717) do
+
+  create_table "commodities", force: true do |t|
+    t.string   "cno"
+    t.string   "name"
+    t.integer  "goodstype_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "unit_id"
+  end
 
   create_table "goodstypes", force: true do |t|
     t.string   "gtno"
@@ -19,14 +28,6 @@ ActiveRecord::Schema.define(version: 20140325213847) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-  end
-
-  create_table "events", force: true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.boolean  "is_public"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "storages", force: true do |t|

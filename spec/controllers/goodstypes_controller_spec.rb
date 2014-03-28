@@ -23,138 +23,155 @@ describe GoodstypesController do
   # This should return the minimal set of attributes required to create a valid
   # Goodstype. As you add validations to Goodstype, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "gtno" => "MyString" } }
+  let(:valid_attributes) { {  } }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # GoodstypesController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
-  describe "GET index" do
-    it "assigns all goodstypes as @goodstypes" do
-      goodstype = Goodstype.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:goodstypes).should eq([goodstype])
-    end
-  end
+  shared_examples("goodstype/test to goodstypes") do
+      
+    describe "GET index" do
+      # it "assigns all goodstypes as @goodstypes" do
+      #   get :index
+      #   expect(assigns(:goodstypes)).to eq([@goodstype])
+      # end
 
-  describe "GET show" do
-    it "assigns the requested goodstype as @goodstype" do
-      goodstype = Goodstype.create! valid_attributes
-      get :show, {:id => goodstype.to_param}, valid_session
-      assigns(:goodstype).should eq(goodstype)
-    end
-  end
-
-  describe "GET new" do
-    it "assigns a new goodstype as @goodstype" do
-      get :new, {}, valid_session
-      assigns(:goodstype).should be_a_new(Goodstype)
-    end
-  end
-
-  describe "GET edit" do
-    it "assigns the requested goodstype as @goodstype" do
-      goodstype = Goodstype.create! valid_attributes
-      get :edit, {:id => goodstype.to_param}, valid_session
-      assigns(:goodstype).should eq(goodstype)
-    end
-  end
-
-  describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Goodstype" do
-        expect {
-          post :create, {:goodstype => valid_attributes}, valid_session
-        }.to change(Goodstype, :count).by(1)
-      end
-
-      it "assigns a newly created goodstype as @goodstype" do
-        post :create, {:goodstype => valid_attributes}, valid_session
-        assigns(:goodstype).should be_a(Goodstype)
-        assigns(:goodstype).should be_persisted
-      end
-
-      it "redirects to the created goodstype" do
-        post :create, {:goodstype => valid_attributes}, valid_session
-        response.should redirect_to(Goodstype.last)
+      it "renders the index view" do
+        get :index
+        expect(response).to render_template :index
       end
     end
 
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved goodstype as @goodstype" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Goodstype.any_instance.stub(:save).and_return(false)
-        post :create, {:goodstype => { "gtno" => "invalid value" }}, valid_session
-        assigns(:goodstype).should be_a_new(Goodstype)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Goodstype.any_instance.stub(:save).and_return(false)
-        post :create, {:goodstype => { "gtno" => "invalid value" }}, valid_session
-        response.should render_template("new")
-      end
-    end
-  end
-
-  describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested goodstype" do
-        goodstype = Goodstype.create! valid_attributes
-        # Assuming there are no other goodstypes in the database, this
-        # specifies that the Goodstype created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Goodstype.any_instance.should_receive(:update).with({ "gtno" => "MyString" })
-        put :update, {:id => goodstype.to_param, :goodstype => { "gtno" => "MyString" }}, valid_session
-      end
-
+    describe "GET show" do
       it "assigns the requested goodstype as @goodstype" do
-        goodstype = Goodstype.create! valid_attributes
-        put :update, {:id => goodstype.to_param, :goodstype => valid_attributes}, valid_session
-        assigns(:goodstype).should eq(goodstype)
+        get :show, id: @goodstype
+        expect(assigns(:goodstype)).to eq(@goodstype)
       end
 
-      it "redirects to the goodstype" do
-        goodstype = Goodstype.create! valid_attributes
-        put :update, {:id => goodstype.to_param, :goodstype => valid_attributes}, valid_session
-        response.should redirect_to(goodstype)
+      it "renders the show view" do
+        get :show, id: @goodstype
+        expect(response).to render_template :show
       end
     end
 
-    describe "with invalid params" do
-      it "assigns the goodstype as @goodstype" do
-        goodstype = Goodstype.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Goodstype.any_instance.stub(:save).and_return(false)
-        put :update, {:id => goodstype.to_param, :goodstype => { "gtno" => "invalid value" }}, valid_session
-        assigns(:goodstype).should eq(goodstype)
+    describe "GET new" do
+      it "assigns a new goodstype as @goodstype" do
+        get :new
+        expect(assigns(:goodstype)).to be_a_new(Goodstype)
       end
 
-      it "re-renders the 'edit' template" do
-        goodstype = Goodstype.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Goodstype.any_instance.stub(:save).and_return(false)
-        put :update, {:id => goodstype.to_param, :goodstype => { "gtno" => "invalid value" }}, valid_session
-        response.should render_template("edit")
+      it "renders the new view" do
+        get :new
+        expect(response).to render_template :new
+      end
+    end
+
+    describe "GET edit" do
+      it "assigns the requested goodstype as @goodstype" do
+        get :edit, id: @goodstype
+        expect(assigns(:goodstype)).to eq(@goodstype)
+      end
+
+      it "renders the edit view" do
+        get :edit, id: @goodstype
+        expect(response).to render_template :edit
+      end
+    end
+
+    describe "POST create" do
+      context "with valid params" do
+        it "creates a new goodstype" do
+            expect { post :create, goodstype: FactoryGirl.attributes_for(:new_goodstype) }.to change(Goodstype, :count).by(1)
+        end
+
+        it "assigns a newly created goodstype as @goodstype" do
+          post :create, goodstype: FactoryGirl.attributes_for(:new_goodstype)
+          expect(assigns(:goodstype)).to be_a(Goodstype)
+          expect(assigns(:goodstype)).to be_persisted
+        end
+
+        it "redirects to the created goodstype" do
+          post :create, goodstype: FactoryGirl.attributes_for(:new_goodstype)
+          expect(response).to redirect_to(Goodstype.last)
+        end
+      end
+
+      context "with invalid params" do
+        it "assigns a newly created but unsaved goodstype as @goodstype" do
+          expect{post :create, goodstype: FactoryGirl.attributes_for(:invalid_goodstype)}.to_not change(Goodstype, :count)
+        end
+
+        it "re-renders the 'new' template" do
+          post :create, goodstype: FactoryGirl.attributes_for(:invalid_goodstype)
+          expect(response).to render_template :new
+        end
+      end
+    end
+
+    describe "PATCH update" do
+      context "with valid params" do
+        it "locates the requested @goodstype" do
+          patch :update, id: @goodstype, goodstype: FactoryGirl.attributes_for(:update_goodstype)
+          expect(assigns(:goodstype)).to eq @goodstype
+        end
+
+        it "changes @goodstype's attributes" do
+          patch :update, id: @goodstype, goodstype: FactoryGirl.attributes_for(:update_goodstype)
+          @goodstype.reload
+          expect(@goodstype.name).to eq("update")
+          expect(@goodstype.gtno).to eq("update")
+          #expect(@goodstype.email).to eq("update")
+        end
+
+        it "redirects to the goodstype" do
+          patch :update, id: @goodstype, goodstype: FactoryGirl.attributes_for(:goodstype)
+          expect(response).to redirect_to @goodstype
+        end
+      end
+
+      context "with invalid params" do
+        it "does not change the goodstype's attributes" do
+          put :update, id: @goodstype, goodstype: FactoryGirl.attributes_for(:invalid_goodstype)
+          @goodstype.reload
+          expect(@goodstype.name).to_not eq("invalid")
+          expect(@goodstype.name).to eq("test")
+        end
+
+        it "re-renders the 'edit' template" do
+          put :update, id: @goodstype, goodstype: FactoryGirl.attributes_for(:invalid_goodstype)
+          expect(response).to render_template("edit")
+        end
+      end
+    end
+
+    describe "DELETE destroy" do
+
+      it "destroys the requested goodstype" do
+        expect {
+          delete :destroy, id: @goodstype
+        }.to change(Goodstype, :count).by(-1)
+      end
+
+      it "redirects to the goodstypes list" do
+        delete :destroy, id: @goodstype
+        expect(response).to redirect_to(goodstypes_url)
       end
     end
   end
-
-  describe "DELETE destroy" do
-    it "destroys the requested goodstype" do
-      goodstype = Goodstype.create! valid_attributes
-      expect {
-        delete :destroy, {:id => goodstype.to_param}, valid_session
-      }.to change(Goodstype, :count).by(-1)
+  describe "test" do
+    before :each do 
+      FactoryGirl.create(:unit)
+      @goodstype = FactoryGirl.create(:goodstype)
+      @user = FactoryGirl.create(:user)
+      @superadmin = FactoryGirl.create(:superadmin)
+      @unitadmin = FactoryGirl.create(:unitadmin)
+      sign_in @superadmin
+      puts @goodstype.unit_id
     end
 
-    it "redirects to the goodstypes list" do
-      goodstype = Goodstype.create! valid_attributes
-      delete :destroy, {:id => goodstype.to_param}, valid_session
-      response.should redirect_to(goodstypes_url)
-    end
+    it_behaves_like "goodstype/test to goodstypes"
+    
   end
-
 end

@@ -237,6 +237,15 @@ zh-CN:
       user_log:
         one: 用户日志查询
         other: 用户日志查询
+      supplier:
+        one: 供应商管理
+        other: 供应商管理
+      goodstype:
+        one: 商品类型管理
+        other: 商品类型管理
+      commodity:
+        one: 商品管理
+        other: 商品管理
     attributes:
       user:
         email: "电子邮件"
@@ -264,6 +273,20 @@ zh-CN:
         object_id: "对象主键"
         object_no: "对象编号"
         created_at: "创建时间"
+      supplier:
+        sno: "供应商编号"
+        name: "名称"
+        address: "地址"
+        phone: "电话"
+        unit: "所属机构"
+      goodstype:
+        gtno: "商品类型编号"
+        name: "类型名称"
+        unit: "所属机构"
+      commodity:
+        cno: "商品编号"
+        name: "商品名称"
+        goodstype_id: "商品类型"
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -299,6 +322,9 @@ zh-CN:
         goodstype:
           name: "商品类型管理"
           link: "/goodstypes"
+        commodity:
+          name: "商品管理"
+          link: "/commodities"
     filetemp:
       name: "模板管理"
       needrole: 

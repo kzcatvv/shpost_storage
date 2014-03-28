@@ -15,6 +15,7 @@ class Ability
         #can :manage, :all
         can :manage, Supplier, unit_id: user.unit_id
         can :manage, Goodstype, unit_id: user.unit_id
+        can :manage, Commodity, unit_id: user.unit_id
 
         can :manage, :all
         can :role, :user

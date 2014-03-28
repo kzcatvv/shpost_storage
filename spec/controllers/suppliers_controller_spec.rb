@@ -30,131 +30,152 @@ describe SuppliersController do
   # SuppliersController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
-  describe "GET index" do
-    it "assigns all suppliers as @suppliers" do
-      supplier = Supplier.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:suppliers).should eq([supplier])
-    end
-  end
+  
+  shared_examples("supplier/test to suppliers") do
+      
+    describe "GET index" do
+      # it "assigns all suppliers as @suppliers" do
+      #   get :index
+      #   expect(assigns(:suppliers)).to eq([@supplier])
+      # end
 
-  describe "GET show" do
-    it "assigns the requested supplier as @supplier" do
-      supplier = Supplier.create! valid_attributes
-      get :show, {:id => supplier.to_param}, valid_session
-      assigns(:supplier).should eq(supplier)
-    end
-  end
-
-  describe "GET new" do
-    it "assigns a new supplier as @supplier" do
-      get :new, {}, valid_session
-      assigns(:supplier).should be_a_new(Supplier)
-    end
-  end
-
-  describe "GET edit" do
-    it "assigns the requested supplier as @supplier" do
-      supplier = Supplier.create! valid_attributes
-      get :edit, {:id => supplier.to_param}, valid_session
-      assigns(:supplier).should eq(supplier)
-    end
-  end
-
-  describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Supplier" do
-        expect {
-          post :create, {:supplier => valid_attributes}, valid_session
-        }.to change(Supplier, :count).by(1)
-      end
-
-      it "assigns a newly created supplier as @supplier" do
-        post :create, {:supplier => valid_attributes}, valid_session
-        assigns(:supplier).should be_a(Supplier)
-        assigns(:supplier).should be_persisted
-      end
-
-      it "redirects to the created supplier" do
-        post :create, {:supplier => valid_attributes}, valid_session
-        response.should redirect_to(Supplier.last)
+      it "renders the index view" do
+        get :index
+        expect(response).to render_template :index
       end
     end
 
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved supplier as @supplier" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Supplier.any_instance.stub(:save).and_return(false)
-        post :create, {:supplier => {  }}, valid_session
-        assigns(:supplier).should be_a_new(Supplier)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Supplier.any_instance.stub(:save).and_return(false)
-        post :create, {:supplier => {  }}, valid_session
-        response.should render_template("new")
-      end
-    end
-  end
-
-  describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested supplier" do
-        supplier = Supplier.create! valid_attributes
-        # Assuming there are no other suppliers in the database, this
-        # specifies that the Supplier created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Supplier.any_instance.should_receive(:update).with({ "these" => "params" })
-        put :update, {:id => supplier.to_param, :supplier => { "these" => "params" }}, valid_session
-      end
-
+    describe "GET show" do
       it "assigns the requested supplier as @supplier" do
-        supplier = Supplier.create! valid_attributes
-        put :update, {:id => supplier.to_param, :supplier => valid_attributes}, valid_session
-        assigns(:supplier).should eq(supplier)
+        get :show, id: @supplier
+        expect(assigns(:supplier)).to eq(@supplier)
       end
 
-      it "redirects to the supplier" do
-        supplier = Supplier.create! valid_attributes
-        put :update, {:id => supplier.to_param, :supplier => valid_attributes}, valid_session
-        response.should redirect_to(supplier)
+      it "renders the show view" do
+        get :show, id: @supplier
+        expect(response).to render_template :show
       end
     end
 
-    describe "with invalid params" do
-      it "assigns the supplier as @supplier" do
-        supplier = Supplier.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Supplier.any_instance.stub(:save).and_return(false)
-        put :update, {:id => supplier.to_param, :supplier => {  }}, valid_session
-        assigns(:supplier).should eq(supplier)
+    describe "GET new" do
+      it "assigns a new supplier as @supplier" do
+        get :new
+        expect(assigns(:supplier)).to be_a_new(Supplier)
       end
 
-      it "re-renders the 'edit' template" do
-        supplier = Supplier.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Supplier.any_instance.stub(:save).and_return(false)
-        put :update, {:id => supplier.to_param, :supplier => {  }}, valid_session
-        response.should render_template("edit")
+      it "renders the new view" do
+        get :new
+        expect(response).to render_template :new
+      end
+    end
+
+    describe "GET edit" do
+      it "assigns the requested supplier as @supplier" do
+        get :edit, id: @supplier
+        expect(assigns(:supplier)).to eq(@supplier)
+      end
+
+      it "renders the edit view" do
+        get :edit, id: @supplier
+        expect(response).to render_template :edit
+      end
+    end
+
+    describe "POST create" do
+      context "with valid params" do
+        it "creates a new supplier" do
+            expect { post :create, supplier: FactoryGirl.attributes_for(:new_supplier) }.to change(Supplier, :count).by(1)
+        end
+
+        it "assigns a newly created supplier as @supplier" do
+          post :create, supplier: FactoryGirl.attributes_for(:new_supplier)
+          expect(assigns(:supplier)).to be_a(Supplier)
+          expect(assigns(:supplier)).to be_persisted
+        end
+
+        it "redirects to the created supplier" do
+          post :create, supplier: FactoryGirl.attributes_for(:new_supplier)
+          expect(response).to redirect_to(Supplier.last)
+        end
+      end
+
+      context "with invalid params" do
+        it "assigns a newly created but unsaved supplier as @supplier" do
+          expect{post :create, supplier: FactoryGirl.attributes_for(:invalid_supplier)}.to_not change(Supplier, :count)
+        end
+
+        it "re-renders the 'new' template" do
+          post :create, supplier: FactoryGirl.attributes_for(:invalid_supplier)
+          expect(response).to render_template :new
+        end
+      end
+    end
+
+    describe "PATCH update" do
+      context "with valid params" do
+        it "locates the requested @supplier" do
+          patch :update, id: @supplier, supplier: FactoryGirl.attributes_for(:update_supplier)
+          expect(assigns(:supplier)).to eq @supplier
+        end
+
+        it "changes @supplier's attributes" do
+          patch :update, id: @supplier, supplier: FactoryGirl.attributes_for(:update_supplier)
+          @supplier.reload
+          expect(@supplier.name).to eq("update")
+          expect(@supplier.sno).to eq("update")
+          #expect(@supplier.email).to eq("update")
+        end
+
+        it "redirects to the supplier" do
+          patch :update, id: @supplier, supplier: FactoryGirl.attributes_for(:supplier)
+          expect(response).to redirect_to @supplier
+        end
+      end
+
+      context "with invalid params" do
+        it "does not change the supplier's attributes" do
+          put :update, id: @supplier, supplier: FactoryGirl.attributes_for(:invalid_supplier)
+          @supplier.reload
+          expect(@supplier.name).to_not eq("invalid")
+          expect(@supplier.name).to eq("test")
+        end
+
+        it "re-renders the 'edit' template" do
+          put :update, id: @supplier, supplier: FactoryGirl.attributes_for(:invalid_supplier)
+          expect(response).to render_template("edit")
+        end
+      end
+    end
+
+    describe "DELETE destroy" do
+
+      it "destroys the requested supplier" do
+        expect {
+          delete :destroy, id: @supplier
+        }.to change(Supplier, :count).by(-1)
+      end
+
+      it "redirects to the suppliers list" do
+        delete :destroy, id: @supplier
+        expect(response).to redirect_to(suppliers_url)
       end
     end
   end
-
-  describe "DELETE destroy" do
-    it "destroys the requested supplier" do
-      supplier = Supplier.create! valid_attributes
-      expect {
-        delete :destroy, {:id => supplier.to_param}, valid_session
-      }.to change(Supplier, :count).by(-1)
+  describe "test" do
+    before :each do 
+      FactoryGirl.create(:unit)
+      @supplier = FactoryGirl.create(:supplier)
+      @user = FactoryGirl.create(:user)
+      @superadmin = FactoryGirl.create(:superadmin)
+      @unitadmin = FactoryGirl.create(:unitadmin)
+      sign_in @superadmin
+      puts @supplier.unit_id
     end
 
-    it "redirects to the suppliers list" do
-      supplier = Supplier.create! valid_attributes
-      delete :destroy, {:id => supplier.to_param}, valid_session
-      response.should redirect_to(suppliers_url)
-    end
+    it_behaves_like "supplier/test to suppliers"
+    
   end
-
 end
+
+  
+
