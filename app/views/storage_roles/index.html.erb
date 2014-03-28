@@ -4,13 +4,13 @@
   <div style="float:right">
     <% if can? :new, Role %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
-                  new_user_role_path(@user),
+                  new_storage_role_path(@storage),
                   :class => 'btn btn-primary' %>
     <% end %>
   </div>
 </div>
 
-<%= grid(@roles_grid) do |g|
+<%= grid(@storageroles_grid) do |g|
 
     g.column name: model_class.human_attribute_name(:user_id), attribute: 'name', model: 'User' do |role|
       role.user.try :name
@@ -25,7 +25,7 @@
     end
 
     g.column do |role|
-      (link_to t('.destroy', :default => t("helpers.links.destroy")), user_role_path(@user,role), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, role)
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), storage_role_path(@storage,role), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, role)
     end
   end 
 %>
