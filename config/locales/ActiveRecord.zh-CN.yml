@@ -146,11 +146,9 @@ zh-CN:
       destroy: 删除
       cancel: 取消
       back: 返回
-      exercise1: 练习一
-      exercise2: 进阶练习二
-      exercise3: 模拟考试
       storages: 管理仓库
       users: 管理用户
+      roles: 角色管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -226,17 +224,30 @@ zh-CN:
       <<: *errors
     models:
       user:
-        one: 用户管理
-        other: 用户管理
+        one: 用户
+        other: 用户
       unit:
-        one: 单位管理
-        other: 单位管理
+        one: 单位
+        other: 单位
       storage:
-        one: 仓库管理
-        other: 仓库管理
+        one: 仓库
+        other: 仓库
       user_log:
-        one: 用户日志查询
-        other: 用户日志查询
+        one: 用户日志
+        other: 用户日志
+      role:
+        one: 角色管理
+        other: 角色管理
+      supplier:
+        one: 供应商管理
+        other: 供应商管理
+      goodstype:
+        one: 商品类型管理
+        other: 商品类型管理
+      commodity:
+        one: 商品管理
+        other: 商品管理
+
     attributes:
       user:
         email: "电子邮件"
@@ -256,14 +267,32 @@ zh-CN:
         name: "仓库名"
         desc: "仓库描述"
         unit_id: "所属单位"
+      role:
+        user_id: "用户"
+        storage_id: "仓库"
+        role: "角色"
       user_log:
         user_id: "用户编号"
-        username: "用户名"
+        username: "操作用户"
         operation: "操作"
         object_class: "对象名称"
         object_id: "对象主键"
-        object_no: "对象编号"
+        object_symbol: "操作对象"
         created_at: "创建时间"
+      supplier:
+        sno: "供应商编号"
+        name: "名称"
+        address: "地址"
+        phone: "电话"
+        unit: "所属机构"
+      goodstype:
+        gtno: "商品类型编号"
+        name: "类型名称"
+        unit: "所属机构"
+      commodity:
+        cno: "商品编号"
+        name: "商品名称"
+        goodstype_id: "商品类型"
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -287,6 +316,21 @@ zh-CN:
           needrole:
             can: :read
             role: :User
+    suppliers:
+      name: "采购与供应商管理"
+      submenu:
+        supplier:
+          name: "供应商管理"
+          link: "/suppliers"
+    goodstypes:
+      name: "商品与规格管理"
+      submenu:
+        goodstype:
+          name: "商品类型管理"
+          link: "/goodstypes"
+        commodity:
+          name: "商品管理"
+          link: "/commodities"
     filetemp:
       name: "模板管理"
       needrole: 
@@ -304,3 +348,9 @@ zh-CN:
   user_navigation:
     update_self: "个人信息"
     show_unit: "单位信息"
+  action_2_operation:
+    index: 遍历
+    show: 查看
+    create: 新增
+    update: 更新
+    destroy: 删除

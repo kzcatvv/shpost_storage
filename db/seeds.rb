@@ -10,6 +10,7 @@ User.destroy_all()
 Unit.destroy_all()
 Storage.destroy_all()
 
+
 unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc')
 unit2 = Unit.create(name: 'unit2_name', desc: 'unit2_desc')
 

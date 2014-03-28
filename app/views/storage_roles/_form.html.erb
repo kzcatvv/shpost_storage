@@ -1,0 +1,23 @@
+<%= form_for ([ @storage, @role]), :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+
+  <div class="control-group">
+    <%= f.label :user_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:user_id, User.all.map{|u| [u.name,u.id]}) %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :role, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:role, Role::ROLE.invert) %>
+    </div>
+  </div>
+
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                storage_roles_path(@storage), :class => 'btn' %>
+  </div>
+<% end %>

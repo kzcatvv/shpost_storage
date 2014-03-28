@@ -9,7 +9,7 @@
   <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
   <dd><%= Storage.find(@role.storage_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:role) %>:</strong></dt>
-  <dd><%= @role.role %></dd>
+  <dd><%= Role::ROLE.fetch(@role.role.to_sym) %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

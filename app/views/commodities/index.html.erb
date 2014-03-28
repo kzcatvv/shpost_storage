@@ -1,0 +1,38 @@
+<%- model_class = Commodity -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human %></h1>
+<div style="float:right">
+    <% if can? :new, Supplier %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_commodity_path,
+            :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@commodities, :show_filters => :always) do |g|
+
+    g.column name: model_class.human_attribute_name(:id), attribute: 'id', filter_type: :range
+
+    g.column name: model_class.human_attribute_name(:cno), attribute: 'cno'
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:goodstype_id), attribute: 'goodstype_id',custom_filter: Goodstype.all.map{|g| [g.name,g.id]} do |commodity|
+      if !commodity.goodstype_id.blank?
+        Goodstype.find(commodity.goodstype_id).name
+      end
+    end
+
+    #g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id'
+
+    g.column do |commodity|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_commodity_path(commodity), :class => 'btn btn-xs btn-primary' if can? :update, commodity) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      commodity_path(commodity),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, commodity)
+      end
+  end 
+%>
