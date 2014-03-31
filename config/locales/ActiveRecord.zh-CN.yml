@@ -224,22 +224,20 @@ zh-CN:
       <<: *errors
     models:
       user:
-        one: 用户
-        other: 用户
+        one: 用户管理
+        other: 用户管理
       unit:
-        one: 单位
-        other: 单位
+        one: 单位管理
+        other: 单位管理
       storage:
-        one: 仓库
-        other: 仓库
+        one: 仓库管理
+        other: 仓库管理
       user_log:
         one: 用户日志
         other: 用户日志
-<<<<<<< HEAD
       stock_log:
         one: 库存日志
         other: 库存日志
-=======
       role:
         one: 角色管理
         other: 角色管理
@@ -252,8 +250,9 @@ zh-CN:
       commodity:
         one: 商品管理
         other: 商品管理
-
->>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
+      business:
+        one: 商户管理
+        other: 商户管理
     attributes:
       user:
         email: "电子邮件"
@@ -285,7 +284,6 @@ zh-CN:
         object_id: "对象主键"
         object_symbol: "对象标识"
         created_at: "创建时间"
-<<<<<<< HEAD
       stock_log:
         user_id: "用户"
         username: "操作用户"
@@ -298,7 +296,6 @@ zh-CN:
         object_symbol: "对象标识"
         created_at: "创建时间"
         checked_at: "确认时间"
-=======
       supplier:
         sno: "供应商编号"
         name: "名称"
@@ -313,7 +310,14 @@ zh-CN:
         cno: "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
->>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
+      business:
+        name: "名称"
+        email: "电子邮件"
+        contactor: "联系人"
+        address: "地址"
+        phone: "电话"
+        desc: "备注"
+        unit: "所属机构"
       filetemp:
         filename: "文档"
         rename: "文件名"
