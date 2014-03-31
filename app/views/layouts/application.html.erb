@@ -90,16 +90,18 @@
                 </ul>
               </li>
               <% if !session[:current_storage].nil? %>
-              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前storage:  <%= session[:current_storage].name %><b class="caret"></b></a>
+              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  <%= session[:current_storage].name %><b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                   <% roles = Role.get_storages_by_user_id(current_user.id) %>
                   <% roles.each do |role| %>
                     <li>
-                      <%= link_to role.storage.name, 'javascript:void(0)', onclick: "alert (#{role.storage.name});" %>
+                      <%= link_to role.storage.name, "/units/#{role.storage.unit.id}/storages/#{role.storage.id}/changecurrentstorage", method: :get %>
                     </li>
                   <% end %>
                 </ul>
               </li>
+              <% else %>
+              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  none </li>
               <% end %>
             </ul>
           </div><!--/.nav-collapse -->
