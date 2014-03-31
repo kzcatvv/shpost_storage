@@ -4,7 +4,7 @@ class Role < ActiveRecord::Base
 
   validates_presence_of :user_id, :storage_id, :role, :message => '不能为空字符'
   
-  ROLE = { purchase: '采购员', sorter: '拣货员' }
+  ROLE = { admin: '管理员', purchase: '采购员', sorter: '拣货员' }
 
   def purchase?
     (role.eql? 'purchase') ? true : false
