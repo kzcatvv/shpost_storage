@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 20140327061651) do
-=======
 ActiveRecord::Schema.define(version: 20140328071000) do
->>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
 
   create_table "commodities", force: true do |t|
     t.string   "cno"
@@ -44,7 +40,15 @@ ActiveRecord::Schema.define(version: 20140328071000) do
 
   add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
 
-<<<<<<< HEAD
+  create_table "specifications", force: true do |t|
+    t.integer  "commodity_id"
+    t.string   "model"
+    t.string   "size"
+    t.string   "color"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "stock_logs", force: true do |t|
     t.integer  "user_id"
     t.integer  "stock_id"
@@ -55,13 +59,6 @@ ActiveRecord::Schema.define(version: 20140328071000) do
     t.string   "object_symbol"
     t.integer  "amount",             default: 0,  null: false
     t.datetime "checked_at"
-=======
-  create_table "specifications", force: true do |t|
-    t.integer  "commodity_id"
-    t.string   "model"
-    t.string   "size"
-    t.string   "color"
->>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

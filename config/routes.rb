@@ -1,8 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
-<<<<<<< HEAD
   resources :stock_logs, only: [:index, :show]
-=======
+
   resources :commodities
 
   resources :goodstypes
@@ -10,7 +9,6 @@ ShpostStorage::Application.routes.draw do
   resources :suppliers
   
   resources :specifications
->>>>>>> 9210721b3cc6d0b4dea91c5b1c0bb7cabe0ef4a0
 
   resources :user_logs, only: [:index, :show]
 
@@ -25,7 +23,11 @@ ShpostStorage::Application.routes.draw do
   resources :units
  
   resources :units do
-     resources :storages
+    resources :storages do
+      member do
+        get 'changecurrentstorage'
+      end
+    end
   end
 
   resources :units do
