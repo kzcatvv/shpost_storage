@@ -26,6 +26,9 @@ class Ability
     else
         can :update, User, id: user.id
         can :read, :all
+        can :change, Storage do |storage|
+            user.storages.include? storage
+        end
     end
 
     

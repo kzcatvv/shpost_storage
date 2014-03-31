@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :areas
+
   resources :stock_logs, only: [:index, :show]
 
   resources :commodities
@@ -18,14 +20,12 @@ ShpostStorage::Application.routes.draw do
 
   resources :users
   
-  resources :storages
-
   resources :units
  
   resources :units do
     resources :storages do
       member do
-        get 'changecurrentstorage'
+          get 'change'
       end
     end
   end
