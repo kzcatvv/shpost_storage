@@ -11,7 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
+ActiveRecord::Schema.define(version: 20140331030833) do
+
+  create_table "businesses", force: true do |t|
+    t.string   "name",       default: "", null: false
+    t.string   "email"
+    t.string   "contactor"
+    t.string   "phone"
+    t.string   "address"
+    t.string   "desc"
+    t.integer  "unit_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+=======
 ActiveRecord::Schema.define(version: 20140328071000) do
+>>>>>>> e8985c6f80b4d0e211260628e6002cbeccf850ef
 
   create_table "commodities", force: true do |t|
     t.string   "cno"

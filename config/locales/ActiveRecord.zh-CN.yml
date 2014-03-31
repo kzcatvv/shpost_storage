@@ -224,14 +224,14 @@ zh-CN:
       <<: *errors
     models:
       user:
-        one: 用户
-        other: 用户
+        one: 用户管理
+        other: 用户管理
       unit:
-        one: 单位
-        other: 单位
+        one: 单位管理
+        other: 单位管理
       storage:
-        one: 仓库
-        other: 仓库
+        one: 仓库管理
+        other: 仓库管理
       user_log:
         one: 用户日志
         other: 用户日志
@@ -250,6 +250,9 @@ zh-CN:
       commodity:
         one: 商品管理
         other: 商品管理
+      business:
+        one: 商户管理
+        other: 商户管理
     attributes:
       user:
         email: "电子邮件"
@@ -307,6 +310,14 @@ zh-CN:
         cno: "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
+      business:
+        name: "名称"
+        email: "电子邮件"
+        contactor: "联系人"
+        address: "地址"
+        phone: "电话"
+        desc: "备注"
+        unit: "所属机构"
       filetemp:
         filename: "文档"
         rename: "文件名"
