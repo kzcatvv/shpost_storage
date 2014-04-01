@@ -26,6 +26,7 @@ class Ability
     else
         can :update, User, id: user.id
         can :manage, Area
+        can :manage, Shelf 
         
         can :read, :all
         can :change, Storage do |storage|

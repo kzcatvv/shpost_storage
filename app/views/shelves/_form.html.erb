@@ -1,0 +1,26 @@
+<%= form_for @shelf, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :area_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :area_id, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :shelf_code, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :shelf_code, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :desc, :class => 'text_field' %>
+    </div>
+  </div>
+
+  
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+            shelves_path, :class => 'btn btn-default' %>
+ 
+<% end %>

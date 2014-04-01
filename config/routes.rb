@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :shelves
+
   resources :areas
 
   resources :businesses
