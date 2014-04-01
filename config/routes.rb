@@ -5,6 +5,9 @@ ShpostStorage::Application.routes.draw do
 
 
 
+  resources :areas
+
+
   resources :businesses
 
   resources :stock_logs, only: [:index, :show]

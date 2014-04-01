@@ -253,9 +253,15 @@ zh-CN:
       business:
         one: 商户管理
         other: 商户管理
+
       purchase:
         one: 采购单管理
         other: 采购单管理
+
+      area:
+        one: 区域管理
+        other: 区域管理
+
     attributes:
       user:
         email: "电子邮件"
@@ -321,6 +327,7 @@ zh-CN:
         phone: "电话"
         desc: "备注"
         unit: "所属机构"
+
       purchase:
         no: "编号"
         unit_id: "所属机构"
@@ -329,6 +336,12 @@ zh-CN:
         sum: "合计金额"
         desc: "备注"
         status: "状态"
+
+      area:
+        current_storage: "当前仓库"
+        area_code: "区域码"
+        desc: "区域描述"
+
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -352,6 +365,15 @@ zh-CN:
           needrole:
             can: :read
             role: :User
+    storagemanage:
+      name: "仓内管理"
+      submenu:
+        area:
+          name: "区域管理"
+          link: "/areas/"
+          needrole:
+            can: :read
+            role: "area"
     suppliers:
       name: "采购与供应商管理"
       submenu:
