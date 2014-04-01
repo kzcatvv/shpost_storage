@@ -253,6 +253,9 @@ zh-CN:
       business:
         one: 商户管理
         other: 商户管理
+      purchase:
+        one: 采购单管理
+        other: 采购单管理
     attributes:
       user:
         email: "电子邮件"
@@ -318,6 +321,14 @@ zh-CN:
         phone: "电话"
         desc: "备注"
         unit: "所属机构"
+      purchase:
+        no: "编号"
+        unit_id: "所属机构"
+        business_id: "所属商户"
+        amount: "合计数量"
+        sum: "合计金额"
+        desc: "备注"
+        status: "状态"
       filetemp:
         filename: "文档"
         rename: "文件名"
