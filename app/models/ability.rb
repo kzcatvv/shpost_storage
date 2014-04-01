@@ -25,6 +25,8 @@ class Ability
         can :update, User, id: user.id
     else
         can :update, User, id: user.id
+        can :manage, Area
+        
         can :read, :all
         can :change, Storage do |storage|
             user.storages.include? storage
