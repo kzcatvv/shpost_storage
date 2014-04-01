@@ -9,6 +9,8 @@
 User.destroy_all()
 Unit.destroy_all()
 Storage.destroy_all()
+Role.destroy_all()
+Area.destroy_all()
 
 
 unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc')
