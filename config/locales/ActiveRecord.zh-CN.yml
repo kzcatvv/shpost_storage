@@ -1,4 +1,5 @@
 zh-CN:
+  title: "上海邮政仓库管理系统"
   welcome: "欢迎登陆"
   date:
     abbr_day_names:
@@ -253,6 +254,12 @@ zh-CN:
       business:
         one: 商户管理
         other: 商户管理
+      stock:
+        one: 库存管理
+        other: 库存管理
+      purchase:
+        one: 采购单管理
+        other: 采购单管理
       area:
         one: 区域管理
         other: 区域管理
@@ -290,6 +297,15 @@ zh-CN:
         object_id: "对象主键"
         object_symbol: "对象标识"
         created_at: "创建时间"
+      stock:
+        shelf_id: 所属货架
+        business_id: 所属商户
+        supplier_id: 供应商
+        batch_no: 批次
+        specification_id: 商品规格
+        actual_amount: 实际库存
+        virtual_amount: 预计库存
+        desc: 备注
       stock_log:
         user_id: "用户"
         username: "操作用户"
@@ -324,6 +340,14 @@ zh-CN:
         phone: "电话"
         desc: "备注"
         unit: "所属机构"
+      purchase:
+        no: "编号"
+        unit_id: "所属机构"
+        business_id: "所属商户"
+        amount: "合计数量"
+        sum: "合计金额"
+        desc: "备注"
+        status: "状态"
       area:
         current_storage: "当前仓库"
         area_code: "区域编号"
@@ -377,6 +401,12 @@ zh-CN:
         supplier:
           name: "供应商管理"
           link: "/suppliers"
+    business:
+      name: "商户与订单管理"
+      submenu:
+        supplier:
+          name: "商户管理"
+          link: "/businesses"
     goodstypes:
       name: "商品与规格管理"
       submenu:
@@ -386,6 +416,24 @@ zh-CN:
         commodity:
           name: "商品管理"
           link: "/commodities"
+    stocks:
+      name: "库存管理"
+      submenu:
+        stock:
+          name: "库存管理"
+          link: "/stocks"
+        stock_log:
+          name: "库存操作查询"
+          link: "/stock_logs"
+    logs:
+      name: "日志查询"
+      submenu:
+        user_log:
+          name: "日志查询"
+          link: "/user_logs"
+        stock_log:
+          name: "库存操作查询"
+          link: "/stock_logs"
     filetemp:
       name: "模板管理"
       needrole: 

@@ -42,12 +42,32 @@ ActiveRecord::Schema.define(version: 20140401064102) do
     t.integer  "unit_id"
   end
 
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "goodstypes", force: true do |t|
     t.string   "gtno"
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "purchases", force: true do |t|
+    t.string   "no",          default: "", null: false
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.integer  "amount"
+    t.float    "sum"
+    t.string   "desc"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "roles", force: true do |t|
@@ -89,6 +109,21 @@ ActiveRecord::Schema.define(version: 20140401064102) do
     t.datetime "checked_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "operation_type"
+    t.string   "desc"
+  end
+
+  create_table "stocks", force: true do |t|
+    t.integer  "shelf_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.string   "batch_no"
+    t.integer  "specification_id",             null: false
+    t.integer  "actual_amount",    default: 0, null: false
+    t.integer  "virtual_amount",   default: 0, null: false
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "storages", force: true do |t|
@@ -126,6 +161,7 @@ ActiveRecord::Schema.define(version: 20140401064102) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "object_symbol"
+    t.string   "desc"
   end
 
   create_table "users", force: true do |t|
