@@ -43,12 +43,35 @@ ActiveRecord::Schema.define(version: 20140402032647) do
     t.integer  "unit_id"
   end
 
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "goodstypes", force: true do |t|
     t.string   "gtno"
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "purchasedetails", force: true do |t|
+    t.string   "name",        default: "", null: false
+    t.integer  "purchase_id"
+    t.integer  "supplier_id"
+    t.integer  "spec_id"
+    t.string   "qg_period"
+    t.string   "batch_no"
+    t.integer  "amount"
+    t.float    "sum"
+    t.string   "desc"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "purchases", force: true do |t|

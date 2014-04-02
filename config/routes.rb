@@ -2,6 +2,10 @@ ShpostStorage::Application.routes.draw do
 
   resources :shelves
 
+  resources :purchasedetails
+
+  resources :purchases
+
   resources :stocks
 
   resources :purchases

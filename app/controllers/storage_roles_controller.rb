@@ -5,7 +5,7 @@ class StorageRolesController < ApplicationController
   # GET /roles.json
   def index
     #@roles = Role.all
-    @storageroles_grid = initialize_grid(@roles)
+    @storageroles_grid = initialize_grid(@roles, include: [:storage, :user])
   end
 
   # GET /roles/1
