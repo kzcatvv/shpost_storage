@@ -2,7 +2,7 @@
   <div class="form-group">
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :business_id, :class => 'form-control' %>
+      <%= f.select(:business_id, Business.all.map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="form-group">

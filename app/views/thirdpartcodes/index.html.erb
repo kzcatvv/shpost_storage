@@ -12,7 +12,9 @@
 
 <%= grid(@thirdpartcodes_grid) do |g|
 
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id'
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |thirdpartcode|
+      thirdpartcode.business.try :name
+    end
 
     g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |thirdpartcode|
       thirdpartcode.supplier.try :name

@@ -11,7 +11,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
 ActiveRecord::Schema.define(version: 20140402032647) do
 
   create_table "areas", force: true do |t|
@@ -107,11 +106,12 @@ ActiveRecord::Schema.define(version: 20140402032647) do
 
   create_table "specifications", force: true do |t|
     t.integer  "commodity_id"
-    t.string   "model"
-    t.string   "size"
-    t.string   "color"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
+    t.string   "sixnine_code"
+    t.string   "desc"
+    t.string   "product_no"
   end
 
   create_table "stock_logs", force: true do |t|
