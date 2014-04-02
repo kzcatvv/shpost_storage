@@ -349,6 +349,7 @@ zh-CN:
         desc: "备注"
         status: "状态"
       area:
+        name: "区域名称"
         current_storage: "当前仓库"
         area_code: "区域编号"
         desc: "区域描述"

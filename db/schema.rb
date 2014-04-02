@@ -11,14 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140401064102) do
+ActiveRecord::Schema.define(version: 20140402032647) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
-    t.string   "desc",       default: "", null: false
+    t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "area_code",  default: "", null: false
+    t.string   "name",       default: "", null: false
   end
 
   create_table "businesses", force: true do |t|
