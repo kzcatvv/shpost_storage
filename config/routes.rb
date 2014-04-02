@@ -1,6 +1,8 @@
 ShpostStorage::Application.routes.draw do
 
 
+  resources :purchasedetails
+
   resources :purchases
 
 

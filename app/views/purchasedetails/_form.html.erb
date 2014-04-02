@@ -1,0 +1,69 @@
+<%= form_for @purchasedetail, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
+    </div>
+  </div>
+  
+  <div class="control-group">
+    <%= f.label :purchase_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :purchase_id, :class => 'text_field' %>
+    </div>
+  <div class="control-group">
+    <%= f.label :supplier_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :supplier_id, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :spec_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :spec_id, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :qg_period, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :qg_period, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :batch_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :batch_no, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :amount, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :amount, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :sum, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :sum, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :desc, :class => 'text_field' %>
+    </div>
+  </div>
+    <div class="control-group">
+    <%= f.label :status, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :status, :class => 'text_field' %>
+    </div>
+  </div>
+
+  
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <% if can? :index, Purchase %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+              purchases_path, :class => 'btn btn-default' %>
+  <% end %>
+<% end %>
