@@ -11,6 +11,8 @@
 </div>
 <%= grid(@shelves_grid) do |g|
 
+    g.column name: model_class.human_attribute_name(:area), attribute: 'area_id'
+
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code'
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'

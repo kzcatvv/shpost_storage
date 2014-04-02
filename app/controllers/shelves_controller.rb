@@ -1,8 +1,7 @@
 class ShelvesController < ApplicationController
   # before_action :set_shelf, only: [:show, :edit, :update, :destroy]
   before_filter :find_current_storage
-  load_and_authorize_resource :area
-  load_and_authorize_resource :shelf, through: :area, parent: false
+  load_and_authorize_resource :shelf
 
   def find_current_storage
     @areas = Area.where("storage_id = ?", session[:current_storage].id)

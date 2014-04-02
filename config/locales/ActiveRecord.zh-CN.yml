@@ -355,6 +355,7 @@ zh-CN:
       shelf:
         current_storage: "当前仓库"
         area_code: "区域编号"
+        area: "区域"
         shelf_code: "货架编号"
         desc: "货架描述"
       filetemp:

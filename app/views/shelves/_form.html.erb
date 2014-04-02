@@ -1,8 +1,8 @@
 <%= form_for @shelf, :html => { :class => 'form-horizontal' } do |f| %>
   <div class="control-group">
-    <%= f.label :area_id, :class => 'control-label' %>
+    <%= f.label :area, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :area_id, :class => 'text_field' %>
+      <%= f.select(:area_id, Area.where(storage_id: session[:current_storage].id).map{|u| [u.desc,u.id]})%>
     </div>
   </div>
   <div class="control-group">
