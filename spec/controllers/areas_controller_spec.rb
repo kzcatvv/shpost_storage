@@ -30,131 +30,209 @@ describe AreasController do
   # AreasController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
-  describe "GET index" do
-    it "assigns all areas as @areas" do
-      area = Area.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:areas).should eq([area])
-    end
-  end
-
-  describe "GET show" do
-    it "assigns the requested area as @area" do
-      area = Area.create! valid_attributes
-      get :show, {:id => area.to_param}, valid_session
-      assigns(:area).should eq(area)
-    end
-  end
-
-  describe "GET new" do
-    it "assigns a new area as @area" do
-      get :new, {}, valid_session
-      assigns(:area).should be_a_new(Area)
-    end
-  end
-
-  describe "GET edit" do
-    it "assigns the requested area as @area" do
-      area = Area.create! valid_attributes
-      get :edit, {:id => area.to_param}, valid_session
-      assigns(:area).should eq(area)
-    end
-  end
-
-  describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Area" do
-        expect {
-          post :create, {:area => valid_attributes}, valid_session
-        }.to change(Area, :count).by(1)
+  shared_examples("user/admin access to areas") do
+    describe "GET index" do
+      it "assigns all areas as @areas" do
+        get :index
+        expect(assigns(:areas)).to eq([@area])
       end
 
-      it "assigns a newly created area as @area" do
-        post :create, {:area => valid_attributes}, valid_session
-        assigns(:area).should be_a(Area)
-        assigns(:area).should be_persisted
-      end
-
-      it "redirects to the created area" do
-        post :create, {:area => valid_attributes}, valid_session
-        response.should redirect_to(Area.last)
+      it "renders the index view" do
+        get :index
+        expect(response).to render_template :index
       end
     end
 
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved area as @area" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Area.any_instance.stub(:save).and_return(false)
-        post :create, {:area => { "storage_id" => "invalid value" }}, valid_session
-        assigns(:area).should be_a_new(Area)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Area.any_instance.stub(:save).and_return(false)
-        post :create, {:area => { "storage_id" => "invalid value" }}, valid_session
-        response.should render_template("new")
-      end
-    end
-  end
-
-  describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested area" do
-        area = Area.create! valid_attributes
-        # Assuming there are no other areas in the database, this
-        # specifies that the Area created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Area.any_instance.should_receive(:update).with({ "storage_id" => "1" })
-        put :update, {:id => area.to_param, :area => { "storage_id" => "1" }}, valid_session
-      end
-
+    describe "GET show" do
       it "assigns the requested area as @area" do
-        area = Area.create! valid_attributes
-        put :update, {:id => area.to_param, :area => valid_attributes}, valid_session
-        assigns(:area).should eq(area)
+        get :show, id: @area
+        expect(assigns(:area)).to eq(@area)
       end
 
-      it "redirects to the area" do
-        area = Area.create! valid_attributes
-        put :update, {:id => area.to_param, :area => valid_attributes}, valid_session
-        response.should redirect_to(area)
+      it "renders the show view" do
+        get :show, id: @area
+        expect(response).to render_template :show
       end
     end
 
-    describe "with invalid params" do
-      it "assigns the area as @area" do
-        area = Area.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Area.any_instance.stub(:save).and_return(false)
-        put :update, {:id => area.to_param, :area => { "storage_id" => "invalid value" }}, valid_session
-        assigns(:area).should eq(area)
+    describe "GET new" do
+      it "assigns a new area as @area" do
+        get :new
+        expect(assigns(:area)).to be_a_new(Area)
       end
 
-      it "re-renders the 'edit' template" do
-        area = Area.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Area.any_instance.stub(:save).and_return(false)
-        put :update, {:id => area.to_param, :area => { "storage_id" => "invalid value" }}, valid_session
-        response.should render_template("edit")
+      it "renders the new view" do
+        get :new
+        expect(response).to render_template :new
+      end
+    end
+
+    describe "GET edit" do
+      it "assigns the requested area as @area" do
+        get :edit, id: @area
+        expect(assigns(:area)).to eq(@area)
+      end
+
+      it "renders the edit view" do
+        get :edit, id: @area
+        expect(response).to render_template :edit
+      end
+    end
+
+    describe "POST create" do
+      context "with valid params" do
+        it "creates a new Area" do
+            expect { post :create, area: FactoryGirl.attributes_for(:new_area) }.to change(Area, :count).by(1)
+        end
+
+        it "assigns a newly created area as @area" do
+          post :create, area: FactoryGirl.attributes_for(:new_area)
+          expect(assigns(:area)).to be_a(Area)
+          expect(assigns(:area)).to be_persisted
+        end
+
+        it "redirects to the created area" do
+          post :create, area: FactoryGirl.attributes_for(:new_area)
+          expect(response).to redirect_to(Area.last)
+        end
+      end
+
+      context "with invalid params" do
+        it "assigns a newly created but unsaved area as @area" do
+          expect{post :create, area: FactoryGirl.attributes_for(:invalid_area)}.to_not change(Area, :count)
+        end
+
+        it "re-renders the 'new' template" do
+          post :create, area: FactoryGirl.attributes_for(:invalid_area)
+          expect(response).to render_template :new
+        end
+      end
+    end
+
+    describe "PATCH update" do
+      context "with valid params" do
+        it "locates the requested @user" do
+          patch :update, id: @area, area: FactoryGirl.attributes_for(:update_area)
+          expect(assigns(:area)).to eq @area
+        end
+
+        it "changes @area's attributes" do
+          patch :update, id: @area, area: FactoryGirl.attributes_for(:update_area)
+          @area.reload
+          expect(@area.area_code).to eq("update_area_code")
+          expect(@area.desc).to eq("update_desc")
+        end
+
+        it "redirects to the area" do
+          patch :update, id: @area, area: FactoryGirl.attributes_for(:area)
+          expect(response).to redirect_to @area
+        end
+      end
+
+      context "with invalid params" do
+        it "does not change the area's attributes" do
+          put :update, id: @area, area: FactoryGirl.attributes_for(:invalid_area)
+          @area.reload
+          expect(@area.area_code).to_not eq("invalid_a")
+          expect(@area.area_code).to eq("area_code")
+        end
+
+        it "re-renders the 'edit' template" do
+          put :update, id: @area, area: FactoryGirl.attributes_for(:invalid_area)
+          expect(response).to render_template("edit")
+        end
+      end
+    end
+
+    describe "DELETE destroy" do
+
+      it "destroys the requested user" do
+        expect {
+          delete :destroy, id: @area
+        }.to change(Area, :count).by(-1)
+      end
+
+      it "redirects to the areas list" do
+        delete :destroy, id: @area
+        expect(response).to redirect_to(areas_url)
       end
     end
   end
 
-  describe "DELETE destroy" do
-    it "destroys the requested area" do
-      area = Area.create! valid_attributes
-      expect {
-        delete :destroy, {:id => area.to_param}, valid_session
-      }.to change(Area, :count).by(-1)
+  # shared_examples("guest access to areas") do
+  #   describe "GET index" do
+  #     it "should login" do
+  #       get :index
+  #       expect(response).to redirect_to "/users/sign_in"
+  #     end
+  #   end
+
+  #   describe "GET show" do
+  #     it "should login" do
+  #       get :show, id: @area
+  #       expect(response).to redirect_to "/users/sign_in"
+  #     end
+  #   end
+
+  #   describe "GET new" do
+  #     it "should login" do
+  #       get :new
+  #       expect(response).to redirect_to "/users/sign_in"
+  #     end
+  #   end
+
+  #   describe "GET edit" do
+  #     it "should login" do
+  #       get :edit, id: @area
+  #       expect(response).to redirect_to "/users/sign_in"
+  #     end
+  #   end
+
+  #   describe "POST create" do
+  #       it "should login" do
+  #         post :create, area: FactoryGirl.attributes_for(:new_area)
+  #         expect(response).to redirect_to "/users/sign_in"
+  #       end
+  #   end
+
+  #   describe "PATCH update" do
+  #       it "should login" do
+  #         patch :update, id: @area, area: FactoryGirl.attributes_for(:area)
+  #         expect(response).to redirect_to "/users/sign_in"
+  #       end
+  #   end
+
+  #   describe "DELETE destroy" do
+  #     it "should login" do
+  #       delete :destroy, id: @area
+  #       expect(response).to redirect_to "/users/sign_in"
+  #     end
+  #   end
+  # end
+
+  describe "admin access" do
+    before :each do 
+      @unit = FactoryGirl.create(:unit)
+      @storage = FactoryGirl.create(:storage)
+      @user = FactoryGirl.create(:user,email: "")
+      @area = FactoryGirl.create(:area)
+      @role = FactoryGirl.create(:role)
+      sign_in @user
+      session[:current_storage] = @area.storage
     end
 
-    it "redirects to the areas list" do
-      area = Area.create! valid_attributes
-      delete :destroy, {:id => area.to_param}, valid_session
-      response.should redirect_to(areas_url)
-    end
+    it_behaves_like "user/admin access to areas"
+    
   end
 
+  # describe "guess access" do
+  #   before :each do 
+  #     FactoryGirl.create(:unit)
+  #     @user = FactoryGirl.create(:user)
+  #     @superadmin = FactoryGirl.create(:superadmin)
+  #     @unitadmin = FactoryGirl.create(:unitadmin)
+  #   end
+
+  #   it_behaves_like "guest access to areas"
+  # end
 end

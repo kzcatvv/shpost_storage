@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20140402015156) do
+
+#ActiveRecord::Schema.define(version: 20140401064102) do
+
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -87,6 +91,14 @@ ActiveRecord::Schema.define(version: 20140402015156) do
 
   add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
 
+  create_table "shelves", force: true do |t|
+    t.integer  "area_id"
+    t.string   "shelf_code"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "specifications", force: true do |t|
     t.integer  "commodity_id"
     t.string   "model"
@@ -106,6 +118,21 @@ ActiveRecord::Schema.define(version: 20140402015156) do
     t.string   "object_symbol"
     t.integer  "amount",             default: 0,  null: false
     t.datetime "checked_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "operation_type"
+    t.string   "desc"
+  end
+
+  create_table "stocks", force: true do |t|
+    t.integer  "shelf_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.string   "batch_no"
+    t.integer  "specification_id",             null: false
+    t.integer  "actual_amount",    default: 0, null: false
+    t.integer  "virtual_amount",   default: 0, null: false
+    t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -145,6 +172,7 @@ ActiveRecord::Schema.define(version: 20140402015156) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "object_symbol"
+    t.string   "desc"
   end
 
   create_table "users", force: true do |t|

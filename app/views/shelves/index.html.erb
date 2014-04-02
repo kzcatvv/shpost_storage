@@ -1,0 +1,26 @@
+<%- model_class = Shelf -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Shelf %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_shelf_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+<%= grid(@shelves_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:area), attribute: 'area_id'
+
+    g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column do |shelf|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")), edit_shelf_path(shelf), :class => 'btn btn-xs btn-primary' if can? :update, shelf) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), shelf_path(shelf), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, shelf)
+    end
+  end 
+%>

@@ -22,7 +22,7 @@
       end
 
     g.column name: model_class.human_attribute_name(:checked_at), attribute: 'checked_at' do |stock_log|
-        stock_log.checked_at.to_s(:db)
+        stock_log.checked_at.try :to_s, :db
       end
 
   end 

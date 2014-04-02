@@ -16,6 +16,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def current_ability
+    @current_ability ||= Ability.new(current_user, session[:current_storage])
+  end
+
   def configure_charsets
     headers["Content-Type"]="text/html;charset=utf-8"
   end
