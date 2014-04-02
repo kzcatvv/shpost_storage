@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :shelf do
-    area_id 1
+    association :area
     shelf_code "shelf1"
     desc "shelf1_desc"
   end
