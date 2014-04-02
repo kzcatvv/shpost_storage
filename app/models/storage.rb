@@ -1,6 +1,7 @@
 class Storage < ActiveRecord::Base
    belongs_to :unit
    has_many :roles
+   has_many :areas, dependent: :destroy
 
    validates_presence_of :name, :unit_id, :message => '不能为空字符'
    validates_uniqueness_of :name, :message => '该仓库已存在'

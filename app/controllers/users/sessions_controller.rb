@@ -6,7 +6,7 @@ class Users::SessionsController < Devise::SessionsController
       @user_log = UserLog.create(user: current_user, operation: '用户登录')
 
       if !current_user.unit.nil?
-      	session[:current_storage] = Storage.get_default_storage(current_user.unit.id)
+      	session[:current_storage] = current_user.storages.first
       end
 
     end

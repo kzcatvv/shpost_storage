@@ -11,7 +11,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140401074407) do
+
+ActiveRecord::Schema.define(version: 20140402032647) do
+
+  create_table "areas", force: true do |t|
+    t.integer  "storage_id"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "area_code",  default: "", null: false
+    t.string   "name",       default: "", null: false
+  end
+
+  create_table "businesses", force: true do |t|
+    t.string   "name",       default: "", null: false
+    t.string   "email"
+    t.string   "contactor"
+    t.string   "phone"
+    t.string   "address"
+    t.string   "desc"
+    t.integer  "unit_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "commodities", force: true do |t|
     t.string   "cno"
@@ -38,6 +60,33 @@ ActiveRecord::Schema.define(version: 20140401074407) do
     t.integer  "unit_id"
   end
 
+  create_table "purchasedetails", force: true do |t|
+    t.string   "name",        default: "", null: false
+    t.integer  "purchase_id"
+    t.integer  "supplier_id"
+    t.integer  "spec_id"
+    t.string   "qg_period"
+    t.string   "batch_no"
+    t.integer  "amount"
+    t.float    "sum"
+    t.string   "desc"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "purchases", force: true do |t|
+    t.string   "no",          default: "", null: false
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.integer  "amount"
+    t.float    "sum"
+    t.string   "desc"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "roles", force: true do |t|
     t.integer  "user_id"
     t.integer  "storage_id"
@@ -48,14 +97,21 @@ ActiveRecord::Schema.define(version: 20140401074407) do
 
   add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
 
-  create_table "specifications", force: true do |t|
-    t.integer  "commodity_id"
+  create_table "shelves", force: true do |t|
+    t.integer  "area_id"
+    t.string   "shelf_code"
+    t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "name"
-    t.string   "sixnine_code"
-    t.string   "desc"
-    t.string   "product_no"
+  end
+
+  create_table "specifications", force: true do |t|
+    t.integer  "commodity_id"
+    t.string   "model"
+    t.string   "size"
+    t.string   "color"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "stock_logs", force: true do |t|
@@ -68,6 +124,21 @@ ActiveRecord::Schema.define(version: 20140401074407) do
     t.string   "object_symbol"
     t.integer  "amount",             default: 0,  null: false
     t.datetime "checked_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "operation_type"
+    t.string   "desc"
+  end
+
+  create_table "stocks", force: true do |t|
+    t.integer  "shelf_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.string   "batch_no"
+    t.integer  "specification_id",             null: false
+    t.integer  "actual_amount",    default: 0, null: false
+    t.integer  "virtual_amount",   default: 0, null: false
+    t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -116,6 +187,7 @@ ActiveRecord::Schema.define(version: 20140401074407) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "object_symbol"
+    t.string   "desc"
   end
 
   create_table "users", force: true do |t|

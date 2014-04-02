@@ -4,6 +4,13 @@ class StoragesController < ApplicationController
   load_and_authorize_resource :unit
   load_and_authorize_resource :storage, through: :unit, parent: false
   #skip_load_resource :storage, :only => :create
+
+  # GET /units/1/storages/1/change
+  def change
+    session[:current_storage] = Storage.find(params[:id])
+    redirect_to request.referer
+  end
+
   # GET /storages
   # GET /storages.json
   def index

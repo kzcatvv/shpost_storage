@@ -96,19 +96,28 @@ describe UsersController do
           expect(response).to redirect_to(User.last)
         end
 
-        it "assigns a newly created user_log with create user as @user_log" do
+        it "creates a new UserLog with creating user" do
+          expect { post :create, user: FactoryGirl.attributes_for(:new_user)}.to change(UserLog, :count).by(1)
+        end
+
+        it "assigns a newly created user_log as @user_log with creating user" do
           post :create, user: FactoryGirl.attributes_for(:new_user)
+
           expect(assigns(:user_log)).to be_a(UserLog)
           expect(assigns(:user_log)).to be_persisted
           expect(assigns(:user_log).object_class).to eq 'User'
           expect(assigns(:user_log).object_id).to eq assigns(:user).id
-          expect(assigns(:user_log).operation).to eq '新增用户'
+          expect(assigns(:user_log).operation).to eq '新增用户管理'
         end
       end
 
       context "with invalid params" do
         it "assigns a newly created but unsaved user as @user" do
           expect{post :create, user: FactoryGirl.attributes_for(:invalid_user)}.to_not change(User, :count)
+        end
+
+        it "assigns a newly created but unsaved user as @user not created user_log" do
+          expect {post :create, user: FactoryGirl.attributes_for(:invalid_user)}.to_not change(UserLog, :count)
         end
 
         it "re-renders the 'new' template" do
@@ -167,13 +176,17 @@ describe UsersController do
         expect(response).to redirect_to(users_url)
       end
 
-      it "assigns a newly created user_log with destorys the request user as @user_log" do
-        delete :destroy, id: @user
+      it "assigns a newly created user_log as @user_log with destroying user" do
+        expect { post :create, user: FactoryGirl.attributes_for(:new_user)}.to change(UserLog, :count).by(1)
+
+        expect {
+          delete :destroy, id: @user
+        }.to change(UserLog, :count).by(1)
         expect(assigns(:user_log)).to be_a(UserLog)
         expect(assigns(:user_log)).to be_persisted
         expect(assigns(:user_log).object_class).to eq 'User'
         expect(assigns(:user_log).object_id).to eq assigns(:user).id
-        expect(assigns(:user_log).operation).to eq '删除用户'
+        expect(assigns(:user_log).operation).to eq '删除用户管理'
       end
     end
   end

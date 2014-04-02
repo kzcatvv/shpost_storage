@@ -10,10 +10,14 @@ class ApplicationController < ActionController::Base
   before_filter :configure_charsets
   before_filter :authenticate_user!
 
-  def self.save_user_logs_filter *args
+  def self.user_logs_filter *args
     after_filter args.first.select{|k,v| k == :only || k == :expert} do |controller|
       save_user_log args.first.reject{|k,v| k == :only || k == :expert}
     end
+  end
+
+  def current_ability
+    @current_ability ||= Ability.new(current_user, session[:current_storage])
   end
 
   def configure_charsets

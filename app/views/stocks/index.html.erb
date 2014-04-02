@@ -1,0 +1,45 @@
+<%- model_class = Stock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Stock %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_stock_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@stocks_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:shelf_id), attribute: 'shelf_code', model: 'Shelf' do |stock|
+        stock.shelf.try :shelf_code
+      end
+
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'model', model: 'Specification' do |stock|
+      stock.specification.try :model
+    end
+
+    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |stock|
+      stock.business.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |stock|
+      stock.supplier.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:actual_amount), attribute: 'actual_amount', filter: false
+
+    g.column name: model_class.human_attribute_name(:virtual_amount), attribute: 'virtual_amount', filter: false
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc', filter: false
+
+    g.column do |stock|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")), edit_stock_path(stock), :class => 'btn btn-xs btn-primary' if can? :update, stock) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), stock_path(stock), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, stock)
+    end
+  end 
+%>

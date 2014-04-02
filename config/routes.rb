@@ -1,12 +1,27 @@
 ShpostStorage::Application.routes.draw do
 
 
+
   resources :thirdpartcodes do
       collection do
         post 'select_commodities'
         post 'select_specifications'
       end
   end
+
+  resources :shelves
+
+  resources :purchasedetails
+
+  resources :purchases
+
+  resources :stocks
+
+  resources :purchases
+
+  resources :areas
+
+  resources :businesses
 
   resources :stock_logs, only: [:index, :show]
 
@@ -24,12 +39,14 @@ ShpostStorage::Application.routes.draw do
 
   resources :users
   
-  resources :storages
-
   resources :units
  
   resources :units do
-     resources :storages
+    resources :storages do
+      member do
+          get 'change'
+      end
+    end
   end
 
   resources :units do

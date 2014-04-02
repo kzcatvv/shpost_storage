@@ -4,7 +4,7 @@ class StockLogsController < ApplicationController
   # GET /stock_logs
   # GET /stock_logs.json
   def index
-    @stock_logs_grid = initialize_grid(@stock_logs)
+    @stock_logs_grid = initialize_grid(@stock_logs, include: :user)
   end
 
   # GET /stock_logs/1

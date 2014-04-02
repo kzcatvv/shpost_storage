@@ -1,0 +1,57 @@
+<%= form_for @stock, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :shelf_id, :class => 'control-label' %>
+    <div class="controls">
+    <%= f.select(:shelf_id, Shelf.accessible_by(current_ability).map{|s| [s.shelf_code,s.id]})%>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :specification_id, :class => 'control-label' %>
+    <div class="controls">
+    <%= f.select(:specification_id, Specification.accessible_by(current_ability).map{|s| [s.model,s.id]})%>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :batch_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :batch_no, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :business_id, :class => 'control-label' %>
+    <div class="controls">
+    <%= f.select(:business_id, Business.accessible_by(current_ability).map{|b| [b.name,b.id]})%>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :supplier_id, :class => 'control-label' %>
+    <div class="controls">
+    <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|s| [s.name,s.id]})%>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :actual_amount, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :actual_amount, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :virtual_amount, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :virtual_amount, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :desc, :class => 'text_field' %>
+    </div>
+  </div>
+
+  
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <% if can? :index, Stock %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+              stocks_path, :class => 'btn btn-default' %>
+  <% end %>
+<% end %>
