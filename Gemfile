@@ -59,6 +59,8 @@ gem 'spreadsheet'
 
 gem 'yomu'
 
+gem 'prototype-rails'
+
 group :test, :development do
   gem 'rspec', '~> 2.0'
   gem 'rspec-rails', '~> 2.0'

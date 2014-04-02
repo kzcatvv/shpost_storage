@@ -16,11 +16,13 @@
       specification.commodity.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:model), attribute: 'model'
+    g.column name: model_class.human_attribute_name(:product_no), attribute: 'product_no'
 
-    g.column name: model_class.human_attribute_name(:size), attribute: 'size'
+    g.column name: model_class.human_attribute_name(:sixnine_code), attribute: 'sixnine_code'
 
-    g.column name: model_class.human_attribute_name(:color), attribute: 'color'
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
     g.column do |specification|
       ActiveSupport::SafeBuffer.new << 
@@ -29,49 +31,3 @@
     end
   end 
 %>
-
-
-
-
-<%- model_class = Specification -%>
-<div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
-</div>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
-      <th><%= model_class.human_attribute_name(:commodity_id) %></th>
-      <th><%= model_class.human_attribute_name(:model) %></th>
-      <th><%= model_class.human_attribute_name(:size) %></th>
-      <th><%= model_class.human_attribute_name(:color) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @specifications.each do |specification| %>
-      <tr>
-        <td><%= link_to specification.id, specification_path(specification) %></td>
-        <td><%= specification.commodity_id %></td>
-        <td><%= specification.model %></td>
-        <td><%= specification.size %></td>
-        <td><%= specification.color %></td>
-        <td><%=l specification.created_at %></td>
-        <td>
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_specification_path(specification), :class => 'btn btn-default btn-xs' %>
-          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      specification_path(specification),
-                      :method => :delete,
-                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<%= link_to t('.new', :default => t("helpers.links.new")),
-            new_specification_path,
-            :class => 'btn btn-primary' %>

@@ -14,6 +14,7 @@ class CommoditiesController < ApplicationController
 
   # GET /commodities/new
   def new
+    @commodity.unit_id = current_user.unit_id
     #@commodity = Commodity.new
   end
 

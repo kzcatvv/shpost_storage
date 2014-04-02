@@ -23,138 +23,217 @@ describe SpecificationsController do
   # This should return the minimal set of attributes required to create a valid
   # Specification. As you add validations to Specification, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "commodity_id" => "1" } }
+  #let(:valid_attributes) { { "commodity_id" => "1" } }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # SpecificationsController. Be sure to keep this updated too.
-  let(:valid_session) { {} }
+  #let(:valid_session) { {} }
 
-  describe "GET index" do
-    it "assigns all specifications as @specifications" do
-      specification = Specification.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:specifications).should eq([specification])
+  # describe "GET index" do
+  #   it "assigns all specifications as @specifications" do
+  #     specification = Specification.create! valid_attributes
+  #     get :index, {}, valid_session
+  #     assigns(:specifications).should eq([specification])
+  #   end
+  # end
+
+  # describe "GET show" do
+  #   it "assigns the requested specification as @specification" do
+  #     specification = Specification.create! valid_attributes
+  #     get :show, {:id => specification.to_param}, valid_session
+  #     assigns(:specification).should eq(specification)
+  #   end
+  # end
+
+  # describe "GET new" do
+  #   it "assigns a new specification as @specification" do
+  #     get :new, {}, valid_session
+  #     assigns(:specification).should be_a_new(Specification)
+  #   end
+  # end
+
+  # describe "GET edit" do
+  #   it "assigns the requested specification as @specification" do
+  #     specification = Specification.create! valid_attributes
+  #     get :edit, {:id => specification.to_param}, valid_session
+  #     assigns(:specification).should eq(specification)
+  #   end
+  # end
+
+  # describe "POST create" do
+  #   describe "with valid params" do
+  #     it "creates a new Specification" do
+  #       expect {
+  #         post :create, {:specification => valid_attributes}, valid_session
+  #       }.to change(Specification, :count).by(1)
+  #     end
+
+  #     it "assigns a newly created specification as @specification" do
+  #       post :create, {:specification => valid_attributes}, valid_session
+  #       assigns(:specification).should be_a(Specification)
+  #       assigns(:specification).should be_persisted
+  #     end
+
+  #     it "redirects to the created specification" do
+  #       post :create, {:specification => valid_attributes}, valid_session
+  #       response.should redirect_to(Specification.last)
+  #     end
+  #   end
+
+  #   describe "with invalid params" do
+  #     it "assigns a newly created but unsaved specification as @specification" do
+  #       # Trigger the behavior that occurs when invalid params are submitted
+  #       Specification.any_instance.stub(:save).and_return(false)
+  #       post :create, {:specification => { "commodity_id" => "invalid value" }}, valid_session
+  #       assigns(:specification).should be_a_new(Specification)
+  #     end
+
+  #     it "re-renders the 'new' template" do
+  #       # Trigger the behavior that occurs when invalid params are submitted
+  #       Specification.any_instance.stub(:save).and_return(false)
+  #       post :create, {:specification => { "commodity_id" => "invalid value" }}, valid_session
+  #       response.should render_template("new")
+  #     end
+  #   end
+  # end
+
+  # describe "PUT update" do
+  #   describe "with valid params" do
+  #     it "updates the requested specification" do
+  #       specification = Specification.create! valid_attributes
+  #       # Assuming there are no other specifications in the database, this
+  #       # specifies that the Specification created on the previous line
+  #       # receives the :update_attributes message with whatever params are
+  #       # submitted in the request.
+  #       Specification.any_instance.should_receive(:update).with({ "commodity_id" => "1" })
+  #       put :update, {:id => specification.to_param, :specification => { "commodity_id" => "1" }}, valid_session
+  #     end
+
+  #     it "assigns the requested specification as @specification" do
+  #       specification = Specification.create! valid_attributes
+  #       put :update, {:id => specification.to_param, :specification => valid_attributes}, valid_session
+  #       assigns(:specification).should eq(specification)
+  #     end
+
+  #     it "redirects to the specification" do
+  #       specification = Specification.create! valid_attributes
+  #       put :update, {:id => specification.to_param, :specification => valid_attributes}, valid_session
+  #       response.should redirect_to(specification)
+  #     end
+  #   end
+
+  #   describe "with invalid params" do
+  #     it "assigns the specification as @specification" do
+  #       specification = Specification.create! valid_attributes
+  #       # Trigger the behavior that occurs when invalid params are submitted
+  #       Specification.any_instance.stub(:save).and_return(false)
+  #       put :update, {:id => specification.to_param, :specification => { "commodity_id" => "invalid value" }}, valid_session
+  #       assigns(:specification).should eq(specification)
+  #     end
+
+  #     it "re-renders the 'edit' template" do
+  #       specification = Specification.create! valid_attributes
+  #       # Trigger the behavior that occurs when invalid params are submitted
+  #       Specification.any_instance.stub(:save).and_return(false)
+  #       put :update, {:id => specification.to_param, :specification => { "commodity_id" => "invalid value" }}, valid_session
+  #       response.should render_template("edit")
+  #     end
+  #   end
+  # end
+
+  # describe "DELETE destroy" do
+  #   it "destroys the requested specification" do
+  #     specification = Specification.create! valid_attributes
+  #     expect {
+  #       delete :destroy, {:id => specification.to_param}, valid_session
+  #     }.to change(Specification, :count).by(-1)
+  #   end
+
+  #   it "redirects to the specifications list" do
+  #     specification = Specification.create! valid_attributes
+  #     delete :destroy, {:id => specification.to_param}, valid_session
+  #     response.should redirect_to(specifications_url)
+  #   end
+  # end
+
+  before :each do 
+      @commodity1 = Commodity.create(id: 1,cno: "1111", name: "commodity1")
+      @commodity2 = Commodity.create(id: 2,cno: "22222", name: "commodity2")
+      @specification11 = Specification.create(id: 11, commodity_id: 1,model: "model1",size: "1",color: "red")
+      @specification12 = Specification.create(id: 12, commodity_id: 1,model: "model2",size: "1",color: "red")
+      @specification13 = Specification.create(id: 13, commodity_id: 2,model: "model3",size: "2",color: "red")
+      @superadmin = FactoryGirl.create(:superadmin)
+      @user = FactoryGirl.create(:new_user)
+      
+      sign_in @superadmin
+      #@user = User.first
+    
     end
-  end
 
-  describe "GET show" do
-    it "assigns the requested specification as @specification" do
-      specification = Specification.create! valid_attributes
-      get :show, {:id => specification.to_param}, valid_session
-      assigns(:specification).should eq(specification)
-    end
-  end
+    describe "GET commodity_specifications test" do
+      #it "assigns all specifications belongs to commodity 1" do
+        #get :index
+        #expect(assigns(:specifications)).to eq([@user1, @user2])
+      #end
 
-  describe "GET new" do
-    it "assigns a new specification as @specification" do
-      get :new, {}, valid_session
-      assigns(:specification).should be_a_new(Specification)
-    end
-  end
-
-  describe "GET edit" do
-    it "assigns the requested specification as @specification" do
-      specification = Specification.create! valid_attributes
-      get :edit, {:id => specification.to_param}, valid_session
-      assigns(:specification).should eq(specification)
-    end
-  end
-
-  describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Specification" do
-        expect {
-          post :create, {:specification => valid_attributes}, valid_session
-        }.to change(Specification, :count).by(1)
+      it " get the index route action" do
+        { :get => "/commodities/1/specifications" }.should route_to("action"=>"index", "controller"=>"specifications", "commodity_id"=>"1")
       end
 
-      it "assigns a newly created specification as @specification" do
-        post :create, {:specification => valid_attributes}, valid_session
-        assigns(:specification).should be_a(Specification)
-        assigns(:specification).should be_persisted
+      it " get the index specifications" do
+          get :index , commodity_id: 1
+          expect(assigns(:specifications)).to eq([@specification11,@specification12])
       end
 
-      it "redirects to the created specification" do
-        post :create, {:specification => valid_attributes}, valid_session
-        response.should redirect_to(Specification.last)
+      it " get the new route action" do
+        { :get => "/commodities/1/specifications/new" }.should route_to("action"=>"new", "controller"=>"specifications", "commodity_id"=>"1")
       end
+
+      it " get the new user" do
+          get :new, commodity_id: 1
+          expect(assigns(:specification)).to be_a_new(Specification)
+      end
+
+      it " get the create route action" do
+        { :post => "/commodities/1/specifications" }.should route_to("action"=>"create", "controller"=>"specifications", "commodity_id"=>"1")
+      end
+
+      it " get the create user" do
+          expect { post :create, commodity_id: 1, specification: FactoryGirl.attributes_for(:specification) }.to change(Specification, :count).by(1)
+      end
+
+      it " get the edit route action" do
+        { :get => "/commodities/1/specifications/1/edit" }.should route_to("action"=>"edit", "controller"=>"specifications", "commodity_id"=>"1", "id"=>"1")
+      end
+
+      it "renders the edit view" do
+        get :edit, commodity_id: 1,id: 11
+        expect(response).to render_template :edit
+      end
+
+      it " get the show route action" do
+        { :get => "/commodities/1/specifications/1" }.should route_to("action"=>"show", "controller"=>"specifications", "commodity_id"=>"1", "id"=>"1")
+      end
+
+      it " get the show user" do
+          get :show, commodity_id: 1, id: 11
+        expect(assigns(:specification)).to eq(@specification11)
+      end
+
+      it " get the update route action" do
+        { :patch => "/commodities/1/specifications/1" }.should route_to("action"=>"update", "controller"=>"specifications", "commodity_id"=>"1", "id"=>"1")
+      end
+
+      #it "changes @user's attributes" do
+          #patch :update, commodity_id: 1, id: @user, user: FactoryGirl.attributes_for(:update_user)
+          #@user.reload
+          #expect(@user.username).to eq("update_username_test")
+          #expect(@user.name).to eq("update_name")
+          #expect(@user.email).to eq("update_user@example.com")
+      #end
+
+      
     end
-
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved specification as @specification" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Specification.any_instance.stub(:save).and_return(false)
-        post :create, {:specification => { "commodity_id" => "invalid value" }}, valid_session
-        assigns(:specification).should be_a_new(Specification)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Specification.any_instance.stub(:save).and_return(false)
-        post :create, {:specification => { "commodity_id" => "invalid value" }}, valid_session
-        response.should render_template("new")
-      end
-    end
-  end
-
-  describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested specification" do
-        specification = Specification.create! valid_attributes
-        # Assuming there are no other specifications in the database, this
-        # specifies that the Specification created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Specification.any_instance.should_receive(:update).with({ "commodity_id" => "1" })
-        put :update, {:id => specification.to_param, :specification => { "commodity_id" => "1" }}, valid_session
-      end
-
-      it "assigns the requested specification as @specification" do
-        specification = Specification.create! valid_attributes
-        put :update, {:id => specification.to_param, :specification => valid_attributes}, valid_session
-        assigns(:specification).should eq(specification)
-      end
-
-      it "redirects to the specification" do
-        specification = Specification.create! valid_attributes
-        put :update, {:id => specification.to_param, :specification => valid_attributes}, valid_session
-        response.should redirect_to(specification)
-      end
-    end
-
-    describe "with invalid params" do
-      it "assigns the specification as @specification" do
-        specification = Specification.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Specification.any_instance.stub(:save).and_return(false)
-        put :update, {:id => specification.to_param, :specification => { "commodity_id" => "invalid value" }}, valid_session
-        assigns(:specification).should eq(specification)
-      end
-
-      it "re-renders the 'edit' template" do
-        specification = Specification.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Specification.any_instance.stub(:save).and_return(false)
-        put :update, {:id => specification.to_param, :specification => { "commodity_id" => "invalid value" }}, valid_session
-        response.should render_template("edit")
-      end
-    end
-  end
-
-  describe "DELETE destroy" do
-    it "destroys the requested specification" do
-      specification = Specification.create! valid_attributes
-      expect {
-        delete :destroy, {:id => specification.to_param}, valid_session
-      }.to change(Specification, :count).by(-1)
-    end
-
-    it "redirects to the specifications list" do
-      specification = Specification.create! valid_attributes
-      delete :destroy, {:id => specification.to_param}, valid_session
-      response.should redirect_to(specifications_url)
-    end
-  end
 
 end
