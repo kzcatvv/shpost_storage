@@ -11,6 +11,11 @@ Unit.destroy_all()
 Storage.destroy_all()
 Role.destroy_all()
 Area.destroy_all()
+Supplier.destroy_all()
+Business.destroy_all()
+Goodstype.destroy_all()
+Commodity.destroy_all()
+Specification.destroy_all()
 
 
 unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc')
