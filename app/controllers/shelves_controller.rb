@@ -5,6 +5,8 @@ class ShelvesController < ApplicationController
 
   def find_current_storage
     @areas = Area.where("storage_id = ?", session[:current_storage].id)
+    # puts @areas.ids
+    @shelves = Shelf.where("area_id in (?)", @areas.ids)
   end
 
   # GET /shelves
