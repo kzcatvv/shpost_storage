@@ -6,7 +6,8 @@ class SpecificationsController < ApplicationController
   # GET /specifications.json
   def index
     #@specifications = Specification.all
-    @rspecifications_grid = initialize_grid(@specifications, include: :commodity)
+    @specifications_grid = initialize_grid(@specifications, include: :commodity)
+
   end
 
   # GET /specifications/1
@@ -30,7 +31,7 @@ class SpecificationsController < ApplicationController
 
     respond_to do |format|
       if @specification.save
-        format.html { redirect_to @specification, notice: 'Specification was successfully created.' }
+        format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: 'Specification was successfully created.' }
         format.json { render action: 'show', status: :created, location: @specification }
       else
         format.html { render action: 'new' }
@@ -44,7 +45,7 @@ class SpecificationsController < ApplicationController
   def update
     respond_to do |format|
       if @specification.update(specification_params)
-        format.html { redirect_to @specification, notice: 'Specification was successfully updated.' }
+        format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: 'Specification was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -58,7 +59,7 @@ class SpecificationsController < ApplicationController
   def destroy
     @specification.destroy
     respond_to do |format|
-      format.html { redirect_to specifications_url }
+      format.html { redirect_to commodity_specifications_path(@commodity) }
       format.json { head :no_content }
     end
   end
@@ -71,6 +72,6 @@ class SpecificationsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def specification_params
-      params.require(:specification).permit( :model, :size, :color)
+      params.require(:specification).permit( :model, :sixnine_code, :desc, :name)
     end
 end

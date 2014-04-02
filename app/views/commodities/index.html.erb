@@ -32,7 +32,9 @@
                       edit_commodity_path(commodity), :class => 'btn btn-xs btn-primary' if can? :update, commodity) << ' ' <<
       (link_to t('.destroy', :default => t("helpers.links.destroy")),
                       commodity_path(commodity),
-                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, commodity)
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, commodity)<< ' ' <<
+      (link_to t('.specifications', :default => t("helpers.links.specifications")),
+                commodity_specifications_path(commodity), :class => 'btn btn-xs btn-primary' if can? :specifications, commodity)
       end
   end 
 %>

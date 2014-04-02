@@ -104,11 +104,12 @@ ActiveRecord::Schema.define(version: 20140402065336) do
 
   create_table "specifications", force: true do |t|
     t.integer  "commodity_id"
-    t.string   "model"
-    t.string   "size"
-    t.string   "color"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
+    t.string   "sixnine_code"
+    t.string   "desc"
+    t.string   "product_no"
   end
 
   create_table "stock_logs", force: true do |t|
@@ -154,6 +155,15 @@ ActiveRecord::Schema.define(version: 20140402065336) do
     t.string   "address"
     t.string   "phone"
     t.integer  "unit_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "thirdpartcodes", force: true do |t|
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.string   "external_code"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
