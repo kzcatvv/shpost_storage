@@ -260,13 +260,12 @@ zh-CN:
       purchase:
         one: 采购单管理
         other: 采购单管理
-<<<<<<< HEAD
-      purchasedetail:
+
+      purchase_detail:
         one: 采购单明细管理
         other: 采购单明细管理
 
-=======
->>>>>>> d52d1cd3bac7f67bdb469ab402db42576d114096
+
       area:
         one: 区域管理
         other: 区域管理
@@ -357,11 +356,11 @@ zh-CN:
         status: "状态"
 
 
-      purchasedetail:
+      purchase_detail:
         name: "编号"
         purchase_id: "所属机构"
         supplier_id: "所属商户"
-        spec_id: "规格号"
+        specification_id: "规格号"
         qg_period: "保质期"
         batch_no: "批次号"
         amount: "数量"

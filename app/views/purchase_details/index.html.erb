@@ -1,0 +1,46 @@
+<%- model_class = PurchaseDetail -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, PurchaseDetail %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_purchase_detail_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+
+
+
+<%= grid(@purchase_details_grid) do |g|
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:purchase_id), attribute: 'purchase_id'
+
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'supplier_id'
+
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'specification_id'
+
+    g.column name: model_class.human_attribute_name(:qg_period), attribute: 'qg_period'
+
+    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'
+
+    g.column name: model_class.human_attribute_name(:sum), attribute: 'sum'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+
+    g.column do |purchase_detail|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_purchase_detail_path(purchase_detail), :class => 'btn btn-xs btn-primary' if can? :update, purchase_detail) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      purchase_detail_path(purchase_detail),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase_detail)
+      end
+  end 
+%>
