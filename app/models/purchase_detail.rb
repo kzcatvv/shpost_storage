@@ -1,4 +1,4 @@
-class Purchasedetail < ActiveRecord::Base
+class PurchaseDetail < ActiveRecord::Base
 	belongs_to :specification
 	belongs_to :supplier
 	belongs_to :purchase

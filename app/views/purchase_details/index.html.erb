@@ -1,10 +1,10 @@
-<%- model_class = Purchasedetail -%>
+<%- model_class = PurchaseDetail -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-    <% if can? :new, Purchasedetail %>
+    <% if can? :new, PurchaseDetail %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
-                  new_purchasedetail_path,
+                  new_purchase_detail_path,
                   :class => 'btn btn-primary' %>
     <% end %>
   </div>
@@ -13,14 +13,14 @@
 
 
 
-<%= grid(@purchasedetails_grid) do |g|
+<%= grid(@purchase_details_grid) do |g|
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
     g.column name: model_class.human_attribute_name(:purchase_id), attribute: 'purchase_id'
 
     g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'supplier_id'
 
-    g.column name: model_class.human_attribute_name(:spec_id), attribute: 'spec_id'
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'specification_id'
 
     g.column name: model_class.human_attribute_name(:qg_period), attribute: 'qg_period'
 
@@ -34,13 +34,13 @@
 
     g.column name: model_class.human_attribute_name(:status), attribute: 'status'
 
-    g.column do |purchasedetail|
+    g.column do |purchase_detail|
       ActiveSupport::SafeBuffer.new << 
       (link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_purchasedetail_path(purchasedetail), :class => 'btn btn-xs btn-primary' if can? :update, purchasedetail) << ' ' <<
+                      edit_purchase_detail_path(purchase_detail), :class => 'btn btn-xs btn-primary' if can? :update, purchase_detail) << ' ' <<
       (link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      purchasedetail_path(purchasedetail),
-                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchasedetail)
+                      purchase_detail_path(purchase_detail),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase_detail)
       end
   end 
 %>

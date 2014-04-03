@@ -1,10 +1,10 @@
-class CreatePurchasedetails < ActiveRecord::Migration
+class CreatePurchaseDetails < ActiveRecord::Migration
   def change
-    create_table :purchasedetails do |t|
+    create_table :purchase_details do |t|
       t.string :name,null:false, default: ''
       t.integer :purchase_id
       t.integer :supplier_id
-      t.integer :spec_id
+      t.integer :specification_id
       t.string :qg_period
       t.string :batch_no
       t.integer :amount
