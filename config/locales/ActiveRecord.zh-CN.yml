@@ -151,6 +151,7 @@ zh-CN:
       users: 用户管理
       roles: 角色管理
       specifications: 商品规格管理
+      details: 明细管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -276,6 +277,12 @@ zh-CN:
       shelf:
         one: 货架管理
         other: 货架管理
+      keyclientorder:
+        one: 大客户订单管理
+        other: 大客户订单管理
+      keyclientorderdetail:
+        one: 大客户订单明细管理
+        other: 大客户订单明细管理
     attributes:
       user:
         email: "电子邮件"
@@ -396,6 +403,17 @@ zh-CN:
         max_volume: "最大体积"
         shelf_code: "货架编号"
         desc: "货架描述"
+      keyclientorder:
+        keyclient_name: 大客户名称
+        keyclient_addr: 大客户地址
+        contact_person: 联系人
+        phone: 联系电话
+        desc: 备注
+        batch_id: 订单批次编号
+      keyclientorderdetail:
+        keyclientorder_id: 大客户订单批次编号
+        specification_id: 商品规格
+        desc: 备注
       filetemp:
         filename: "文档"
         rename: "文件名"

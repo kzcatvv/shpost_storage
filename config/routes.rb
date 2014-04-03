@@ -2,6 +2,12 @@ ShpostStorage::Application.routes.draw do
 
 
 
+  
+
+  resources :keyclientorders do
+    resources :keyclientorderdetails
+  end
+
   resources :thirdpartcodes do
       collection do
         post 'select_commodities'
