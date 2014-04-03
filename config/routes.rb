@@ -1,15 +1,24 @@
 ShpostStorage::Application.routes.draw do
+  resources :thirdpartcodes do
+      collection do
+        post 'select_commodities'
+        post 'select_specifications'
+      end
+  end
 
   resources :shelves
-
 
   resources :purchase_details
 
   resources :purchases
 
-
   resources :stocks
 
+  resources :purchasedetails
+
+  resources :purchases
+
+  resources :stocks
 
   resources :purchases
 
@@ -24,8 +33,6 @@ ShpostStorage::Application.routes.draw do
   resources :goodstypes
 
   resources :suppliers
-  
-  resources :specifications
 
   resources :user_logs, only: [:index, :show]
 
@@ -57,9 +64,11 @@ ShpostStorage::Application.routes.draw do
      resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
   end
 
-  resources :commoditys do
+  resources :commodities do
      resources :specifications
   end
+
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

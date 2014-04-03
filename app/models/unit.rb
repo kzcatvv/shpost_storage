@@ -7,4 +7,5 @@ class Unit < ActiveRecord::Base
   validates :name, presence: true,
                     uniqueness: { case_sensitive: false }
   validates_presence_of :name, :message => '不能为空字符'
+  validates_uniqueness_of :name, :message => '该单位已存在'
 end

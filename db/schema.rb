@@ -11,14 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140402015156) do
+
+ActiveRecord::Schema.define(version: 20140402065336) do
+
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
-    t.string   "desc",       default: "", null: false
+    t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "area_code",  default: "", null: false
+    t.string   "name",       default: "", null: false
   end
 
   create_table "businesses", force: true do |t|
@@ -40,6 +43,14 @@ ActiveRecord::Schema.define(version: 20140402015156) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "goodstypes", force: true do |t|
@@ -93,15 +104,22 @@ ActiveRecord::Schema.define(version: 20140402015156) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "vertical",     default: 1, null: false
+    t.integer  "horizontal",   default: 1, null: false
+    t.integer  "shelf_row",    default: 1, null: false
+    t.integer  "shelf_column", default: 1, null: false
+    t.integer  "max_weight",   default: 0, null: false
+    t.integer  "max_volume",   default: 0, null: false
   end
 
   create_table "specifications", force: true do |t|
     t.integer  "commodity_id"
-    t.string   "model"
-    t.string   "size"
-    t.string   "color"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
+    t.string   "sixnine_code"
+    t.string   "desc"
+    t.string   "product_no"
   end
 
   create_table "stock_logs", force: true do |t|
@@ -147,6 +165,15 @@ ActiveRecord::Schema.define(version: 20140402015156) do
     t.string   "address"
     t.string   "phone"
     t.integer  "unit_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "thirdpartcodes", force: true do |t|
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.string   "external_code"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

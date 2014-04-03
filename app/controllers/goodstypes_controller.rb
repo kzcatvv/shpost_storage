@@ -14,6 +14,7 @@ class GoodstypesController < ApplicationController
 
   # GET /goodstypes/new
   def new
+    @goodstype.unit_id = current_user.unit_id
     #@goodstype = Goodstype.new
   end
 

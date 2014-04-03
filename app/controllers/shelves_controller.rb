@@ -12,7 +12,7 @@ class ShelvesController < ApplicationController
   # GET /shelves
   # GET /shelves.json
   def index
-    @shelves_grid = initialize_grid(@shelves)
+    @shelves_grid = initialize_grid(@shelves,:include => :area)
   end
 
   # GET /shelves/1
@@ -33,6 +33,11 @@ class ShelvesController < ApplicationController
   # POST /shelves.json
   def create
     @shelf = Shelf.new(shelf_params)
+    @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:vertical]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:horizontal]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_row]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_column]
 
     respond_to do |format|
       if @shelf.save
@@ -77,6 +82,6 @@ class ShelvesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shelf_params
-      params.require(:shelf).permit(:area_id, :shelf_code, :desc)
+      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :vertical, :horizontal, :shelf_row, :shelf_column, :max_weight, :max_volume)
     end
 end

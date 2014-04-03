@@ -113,6 +113,8 @@ GEM
       mini_portile (~> 0.5.0)
     orm_adapter (0.5.0)
     polyglot (0.3.4)
+    prototype-rails (4.0.0)
+      rails (~> 4.0)
     pry (0.9.12.6)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -234,6 +236,7 @@ DEPENDENCIES
   launchy (~> 2.3.0)
   less-rails
   minitest
+  prototype-rails
   pry
   rails (= 4.0.2)
   rails-i18n (~> 4.0.0)

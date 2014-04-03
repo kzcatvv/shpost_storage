@@ -1,10 +1,10 @@
 <%= form_for @stock, :html => { :class => 'form-horizontal' } do |f| %>
-  <!-- div class="control-group">
-    <!%= f.label :shelf_id, :class => 'control-label' %>
+  <div class="control-group">
+    <%= f.label :shelf_id, :class => 'control-label' %>
     <div class="controls">
-    <!%= f.select(:shelf_id, Shelf.all.map{|s| [s.id,s.id]})%>
+    <%= f.select(:shelf_id, Shelf.accessible_by(current_ability).map{|s| [s.shelf_code,s.id]})%>
     </div>
-  </div> -->
+  </div>
   <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">

@@ -147,9 +147,10 @@ zh-CN:
       destroy: 删除
       cancel: 取消
       back: 返回
-      storages: 管理仓库
-      users: 管理用户
+      storages: 仓库管理
+      users: 用户管理
       roles: 角色管理
+      specifications: 商品规格管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -251,6 +252,12 @@ zh-CN:
       commodity:
         one: 商品管理
         other: 商品管理
+      specification:
+        one: 商品规格管理
+        other: 商品规格管理
+      thirdpartcode:
+        one: 第三方商品编码管理
+        other: 第三方商品编码管理
       business:
         one: 商户管理
         other: 商户管理
@@ -260,12 +267,9 @@ zh-CN:
       purchase:
         one: 采购单管理
         other: 采购单管理
-
       purchase_detail:
         one: 采购单明细管理
         other: 采购单明细管理
-
-
       area:
         one: 区域管理
         other: 区域管理
@@ -338,6 +342,16 @@ zh-CN:
         cno: "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
+      specification:
+        commodity_id: "商品"
+        product_no: "商品规格编号"
+        desc: "规格描述"
+        sixnine_code: "69码"
+      thirdpartcode:
+        business_id: "商户"
+        supplier_id: "供应商"
+        specification_id: "商品规格"
+        external_code: "第三方商品编码"
       business:
         name: "名称"
         email: "电子邮件"
@@ -354,8 +368,6 @@ zh-CN:
         sum: "合计金额"
         desc: "备注"
         status: "状态"
-
-
       purchase_detail:
         name: "编号"
         purchase_id: "所属机构"
@@ -367,12 +379,8 @@ zh-CN:
         sum: "单价金额"
         desc: "备注"
         status: "状态"
-
-
-
-
-
       area:
+        name: "区域名称"
         current_storage: "当前仓库"
         area_code: "区域编号"
         desc: "区域描述"
@@ -380,6 +388,12 @@ zh-CN:
         current_storage: "当前仓库"
         area_code: "区域编号"
         area: "区域"
+        vertical: "第几排"
+        horizontal: "第几个"
+        shelf_row: "行数"
+        shelf_column: "列数"
+        max_weight: "最大承重"
+        max_volume: "最大体积"
         shelf_code: "货架编号"
         desc: "货架描述"
       filetemp:
@@ -441,6 +455,9 @@ zh-CN:
         commodity:
           name: "商品管理"
           link: "/commodities"
+        thirdpartcode:
+          name: "第三方商品编码管理"
+          link: "/thirdpartcodes"
     stocks:
       name: "库存管理"
       submenu:

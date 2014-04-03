@@ -5,13 +5,15 @@
 
 <dl class="dl-horizontal">
   <dt><strong><%= model_class.human_attribute_name(:commodity_id) %>:</strong></dt>
-  <dd><%= @specification.commodity_id %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:model) %>:</strong></dt>
-  <dd><%= @specification.model %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:size) %>:</strong></dt>
-  <dd><%= @specification.size %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:color) %>:</strong></dt>
-  <dd><%= @specification.color %></dd>
+  <dd><%= Commodity.find(@specification.commodity_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:product_no) %>:</strong></dt>
+  <dd><%= @specification.product_no %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:sixnine_code) %>:</strong></dt>
+  <dd><%= @specification.sixnine_code %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
+  <dd><%= @specification.desc %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
+  <dd><%= @specification.name %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
