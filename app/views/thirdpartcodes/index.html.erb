@@ -28,6 +28,8 @@
 
     g.column do |thirdpartcode|
       ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_thirdpartcode_path(thirdpartcode), :class => 'btn btn-xs btn-primary' if can? :update, thirdpartcode) << ' ' <<
         (link_to t('.destroy', :default => t("helpers.links.destroy")), thirdpartcode_path(thirdpartcode), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, thirdpartcode)
     end
   end 
