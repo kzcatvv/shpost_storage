@@ -14,8 +14,6 @@ ShpostStorage::Application.routes.draw do
 
   resources :stocks
 
-  resources :purchasedetails
-
   resources :purchases
 
   resources :stocks
