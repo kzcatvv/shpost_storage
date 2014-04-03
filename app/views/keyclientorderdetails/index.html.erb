@@ -1,0 +1,32 @@
+<%- model_class = Keyclientorderdetail -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Thirdpartcode %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_keyclientorder_keyclientorderdetail_path(@keyclientorder),
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@keyclientorderdetails_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_id', model: 'Keyclientorder' do |keyclientorderdetail|
+      keyclientorderdetail.keyclientorder.try :batch_id
+    end
+
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'name', model: 'Specification' do |keyclientorderdetail|
+      keyclientorderdetail.specification.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column do |keyclientorderdetail|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_keyclientorder_keyclientorderdetail_path(@keyclientorder,keyclientorderdetail), :class => 'btn btn-xs btn-primary' if can? :update, keyclientorderdetail) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), keyclientorder_keyclientorderdetail_path(@keyclientorder,keyclientorderdetail), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, keyclientorderdetail)
+    end
+  end
+%>

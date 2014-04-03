@@ -11,7 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140403054511) do
+
+#ActiveRecord::Schema.define(version: 20140403054511) do
+
+
+ActiveRecord::Schema.define(version: 20140403062126) do
+
+
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -75,8 +81,29 @@ ActiveRecord::Schema.define(version: 20140403054511) do
     t.datetime "updated_at"
   end
 
-  create_table "purchase_details", force: true do |t|
-    t.string   "name",             default: "", null: false
+  create_table "keyclientorderdetails", force: true do |t|
+    t.integer  "keyclientorder_id"
+    t.integer  "specification_id"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
+  create_table "keyclientorders", force: true do |t|
+    t.string   "keyclient_name"
+    t.string   "keyclient_addr"
+    t.string   "contact_person"
+    t.string   "phone"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "batch_id"
+  end
+
+  create_table "purchasedetails", force: true do |t|
+    t.string   "name",        default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"

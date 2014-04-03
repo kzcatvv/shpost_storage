@@ -1,0 +1,45 @@
+<%= form_for @keyclientorder, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+    <div class="control-group">
+      <%= f.label :keyclient_name, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :keyclient_name, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :keyclient_addr, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :keyclient_addr, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :contact_person, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :contact_person, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :phone, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :phone, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :desc, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :desc, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :batch_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :batch_id, :class => 'text_field' %>
+      </div>
+    </div>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                keyclientorders_path, :class => 'btn' %>
+  </div>
+<% end %>
