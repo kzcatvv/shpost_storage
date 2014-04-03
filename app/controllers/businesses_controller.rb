@@ -14,7 +14,7 @@ class BusinessesController < ApplicationController
 
   # GET /businesses/new
   def new
-    @business = Business.new
+   # @business = Business.new
   end
 
   # GET /businesses/1/edit
@@ -24,7 +24,7 @@ class BusinessesController < ApplicationController
   # POST /businesses
   # POST /businesses.json
   def create
-    @business = Business.new(business_params)
+   # @business = Business.new(business_params)
 
     respond_to do |format|
       if @business.save

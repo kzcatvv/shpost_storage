@@ -1,4 +1,6 @@
 ShpostStorage::Application.routes.draw do
+  resources :orders
+
   resources :thirdpartcodes do
       collection do
         post 'select_commodities'

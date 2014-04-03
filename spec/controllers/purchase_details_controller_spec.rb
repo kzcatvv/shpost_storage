@@ -99,7 +99,7 @@ describe PurchaseDetailsController do
 
       context "with invalid params" do
         it "assigns a newly created but unsaved purchase_detail as @purchase_detail" do
-          expect{post :create, purchase_detail: FactoryGirl.attributes_for(:invalid_purchase_detail)}.to_not change(Purchase, :count)
+          expect{post :create, purchase_detail: FactoryGirl.attributes_for(:invalid_purchase_detail)}.to_not change(PurchaseDetail, :count)
         end
 
         it "re-renders the 'new' template" do
