@@ -9,14 +9,18 @@
   <div class="control-group">
     <%= f.label :unit_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :unit_id, :class => 'text_field' %>
+       <%= f.select(:unit_id, Unit.all.map{|u| [u.name,u.id]})%>
     </div>
+  </div>
+
+
   <div class="control-group">
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :business_id, :class => 'text_field' %>
+      <%= f.select(:business_id, Business.all.map{|u| [u.name,u.id]})%>
     </div>
   </div>
+
   <div class="control-group">
     <%= f.label :amount, :class => 'control-label' %>
     <div class="controls">
@@ -29,6 +33,7 @@
       <%= f.text_field :sum, :class => 'text_field' %>
     </div>
   </div>
+
   <div class="control-group">
     <%= f.label :desc, :class => 'control-label' %>
     <div class="controls">
@@ -36,7 +41,16 @@
     </div>
   </div>
 
+  <div class="control-group">
+    <%= f.label :status, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:status, Purchase::STATUS.invert) %>
+    </div>
+  </div>
+
   
+
+
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <% if can? :index, Purchase %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

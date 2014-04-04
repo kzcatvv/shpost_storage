@@ -16,9 +16,14 @@
 <%= grid(@purchases_grid) do |g|
     g.column name: model_class.human_attribute_name(:no), attribute: 'no'
 
-    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id'
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'name',
+    model: 'Unit' do |purchase|
+        purchase.unit.try :name
+    end
 
     g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id'
+  
+    
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'
 
@@ -27,6 +32,8 @@
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
     g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+
+
 
     g.column do |purchase|
       ActiveSupport::SafeBuffer.new << 
