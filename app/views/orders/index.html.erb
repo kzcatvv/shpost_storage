@@ -1,0 +1,74 @@
+<%- model_class = Order -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Order %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_order_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+
+
+
+<%= grid(@orders_grid) do |g|
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
+
+    g.column name: model_class.human_attribute_name(:order_type), attribute: 'order_type'
+
+    g.column name: model_class.human_attribute_name(:need_invoice), attribute: 'need_invoice'
+
+   
+    g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name'
+
+    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit'
+
+    g.column name: model_class.human_attribute_name(:customer_tel), attribute: 'customer_tel'
+
+    g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone'
+
+    g.column name: model_class.human_attribute_name(:customer_address), attribute: 'customer_address'
+
+    g.column name: model_class.human_attribute_name(:customer_postcode), attribute: 'customer_postcode'
+
+    g.column name: model_class.human_attribute_name(:customer_email), attribute: 'customer_email'
+
+    g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight'
+
+    g.column name: model_class.human_attribute_name(:total_price), attribute: 'total_price'
+
+    g.column name: model_class.human_attribute_name(:total_amount), attribute: 'total_amount'
+
+    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type'
+
+    g.column name: model_class.human_attribute_name(:transport_price), attribute: 'transport_price'
+
+    g.column name: model_class.human_attribute_name(:pay_type), attribute: 'pay_type'
+
+    g.column name: model_class.human_attribute_name(:buyer_desc), attribute: 'buyer_desc'
+
+    g.column name: model_class.human_attribute_name(:seller_desc), attribute: 'seller_desc'
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id'
+
+    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'storage_id'
+
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id'
+
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'keyclientorder_id'
+
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+
+    g.column do |order|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_order_path(order), :class => 'btn btn-xs btn-primary' if can? :update, order) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      order_path(order),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, order)
+      end
+  end 
+%>

@@ -1,0 +1,23 @@
+<%- model_class = Keyclientorderdetail -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:keyclientorder_id) %>:</strong></dt>
+  <dd><%= Keyclientorder.find(@keyclientorderdetail.keyclientorder_id).batch_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:specification_id) %>:</strong></dt>
+  <dd><%= Specification.find(@keyclientorderdetail.specification_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
+  <dd><%= @keyclientorderdetail.desc %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              keyclientorder_keyclientorderdetails_path(@keyclientorder), :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_keyclientorder_keyclientorderdetail_path(@keyclientorder,@keyclientorderdetail), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              keyclientorder_keyclientorderdetail_path(@keyclientorder,@keyclientorderdetail),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

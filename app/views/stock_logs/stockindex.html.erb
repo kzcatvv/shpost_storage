@@ -1,0 +1,78 @@
+<%- model_class = StockLog -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
+
+<%= form_tag('/stock_logs/check', method: :post) do -%>
+
+<%= grid(@stock_logs_grid) do |g|
+
+    g.column do |stock_log|
+      if stock_log.status == 'waiting'
+        hidden_field_tag "stock_logs[][id]", stock_log.id
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:specification), attribute: 'name', model: 'Specification' do |stock_log|
+      if stock_log.status == 'waiting'
+        text_field_tag("stock_logs[][specification_id]", stock_log.stock.specification.name)
+      else
+        stock_log.stock.specification.name
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', model: 'Shelf' do |stock_log|
+      if stock_log.status == 'waiting'
+        select_tag("stock_logs[][shelf_id]", options_for_select(@shelves.map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id))
+      else
+        stock_log.stock.shelf.shelf_code
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount' do |stock_log|
+      if stock_log.status == 'waiting'
+        text_field_tag("stock_logs[][amount]", stock_log.amount)
+      else
+        stock_log.amount
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status' do |stock_log|
+      if stock_log.status == 'waiting'
+        select_tag("stock_logs[][status]", options_for_select(StockLog::STATUS.invert,stock_log.status))
+      else
+        StockLog::STATUS[stock_log.status.to_sym]
+      end
+    end
+    
+    g.column name: model_class.human_attribute_name(:operation_type), attribute: 'operation_type' do |stock_log|
+      if stock_log.status == 'waiting'
+        select_tag("stock_logs[][operation_type]", options_for_select(StockLog::OPERATION_TYPE.invert,stock_log.operation_type))
+      else
+        StockLog::OPERATION_TYPE[stock_log.operation_type.to_sym]
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |stock_log|
+        stock_log.created_at.to_s(:db)
+      end
+
+    g.column name: model_class.human_attribute_name(:checked_at), attribute: 'checked_at' do |stock_log|
+        stock_log.checked_at.try :to_s, :db
+    end
+
+    # g.column do |stock_log|
+    #   ActiveSupport::SafeBuffer.new <<
+        # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
+        # (submit_tag('check!!'))  #<< ' ' <<
+        # (button_tag() do
+        #   content_tag(:strong, 'check')
+        # end)  << ' ' <<
+        # (link_to t('.edit', :default => t("helpers.links.edit")), check_stock_logs_path(stock_log), :class => 'btn btn-xs btn-primary', method: :post)
+    # end
+  end
+%>
+
+<%= submit_tag('check!!') %>
+
+<% end -%>

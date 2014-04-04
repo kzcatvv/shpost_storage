@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20140402065336) do
+=======
+ActiveRecord::Schema.define(version: 20140404064225) do
+>>>>>>> 287e466e0f44208b0be2cccf71ce74c764e22328
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -46,16 +50,68 @@ ActiveRecord::Schema.define(version: 20140402065336) do
   create_table "goodstypes", force: true do |t|
     t.string   "gtno"
     t.string   "name"
+<<<<<<< HEAD
+=======
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "keyclientorderdetails", force: true do |t|
+    t.integer  "keyclientorder_id"
+    t.integer  "specification_id"
+    t.string   "desc"
+>>>>>>> 287e466e0f44208b0be2cccf71ce74c764e22328
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
+  create_table "keyclientorders", force: true do |t|
+    t.string   "keyclient_name"
+    t.string   "keyclient_addr"
+    t.string   "contact_person"
+    t.string   "phone"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "batch_id"
+  end
+
+  create_table "orders", force: true do |t|
+    t.string   "no",               default: "", null: false
+    t.string   "order_type"
+    t.string   "has_invoice"
+    t.string   "cust_id"
+    t.string   "cust_name"
+    t.string   "cust_phone"
+    t.string   "cust_mobilephone"
+    t.string   "cust_address"
+    t.string   "cust_postcode"
+    t.string   "cust_email"
+    t.float    "good_weight"
+    t.float    "good_sum"
+    t.integer  "good_amount"
+    t.string   "trans_type"
+    t.float    "trans_sum"
+    t.string   "pay_type"
+    t.string   "status"
+    t.string   "buyer_desc"
+    t.string   "seller_desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "business_id",       default: 1,  null: false
+    t.integer  "unit_id",           default: 1,  null: false
+    t.integer  "storage_id",        default: 1,  null: false
+    t.integer  "keyclientorder_id", default: 1,  null: false
   end
 
   create_table "purchase_details", force: true do |t|
     t.string   "name",             default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
-    t.integer  "specification_id"
+    t.integer  "spec_id"
     t.string   "qg_period"
     t.string   "batch_no"
     t.integer  "amount"
@@ -94,6 +150,7 @@ ActiveRecord::Schema.define(version: 20140402065336) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+<<<<<<< HEAD
     t.integer  "priority_level"
     t.integer  "vertical",       default: 1, null: false
     t.integer  "horizontal",     default: 1, null: false
@@ -101,6 +158,15 @@ ActiveRecord::Schema.define(version: 20140402065336) do
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
     t.integer  "max_volume",     default: 0, null: false
+=======
+    t.integer  "shelf_row",    default: 1, null: false
+    t.integer  "shelf_column", default: 1, null: false
+    t.integer  "max_weight",   default: 0, null: false
+    t.integer  "max_volume",   default: 0, null: false
+    t.integer  "area_length",  default: 1, null: false
+    t.integer  "area_width",   default: 1, null: false
+    t.integer  "area_height",  default: 1, null: false
+>>>>>>> 287e466e0f44208b0be2cccf71ce74c764e22328
   end
 
   create_table "specifications", force: true do |t|

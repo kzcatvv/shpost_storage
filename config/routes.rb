@@ -1,4 +1,15 @@
 ShpostStorage::Application.routes.draw do
+
+  resources :order_details
+
+  resources :orders
+
+
+  resources :keyclientorders do
+    resources :keyclientorderdetails
+  end
+
+
   resources :thirdpartcodes do
       collection do
         post 'select_commodities'
@@ -28,7 +39,12 @@ ShpostStorage::Application.routes.draw do
 
   resources :businesses
 
-  resources :stock_logs, only: [:index, :show]
+  resources :stock_logs, only: [:index, :show] do
+    collection do
+      get 'stockindex'
+      post 'check'
+    end
+  end
 
   resources :commodities
 

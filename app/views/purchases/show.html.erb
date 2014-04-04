@@ -9,7 +9,7 @@
   <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
   <dd><%= @purchase.unit_id %></dd>
   <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
-  <dd><%= @purchase.business_id %></dd>
+  <dd><%= Business.find(@purchase.business_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:amount) %>:</strong></dt>
   <dd><%= @purchase.amount %></dd>
   <dt><strong><%= model_class.human_attribute_name(:sum) %>:</strong></dt>

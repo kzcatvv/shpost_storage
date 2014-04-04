@@ -14,7 +14,7 @@ class PurchaseDetailsController < ApplicationController
 
   # GET /purchase_detailes/new
   def new
-    @purchase_detail = PurchaseDetail.new
+  #  @purchase_detail = PurchaseDetail.new
   end
 
   # GET /purchase_detailes/1/edit
@@ -24,7 +24,7 @@ class PurchaseDetailsController < ApplicationController
   # POST /purchase_detailes
   # POST /purchase_detailes.json
   def create
-    @purchase_detail = PurchaseDetail.new(purchase_detail_params)
+   # @purchase_detail = PurchaseDetail.new(purchase_detail_params)
 
     respond_to do |format|
       if @purchase_detail.save

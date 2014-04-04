@@ -5,7 +5,6 @@ class ShelvesController < ApplicationController
 
   def find_current_storage
     @areas = Area.where("storage_id = ?", session[:current_storage].id)
-    # puts @areas.ids
     @shelves = Shelf.where("area_id in (?)", @areas.ids)
   end
 
@@ -22,7 +21,6 @@ class ShelvesController < ApplicationController
 
   # GET /shelves/new
   def new
-    @shelf = Shelf.new
   end
 
   # GET /shelves/1/edit
@@ -34,8 +32,9 @@ class ShelvesController < ApplicationController
   def create
     @shelf = Shelf.new(shelf_params)
     @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:vertical]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:horizontal]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_length]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_width]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_height]
     @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_row]
     @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_column]
 
@@ -53,6 +52,13 @@ class ShelvesController < ApplicationController
   # PATCH/PUT /shelves/1
   # PATCH/PUT /shelves/1.json
   def update
+    @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_length]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_width]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_height]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_row]
+    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_column]
+    
     respond_to do |format|
       if @shelf.update(shelf_params)
         format.html { redirect_to @shelf, notice: 'Shelf was successfully updated.' }
@@ -82,6 +88,6 @@ class ShelvesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shelf_params
-      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :vertical, :horizontal, :shelf_row, :shelf_column, :max_weight, :max_volume)
+      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume)
     end
 end
