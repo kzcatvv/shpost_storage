@@ -41,6 +41,14 @@
   <dd><%= @order.buyer_desc %></dd>
   <dt><strong><%= model_class.human_attribute_name(:seller_desc) %>:</strong></dt>
   <dd><%= @order.seller_desc %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
+  <dd><%= @order.business_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
+  <dd><%= @order.unit_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
+  <dd><%= @order.storage_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:keyclientorder_id) %>:</strong></dt>
+  <dd><%= @order.keyclientorder_id %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

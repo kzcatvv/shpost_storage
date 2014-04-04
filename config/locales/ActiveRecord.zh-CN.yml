@@ -274,6 +274,9 @@ zh-CN:
       order:
         one: 订单管理
         other: 订单管理
+      order_detail:
+        one: 订单明细管理
+        other: 订单明细管理
       area:
         one: 区域管理
         other: 区域管理
@@ -391,6 +394,16 @@ zh-CN:
         status: "状态"            
         buyer_desc: "买家留言"        
         seller_desc: "卖家留言"       
+
+      order_detail:
+        name: "商品名称"
+        specification_id: "商品规格"        
+        amount: "商品数量"      
+        price: "商品单价"    
+        batch_no: "批次号"     
+        supplier_id: "供应商"     
+        order_id: "订单编号"
+        desc: "备注"
 
       purchase:
         no: "编号"

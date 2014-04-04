@@ -20,6 +20,7 @@ class CreateOrders < ActiveRecord::Migration
       t.string :status
       t.string :buyer_desc
       t.string :seller_desc
+     
 
       t.timestamps
     end

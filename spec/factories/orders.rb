@@ -21,6 +21,10 @@ FactoryGirl.define do
     status "prepare"
     buyer_desc "buyer_desc"
     seller_desc "seller_desc"
+    business_id 1
+    unit_id 1
+    storage_id 1
+    keyclientorder_id 1
 
     factory :invalid_order do
         no nil
