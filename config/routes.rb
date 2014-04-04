@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :order_details
+
   resources :orders
 
 

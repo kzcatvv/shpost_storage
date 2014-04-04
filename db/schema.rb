@@ -94,10 +94,14 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.string   "seller_desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "business_id",       default: 1,  null: false
+    t.integer  "unit_id",           default: 1,  null: false
+    t.integer  "storage_id",        default: 1,  null: false
+    t.integer  "keyclientorder_id", default: 1,  null: false
   end
 
-  create_table "purchasedetails", force: true do |t|
-    t.string   "name",        default: "", null: false
+  create_table "purchase_details", force: true do |t|
+    t.string   "name",             default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
     t.integer  "spec_id"
