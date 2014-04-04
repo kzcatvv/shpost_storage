@@ -120,8 +120,8 @@ describe OrdersController do
           patch :update, id: @order1, order: FactoryGirl.attributes_for(:update_order)
           @order1.reload
           expect(@order1.no).to eq("20140401001")
-          expect(@order1.good_amount).to eq(200)
-          expect(@order1.good_sum).to eq(200.1)
+          expect(@order1.total_amount).to eq(200)
+          expect(@order1.total_price).to eq(1.5)
         end
 
         it "redirects to the order" do
@@ -134,8 +134,8 @@ describe OrdersController do
         it "does not change the order's attributes" do
           put :update, id: @order1, order: FactoryGirl.attributes_for(:invalid_order)
           @order1.reload
-          expect(@order1.good_sum).to eq(1.5)
-          expect(@order1.good_amount).to_not eq(0)
+          expect(@order1.total_price).to eq(1.5)
+          expect(@order1.total_amount).to_not eq(0)
         end
 
         it "re-renders the 'edit' template" do
