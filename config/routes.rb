@@ -35,7 +35,12 @@ ShpostStorage::Application.routes.draw do
 
   resources :businesses
 
-  resources :stock_logs, only: [:index, :show]
+  resources :stock_logs, only: [:index, :show] do
+    collection do
+      get 'stockindex'
+      post 'check'
+    end
+  end
 
   resources :commodities
 
