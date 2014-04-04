@@ -16,6 +16,7 @@ Business.destroy_all()
 Goodstype.destroy_all()
 Commodity.destroy_all()
 Specification.destroy_all()
+Shelf.destroy_all()
 
 
 unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc')
@@ -59,5 +60,15 @@ goodstype2 = Goodstype.create(gtno: 'SL02',name: '商品类型2', unit: unit1)
 commodity1 = Commodity.create(cno: 'S001',name: '商品1',goodstype: goodstype1, unit: unit1)
 commodity2 = Commodity.create(cno: 'S002',name: '商品2',goodstype: goodstype1, unit: unit1)
 
-specification1 = Specification.create(commodity: commodity1, model: 'model1',size: 'small',color: 'red')
-specification2 = Specification.create(commodity: commodity1, model: 'model2',size: 'big',color: 'green')
+specification1 = Specification.create(commodity: commodity1, product_no: 'model1',name: 'small red')
+specification2 = Specification.create(commodity: commodity1, product_no: 'model2',name: 'big green')
+
+shelf1 = Shelf.create(shelf_code: "A2-01-01-01-01", area: area112, priority_level: 1)
+shelf2 = Shelf.create(shelf_code: "A2-01-01-01-02", area: area112, priority_level: 2)
+shelf3 = Shelf.create(shelf_code: "A2-01-01-02-01", area: area112, priority_level: 3)
+shelf4 = Shelf.create(shelf_code: "A2-01-01-02-02", area: area112, priority_level: 4)
+
+stock1 = Stock.create(shelf: shelf1, specification: specification1, supplier: supplier1, business: business1, batch_no: '00001')
+stock2 = Stock.create(shelf: shelf2, specification: specification1, supplier: supplier1, business: business1, batch_no: '00002')
+#stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00003')
+#stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00004')

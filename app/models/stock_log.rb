@@ -2,9 +2,9 @@ class StockLog < ActiveRecord::Base
   belongs_to :user
   belongs_to :stock
 
-  OPERATION = {create_stock: '新增库存', destroy_stock: '删除库存', update_stock: '修改库存'}
-  STATUS = {waiting: '待确认', checked: '已确认'}
-  OPERATION_TYPE = {in: '入库',out: '出库', reset: '重置'}
+  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in'}
+  STATUS = {waiting: 'waiting', checked: 'checked'}
+  OPERATION_TYPE = {in: 'in', out: 'out', reset: 'reset'}
 
   validates_presence_of :operation, :amount
 

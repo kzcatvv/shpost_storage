@@ -14,7 +14,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :stocks
 
-  resources :purchases
+  resources :purchases do |x|
+    member do
+      patch 'stock_in'
+    end
+  end
 
   resources :stocks
 

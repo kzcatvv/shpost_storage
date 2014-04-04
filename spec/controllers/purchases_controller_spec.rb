@@ -132,14 +132,14 @@ describe PurchasesController do
 
       context "with invalid params" do
         it "does not change the purchase's attributes" do
-          put :update, id: @purchase1, purchase: FactoryGirl.attributes_for(:invalid_purchase)
+          patch :update, id: @purchase1, purchase: FactoryGirl.attributes_for(:invalid_purchase)
           @purchase1.reload
           expect(@purchase1.sum).to eq(100.1)
           expect(@purchase1.amount).to_not eq(0)
         end
 
         it "re-renders the 'edit' template" do
-          put :update, id: @purchase1, purchase: FactoryGirl.attributes_for(:invalid_purchase)
+          patch :update, id: @purchase1, purchase: FactoryGirl.attributes_for(:invalid_purchase)
           expect(response).to render_template("edit")
         end
       end
@@ -158,6 +158,44 @@ describe PurchasesController do
         expect(response).to redirect_to(purchases_url)
       end
 
+    end
+    #Kiat-mao
+    describe "generates stock in" do
+      it "stock_in the requested purchase" do
+        expect {
+          patch :stock_in, id: @purchase1
+        }.to change(StockLog, :count)
+      end
+
+      it "assigns newly stock_logs belongs_to @purchase1" do
+        patch :stock_in, id: @purchase1
+        assigns(:stock_logs).each do |x|
+          expect(x.object_class).to eq("PurchaseDetail")
+          # expect(x.object_primary_key).to eq(@purchase1.id)
+        end
+      end
+
+      it "assigns newly stock_logs is vaild" do
+        patch :stock_in, id: @purchase1
+        assigns(:stock_logs).each do |x|
+          expect(x.status).to eq(StockLog::STATUS[:waiting])
+          expect(x.operation).to eq(StockLog::OPERATION[:purchase_stock_in])
+          expect(x.operation_type).to eq(StockLog::OPERATION_TYPE[:in])
+        end
+      end
+
+      it "assigns newly stock_logs with stock belongs_to specification that purchase include" do
+        patch :stock_in, id: @purchase1
+        assigns(:stock_logs).each do |x|
+          expect(x.stock).not_to be_blank 
+          expect(@purchase1.purchase_details.map{|x| x.specification}).to include(x.stock.specification)
+        end
+      end
+
+      it "redirects to the stock_in list" do
+        patch :stock_in, id: @purchase1
+        expect(response).to render_template("stock_in")
+      end
     end
   end
 
@@ -219,6 +257,8 @@ describe PurchasesController do
 
       @superadmin = User.find 1
       @purchase1 = FactoryGirl.create(:purchase)
+      @purchase_detail1 = FactoryGirl.create(:purchase_detail)
+      @purchase_detail2 = FactoryGirl.create(:purchase_detail, specification_id: 2)
       @purchase2 = FactoryGirl.create(:purchase)
       @purchase3 = FactoryGirl.create(:purchase)
       sign_in @superadmin
