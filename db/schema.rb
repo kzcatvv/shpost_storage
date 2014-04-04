@@ -11,13 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-#ActiveRecord::Schema.define(version: 20140403054511) do
-
-
-ActiveRecord::Schema.define(version: 20140403062126) do
-
-
+ActiveRecord::Schema.define(version: 20140404064225) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -57,6 +51,27 @@ ActiveRecord::Schema.define(version: 20140403062126) do
     t.integer  "unit_id"
   end
 
+  create_table "keyclientorderdetails", force: true do |t|
+    t.integer  "keyclientorder_id"
+    t.integer  "specification_id"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
+  create_table "keyclientorders", force: true do |t|
+    t.string   "keyclient_name"
+    t.string   "keyclient_addr"
+    t.string   "contact_person"
+    t.string   "phone"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "batch_id"
+  end
+
   create_table "orders", force: true do |t|
     t.string   "no",               default: "", null: false
     t.string   "order_type"
@@ -81,32 +96,11 @@ ActiveRecord::Schema.define(version: 20140403062126) do
     t.datetime "updated_at"
   end
 
-  create_table "keyclientorderdetails", force: true do |t|
-    t.integer  "keyclientorder_id"
-    t.integer  "specification_id"
-    t.string   "desc"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
-
-  create_table "keyclientorders", force: true do |t|
-    t.string   "keyclient_name"
-    t.string   "keyclient_addr"
-    t.string   "contact_person"
-    t.string   "phone"
-    t.string   "desc"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "batch_id"
-  end
-
   create_table "purchasedetails", force: true do |t|
     t.string   "name",        default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
-    t.integer  "specification_id"
+    t.integer  "spec_id"
     t.string   "qg_period"
     t.string   "batch_no"
     t.integer  "amount"
@@ -145,12 +139,13 @@ ActiveRecord::Schema.define(version: 20140403062126) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "vertical",     default: 1, null: false
-    t.integer  "horizontal",   default: 1, null: false
     t.integer  "shelf_row",    default: 1, null: false
     t.integer  "shelf_column", default: 1, null: false
     t.integer  "max_weight",   default: 0, null: false
     t.integer  "max_volume",   default: 0, null: false
+    t.integer  "area_length",  default: 1, null: false
+    t.integer  "area_width",   default: 1, null: false
+    t.integer  "area_height",  default: 1, null: false
   end
 
   create_table "specifications", force: true do |t|
