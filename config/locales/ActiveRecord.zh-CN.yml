@@ -151,6 +151,7 @@ zh-CN:
       users: 用户管理
       roles: 角色管理
       specifications: 商品规格管理
+      details: 明细管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -270,12 +271,21 @@ zh-CN:
       purchase_detail:
         one: 采购单明细管理
         other: 采购单明细管理
+      order:
+        one: 订单管理
+        other: 订单管理
       area:
         one: 区域管理
         other: 区域管理
       shelf:
         one: 货架管理
         other: 货架管理
+      keyclientorder:
+        one: 大客户订单管理
+        other: 大客户订单管理
+      keyclientorderdetail:
+        one: 大客户订单明细管理
+        other: 大客户订单明细管理
     attributes:
       user:
         email: "电子邮件"
@@ -360,6 +370,28 @@ zh-CN:
         phone: "电话"
         desc: "备注"
         unit: "所属机构"
+
+      order:
+        no: "订单编号"
+        order_type: "订单类型"        
+        has_invoice: "是否需要发票"      
+        cust_id: "客户编号"          
+        cust_name: "客户名称"         
+        cust_phone: "客户电话"       
+        cust_mobilephone: "客户手机"  
+        cust_address: "客户地址"      
+        cust_postcode: "邮编"     
+        cust_email: "电子邮箱"       
+        good_weight: "商品重量"       
+        good_sum: "商品总价"          
+        good_amount: "商品总数"       
+        trans_type: "运输方式"        
+        trans_sum: "运费"         
+        pay_type: "支付方式"          
+        status: "状态"            
+        buyer_desc: "买家留言"        
+        seller_desc: "卖家留言"       
+
       purchase:
         no: "编号"
         unit_id: "所属机构"
@@ -368,6 +400,7 @@ zh-CN:
         sum: "合计金额"
         desc: "备注"
         status: "状态"
+
       purchase_detail:
         name: "编号"
         purchase_id: "所属机构"
@@ -396,6 +429,17 @@ zh-CN:
         max_volume: "最大体积"
         shelf_code: "货架编号"
         desc: "货架描述"
+      keyclientorder:
+        keyclient_name: 大客户名称
+        keyclient_addr: 大客户地址
+        contact_person: 联系人
+        phone: 联系电话
+        desc: 备注
+        batch_id: 订单批次编号
+      keyclientorderdetail:
+        keyclientorder_id: 大客户订单批次编号
+        specification_id: 商品规格
+        desc: 备注
       filetemp:
         filename: "文档"
         rename: "文件名"
