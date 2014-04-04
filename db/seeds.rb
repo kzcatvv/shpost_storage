@@ -16,13 +16,9 @@ Business.destroy_all()
 Goodstype.destroy_all()
 Commodity.destroy_all()
 Specification.destroy_all()
-<<<<<<< HEAD
 Shelf.destroy_all()
-
-=======
 Stock.destroy_all()
 StockLog.destroy_all()
->>>>>>> 287e466e0f44208b0be2cccf71ce74c764e22328
 
 unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc')
 unit2 = Unit.create(name: 'unit2_name', desc: 'unit2_desc')
@@ -68,22 +64,19 @@ goodstype2 = Goodstype.create(gtno: 'SL02',name: '商品类型2', unit: unit1)
 commodity1 = Commodity.create(cno: 'S001',name: '商品1',goodstype: goodstype1, unit: unit1)
 commodity2 = Commodity.create(cno: 'S002',name: '商品2',goodstype: goodstype1, unit: unit1)
 
-<<<<<<< HEAD
-specification1 = Specification.create(commodity: commodity1, product_no: 'model1',name: 'small red')
-specification2 = Specification.create(commodity: commodity1, product_no: 'model2',name: 'big green')
+specification1 = Specification.create(commodity: commodity1, name: 'Sname1', product_no: '1')
+specification2 = Specification.create(commodity: commodity1, name: 'Sname2', product_no: '2')
 
 shelf1 = Shelf.create(shelf_code: "A2-01-01-01-01", area: area112, priority_level: 1)
 shelf2 = Shelf.create(shelf_code: "A2-01-01-01-02", area: area112, priority_level: 2)
 shelf3 = Shelf.create(shelf_code: "A2-01-01-02-01", area: area112, priority_level: 3)
 shelf4 = Shelf.create(shelf_code: "A2-01-01-02-02", area: area112, priority_level: 4)
 
-stock1 = Stock.create(shelf: shelf1, specification: specification1, supplier: supplier1, business: business1, batch_no: '00001')
-stock2 = Stock.create(shelf: shelf2, specification: specification1, supplier: supplier1, business: business1, batch_no: '00002')
+stock_1 = Stock.create(shelf: shelf1, specification: specification1, supplier: supplier1, business: business1, batch_no: '00001')
+stock_2 = Stock.create(shelf: shelf2, specification: specification1, supplier: supplier1, business: business1, batch_no: '00002')
 #stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00003')
 #stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00004')
-=======
-specification1 = Specification.create(commodity: commodity1, name: 'Sname1', product_no: '1')
-specification2 = Specification.create(commodity: commodity1, name: 'Sname2', product_no: '2')
+
 
 stock1 = Stock.create(shelf: shelf1111, business: business1, supplier: supplier1, batch_no: '1', specification: specification1, actual_amount: 5, virtual_amount: 5, desc: 'desc')
 stock2 = Stock.create(shelf: shelf1111, business: business1, supplier: supplier2, batch_no: '2', specification: specification2, actual_amount: 7, virtual_amount: 8, desc: 'desc')
@@ -96,4 +89,3 @@ stock_log2 = StockLog.create(user: user11, stock: stock2, operation: 'create_sto
 stock_log3 = StockLog.create(user: user11, stock: stock3, operation: 'create_stock', status: 'checked', object_class: 'object_class', object_primary_key: 1, object_symbol: 'object_symbol', amount: 8, operation_type: 'in', desc: 'desc')
 stock_log4 = StockLog.create(user: unit1admin, stock: stock4, operation: 'create_stock', status: 'waiting', object_class: 'object_class', object_primary_key: 1, object_symbol: 'object_symbol', amount: 10, operation_type: 'in', desc: 'desc')
 stock_log5 = StockLog.create(user: unit1admin, stock: stock5, operation: 'create_stock', status: 'waiting', object_class: 'object_class', object_primary_key: 1, object_symbol: 'object_symbol', amount: 46, operation_type: 'in', desc: 'desc')
->>>>>>> 287e466e0f44208b0be2cccf71ce74c764e22328
