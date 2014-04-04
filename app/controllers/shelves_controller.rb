@@ -22,7 +22,6 @@ class ShelvesController < ApplicationController
 
   # GET /shelves/new
   def new
-    @shelf = Shelf.new
   end
 
   # GET /shelves/1/edit

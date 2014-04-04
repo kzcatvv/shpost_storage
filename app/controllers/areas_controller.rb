@@ -19,7 +19,6 @@ class AreasController < ApplicationController
 
   # GET /areas/new
   def new
-    @area = Area.new
   end
 
   # GET /areas/1/edit
