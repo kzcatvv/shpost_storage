@@ -1,0 +1,48 @@
+<%- model_class = OrderDetail -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, OrderDetail %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_order_detail_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+
+
+
+<%= grid(@order_details_grid) do |g|
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'specification_id'
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'
+
+   
+    g.column name: model_class.human_attribute_name(:price), attribute: 'price'
+
+    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
+
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'supplier_id'
+
+    g.column name: model_class.human_attribute_name(:order_id), attribute: 'order_id'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+   
+
+
+   
+
+    g.column do |order_detail|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_order_detail_path(order_detail), :class => 'btn btn-xs btn-primary' if can? :update, order_detail) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      order_detail_path(order_detail),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, order_detail)
+      end
+  end 
+%>

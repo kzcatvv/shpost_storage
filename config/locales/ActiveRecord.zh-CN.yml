@@ -274,6 +274,9 @@ zh-CN:
       order:
         one: 订单管理
         other: 订单管理
+      order_detail:
+        one: 订单明细管理
+        other: 订单明细管理
       area:
         one: 区域管理
         other: 区域管理
@@ -374,23 +377,33 @@ zh-CN:
       order:
         no: "订单编号"
         order_type: "订单类型"        
-        has_invoice: "是否需要发票"      
-        cust_id: "客户编号"          
-        cust_name: "客户名称"         
-        cust_phone: "客户电话"       
-        cust_mobilephone: "客户手机"  
-        cust_address: "客户地址"      
-        cust_postcode: "邮编"     
-        cust_email: "电子邮箱"       
-        good_weight: "商品重量"       
-        good_sum: "商品总价"          
-        good_amount: "商品总数"       
-        trans_type: "运输方式"        
-        trans_sum: "运费"         
+        need_invoice: "是否需要发票"      
+        customer_name: "客户名称"    
+        customer_unit: "客户单位"     
+        customer_tel: "客户电话"       
+        customer_phone: "客户手机"  
+        customer_address: "客户地址"      
+        customer_postcode: "邮编"     
+        customer_email: "电子邮箱"       
+        total_weight: "商品重量"       
+        total_price: "商品总价"          
+        total_amount: "商品总数"       
+        transport_type: "运输方式"        
+        transport_price: "运费"         
         pay_type: "支付方式"          
         status: "状态"            
         buyer_desc: "买家留言"        
         seller_desc: "卖家留言"       
+
+      order_detail:
+        name: "商品名称"
+        specification_id: "商品规格"        
+        amount: "商品数量"      
+        price: "商品单价"    
+        batch_no: "批次号"     
+        supplier_id: "供应商"     
+        order_id: "订单编号"
+        desc: "备注"
 
       purchase:
         no: "编号"
@@ -421,8 +434,9 @@ zh-CN:
         current_storage: "当前仓库"
         area_code: "区域编号"
         area: "区域"
-        vertical: "第几排"
-        horizontal: "第几个"
+        area_length: "区域排数"
+        area_width: "区域列数"
+        area_height: "区域层数"
         shelf_row: "行数"
         shelf_column: "列数"
         max_weight: "最大承重"

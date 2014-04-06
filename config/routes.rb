@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :order_details
+
   resources :orders
 
 
@@ -23,7 +25,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :stocks
 
-  resources :purchases
+  resources :purchases do |x|
+    member do
+      patch 'stock_in'
+    end
+  end
 
   resources :stocks
 
@@ -33,7 +39,12 @@ ShpostStorage::Application.routes.draw do
 
   resources :businesses
 
-  resources :stock_logs, only: [:index, :show]
+  resources :stock_logs, only: [:index, :show] do
+    collection do
+      get 'stockindex'
+      post 'check'
+    end
+  end
 
   resources :commodities
 

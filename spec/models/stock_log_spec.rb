@@ -11,8 +11,8 @@ describe StockLog do
   end
 
   it "is has desc with create" do
-    stock_log = FactoryGirl.build(:stock_log)
-    stock_log.save
+    stock_log = FactoryGirl.create(:stock_log)
+    # stock_log.save
     expect(stock_log.desc).to_not be_blank
   end
 

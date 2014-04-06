@@ -61,6 +61,22 @@ class PurchasesController < ApplicationController
     end
   end
 
+  # PATCH /specifications/1
+  def stock_in
+    @stock_logs = []
+    @purchase.purchase_details.each do |x|
+      while x.amount > 0
+        stock = Stock.get_available_stock(x.specification, @purchase.business, x.supplier, x.batch_no)
+        
+        push_amount = stock.push_amount(x.amount)
+        x.amount -= push_amount
+
+        stock.save
+        @stock_logs << StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], object_class: x.class.to_s, object_primary_key: x.id, object_symbol: x.name, amount: x.amount, operation_type: StockLog::OPERATION_TYPE[:in])
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_purchase

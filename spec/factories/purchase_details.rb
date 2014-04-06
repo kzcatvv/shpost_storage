@@ -8,7 +8,8 @@ FactoryGirl.define do
     supplier_id 1
     specification_id 1
     qg_period  "180 day"
-    batch_no   "20140402001"
+    sequence(:batch_no) { |n| "20140402001#{n}"}
+    # batch_no   "20140402001"
     amount 100
     sum 100.1
     desc "liuyingying company"
