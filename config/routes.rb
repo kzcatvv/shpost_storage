@@ -10,8 +10,8 @@ ShpostStorage::Application.routes.draw do
 
   resources :thirdpartcodes do
       collection do
-        post 'select_commodities'
-        post 'select_specifications'
+        get 'select_commodities'
+        get 'select_specifications'
       end
   end
 
