@@ -30,7 +30,7 @@
       if stock_log.status == 'waiting'
         text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", readonly: true, onclick: 'clickin(this);', onblur: 'clickout(this)')
       else
-        stock_log.amount
+        [stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"}]
       end
     end
 
