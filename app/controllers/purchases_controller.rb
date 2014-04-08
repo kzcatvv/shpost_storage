@@ -15,6 +15,8 @@ class PurchasesController < ApplicationController
   # GET /purchasees/new
   def new
    # @purchase = Purchase.new
+    @purchase.unit = current_user.unit
+    @purchase.status = Purchase::STATUS[:waiting]
   end
 
   # GET /purchasees/1/edit
@@ -85,6 +87,6 @@ class PurchasesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_params
-      params.require(:purchase).permit(:no, :unit_id, :business_id, :amount, :sum, :desc,:status)
+      params.require(:purchase).permit(:no, :name, :unit_id, :business_id, :amount, :sum, :desc,:status)
     end
 end

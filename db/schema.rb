@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140408023546) do
+ActiveRecord::Schema.define(version: 20140408033026) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -138,6 +138,7 @@ ActiveRecord::Schema.define(version: 20140408023546) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name",        default: "", null: false
   end
 
   create_table "roles", force: true do |t|

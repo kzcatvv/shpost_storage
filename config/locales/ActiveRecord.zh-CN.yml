@@ -155,6 +155,7 @@ zh-CN:
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
+      stock_in: "%{model}入库单"
   number:
     currency:
       format:
@@ -407,6 +408,7 @@ zh-CN:
 
       purchase:
         no: "编号"
+        name: "名称"
         unit_id: "所属机构"
         business_id: "所属商户"
         amount: "合计数量"
@@ -415,14 +417,14 @@ zh-CN:
         status: "状态"
 
       purchase_detail:
-        name: "编号"
-        purchase_id: "所属机构"
-        supplier_id: "所属商户"
-        specification_id: "规格号"
+        name: "名称"
+        purchase_id: "采购单"
+        supplier_id: "供应商"
+        specification_id: "规格"
         qg_period: "保质期"
         batch_no: "批次号"
         amount: "数量"
-        sum: "单价金额"
+        sum: "金额"
         desc: "备注"
         status: "状态"
       area:
@@ -498,10 +500,13 @@ zh-CN:
         supplier:
           name: "供应商管理"
           link: "/suppliers"
+        purchase:
+          name: "采购单管理"
+          link: "/purchases"
     business:
       name: "商户与订单管理"
       submenu:
-        supplier:
+        business:
           name: "商户管理"
           link: "/businesses"
     goodstypes:
@@ -534,20 +539,20 @@ zh-CN:
         stock_log:
           name: "库存操作查询"
           link: "/stock_logs"
-    filetemp:
-      name: "模板管理"
-      needrole: 
-        can: :read
-        role: "Menu.Filetemp"
-      submenu:
-        filetemp_upload:
-          name: "模板上传"
-          link: "/filetemps/upload"
-          #needrole: ["create", "Filetemp"]
-        filetemp_download:
-          name: "模板下载"
-          link: "/filetemps"
-          #needrole: ["read", "Filetemp"]
+    # filetemp:
+    #   name: "模板管理"
+    #   needrole: 
+    #     can: :read
+    #     role: "Menu.Filetemp"
+    #   submenu:
+    #     filetemp_upload:
+    #       name: "模板上传"
+    #       link: "/filetemps/upload"
+    #       #needrole: ["create", "Filetemp"]
+    #     filetemp_download:
+    #       name: "模板下载"
+    #       link: "/filetemps"
+    #       #needrole: ["read", "Filetemp"]
   user_navigation:
     update_self: "个人信息"
     show_unit: "单位信息"
