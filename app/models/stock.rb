@@ -38,10 +38,10 @@ class Stock < ActiveRecord::Base
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
   end
 
-  def push_amount(amount)
-    push_amount = available_amount(amount)
-    self.virtual_amount += push_amount
-    push_amount
+  def stock_in_amount(amount)
+    stock_in_amount = available_amount(amount)
+    self.virtual_amount += stock_in_amount
+    stock_in_amount
   end
 
   def available_amount(amount)
