@@ -39,12 +39,38 @@ div {
   color: green;
 }
 
-.field_with_errors {
-  padding: 2px;
-  background-color: red;
-  display: table;
+.field_with_errors input[type="text"] {
+  #padding: 3px 2px;
+  border: 2px solid red;
+  #display: table;
 }
-
+.field_with_errors input[type="password"] {
+  #padding: 3px 2px;
+  border: 2px solid red;
+  #display: table;
+}
+.field_with_errors textarea {
+  #padding: 3px 2px;
+  border: 2px solid red;
+  #display: table;
+}
+.field_with_errors input[type="checkbox"] {
+  #padding: 3px;
+  border: 2px solid red;
+  #display: table;
+}
+.field_with_errors input[type="radio"] {
+  #padding: 3px;
+  border: 2px solid red;
+  #display: table;
+}
+.field_with_errors input[type="select"] {
+  background:red;
+  #display: table;
+}
+.field_with_errors{
+  display: inline;
+}
 #error_explanation {
   width: 450px;
   border: 2px solid red;
@@ -66,4 +92,10 @@ div {
     font-size: 12px;
     list-style: square;
   }
+}
+
+dt, dd {
+  line-height: 20px;
+  /* Keep this the same as line-height */
+  min-height: 20px;
 }

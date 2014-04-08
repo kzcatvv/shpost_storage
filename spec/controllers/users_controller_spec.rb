@@ -106,7 +106,7 @@ describe UsersController do
           expect(assigns(:user_log)).to be_a(UserLog)
           expect(assigns(:user_log)).to be_persisted
           expect(assigns(:user_log).object_class).to eq 'User'
-          expect(assigns(:user_log).object_id).to eq assigns(:user).id
+          expect(assigns(:user_log).object_primary_key).to eq assigns(:user).id
           expect(assigns(:user_log).operation).to eq '新增用户管理'
         end
       end
@@ -177,15 +177,13 @@ describe UsersController do
       end
 
       it "assigns a newly created user_log as @user_log with destroying user" do
-        expect { post :create, user: FactoryGirl.attributes_for(:new_user)}.to change(UserLog, :count).by(1)
-
         expect {
           delete :destroy, id: @user
         }.to change(UserLog, :count).by(1)
         expect(assigns(:user_log)).to be_a(UserLog)
         expect(assigns(:user_log)).to be_persisted
         expect(assigns(:user_log).object_class).to eq 'User'
-        expect(assigns(:user_log).object_id).to eq assigns(:user).id
+        expect(assigns(:user_log).object_primary_key).to eq assigns(:user).id
         expect(assigns(:user_log).operation).to eq '删除用户管理'
       end
     end
@@ -244,6 +242,7 @@ describe UsersController do
 
   describe "admin access" do
     before :each do 
+      User.destroy_all
       FactoryGirl.create(:unit)
       @user = FactoryGirl.create(:user)
       @superadmin = FactoryGirl.create(:superadmin)

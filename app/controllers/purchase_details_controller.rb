@@ -15,6 +15,7 @@ class PurchaseDetailsController < ApplicationController
   # GET /purchase_detailes/new
   def new
   #  @purchase_detail = PurchaseDetail.new
+    @purchase_detail.status = PurchaseDetail::STATUS[:opened]
   end
 
   # GET /purchase_detailes/1/edit
@@ -69,6 +70,6 @@ class PurchaseDetailsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_detail_params
-      params.require(:purchase_detail).permit(:name,:purchase_id,:supplier_id,:spec_id,:qg_period,:batch_no,:amount,:sum,:desc,:status)
+      params.require(:purchase_detail).permit(:name,:purchase_id, :specification_id, :supplier_id, :qg_period, :batch_no, :amount, :sum, :desc)
     end
 end

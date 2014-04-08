@@ -72,8 +72,8 @@ shelf2 = Shelf.create(shelf_code: "A2-01-01-01-02", area: area112, priority_leve
 shelf3 = Shelf.create(shelf_code: "A2-01-01-02-01", area: area112, priority_level: 3)
 shelf4 = Shelf.create(shelf_code: "A2-01-01-02-02", area: area112, priority_level: 4)
 
-stock_1 = Stock.create(shelf: shelf1, specification: specification1, supplier: supplier1, business: business1, batch_no: '00001')
-stock_2 = Stock.create(shelf: shelf2, specification: specification1, supplier: supplier1, business: business1, batch_no: '00002')
+stock_0_1 = Stock.create(shelf: shelf1, specification: specification1, supplier: supplier1, business: business1, batch_no: '00001')
+stock_0_2 = Stock.create(shelf: shelf2, specification: specification1, supplier: supplier1, business: business1, batch_no: '00002')
 #stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00003')
 #stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00004')
 

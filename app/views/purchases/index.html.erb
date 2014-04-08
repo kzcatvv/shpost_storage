@@ -15,33 +15,28 @@
 
 <%= grid(@purchases_grid) do |g|
     g.column name: model_class.human_attribute_name(:no), attribute: 'no'
-
-    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'name',
-    model: 'Unit' do |purchase|
-        purchase.unit.try :name
-    end
+  
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
     g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id'
   
-    
-
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'
 
-    g.column name: model_class.human_attribute_name(:sum), attribute: 'sum'
+    g.column name: model_class.human_attribute_name(:sum), attribute: 'sum', filter: false
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Purchase::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |purchase| 
+      purchase.status_name
+    end
 
 
 
     g.column do |purchase|
       ActiveSupport::SafeBuffer.new << 
-      (link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_purchase_path(purchase), :class => 'btn btn-xs btn-primary' if can? :update, purchase) << ' ' <<
-      (link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      purchase_path(purchase),
-                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase)
+      (link_to t('.edit', :default => t("helpers.links.edit")), edit_purchase_path(purchase), :class => 'btn btn-xs btn-primary' if can? :update, purchase) << ' ' <<
+      (link_to t('.edit', :default => t("helpers.links.stock_in")), stock_in_purchase_path(purchase), method: :patch, :class => 'btn btn-xs btn-primary' if can? :stock_in, purchase) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), purchase_path(purchase), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase)
       end
   end 
 %>

@@ -2,6 +2,8 @@ class UnitUsersController < ApplicationController
   # before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
   load_and_authorize_resource :unit
   load_and_authorize_resource :user, through: :unit, parent: false
+
+  user_logs_filter only: [:create, :destroy], object: :user,symbol: :username
   #skip_load_resource :user, :only => :create
 
   # GET /users
