@@ -11,7 +11,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20140404064225) do
+
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -41,6 +43,14 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "goodstypes", force: true do |t|
@@ -113,6 +123,7 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.integer  "keyclientorder_id", default: 1,  null: false
   end
 
+
   create_table "purchase_details", force: true do |t|
     t.string   "name",             default: "", null: false
     t.integer  "purchase_id"
@@ -156,13 +167,14 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "shelf_row",    default: 1, null: false
-    t.integer  "shelf_column", default: 1, null: false
-    t.integer  "max_weight",   default: 0, null: false
-    t.integer  "max_volume",   default: 0, null: false
-    t.integer  "area_length",  default: 1, null: false
-    t.integer  "area_width",   default: 1, null: false
-    t.integer  "area_height",  default: 1, null: false
+    t.integer  "priority_level"
+    t.integer  "shelf_row",      default: 1, null: false
+    t.integer  "shelf_column",   default: 1, null: false
+    t.integer  "max_weight",     default: 0, null: false
+    t.integer  "max_volume",     default: 0, null: false
+    t.integer  "area_length",    default: 1, null: false
+    t.integer  "area_width",     default: 1, null: false
+    t.integer  "area_height",    default: 1, null: false
   end
 
   create_table "specifications", force: true do |t|
