@@ -44,6 +44,18 @@ class Stock < ActiveRecord::Base
     stock_in_amount
   end
 
+  def check_in_amount(amount)
+    self.actual_amount += amount
+  end
+
+  def check_out_amount(amount)
+    self.actual_amount -= amount
+  end
+
+  def check_reset_amount(amount)
+    self.actual_amount = amount
+  end
+
   def available_amount(amount)
     amount
   end

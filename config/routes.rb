@@ -40,6 +40,9 @@ ShpostStorage::Application.routes.draw do
   resources :businesses
 
   resources :stock_logs, only: [:index, :show] do
+    member do
+      patch 'check'
+    end
     collection do
       get 'stockindex'
       post 'checkall'

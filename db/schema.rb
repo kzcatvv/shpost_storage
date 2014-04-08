@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20140408083707) do
+ActiveRecord::Schema.define(version: 20140408144023) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -89,19 +88,6 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.datetime "updated_at"
   end
 
-  create_table "order_details", force: true do |t|
-    t.string   "name",             default: "", null: false
-    t.integer  "specification_id"
-    t.integer  "amount"
-    t.float    "price"
-    t.string   "batch_no"
-    t.integer  "supplier_id"
-    t.integer  "order_id"
-    t.string   "desc"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "orders", force: true do |t|
     t.string   "no",                default: "", null: false
     t.string   "order_type"
@@ -130,8 +116,8 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.integer  "keyclientorder_id", default: 1,  null: false
   end
 
-  create_table "purchasedetails", force: true do |t|
-    t.string   "name",        default: "", null: false
+  create_table "purchase_details", force: true do |t|
+    t.string   "name",             default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
@@ -174,11 +160,11 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "priority_level"
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
     t.integer  "max_volume",     default: 0, null: false
-    t.integer  "priority_level"
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
@@ -199,9 +185,7 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.integer  "stock_id"
     t.string   "operation",          default: "", null: false
     t.string   "status"
-    t.string   "object_class"
-    t.integer  "object_primary_key"
-    t.string   "object_symbol"
+    t.integer  "purchase_detail_id"
     t.integer  "amount",             default: 0,  null: false
     t.datetime "checked_at"
     t.datetime "created_at"
