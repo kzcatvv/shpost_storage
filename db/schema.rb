@@ -11,7 +11,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20140404064225) do
+
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -41,6 +43,14 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "goodstypes", force: true do |t|
@@ -112,6 +122,7 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.integer  "storage_id",        default: 1,  null: false
     t.integer  "keyclientorder_id", default: 1,  null: false
   end
+
 
   create_table "purchase_details", force: true do |t|
     t.string   "name",             default: "", null: false

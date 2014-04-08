@@ -17,6 +17,7 @@ class KeyclientorderdetailsController < ApplicationController
   # GET /keyclientorderdetails/new
   def new
     #@keyclientorderdetail = Keyclientorderdetail.new
+    @commodities = ""
   end
 
   # GET /keyclientorderdetails/1/edit
