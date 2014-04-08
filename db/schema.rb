@@ -72,22 +72,35 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.string   "batch_id"
   end
 
+  create_table "order_details", force: true do |t|
+    t.string   "name",             default: "", null: false
+    t.integer  "specification_id"
+    t.integer  "amount"
+    t.float    "price"
+    t.string   "batch_no"
+    t.integer  "supplier_id"
+    t.integer  "order_id"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "orders", force: true do |t|
-    t.string   "no",               default: "", null: false
+    t.string   "no",                default: "", null: false
     t.string   "order_type"
-    t.string   "has_invoice"
-    t.string   "cust_id"
-    t.string   "cust_name"
-    t.string   "cust_phone"
-    t.string   "cust_mobilephone"
-    t.string   "cust_address"
-    t.string   "cust_postcode"
-    t.string   "cust_email"
-    t.float    "good_weight"
-    t.float    "good_sum"
-    t.integer  "good_amount"
-    t.string   "trans_type"
-    t.float    "trans_sum"
+    t.string   "need_invoice"
+    t.string   "customer_name"
+    t.string   "customer_unit"
+    t.string   "customer_tel"
+    t.string   "customer_phone"
+    t.string   "customer_address"
+    t.string   "customer_postcode"
+    t.string   "customer_email"
+    t.float    "total_weight"
+    t.float    "total_price"
+    t.integer  "total_amount"
+    t.string   "transport_type"
+    t.float    "transport_price"
     t.string   "pay_type"
     t.string   "status"
     t.string   "buyer_desc"
@@ -104,7 +117,7 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.string   "name",             default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
-    t.integer  "spec_id"
+    t.integer  "specification_id"
     t.string   "qg_period"
     t.string   "batch_no"
     t.integer  "amount"
@@ -144,15 +157,13 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "priority_level"
-    t.integer  "vertical",       default: 1, null: false
-    t.integer  "horizontal",     default: 1, null: false
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
     t.integer  "max_volume",     default: 0, null: false
-    t.integer  "area_length",  default: 1, null: false
-    t.integer  "area_width",   default: 1, null: false
-    t.integer  "area_height",  default: 1, null: false
+    t.integer  "area_length",    default: 1, null: false
+    t.integer  "area_width",     default: 1, null: false
+    t.integer  "area_height",    default: 1, null: false
   end
 
   create_table "specifications", force: true do |t|
