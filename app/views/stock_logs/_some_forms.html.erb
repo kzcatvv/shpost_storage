@@ -1,5 +1,5 @@
 <%- model_class = StockLog -%>
-<%= form_tag('/stock_logs/check', method: :post) do -%>
+<%= form_tag('/stock_logs/checkall', method: :post) do -%>
 
 <%= grid(@stock_logs_grid) do |g|
 
@@ -11,7 +11,7 @@
 
     g.column name: model_class.human_attribute_name(:specification), attribute: 'name', model: 'Specification' do |stock_log|
       if stock_log.status == 'waiting'
-        text_field_tag("stock_logs[][specification_id]", stock_log.stock.specification.name)
+        text_field_tag("stock_logs[][specificationid]", stock_log.stock.specification.name)
       else
         stock_log.stock.specification.name
       end
@@ -19,7 +19,8 @@
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', model: 'Shelf' do |stock_log|
       if stock_log.status == 'waiting'
-        select_tag("stock_logs[][shelf_id]", options_for_select(@shelves.map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id))
+        select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id))
+        stock_log.stock.shelf.shelf_code
       else
         stock_log.stock.shelf.shelf_code
       end
@@ -27,29 +28,17 @@
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount' do |stock_log|
       if stock_log.status == 'waiting'
-        text_field_tag("stock_logs[][amount]", stock_log.amount)
+        text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", readonly: true, onclick: 'clickin(this);', onblur: 'clickout(this)')
       else
         stock_log.amount
       end
     end
 
     g.column name: model_class.human_attribute_name(:status), attribute: 'status', custom_filter: StockLog::STATUS.invert do |stock_log|
-      if stock_log.status == 'waiting'
-        select_tag("stock_logs[][status]", options_for_select(StockLog::STATUS.invert,stock_log.status))
-      else
         StockLog::STATUS[stock_log.status.to_sym]
-      end
-    end
-    
-    g.column name: model_class.human_attribute_name(:operation_type), attribute: 'operation_type' do |stock_log|
-      if stock_log.status == 'waiting'
-        select_tag("stock_logs[][operation_type]", options_for_select(StockLog::OPERATION_TYPE.invert,stock_log.operation_type))
-      else
-        StockLog::OPERATION_TYPE[stock_log.operation_type.to_sym]
-      end
     end
 
-    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', html: {onclick: 'test(createdat);', id: 'createdat'} do |stock_log|
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', html: {onclick: 'change(this);', id: 'createdat'} do |stock_log|
         stock_log.created_at.to_s(:db)
       end
 
@@ -69,6 +58,71 @@
   end
 %>
 
-<%= submit_tag('check!!') %>
+<!-- <%= submit_tag('check!!') %> -->
 
 <% end -%>
+
+<script type="text/javascript">
+// $(document).ready(function(){
+//   $("td").click(function) {
+//     alert("Text: " + $("select#stock_logs__amount").text())
+//   }
+// });
+
+function test()
+{
+  alert(1);
+}
+
+function clickin(current)
+{
+  // alert(current.cellIndex);
+  $("input#"+current.id).removeAttr("readonly");
+
+
+  // param = current.id.split('_');
+  // $("input#"+current.id).remove();
+  // text_field='<input id="stock_log11111s_#{param[2]_#{param[3]}}" type="text" value="' + current.value + '" name="stock_logs[][#{param[2]}]"></input>'
+  // $("input#"+current.id).append(text_field);
+}
+
+function clickout(current)
+{
+  // alert(current.cellIndex);
+  $("input#"+current.id).attr("readonly","readonly");
+  modify(current);
+  // $("input#"+current.id).hide();
+  // text_field='<input id="stock_logs_amount" type="text" value="' + current.value + '" name="stock_logs[][amount]"></input>'
+  // $("#"+current.id).append(text_field);
+}
+
+function modify(current)
+{
+  param = current.id.split('_');
+  // alert(param[0]);
+  // alert(param[1]);
+  // alert(param[2]);
+  // alert(param[3]);
+  // alert(current.value);
+
+  // var id=param[3];
+  // var amount=2;
+  // var shelf_id=3;
+  $.ajax({
+             type: "POST",
+             url: "/stock_logs/modify",
+             data: "id=" + param[3] + "&" + param[2] + "=" + current.value,
+             dataType: "json",
+             // success: function(data){
+             //             $('#resText').empty();   //清空resText里面的所有内容
+             //             var html = ''; 
+             //             $.each(data, function(commentIndex, comment){
+             //                   html += '<div class="comment"><h6>' + comment['username']
+             //                             + ':</h6><p class="para"' + comment['content']
+             //                             + '</p></div>';
+             //             });
+             //             $('#resText').html(html);
+             //          }
+         });
+}
+</script>

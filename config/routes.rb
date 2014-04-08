@@ -42,7 +42,8 @@ ShpostStorage::Application.routes.draw do
   resources :stock_logs, only: [:index, :show] do
     collection do
       get 'stockindex'
-      post 'check'
+      post 'checkall'
+      post 'modify'
     end
   end
 
