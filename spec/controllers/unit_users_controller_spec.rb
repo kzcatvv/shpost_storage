@@ -3,6 +3,8 @@ require 'spec_helper'
 describe UnitUsersController do
 
     before :each do 
+      Unit.destroy_all
+      User.destroy_all
       @unit1 = Unit.create(id: 1,name: "unit1",desc: "unit1")
       @unit2 = Unit.create(id: 2,name: "unit2",desc: "unit2")
       @user11 = User.create(id: 11,name: "user1",email: "user1@111.com",username: "user1",unit_id: 1,password: "11111111",password_confirmation: "11111111",role: "user")
@@ -48,6 +50,16 @@ describe UnitUsersController do
           expect { post :create, unit_id: 1, user: FactoryGirl.attributes_for(:user) }.to change(User, :count).by(1)
       end
 
+      it "assigns a newly created user_log as @user_log with creating user" do
+          post :create, unit_id: 1, user: FactoryGirl.attributes_for(:user)
+
+          expect(assigns(:user_log)).to be_a(UserLog)
+          expect(assigns(:user_log)).to be_persisted
+          expect(assigns(:user_log).object_class).to eq 'User'
+          expect(assigns(:user_log).object_primary_key).to eq assigns(:user).id
+          expect(assigns(:user_log).operation).to eq '新增用户管理'
+      end
+
       it " get the edit route action" do
         { :get => "/units/1/users/1/edit" }.should route_to("action"=>"edit", "controller"=>"unit_users", "unit_id"=>"1", "id"=>"1")
       end
@@ -68,6 +80,17 @@ describe UnitUsersController do
 
       it " get the update route action" do
         { :patch => "/units/1/users/1" }.should route_to("action"=>"update", "controller"=>"unit_users", "unit_id"=>"1", "id"=>"1")
+      end
+
+      it "assigns a newly created user_log as @user_log with destroying user" do
+        expect {
+          delete :destroy, unit_id: 1, id: @user
+        }.to change(UserLog, :count).by(1)
+        expect(assigns(:user_log)).to be_a(UserLog)
+        expect(assigns(:user_log)).to be_persisted
+        expect(assigns(:user_log).object_class).to eq 'User'
+        expect(assigns(:user_log).object_primary_key).to eq assigns(:user).id
+        expect(assigns(:user_log).operation).to eq '删除用户管理'
       end
 
       #it "changes @user's attributes" do

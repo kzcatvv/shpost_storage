@@ -40,7 +40,7 @@ class ApplicationController < ActionController::Base
     if object
       if object.errors.blank?
         @user_log.object_class = object.class.to_s
-        @user_log.object_id = object.id
+        @user_log.object_primary_key = object.id
 
         if symbol && object[:symbol]
           @user_log.object_symbol = object[:symbol]

@@ -159,8 +159,9 @@ describe PurchasesController do
       end
 
     end
+
     #Kiat-mao
-    describe "generates stock in" do
+    describe "Stock in" do
       it "stock_in the requested purchase" do
         expect {
           patch :stock_in, id: @purchase1
@@ -185,6 +186,14 @@ describe PurchasesController do
       end
 
       it "assigns newly stock_logs with stock belongs_to specification that purchase include" do
+        patch :stock_in, id: @purchase1
+        assigns(:stock_logs).each do |x|
+          expect(x.stock).not_to be_blank 
+          expect(@purchase1.purchase_details.map{|x| x.specification}).to include(x.stock.specification)
+        end
+      end
+
+      it "assigns newly stock_logs with stock belongs_to specifications that purchase include" do
         patch :stock_in, id: @purchase1
         assigns(:stock_logs).each do |x|
           expect(x.stock).not_to be_blank 
