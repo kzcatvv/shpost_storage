@@ -4,7 +4,11 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    @orders_grid = initialize_grid(@orders)
+    @orders_grid = initialize_grid(@orders,
+                  :include => [:order_detail],
+                  :order => 'order_details.specification_id',
+                  :page => 1,
+                  :per_page => 25)
   end
 
   # GET /orderes/1

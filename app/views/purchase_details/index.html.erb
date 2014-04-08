@@ -32,8 +32,14 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
+<<<<<<< HEAD
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',
+    custom_filter: PurchaseDetail::STATUS.invert do |purchase_detail| 
+      purchase_detail.statusname
+=======
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: PurchaseDetail::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |purchase_detail| 
       purchase_detail.status_name
+>>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
     end
 
     g.column do |purchase_detail|

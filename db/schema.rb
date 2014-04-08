@@ -43,6 +43,14 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.integer  "unit_id"
   end
 
+  create_table "events", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.boolean  "is_public"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "goodstypes", force: true do |t|
     t.string   "gtno"
     t.string   "name"
@@ -120,7 +128,7 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.string   "name",             default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
-    t.integer  "specification_id"
+    t.integer  "spec_id"
     t.string   "qg_period"
     t.string   "batch_no"
     t.integer  "amount"
