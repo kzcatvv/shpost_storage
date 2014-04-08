@@ -450,10 +450,13 @@ zh-CN:
         phone: 联系电话
         desc: 备注
         batch_id: 订单批次编号
+        unit_id: 单位
+        storage_id: 仓库
       keyclientorderdetail:
         keyclientorder_id: 大客户订单批次编号
         specification_id: 商品规格
         desc: 备注
+        amount: 数量
       filetemp:
         filename: "文档"
         rename: "文件名"

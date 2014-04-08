@@ -67,7 +67,7 @@ class ThirdpartcodesController < ApplicationController
   def select_commodities
       #@objid = params[:object_id]
 
-      @commodities = Commodity.where(goodstype_id: params[:goodstype_id]).collect{|c| [c.name,c.id]}
+      @commodities = Commodity.where(goodstype_id: params[:goodstype_id]).collect{|c| [c.name,c.id]}.insert(0,"请选择")
       #binding.pry
       respond_to do |format|
         format.js 
@@ -76,9 +76,12 @@ class ThirdpartcodesController < ApplicationController
   end
 
   def select_specifications
-      #@objid = params[:object_id]
-      @specifications = Specification.where(commodity_id: params[:commodity_id]).collect{|l| [l.name,l.id]}
-      render(:layout => false)
+      @objid = params[:object_id]+"_specification_id"
+      @specifications = Specification.where(commodity_id: params[:commodity_id]).collect{|l| [l.name,l.id]}.insert(0,"请选择")
+      #binding.pry
+      respond_to do |format|
+        format.js 
+      end
   end
 
   private

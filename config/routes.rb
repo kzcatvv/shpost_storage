@@ -86,6 +86,9 @@ ShpostStorage::Application.routes.draw do
      resources :specifications
   end
 
+  resources :keyclientorders do
+     resources :orders, :controller => 'keyclientorder_orders'
+  end
 
 
   # The priority is based upon order of creation: first created -> highest priority.

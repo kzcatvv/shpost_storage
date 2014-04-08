@@ -1,12 +1,12 @@
-class KeyclientorderdetailsController < ApplicationController
+class KeyclientorderOrdersController < ApplicationController
   #before_action :set_keyclientorderdetail, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource :keyclientorder
-  load_and_authorize_resource :keyclientorderdetail, through: :keyclientorder, parent: false
+  load_and_authorize_resource :order, through: :keyclientorder, parent: false
   # GET /keyclientorderdetails
   # GET /keyclientorderdetails.json
   def index
     #@keyclientorderdetails = Keyclientorderdetail.all
-    @keyclientorderdetails_grid = initialize_grid(@keyclientorderdetails)
+    @orders_grid = initialize_grid(@orders)
   end
 
   # GET /keyclientorderdetails/1
@@ -27,14 +27,16 @@ class KeyclientorderdetailsController < ApplicationController
   # POST /keyclientorderdetails.json
   def create
     #@keyclientorderdetail = Keyclientorderdetail.new(keyclientorderdetail_params)
-    
+
     respond_to do |format|
-      if @keyclientorderdetail.save
-        format.html { redirect_to keyclientorder_keyclientorderdetail_path(@keyclientorder,@keyclientorderdetail), notice: 'Keyclientorderdetail was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @keyclientorderdetail }
+      if @order.save
+        @keyclientorderdetail = keyclientorderdetail.where(keyclientorder_id: params[:keyclientorder_id])
+        @orderdetail= OrderDetail.create(specification_id: @keyclientorderdetail.specification_id,order: @order)
+        format.html { redirect_to keyclientorder_order_path(@keyclientorder,@order), notice: 'Order was successfully created.' }
+        format.json { render action: 'show', status: :created, location: @order }
       else
         format.html { render action: 'new' }
-        format.json { render json: @keyclientorderdetail.errors, status: :unprocessable_entity }
+        format.json { render json: @order.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -43,12 +45,12 @@ class KeyclientorderdetailsController < ApplicationController
   # PATCH/PUT /keyclientorderdetails/1.json
   def update
     respond_to do |format|
-      if @keyclientorderdetail.update(keyclientorderdetail_params)
-        format.html { redirect_to keyclientorder_keyclientorderdetail_path(@keyclientorder,@keyclientorderdetail), notice: 'Keyclientorderdetail was successfully updated.' }
+      if @order.update(order_params)
+        format.html { redirect_to keyclientorder_order_path(@keyclientorder,@order), notice: 'Order was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
-        format.json { render json: @keyclientorderdetail.errors, status: :unprocessable_entity }
+        format.json { render json: @order.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -56,9 +58,9 @@ class KeyclientorderdetailsController < ApplicationController
   # DELETE /keyclientorderdetails/1
   # DELETE /keyclientorderdetails/1.json
   def destroy
-    @keyclientorderdetail.destroy
+    @order.destroy
     respond_to do |format|
-      format.html { redirect_to keyclientorder_keyclientorderdetails_path(@keyclientorder) }
+      format.html { redirect_to keyclientorder_orders_path(@keyclientorder) }
       format.json { head :no_content }
     end
   end
@@ -70,7 +72,7 @@ class KeyclientorderdetailsController < ApplicationController
     #end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def keyclientorderdetail_params
-      params.require(:keyclientorderdetail).permit(:keyclientorder_id, :specification_id, :desc, :amount)
+    def order_params
+      params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
     end
 end
