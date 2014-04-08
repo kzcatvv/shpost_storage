@@ -152,6 +152,7 @@ zh-CN:
       roles: 角色管理
       specifications: 商品规格管理
       details: 明细管理
+      stock_in: 入库单管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -405,7 +406,6 @@ zh-CN:
         supplier_id: "供应商"     
         order_id: "订单编号"
         desc: "备注"
-
       purchase:
         no: "编号"
         name: "名称"
@@ -415,7 +415,8 @@ zh-CN:
         sum: "合计金额"
         desc: "备注"
         status: "状态"
-
+        status_opened: "开放"
+        status_closed: "已关闭"
       purchase_detail:
         name: "名称"
         purchase_id: "采购单"
@@ -427,6 +428,8 @@ zh-CN:
         sum: "金额"
         desc: "备注"
         status: "状态"
+        status_waiting: "处理中"
+        status_stock_in: "完成入库"
       area:
         name: "区域名称"
         current_storage: "当前仓库"

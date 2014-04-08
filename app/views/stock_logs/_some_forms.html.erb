@@ -19,7 +19,7 @@
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', model: 'Shelf' do |stock_log|
       if stock_log.status == 'waiting'
-        select_tag("stock_logs[][shelf_id]", options_for_select(@shelves.map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id))
+        select_tag("stock_logs[][shelf_id]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id))
       else
         stock_log.stock.shelf.shelf_code
       end
