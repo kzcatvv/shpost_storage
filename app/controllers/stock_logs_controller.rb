@@ -31,20 +31,8 @@ class StockLogsController < ApplicationController
       @stock_log.status = stock_log[:status]
       @stock_log.amount = stock_log[:amount]
 
-      puts "-----------------------------------"
-      puts @stock_log
-      puts @stock
-      puts "-----------------------------------"
-
       @stock.save!()
       @stock_log.save!()
-      # order_info = SubOrder.new info
-      # if order_info.product_number.is_a?(Integer) and order_info.product_number > 0
-      #   @sendtext << order_info.product.name
-      #   @sendtext << order_info.product_number.to_s
-      #   @sendtext << "份 "
-      #   params[:order][:sub_orders] << order_info
-      # end
     end
     redirect_to request.referer
   end
