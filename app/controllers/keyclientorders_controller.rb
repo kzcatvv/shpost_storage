@@ -27,7 +27,7 @@ class KeyclientordersController < ApplicationController
   def create
     #@keyclientorder = Keyclientorder.new(keyclientorder_params)
      @keyclientorder.unit_id = current_user.unit_id
-     @keyclientorder.storage_id = current_storage.id
+     @keyclientorder.storage_id = session[:current_storage].id
     respond_to do |format|
       if @keyclientorder.save
         format.html { redirect_to @keyclientorder, notice: 'Keyclientorder was successfully created.' }

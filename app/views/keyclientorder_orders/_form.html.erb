@@ -1,101 +1,98 @@
-<%= form_for @order, :html => { :class => 'form-horizontal' } do |f| %>
+<%= form_for ([ @keyclientorder, @order]), :html => { :class => 'form-horizontal' } do |f| %>
   <div class="control-group">
     <%= f.label :no, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :no, :class => 'text_field' %>
     </div>
   </div>
-  
-  <div class="control-group">
-    <%= f.label :order_type, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :order_type, :class => 'text_field' %>
-    </div>
 
     <div class="control-group">
-    <%= f.label :has_invoice, :class => 'control-label' %>
+     
     <div class="controls">
-      <%= f.text_field :has_invoice, :class => 'text_field' %>
+     <%= f.label :need_invoice, :class => 'control-label' %><%=f.check_box :need_invoice,:class =>'check_box'%>
     </div>
    
     <div class="control-group">
-    <%= f.label :cust_name, :class => 'control-label' %>
+    <%= f.label :customer_name, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :cust_name, :class => 'text_field' %>
+      <%= f.text_field :customer_name, :class => 'text_field' %>
+    </div>
+
+     <div class="control-group">
+    <%= f.label :customer_unit, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_unit, :class => 'text_field' %>
     </div>
     <div class="control-group">
-    <%= f.label :cust_mobilephone, :class => 'control-label' %>
+    <%= f.label :customer_tel, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :cust_mobilephone, :class => 'text_field' %>
+      <%= f.text_field :customer_tel, :class => 'text_field' %>
     </div>
     <div class="control-group">
-    <%= f.label :cust_phone, :class => 'control-label' %>
+    <%= f.label :customer_phone, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :cust_phone, :class => 'text_field' %>
+      <%= f.text_field :customer_phone, :class => 'text_field' %>
     </div>
     <div class="control-group">
-    <%= f.label :cust_address, :class => 'control-label' %>
+    <%= f.label :customer_address, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :cust_address, :class => 'text_field' %>
+      <%= f.text_field :customer_address, :class => 'text_field' %>
     </div>
   <div class="control-group">
-    <%= f.label :cust_postcode, :class => 'control-label' %>
+    <%= f.label :customer_postcode, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :cust_postcode, :class => 'text_field' %>
+      <%= f.text_field :customer_postcode, :class => 'text_field' %>
     </div>
   </div>
   <div class="control-group">
-    <%= f.label :cust_email, :class => 'control-label' %>
+    <%= f.label :customer_email, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :cust_email, :class => 'text_field' %>
+      <%= f.text_field :customer_email, :class => 'text_field' %>
     </div>
   </div>
   <div class="control-group">
-    <%= f.label :good_weight, :class => 'control-label' %>
+    <%= f.label :total_weight, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :good_weight, :class => 'text_field' %>
+      <%= f.text_field :total_weight, :class => 'text_field' %>
     </div>
   </div>
     <div class="control-group">
-    <%= f.label :good_sum, :class => 'control-label' %>
+    <%= f.label :total_price, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :good_sum, :class => 'text_field' %>
+      <%= f.text_field :total_price, :class => 'text_field' %>
     </div>
   </div>
 
   <div class="control-group">
-    <%= f.label :good_amount, :class => 'control-label' %>
+    <%= f.label :total_amount, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :good_amount, :class => 'text_field' %>
+      <%= f.text_field :total_amount, :class => 'text_field' %>
     </div>
   </div>
 
   <div class="control-group">
-    <%= f.label :trans_type, :class => 'control-label' %>
+    <%= f.label :transport_type, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :trans_type, :class => 'text_field' %>
+     <%= f.select(:transport_type, Order::TRANSPORT_TYPE.invert) %>
     </div>
   </div>
 
   <div class="control-group">
-    <%= f.label :trans_sum, :class => 'control-label' %>
+    <%= f.label :transport_price, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :trans_sum, :class => 'text_field' %>
+      <%= f.text_field :transport_price, :class => 'text_field' %>
+
     </div>
   </div>
 
   <div class="control-group">
     <%= f.label :pay_type, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :pay_type, :class => 'text_field' %>
+     
+      <%= f.select(:pay_type, Order::PAY_TYPE.invert) %>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :status, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :status, :class => 'text_field' %>
-    </div>
-  </div>
+
   <div class="control-group">
     <%= f.label :buyer_desc, :class => 'control-label' %>
     <div class="controls">
@@ -111,22 +108,9 @@
   <div class="control-group">
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :business_id, :class => 'text_field' %>
+    <%= f.select(:business_id, Business.all.map{|u| [u.name,u.id]})%>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :unit_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :unit_id, :class => 'text_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :storage_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :storage_id, :class => 'text_field' %>
-    </div>
-  </div>
-
 
   
   <%= f.submit nil, :class => 'btn btn-primary' %>

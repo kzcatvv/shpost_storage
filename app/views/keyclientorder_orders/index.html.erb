@@ -16,36 +16,39 @@
 <%= grid(@orders_grid) do |g|
     g.column name: model_class.human_attribute_name(:no), attribute: 'no'
 
-    g.column name: model_class.human_attribute_name(:order_type), attribute: 'order_type'
+    g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name'
 
-    g.column name: model_class.human_attribute_name(:has_invoice), attribute: 'has_invoice'
+    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit'
 
-   
-    g.column name: model_class.human_attribute_name(:cust_name), attribute: 'cust_name'
+    g.column name: model_class.human_attribute_name(:customer_tel), attribute: 'customer_tel'
 
-    g.column name: model_class.human_attribute_name(:cust_mobilephone), attribute: 'cust_mobilephone'
+    g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone'
 
-    g.column name: model_class.human_attribute_name(:cust_phone), attribute: 'cust_phone'
+    g.column name: model_class.human_attribute_name(:customer_address), attribute: 'customer_address'
 
-    g.column name: model_class.human_attribute_name(:cust_address), attribute: 'cust_address'
+    g.column name: model_class.human_attribute_name(:customer_postcode), attribute: 'customer_postcode'
 
-    g.column name: model_class.human_attribute_name(:cust_postcode), attribute: 'cust_postcode'
+    g.column name: model_class.human_attribute_name(:customer_email), attribute: 'customer_email'
 
-    g.column name: model_class.human_attribute_name(:cust_email), attribute: 'cust_email'
+    g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight'
 
-    g.column name: model_class.human_attribute_name(:good_weight), attribute: 'good_weight'
+    g.column name: model_class.human_attribute_name(:total_price), attribute: 'total_price'
 
-    g.column name: model_class.human_attribute_name(:good_sum), attribute: 'good_sum'
+    g.column name: model_class.human_attribute_name(:total_amount), attribute: 'total_amount'
 
-    g.column name: model_class.human_attribute_name(:good_amount), attribute: 'good_amount'
+    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type',custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
+      order.transporttypename
+    end
 
-    g.column name: model_class.human_attribute_name(:trans_type), attribute: 'trans_type'
+    g.column name: model_class.human_attribute_name(:transport_price), attribute: 'transport_price'
 
-    g.column name: model_class.human_attribute_name(:trans_sum), attribute: 'trans_sum'
+    g.column name: model_class.human_attribute_name(:pay_type), attribute: 'pay_type',custom_filter: Order::PAY_TYPE.invert do |order| 
+      order.paytypename
+    end
 
-    g.column name: model_class.human_attribute_name(:pay_type), attribute: 'pay_type'
-
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Order::STATUS.invert do |order| 
+      order.statusname
+    end
 
     g.column name: model_class.human_attribute_name(:buyer_desc), attribute: 'buyer_desc'
 
@@ -67,8 +70,6 @@
       order.keyclientorder.try :batch_id
     end
 
-
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status'
 
     g.column do |order|
       ActiveSupport::SafeBuffer.new << 

@@ -27,12 +27,17 @@ class KeyclientorderOrdersController < ApplicationController
   # POST /keyclientorderdetails.json
   def create
     #@keyclientorderdetail = Keyclientorderdetail.new(keyclientorderdetail_params)
-
+    @order.order_type = "keyclientorder"
+    @order.unit_id = current_user.unit_id
+    @order.storage_id = session[:current_storage].id
+    @order.status = "untreated"
     respond_to do |format|
       if @order.save
         @keyclientorderdetail = Keyclientorderdetail.where(keyclientorder_id: params[:keyclientorder_id])
-        @specification = Specification.find(@keyclientorderdetail.specification_id)
-        @orderdetail= OrderDetail.create(name: @specification.name,specification: @specification, amount: @specification.amount,order: @order)
+        @keyclientorderdetail.each do |d|
+           @specification = Specification.find(d.specification_id)
+           @orderdetail= OrderDetail.create(name: @specification.name,specification: @specification, amount: d.amount, order: @order)
+        end
         format.html { redirect_to keyclientorder_order_path(@keyclientorder,@order), notice: 'Order was successfully created.' }
         format.json { render action: 'show', status: :created, location: @order }
       else
