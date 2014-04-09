@@ -6,8 +6,8 @@
 <dl class="dl-horizontal">
   <dt><strong><%= model_class.human_attribute_name(:no) %>:</strong></dt>
   <dd><%= @purchase.no %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
-  <dd><%= @purchase.unit_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
+  <dd><%= @purchase.name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
   <dd><%= Business.find(@purchase.business_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:amount) %>:</strong></dt>
@@ -16,10 +16,13 @@
   <dd><%= @purchase.sum %></dd>
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @purchase.desc %></dd>
+<<<<<<< HEAD
   <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
   <dd><%= @purchase.statusname %></dd>
 
 
+=======
+>>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

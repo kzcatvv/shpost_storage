@@ -26,7 +26,8 @@ class KeyclientordersController < ApplicationController
   # POST /keyclientorders.json
   def create
     #@keyclientorder = Keyclientorder.new(keyclientorder_params)
-
+     @keyclientorder.unit_id = current_user.unit_id
+     @keyclientorder.storage_id = current_storage.id
     respond_to do |format|
       if @keyclientorder.save
         format.html { redirect_to @keyclientorder, notice: 'Keyclientorder was successfully created.' }
@@ -70,6 +71,6 @@ class KeyclientordersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def keyclientorder_params
-      params.require(:keyclientorder).permit(:keyclient_name, :keyclient_addr, :contact_person, :phone, :desc, :batch_id)
+      params.require(:keyclientorder).permit(:keyclient_name, :keyclient_addr, :contact_person, :phone, :desc, :batch_id, :unit_id, :storage_id)
     end
 end

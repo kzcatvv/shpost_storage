@@ -17,7 +17,6 @@ class KeyclientorderdetailsController < ApplicationController
   # GET /keyclientorderdetails/new
   def new
     #@keyclientorderdetail = Keyclientorderdetail.new
-    @commodities = ""
   end
 
   # GET /keyclientorderdetails/1/edit
@@ -28,7 +27,7 @@ class KeyclientorderdetailsController < ApplicationController
   # POST /keyclientorderdetails.json
   def create
     #@keyclientorderdetail = Keyclientorderdetail.new(keyclientorderdetail_params)
-
+    
     respond_to do |format|
       if @keyclientorderdetail.save
         format.html { redirect_to keyclientorder_keyclientorderdetail_path(@keyclientorder,@keyclientorderdetail), notice: 'Keyclientorderdetail was successfully created.' }
@@ -72,6 +71,6 @@ class KeyclientorderdetailsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def keyclientorderdetail_params
-      params.require(:keyclientorderdetail).permit(:keyclientorder_id, :specification_id, :desc)
+      params.require(:keyclientorderdetail).permit(:keyclientorder_id, :specification_id, :desc, :amount)
     end
 end

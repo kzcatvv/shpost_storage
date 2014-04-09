@@ -15,6 +15,8 @@ class PurchasesController < ApplicationController
   # GET /purchasees/new
   def new
    # @purchase = Purchase.new
+    @purchase.unit = current_user.unit
+    @purchase.status = Purchase::STATUS[:waiting]
   end
 
   # GET /purchasees/1/edit
@@ -63,18 +65,22 @@ class PurchasesController < ApplicationController
 
   # PATCH /specifications/1
   def stock_in
-    @stock_logs = []
+    #@stock_logs = []
     @purchase.purchase_details.each do |x|
-      while x.amount > 0
+      while x.waiting_amount > 0
         stock = Stock.get_available_stock(x.specification, @purchase.business, x.supplier, x.batch_no)
         
         stock_in_amount = stock.stock_in_amount(x.amount)
-        x.amount -= stock_in_amount
+        #x.amount -= stock_in_amount
 
         stock.save
-        @stock_logs << StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], object_class: x.class.to_s, object_primary_key: x.id, object_symbol: x.name, amount: x.amount, operation_type: StockLog::OPERATION_TYPE[:in])
+
+        x.stock_logs.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], object_class: x.class.to_s, object_primary_key: x.id, object_symbol: x.name, amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
       end
     end
+
+    @stock_logs = @purchase.stock_logs
+    @stock_logs_grid = initialize_grid(@stock_logs)
   end
 
   private
@@ -85,6 +91,6 @@ class PurchasesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_params
-      params.require(:purchase).permit(:no, :unit_id, :business_id, :amount, :sum, :desc,:status)
+      params.require(:purchase).permit(:no, :name, :business_id, :amount, :sum, :desc)
     end
 end

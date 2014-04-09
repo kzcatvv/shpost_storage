@@ -67,5 +67,5 @@ zh-CN:
       new:
         resend_unlock_instructions: 重发解锁指示
     failure:
-      admin:
+      user:
         not_found_in_database: 没有该用户

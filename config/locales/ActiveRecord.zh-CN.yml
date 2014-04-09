@@ -154,9 +154,11 @@ zh-CN:
       details: 明细管理
       purchase_details: 采购单明细管理
       order_details: 订单明细管理
+      stock_in: 入库单管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
+      stock_in: "%{model}入库单"
   number:
     currency:
       format:
@@ -410,28 +412,31 @@ zh-CN:
         supplier_id: "供应商"     
         order_id: "订单编号"
         desc: "备注"
-
       purchase:
         no: "编号"
+        name: "名称"
         unit_id: "所属机构"
         business_id: "所属商户"
         amount: "合计数量"
         sum: "合计金额"
         desc: "备注"
         status: "状态"
-      
 
+        status_opened: "开放"
+        status_closed: "已关闭"
       purchase_detail:
-        name: "编号"
-        purchase_id: "所属机构"
-        supplier_id: "所属商户"
-        specification_id: "规格号"
+        name: "名称"
+        purchase_id: "采购单"
+        supplier_id: "供应商"
+        specification_id: "规格"
         qg_period: "保质期"
         batch_no: "批次号"
         amount: "数量"
-        sum: "单价金额"
+        sum: "金额"
         desc: "备注"
         status: "状态"
+        status_waiting: "处理中"
+        status_stock_in: "完成入库"
       area:
         name: "区域名称"
         current_storage: "当前仓库"
@@ -457,10 +462,13 @@ zh-CN:
         phone: 联系电话
         desc: 备注
         batch_id: 订单批次编号
+        unit_id: 单位
+        storage_id: 仓库
       keyclientorderdetail:
         keyclientorder_id: 大客户订单批次编号
         specification_id: 商品规格
         desc: 备注
+        amount: 数量
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -505,10 +513,13 @@ zh-CN:
         supplier:
           name: "供应商管理"
           link: "/suppliers"
+        purchase:
+          name: "采购单管理"
+          link: "/purchases"
     business:
       name: "商户与订单管理"
       submenu:
-        supplier:
+        business:
           name: "商户管理"
           link: "/businesses"
     goodstypes:
@@ -541,20 +552,20 @@ zh-CN:
         stock_log:
           name: "库存操作查询"
           link: "/stock_logs"
-    filetemp:
-      name: "模板管理"
-      needrole: 
-        can: :read
-        role: "Menu.Filetemp"
-      submenu:
-        filetemp_upload:
-          name: "模板上传"
-          link: "/filetemps/upload"
-          #needrole: ["create", "Filetemp"]
-        filetemp_download:
-          name: "模板下载"
-          link: "/filetemps"
-          #needrole: ["read", "Filetemp"]
+    # filetemp:
+    #   name: "模板管理"
+    #   needrole: 
+    #     can: :read
+    #     role: "Menu.Filetemp"
+    #   submenu:
+    #     filetemp_upload:
+    #       name: "模板上传"
+    #       link: "/filetemps/upload"
+    #       #needrole: ["create", "Filetemp"]
+    #     filetemp_download:
+    #       name: "模板下载"
+    #       link: "/filetemps"
+    #       #needrole: ["read", "Filetemp"]
   user_navigation:
     update_self: "个人信息"
     show_unit: "单位信息"

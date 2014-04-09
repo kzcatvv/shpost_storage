@@ -11,9 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20140404064225) do
-
+ActiveRecord::Schema.define(version: 20140408083707) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -45,14 +43,6 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.integer  "unit_id"
   end
 
-  create_table "events", force: true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.boolean  "is_public"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "goodstypes", force: true do |t|
     t.string   "gtno"
     t.string   "name"
@@ -67,6 +57,7 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "amount"
   end
 
   add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
@@ -80,6 +71,8 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "batch_id"
+    t.integer  "unit_id"
+    t.integer  "storage_id"
   end
 
   create_table "order_details", force: true do |t|
@@ -123,7 +116,6 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.integer  "keyclientorder_id", default: 1,  null: false
   end
 
-
   create_table "purchase_details", force: true do |t|
     t.string   "name",             default: "", null: false
     t.integer  "purchase_id"
@@ -149,6 +141,7 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name",        default: "", null: false
   end
 
   create_table "roles", force: true do |t|
@@ -167,7 +160,6 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "priority_level"
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
@@ -175,6 +167,7 @@ ActiveRecord::Schema.define(version: 20140404064225) do
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
+    t.integer  "priority_level"
   end
 
   create_table "specifications", force: true do |t|
@@ -253,10 +246,10 @@ ActiveRecord::Schema.define(version: 20140404064225) do
   add_index "units", ["name"], name: "index_units_on_name", unique: true
 
   create_table "user_logs", force: true do |t|
-    t.integer  "user_id",       default: 0,  null: false
-    t.string   "operation",     default: "", null: false
+    t.integer  "user_id",            default: 0,  null: false
+    t.string   "operation",          default: "", null: false
     t.string   "object_class"
-    t.integer  "object_id"
+    t.integer  "object_primary_key"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "object_symbol"
