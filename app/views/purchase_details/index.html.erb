@@ -32,7 +32,10 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',
+    custom_filter: PurchaseDetail::STATUS.invert do |purchase_detail| 
+      purchase_detail.statusname
+    end
 
     g.column do |purchase_detail|
       ActiveSupport::SafeBuffer.new << 

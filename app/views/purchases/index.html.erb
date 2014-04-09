@@ -34,7 +34,10 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',
+    custom_filter: Purchase::STATUS.invert do |purchase| 
+      purchase.statusname
+    end
 
 
 
@@ -44,7 +47,9 @@
                       edit_purchase_path(purchase), :class => 'btn btn-xs btn-primary' if can? :update, purchase) << ' ' <<
       (link_to t('.destroy', :default => t("helpers.links.destroy")),
                       purchase_path(purchase),
-                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase)
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase)<< ' ' <<
+      
+      (link_to t('.purchase_details', :default => t("helpers.links.purchase_details")),purchase_purchase_details_path(purchase), :class => 'btn btn-xs btn-info' if can? :purchase_detail, purchase) 
       end
   end 
 %>

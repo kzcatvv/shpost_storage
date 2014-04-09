@@ -4,6 +4,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :orders
 
+  resources :orders do
+     resources :order_details
+  end
+
+
 
   resources :keyclientorders do
     resources :keyclientorderdetails
@@ -34,6 +39,10 @@ ShpostStorage::Application.routes.draw do
   resources :stocks
 
   resources :purchases
+
+  resources :purchases do
+     resources :purchase_details
+  end
 
   resources :areas
 

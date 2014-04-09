@@ -152,6 +152,8 @@ zh-CN:
       roles: 角色管理
       specifications: 商品规格管理
       details: 明细管理
+      purchase_details: 采购单明细管理
+      order_details: 订单明细管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -393,7 +395,11 @@ zh-CN:
         pay_type: "支付方式"          
         status: "状态"            
         buyer_desc: "买家留言"        
-        seller_desc: "卖家留言"       
+        seller_desc: "卖家留言"  
+        unit_id: "所属机构"     
+        business_id: "所属商户"
+        storage_id: "所属仓库"
+        keyclientorder_id: "大客户订单编号"
 
       order_detail:
         name: "商品名称"
@@ -413,6 +419,7 @@ zh-CN:
         sum: "合计金额"
         desc: "备注"
         status: "状态"
+      
 
       purchase_detail:
         name: "编号"

@@ -17,7 +17,9 @@
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @purchase.desc %></dd>
   <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
-  <dd><%= @purchase.status %></dd>
+  <dd><%= @purchase.statusname %></dd>
+
+
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
