@@ -5,22 +5,16 @@
       <%= f.text_field :no, :class => 'text_field' %>
     </div>
   </div>
-  
   <div class="control-group">
-  
-
     <div class="control-group">
-   
     <div class="controls">
     <%= f.label :need_invoice, :class => 'control-label' %> <%=f.check_box :need_invoice,:class =>'check_box'%>
     </div>
-   
     <div class="control-group">
     <%= f.label :customer_name, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :customer_name, :class => 'text_field' %>
     </div>
-
      <div class="control-group">
     <%= f.label :customer_unit, :class => 'control-label' %>
     <div class="controls">
@@ -72,33 +66,10 @@
       <%= f.text_field :total_amount, :class => 'text_field' %>
     </div>
   </div>
-
-  <div class="control-group">
-    <%= f.label :transport_type, :class => 'control-label' %>
-    <div class="controls">
-     <%= f.select(:transport_type, Order::TRANSPORT_TYPE.invert) %>
-    </div>
-  </div>
-
   <div class="control-group">
     <%= f.label :transport_price, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :transport_price, :class => 'text_field' %>
-
-    </div>
-  </div>
-
-  <div class="control-group">
-    <%= f.label :pay_type, :class => 'control-label' %>
-    <div class="controls">
-     
-      <%= f.select(:pay_type, Order::PAY_TYPE.invert) %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :status, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select(:status, Order::STATUS.invert) %>
     </div>
   </div>
   <div class="control-group">
@@ -116,25 +87,9 @@
   <div class="control-group">
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
-    <%= f.select(:business_id, Business.all.map{|u| [u.name,u.id]})%>
+    <%= f.select(:business_id, Business.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :unit_id, :class => 'control-label' %>
-    <div class="controls">
-    <%= f.select(:unit_id, Unit.all.map{|u| [u.name,u.id]})%>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :storage_id, :class => 'control-label' %>
-    <div class="controls">
-    <%= f.select(:storage_id, Storage.all.map{|u| [u.name,u.id]})%>
-    </div>
-  </div>
- 
- 
-
-  
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <% if can? :index, Order %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

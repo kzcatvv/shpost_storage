@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140411022407) do
+ActiveRecord::Schema.define(version: 20140408144023) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -160,6 +160,7 @@ ActiveRecord::Schema.define(version: 20140411022407) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "priority_level"
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
@@ -167,7 +168,6 @@ ActiveRecord::Schema.define(version: 20140411022407) do
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
-    t.integer  "priority_level"
   end
 
   create_table "specifications", force: true do |t|
