@@ -1,5 +1,44 @@
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+	<embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
+</object>
 <%- model_class = Purchase -%>
 <div class="page-header">
   <h1><%=t '.title', :default => [:'helpers.titles.stock_in', '%{model} Stock In'], :model => model_class.model_name.human.titleize %></h1>
+  <div style="float:right">   
+      <a href="javascript:stockin_preview()" class='btn btn-primary' >打印入库单</a>
+  </div>
 </div>
 <%= render :partial => 'stock_logs/some_forms' %>
+
+<script language="javascript" type="text/javascript"> 
+function CreateStockinPage(){
+    LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));  
+    LODOP.PRINT_INIT("打印入库单");
+    LODOP.SET_PRINT_STYLE("FontSize",18);
+    LODOP.SET_PRINT_STYLE("Bold",1);
+    LODOP.SET_PRINT_STYLE("ItemType",4);
+    LODOP.ADD_PRINT_TEXT(50,"45%",260,39,"入库单");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(50,"75%",260,39,CurentTime(0));
+    LODOP.SET_PRINT_STYLE("FontSize",15);
+    LODOP.SET_PRINT_STYLE("Bold",1);
+    h=110;
+    LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"采购单");
+    LODOP.ADD_PRINT_TEXT(h,"20%",260,25,"商品名称规格");
+    LODOP.ADD_PRINT_TEXT(h,"45%",260,25,"数量");
+    LODOP.ADD_PRINT_TEXT(h,"55%",260,25,"货架");
+    LODOP.ADD_PRINT_TEXT(h,"75%",260,25,"69码");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    <% @stock_logs_grid.all_pages_records.map(&:id).each do |j| %>
+        h=h+33;
+        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'采购单明细');
+        LODOP.ADD_PRINT_TEXT(h,"20%",260,25,'<%= StockLog.find(j).stock.specification.commodity.name %>'+' '+'<%= StockLog.find(j).stock.specification.name %>');
+        LODOP.ADD_PRINT_TEXT(h,"45%",260,25,'<%= StockLog.find(j).amount %>');
+        LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= StockLog.find(j).stock.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= StockLog.find(j).stock.specification.sixnine_code %>');
+      <% end %>
+      
+  };
+</script>
