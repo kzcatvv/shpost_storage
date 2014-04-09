@@ -30,8 +30,9 @@ class KeyclientorderOrdersController < ApplicationController
 
     respond_to do |format|
       if @order.save
-        @keyclientorderdetail = keyclientorderdetail.where(keyclientorder_id: params[:keyclientorder_id])
-        @orderdetail= OrderDetail.create(specification_id: @keyclientorderdetail.specification_id,order: @order)
+        @keyclientorderdetail = Keyclientorderdetail.where(keyclientorder_id: params[:keyclientorder_id])
+        @specification = Specification.find(@keyclientorderdetail.specification_id)
+        @orderdetail= OrderDetail.create(name: @specification.name,specification: @specification, amount: @specification.amount,order: @order)
         format.html { redirect_to keyclientorder_order_path(@keyclientorder,@order), notice: 'Order was successfully created.' }
         format.json { render action: 'show', status: :created, location: @order }
       else
