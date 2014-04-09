@@ -164,10 +164,10 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
     t.integer  "max_volume",     default: 0, null: false
-    t.integer  "priority_level"
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
+    t.integer  "priority_level"
   end
 
   create_table "specifications", force: true do |t|

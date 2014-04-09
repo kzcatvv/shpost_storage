@@ -5,7 +5,7 @@ ShpostStorage::Application.routes.draw do
   resources :orders
 
   resources :orders do
-     resources :order_details
+     resources :order_details,:controller => 'order_details'
   end
 
 
