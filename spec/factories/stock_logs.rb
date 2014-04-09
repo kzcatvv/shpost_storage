@@ -5,12 +5,14 @@ FactoryGirl.define do
     user_id 1
     stock_id 1
     operation "create_stock"
-    operation_type "in"
-    status "waiting"
-    checked_at "2014-03-25 20:01:36"
-    object_class "Purchase"
-    object_primary_key 1
+    operation_type StockLog::OPERATION_TYPE[:in]
+    status StockLog::STATUS[:waiting]
+    purchase_detail_id 1
     amount 10
-    object_symbol "purchase_no"
+  
+    factory :checked_stock_log do
+      status StockLog::STATUS[:checked]
+      checked_at "2014-03-25 20:01:36"
+    end
   end
 end

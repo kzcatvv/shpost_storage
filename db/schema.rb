@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140408083707) do
+ActiveRecord::Schema.define(version: 20140408144023) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -185,9 +185,7 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.integer  "stock_id"
     t.string   "operation",          default: "", null: false
     t.string   "status"
-    t.string   "object_class"
-    t.integer  "object_primary_key"
-    t.string   "object_symbol"
+    t.integer  "purchase_detail_id"
     t.integer  "amount",             default: 0,  null: false
     t.datetime "checked_at"
     t.datetime "created_at"

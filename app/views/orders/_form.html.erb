@@ -9,13 +9,13 @@
   <div class="control-group">
     <%= f.label :order_type, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :order_type, :class => 'text_field' %>
+      <%= f.select(:status, Order::TYPE.invert) %>
     </div>
 
     <div class="control-group">
-    <%= f.label :need_invoice, :class => 'control-label' %>
+   
     <div class="controls">
-      <%= f.text_field :need_invoice, :class => 'text_field' %>
+    <%= f.label :need_invoice, :class => 'control-label' %> <%=f.check_box :need_invoice,:class =>'check_box'%>
     </div>
    
     <div class="control-group">
@@ -79,7 +79,7 @@
   <div class="control-group">
     <%= f.label :transport_type, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :transport_type, :class => 'text_field' %>
+     <%= f.select(:transport_type, Order::TRANSPORT_TYPE.invert) %>
     </div>
   </div>
 
@@ -87,19 +87,21 @@
     <%= f.label :transport_price, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :transport_price, :class => 'text_field' %>
+
     </div>
   </div>
 
   <div class="control-group">
     <%= f.label :pay_type, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :pay_type, :class => 'text_field' %>
+     
+      <%= f.select(:pay_type, Order::PAY_TYPE.invert) %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :status, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :status, :class => 'text_field' %>
+      <%= f.select(:status, Order::STATUS.invert) %>
     </div>
   </div>
   <div class="control-group">
@@ -117,19 +119,19 @@
   <div class="control-group">
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :business_id, :class => 'text_field' %>
+    <%= f.select(:business_id, Business.all.map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :unit_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :unit_id, :class => 'text_field' %>
+    <%= f.select(:unit_id, Unit.all.map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :storage_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :storage_id, :class => 'text_field' %>
+    <%= f.select(:storage_id, Storage.all.map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="control-group">

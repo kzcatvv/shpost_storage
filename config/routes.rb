@@ -4,6 +4,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :orders
 
+  resources :orders do
+     resources :order_details
+  end
+
+
 
   resources :keyclientorders do
     resources :keyclientorderdetails
@@ -35,15 +40,25 @@ ShpostStorage::Application.routes.draw do
 
   resources :purchases
 
+  resources :purchases do
+     resources :purchase_details
+  end
+
   resources :areas
 
   resources :businesses
 
   resources :stock_logs, only: [:index, :show] do
+    member do
+      patch 'check'
+    end
     collection do
       get 'stockindex'
-      post 'checkall'
+      post 'updateall'
       post 'modify'
+    end
+    member do
+      get 'split'
     end
   end
 
