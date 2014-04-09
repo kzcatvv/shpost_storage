@@ -5,6 +5,7 @@ FactoryGirl.define do
   factory :purchase do
     sequence(:no) { |n| "no#{n}_test"}
     #date "2008-04-01 08:10:01"
+    name 'iphone5 purchase'
     unit_id 1
     business_id 1
     amount 100

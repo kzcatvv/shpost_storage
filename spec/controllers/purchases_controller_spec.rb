@@ -159,8 +159,9 @@ describe PurchasesController do
       end
 
     end
+
     #Kiat-mao
-    describe "generates stock in" do
+    describe "Stock in" do
       it "stock_in the requested purchase" do
         expect {
           patch :stock_in, id: @purchase1
@@ -169,9 +170,14 @@ describe PurchasesController do
 
       it "assigns newly stock_logs belongs_to @purchase1" do
         patch :stock_in, id: @purchase1
-        assigns(:stock_logs).each do |x|
-          expect(x.object_class).to eq("PurchaseDetail")
+        expect(assigns(:stock_logs)).to eq(@purchase1.stock_logs)
           # expect(x.object_primary_key).to eq(@purchase1.id)
+      end
+
+      it "assigns purchase_details in @purchase1 waiting_amount eq 0" do
+        patch :stock_in, id: @purchase1
+        @purchase1.purchase_details.each do |x|
+          expect(x.waiting_amount).to eq(0)
         end
       end
 
@@ -181,15 +187,18 @@ describe PurchasesController do
           expect(x.status).to eq(StockLog::STATUS[:waiting])
           expect(x.operation).to eq(StockLog::OPERATION[:purchase_stock_in])
           expect(x.operation_type).to eq(StockLog::OPERATION_TYPE[:in])
-        end
-      end
-
-      it "assigns newly stock_logs with stock belongs_to specification that purchase include" do
-        patch :stock_in, id: @purchase1
-        assigns(:stock_logs).each do |x|
           expect(x.stock).not_to be_blank 
           expect(@purchase1.purchase_details.map{|x| x.specification}).to include(x.stock.specification)
         end
+      end
+
+      it "assigns stock_logs eq with stock_in twice" do
+        patch :stock_in, id: @purchase1
+        stock_logs1 = assigns(:stock_logs)
+
+        patch :stock_in, id: @purchase1
+        stock_logs2 = assigns(:stock_logs)
+        expect(stock_logs1).to eq stock_logs2
       end
 
       it "redirects to the stock_in list" do

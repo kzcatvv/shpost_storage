@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20140408083707) do
 
   create_table "areas", force: true do |t|
@@ -41,14 +42,6 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-  end
-
-  create_table "events", force: true do |t|
-    t.string   "name"
-    t.text     "description"
-    t.boolean  "is_public"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "goodstypes", force: true do |t|
@@ -96,22 +89,35 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.datetime "updated_at"
   end
 
+  create_table "order_details", force: true do |t|
+    t.string   "name",             default: "", null: false
+    t.integer  "specification_id"
+    t.integer  "amount"
+    t.float    "price"
+    t.string   "batch_no"
+    t.integer  "supplier_id"
+    t.integer  "order_id"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "orders", force: true do |t|
     t.string   "no",                default: "", null: false
     t.string   "order_type"
-    t.string   "has_invoice"
-    t.string   "cust_id"
-    t.string   "cust_name"
-    t.string   "cust_phone"
-    t.string   "cust_mobilephone"
-    t.string   "cust_address"
-    t.string   "cust_postcode"
-    t.string   "cust_email"
-    t.float    "good_weight"
-    t.float    "good_sum"
-    t.integer  "good_amount"
-    t.string   "trans_type"
-    t.float    "trans_sum"
+    t.string   "need_invoice"
+    t.string   "customer_name"
+    t.string   "customer_unit"
+    t.string   "customer_tel"
+    t.string   "customer_phone"
+    t.string   "customer_address"
+    t.string   "customer_postcode"
+    t.string   "customer_email"
+    t.float    "total_weight"
+    t.float    "total_price"
+    t.integer  "total_amount"
+    t.string   "transport_type"
+    t.float    "transport_price"
     t.string   "pay_type"
     t.string   "status"
     t.string   "buyer_desc"
@@ -128,7 +134,7 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.string   "name",        default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
-    t.integer  "spec_id"
+    t.integer  "specification_id"
     t.string   "qg_period"
     t.string   "batch_no"
     t.integer  "amount"
@@ -149,6 +155,7 @@ ActiveRecord::Schema.define(version: 20140408083707) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name",        default: "", null: false
   end
 
   create_table "roles", force: true do |t|
@@ -253,10 +260,10 @@ ActiveRecord::Schema.define(version: 20140408083707) do
   add_index "units", ["name"], name: "index_units_on_name", unique: true
 
   create_table "user_logs", force: true do |t|
-    t.integer  "user_id",       default: 0,  null: false
-    t.string   "operation",     default: "", null: false
+    t.integer  "user_id",            default: 0,  null: false
+    t.string   "operation",          default: "", null: false
     t.string   "object_class"
-    t.integer  "object_id"
+    t.integer  "object_primary_key"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "object_symbol"

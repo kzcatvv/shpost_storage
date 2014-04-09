@@ -1,4 +1,5 @@
 <%= form_for @purchase_detail, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
   <div class="control-group">
     <%= f.label :name, :class => 'control-label' %>
     <div class="controls">
@@ -14,13 +15,13 @@
   <div class="control-group">
     <%= f.label :supplier_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :supplier_id, :class => 'text_field' %>
+      <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :specification_id, :class => 'text_field' %>
+      <%= f.select(:specification_id, Specification.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="control-group">
@@ -50,16 +51,9 @@
   <div class="control-group">
     <%= f.label :desc, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :desc, :class => 'text_field' %>
+      <%= f.text_area :desc, :class => 'text_field' %>
     </div>
   </div>
-    <div class="control-group">
-    <%= f.label :status, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :status, :class => 'text_field' %>
-    </div>
-  </div>
-
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <% if can? :index, PurchaseDetail %>
