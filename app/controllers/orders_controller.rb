@@ -7,7 +7,7 @@ class OrdersController < ApplicationController
     @orders_grid = initialize_grid(@orders,
                   :include => [:order_detail],
                   :order => 'order_details.specification_id',
-                  :page => 1,
+                  :conditions => {:order_type => "pubiicclient"},
                   :per_page => 25)
   end
 

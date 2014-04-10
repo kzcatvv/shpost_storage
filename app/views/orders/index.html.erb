@@ -13,7 +13,7 @@
 
 
 
-<%= grid(@orders_grid) do |g|
+<%= grid(@orders_grid, allow_showing_all_records: false) do |g|
     g.column name: model_class.human_attribute_name(:no), attribute: 'no'
  
     g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name'
