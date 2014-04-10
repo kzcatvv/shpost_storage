@@ -79,9 +79,6 @@ class StockLogsController < ApplicationController
     @stock_log_new.user_id = @stock_log_update.user_id
     @stock_log_new.operation = @stock_log_update.operation
     @stock_log_new.status = @stock_log_update.status
-    @stock_log_new.object_class = @stock_log_update.object_class
-    @stock_log_new.object_primary_key = @stock_log_update.object_primary_key
-    @stock_log_new.object_symbol = @stock_log_update.object_symbol
     @stock_log_new.operation_type = @stock_log_update.operation_type
     @stock_log_new.desc = @stock_log_update.desc
 
