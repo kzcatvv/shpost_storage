@@ -6,8 +6,10 @@
 <dl class="dl-horizontal">
   <dt><strong><%= model_class.human_attribute_name(:no) %>:</strong></dt>
   <dd><%= @order.no %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:order_type) %>:</strong></dt>
   <dd><%= @order.order_type %></dd>
+
    <dt><strong><%= model_class.human_attribute_name(:need_invoice) %>:</strong></dt>
   <dd><%= @order.need_invoice %></dd>
   
@@ -21,8 +23,11 @@
   <dd><%= @order.customer_address %></dd>
    <dt><strong><%= model_class.human_attribute_name(:customer_postcode) %>:</strong></dt>
   <dd><%= @order.customer_postcode %></dd>
+
+
    <dt><strong><%= model_class.human_attribute_name(:customer_email) %>:</strong></dt>
   <dd><%= @order.customer_email %></dd>
+
    <dt><strong><%= model_class.human_attribute_name(:total_weight) %>:</strong></dt>
   <dd><%= @order.total_weight %></dd>
   <dt><strong><%= model_class.human_attribute_name(:total_price) %>:</strong></dt>
@@ -34,21 +39,25 @@
   <dt><strong><%= model_class.human_attribute_name(:transport_price) %>:</strong></dt>
   <dd><%= @order.transport_price %></dd>
   <dt><strong><%= model_class.human_attribute_name(:pay_type) %>:</strong></dt>
-  <dd><%= @order.pay_type %></dd>
+  <dd><%= @order.paytypename %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
-  <dd><%= @order.status %></dd>
+  <dd><%= @order.statusname %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:buyer_desc) %>:</strong></dt>
   <dd><%= @order.buyer_desc %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:seller_desc) %>:</strong></dt>
   <dd><%= @order.seller_desc %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
-  <dd><%= @order.business_id %></dd>
+  <dd><%= Business.find(@order.business_id).name %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
-  <dd><%= @order.unit_id %></dd>
+  <dd><%= Unit.find(@order.unit_id).name %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
-  <dd><%= @order.storage_id %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:keyclientorder_id) %>:</strong></dt>
-  <dd><%= @order.keyclientorder_id %></dd>
+  <dd><%= Storage.find(@order.storage_id).name %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

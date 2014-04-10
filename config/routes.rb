@@ -4,6 +4,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :orders
 
+  resources :orders do
+     resources :order_details
+  end
+
+
 
   resources :keyclientorders do
     resources :keyclientorderdetails
@@ -35,11 +40,18 @@ ShpostStorage::Application.routes.draw do
 
   resources :purchases
 
+  resources :purchases do
+     resources :purchase_details
+  end
+
   resources :areas
 
   resources :businesses
 
   resources :stock_logs, only: [:index, :show] do
+    member do
+      patch 'check'
+    end
     collection do
       get 'stockindex'
       post 'updateall'
@@ -90,6 +102,9 @@ ShpostStorage::Application.routes.draw do
      resources :specifications
   end
 
+  resources :keyclientorders do
+     resources :orders, :controller => 'keyclientorder_orders'
+  end
 
 
   # The priority is based upon order of creation: first created -> highest priority.

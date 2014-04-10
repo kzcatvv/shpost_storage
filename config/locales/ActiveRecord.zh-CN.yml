@@ -151,7 +151,10 @@ zh-CN:
       users: 用户管理
       roles: 角色管理
       specifications: 商品规格管理
-      details: 明细管理
+      pddetails: 商品明细管理
+      custorders: 客户明细管理
+      purchase_details: 采购单明细管理
+      order_details: 订单明细管理
       stock_in: 入库单管理
     titles:
       edit: 编辑%{model}
@@ -395,7 +398,11 @@ zh-CN:
         pay_type: "支付方式"          
         status: "状态"            
         buyer_desc: "买家留言"        
-        seller_desc: "卖家留言"       
+        seller_desc: "卖家留言"  
+        unit_id: "所属机构"     
+        business_id: "所属商户"
+        storage_id: "所属仓库"
+        keyclientorder_id: "大客户订单编号"
 
       order_detail:
         name: "商品名称"
@@ -415,6 +422,7 @@ zh-CN:
         sum: "合计金额"
         desc: "备注"
         status: "状态"
+
         status_opened: "开放"
         status_closed: "已关闭"
       purchase_detail:
@@ -455,10 +463,13 @@ zh-CN:
         phone: 联系电话
         desc: 备注
         batch_id: 订单批次编号
+        unit_id: 单位
+        storage_id: 仓库
       keyclientorderdetail:
         keyclientorder_id: 大客户订单批次编号
         specification_id: 商品规格
         desc: 备注
+        amount: 数量
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -512,6 +523,9 @@ zh-CN:
         business:
           name: "商户管理"
           link: "/businesses"
+        keyclientorder:
+          name: "大客户订单管理"
+          link: "/keyclientorders"
     goodstypes:
       name: "商品与规格管理"
       submenu:

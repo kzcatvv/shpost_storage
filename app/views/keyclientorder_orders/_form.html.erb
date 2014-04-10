@@ -1,0 +1,121 @@
+<%= form_for ([ @keyclientorder, @order]), :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :no, :class => 'text_field' %>
+    </div>
+  </div>
+
+    <div class="control-group">
+     
+    <div class="controls">
+     <%= f.label :need_invoice, :class => 'control-label' %><%=f.check_box :need_invoice,:class =>'check_box'%>
+    </div>
+   
+    <div class="control-group">
+    <%= f.label :customer_name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_name, :class => 'text_field' %>
+    </div>
+
+     <div class="control-group">
+    <%= f.label :customer_unit, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_unit, :class => 'text_field' %>
+    </div>
+    <div class="control-group">
+    <%= f.label :customer_tel, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_tel, :class => 'text_field' %>
+    </div>
+    <div class="control-group">
+    <%= f.label :customer_phone, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_phone, :class => 'text_field' %>
+    </div>
+    <div class="control-group">
+    <%= f.label :customer_address, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_address, :class => 'text_field' %>
+    </div>
+  <div class="control-group">
+    <%= f.label :customer_postcode, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_postcode, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :customer_email, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :customer_email, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :total_weight, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :total_weight, :class => 'text_field' %>
+    </div>
+  </div>
+    <div class="control-group">
+    <%= f.label :total_price, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :total_price, :class => 'text_field' %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :total_amount, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :total_amount, :class => 'text_field' %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :transport_type, :class => 'control-label' %>
+    <div class="controls">
+     <%= f.select(:transport_type, Order::TRANSPORT_TYPE.invert) %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :transport_price, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :transport_price, :class => 'text_field' %>
+
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :pay_type, :class => 'control-label' %>
+    <div class="controls">
+     
+      <%= f.select(:pay_type, Order::PAY_TYPE.invert) %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :buyer_desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :buyer_desc, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :seller_desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :seller_desc, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :business_id, :class => 'control-label' %>
+    <div class="controls">
+    <%= f.select(:business_id, Business.all.map{|u| [u.name,u.id]})%>
+    </div>
+  </div>
+
+  
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <% if can? :index, Order %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+             orders_path, :class => 'btn btn-default' %>
+  <% end %>
+<% end %>

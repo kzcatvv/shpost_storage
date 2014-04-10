@@ -17,6 +17,13 @@ class StockLogsController < ApplicationController
   #   @areas = Area.where("storage_id = ?", session[:current_storage].id)
   #   @shelves = Shelf.where("area_id in (?)", @areas.ids)
   # end
+  def check
+    respond_to do |format|
+      @stock_log.check!
+      format.html { redirect_to stock_logs_url }
+      format.json { render :json => "success".to_json}#, :callback => "process_user" }
+    end
+  end
 
   def stockindex
     @stock_logs_grid = initialize_grid(@stock_logs, include: [:user,:stock])

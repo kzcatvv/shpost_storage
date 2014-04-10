@@ -3,13 +3,7 @@
   <div class="form-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-      <%= select(:goodstype_id, nil , Goodstype.all.map{|u| [u.name,u.id]},
-                 {:prompt => "选择"}, data: { remote: true,
-                  :url => "/thirdpartcodes/select_commodities" 
-                    }) %>
-      <span>
-        <%= render 'thirdpartcodes/commodities' %>
-      </span>
+      <%= product_select("keyclientorderdetail") %>
     </div>
 
   </div>
@@ -17,6 +11,12 @@
     <%= f.label :desc, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :desc, :class => 'form-control' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :amount, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :amount, :class => 'form-control' %>
     </div>
   </div>
 
