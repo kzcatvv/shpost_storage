@@ -98,9 +98,10 @@ function stockin_preview() {
 		return false;
 	}
   	LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
-  	LODOP.PRINT_INITA("0mm","-0.8mm","232mm","130.7mm","");
-    LODOP.SET_PRINT_PAGESIZE(1,2090,1130,"");
+    LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","");
+    LODOP.PRINT_INITA("-5.5mm","-3mm","232mm","130.7mm","");
     CreateTracking1Page();  
     LODOP.PREVIEW();
     return true;
   }; 
+  

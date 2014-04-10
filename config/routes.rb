@@ -85,7 +85,9 @@ ShpostStorage::Application.routes.draw do
 
   match "/print/tracking" => "print#tracking",via: [:get, :post]
   match "/print/trackingnum" => "print#trackingnum",via: [:get, :post]
-
+  match "/print/keytracking" => "print#keytracking",via: [:get, :post]
+  match "/print/keytrackingnum" => "print#keytrackingnum",via: [:get, :post]
+  match "/print/confirm" => "print#confirm",via: [:get, :post]
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<%= stylesheet_link_tag "application", :media => "all" %>
+<%= javascript_include_tag :defaults %>
+      <%= javascript_include_tag "application" %>
+
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+	<embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
+</object>
+
+  <script language="javascript" type="text/javascript">
+  function trackingn_preview() {
+
+  	LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
+  	LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","");
+    LODOP.PRINT_INITA("-5.5mm","-3mm","232mm","130.7mm","");
+    <% @orders.each do |eorder| %>
+    LODOP.NewPage();
+	LODOP.ADD_PRINT_TEXT("41mm","86.8mm","25.1mm","6.6mm",'<%= eorder.province %><%= eorder.city %>');
+LODOP.ADD_PRINT_TEXT("49.5mm","36.5mm","26.5mm","5.3mm",'<%= eorder.customer_name %>');
+LODOP.ADD_PRINT_TEXT("48.7mm","82.8mm","27.8mm","6.6mm",'<%= eorder.customer_phone %>');
+LODOP.ADD_PRINT_TEXT("62.7mm","44.2mm","65.4mm","5.3mm",'<%= eorder.customer_address %>');
+LODOP.ADD_PRINT_TEXT("41mm","25.9mm","4mm","5.3mm",'<%= eorder.customer_postcode[0] %>');
+LODOP.ADD_PRINT_TEXT("41mm","33.1mm","4.5mm","5.3mm",'<%= eorder.customer_postcode[1] %>');
+LODOP.ADD_PRINT_TEXT("41mm","39.7mm","4.8mm","5.3mm",'<%= eorder.customer_postcode[2] %>');
+LODOP.ADD_PRINT_TEXT("41mm","46.3mm","3.4mm","5.3mm",'<%= eorder.customer_postcode[3] %>');
+LODOP.ADD_PRINT_TEXT("41mm","52.4mm","4.8mm","5.3mm",'<%= eorder.customer_postcode[4] %>');
+LODOP.ADD_PRINT_TEXT("41mm","59mm","4mm","5.3mm",'<%= eorder.customer_postcode[5] %>');
+LODOP.ADD_PRINT_TEXT("75.7mm","83.1mm","27.8mm","5.3mm",'<%= eorder.business.phone %>');
+LODOP.ADD_PRINT_TEXT("83.1mm","44.4mm","64.8mm","5.3mm",'<%= eorder.business.name %>');
+LODOP.ADD_PRINT_TEXT("89.2mm","45.8mm","65.1mm","5.3mm",'<%= eorder.business.name %>');
+LODOP.ADD_PRINT_TEXT("96.6mm","37.3mm","71.4mm","5.3mm","邮政客服电话：4008215071");
+LODOP.ADD_PRINT_TEXT("104mm","133.4mm","23.8mm","6.6mm",'<%= eorder.business.name %>');
+content='';
+<% @keyclientorder.keyclientorderdetails.each do |j| %>
+content=content+'<%= j.specification.name %>  数量：<%= j.amount %>\n'
+<% end %>
+LODOP.ADD_PRINT_TEXT("46.3mm","114.6mm","42.3mm","34.4mm",content);
+LODOP.ADD_PRINT_TEXT("46.6mm","161.4mm","33.1mm","6.6mm",CurentTime(0,1));
+LODOP.ADD_PRINT_TEXT("59.5mm","162.7mm","33.1mm","5.3mm",'<%= current_user.unit.name %>');
+LODOP.ADD_PRINT_TEXT("75.9mm","171.4mm","21.4mm","5.3mm",'<%= eorder.total_weight %>');
+LODOP.ADD_PRINT_TEXT("31.8mm","161.7mm","37.3mm","5.3mm",'<%= eorder.no %>');			
+	<% end %>
+    LODOP.PREVIEW();
+    
+  };
+
+  </script>
+
+</head>
+  
+  <body onLoad="trackingn_preview();window.opener.location.reload();window.opener=null;window.open('','_top'); window.top.close();">
+  
+  	</body>
+</html>
