@@ -124,8 +124,8 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.integer  "keyclientorder_id", default: 1,  null: false
   end
 
-  create_table "purchase_details", force: true do |t|
-    t.string   "name",             default: "", null: false
+  create_table "purchasedetails", force: true do |t|
+    t.string   "name",        default: "", null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
     t.integer  "spec_id"
@@ -168,11 +168,11 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "priority_level"
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
     t.integer  "max_volume",     default: 0, null: false
+    t.integer  "priority_level"
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
