@@ -15,8 +15,7 @@ class PurchasesController < ApplicationController
   # GET /purchasees/new
   def new
    # @purchase = Purchase.new
-    @purchase.unit = current_user.unit
-    @purchase.status = Purchase::STATUS[:waiting]
+    
   end
 
   # GET /purchasees/1/edit
@@ -27,7 +26,8 @@ class PurchasesController < ApplicationController
   # POST /purchasees.json
   def create
    # @purchase = Purchase.new(purchase_params)
-
+    @purchase.unit = current_user.unit
+    @purchase.status = Purchase::STATUS[:waiting]
     respond_to do |format|
       if @purchase.save
         format.html { redirect_to @purchase, notice: 'Purchase was successfully created.' }

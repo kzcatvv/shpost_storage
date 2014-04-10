@@ -12,6 +12,10 @@
   <dd><%= @keyclientorderdetail.desc %></dd>
   <dt><strong><%= model_class.human_attribute_name(:amount) %>:</strong></dt>
   <dd><%= @keyclientorderdetail.amount %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:batch_no) %>:</strong></dt>
+  <dd><%= @keyclientorderdetail.batch_no %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:supplier_id) %>:</strong></dt>
+  <dd><%= Supplier.find(@keyclientorderdetail.supplier_id).name %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140414020807) do
+ActiveRecord::Schema.define(version: 20140415004643) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -58,6 +58,8 @@ ActiveRecord::Schema.define(version: 20140414020807) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "amount"
+    t.string   "batch_no"
+    t.integer  "supplier_id"
   end
 
   add_index "keyclientorderdetails", ["keyclientorder_id", "specification_id"], name: "index_on_keyorderdtl_id_specification", unique: true

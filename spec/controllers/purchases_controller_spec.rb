@@ -162,10 +162,16 @@ describe PurchasesController do
 
     #Kiat-mao
     describe "Stock in" do
-      it "stock_in the requested purchase" do
+      it "add stock_logs count by stock_in the requested purchase" do
         expect {
           patch :stock_in, id: @purchase1
-        }.to change(StockLog, :count)
+        }.to change(StockLog, :count).by(3)
+      end
+
+      it "add stocks count by stock_in the requested purchase" do
+        expect {
+          patch :stock_in, id: @purchase1
+        }.to change(Stock, :count).by(3)
       end
 
       it "assigns newly stock_logs belongs_to @purchase1" do
@@ -267,7 +273,8 @@ describe PurchasesController do
       @superadmin = User.find 1
       @purchase1 = FactoryGirl.create(:purchase)
       @purchase_detail1 = FactoryGirl.create(:purchase_detail)
-      @purchase_detail2 = FactoryGirl.create(:purchase_detail, specification_id: 2)
+      @purchase_detail2 = FactoryGirl.create(:purchase_detail)
+      @purchase_detail3 = FactoryGirl.create(:purchase_detail, specification_id: 2)
       @purchase2 = FactoryGirl.create(:purchase)
       @purchase3 = FactoryGirl.create(:purchase)
       sign_in @superadmin
