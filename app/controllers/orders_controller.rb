@@ -4,8 +4,8 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    @orders = Order.where(order_type: Order::TYPE[:b2c]).joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25)
-
+    @orders_grid = initialize_grid(@orders,
+                   :conditions => {:order_type => "b2c"})
   end
 
   # GET /orderes/1
@@ -62,6 +62,11 @@ class OrdersController < ApplicationController
       format.html { redirect_to orders_url }
       format.json { head :no_content }
     end
+  end
+
+  def findprint
+    @orders = Order.where(" order_type = ? and status = ?","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25)
+
   end
 
   private
