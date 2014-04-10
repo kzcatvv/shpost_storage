@@ -4,7 +4,9 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    @orders_grid = initialize_grid(@orders)
+
+    @orders = Order.where(order_type: "pubiicclient").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25)
+
   end
 
   # GET /orderes/1

@@ -6,19 +6,10 @@
       <%= f.text_field :name, :class => 'text_field' %>
     </div>
   </div>
-  
-  <div class="control-group">
-    <%= f.label :purchase_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :purchase_id, :class => 'text_field' %>
-    </div>
   <div class="control-group">
     <%= f.label :supplier_id, :class => 'control-label' %>
     <div class="controls">
-
-
       <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
-
     </div>
   </div>
   <div class="control-group">
@@ -58,18 +49,9 @@
     </div>
   </div>
 
-    <div class="control-group">
-    <%= f.label :status, :class => 'control-label' %>
-    <div class="controls">
-     <%= f.select(:status, PurchaseDetail::STATUS.invert) %>
-    </div>
-  </div>
-
-
-  
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <% if can? :index, PurchaseDetail %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-              purchase_details_path, :class => 'btn btn-default' %>
+              purchase_purchase_details_path(@purchase), :class => 'btn btn-default' %>
   <% end %>
 <% end %>
