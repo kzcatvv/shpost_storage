@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<%= stylesheet_link_tag "application", :media => "all" %>
+<%= javascript_include_tag :defaults %>
+      <%= javascript_include_tag "application" %>
+</head>
+  
+  <body>
+  	<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+	<embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
+</object>
+
+  	<center>
+<br><br>
+<h1>打印<%= @order.transport_type%>面单</h1>
+</center>
+<br><br><br><br><br><br><br>
+<center> 
+	<form action="/print/trackingnum" onsubmit="return tracking1_preview(this)" method="post">
+		<%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
+         <h3>请输入面单号：<input type=text name='num' id='num'/></h3> 
+         <input type=hidden id='id' name='id' value='<%= @order.id%>'/>
+         <br><br>
+         <input type="submit" value="打印面单" class='btn btn-primary'> 
+    </form>
+
+ </center>
+
+<script language="javascript" type="text/javascript"> 
+
+function CreateTracking1Page(){
+    LODOP.ADD_PRINT_TEXT("41mm","86.8mm","25.1mm","6.6mm","寄达局");
+LODOP.ADD_PRINT_TEXT("49.5mm","36.5mm","26.5mm","5.3mm",'<%= @order.customer_name %>');
+LODOP.ADD_PRINT_TEXT("48.7mm","82.8mm","27.8mm","6.6mm",'<%= @order.customer_phone %>');
+LODOP.ADD_PRINT_TEXT("62.7mm","44.2mm","65.4mm","5.3mm",'<%= @order.customer_address %>');
+LODOP.ADD_PRINT_TEXT("41mm","25.9mm","4mm","5.3mm",'<%= @order.customer_postcode[0] %>');
+LODOP.ADD_PRINT_TEXT("41mm","33.1mm","4.5mm","5.3mm",'<%= @order.customer_postcode[1] %>');
+LODOP.ADD_PRINT_TEXT("40.7mm","39.7mm","4.8mm","5.3mm",'<%= @order.customer_postcode[2] %>');
+LODOP.ADD_PRINT_TEXT("41.5mm","46.3mm","3.4mm","5.3mm",'<%= @order.customer_postcode[3] %>');
+LODOP.ADD_PRINT_TEXT("41.8mm","52.4mm","4.8mm","5.3mm",'<%= @order.customer_postcode[4] %>');
+LODOP.ADD_PRINT_TEXT("41.5mm","59mm","4mm","5.3mm",'<%= @order.customer_postcode[5] %>');
+LODOP.ADD_PRINT_TEXT("75.7mm","83.1mm","27.8mm","5.3mm",'<%= @order.business.phone %>');
+LODOP.ADD_PRINT_TEXT("83.1mm","44.4mm","64.8mm","5.3mm",'<%= @order.business.name %>');
+LODOP.ADD_PRINT_TEXT("89.2mm","45.8mm","65.1mm","5.3mm",'<%= @order.business.name %>');
+LODOP.ADD_PRINT_TEXT("96.6mm","37.3mm","71.4mm","5.3mm","邮政客服电话：4008215071");
+LODOP.ADD_PRINT_TEXT("104mm","133.4mm","23.8mm","6.6mm",'<%= @order.business.name %>');
+content='';
+<% @order.order_details.each do |j| %>
+content=content+'<%= j.name %>  数量：<%= j.amount %>\n'
+<% end %>
+LODOP.ADD_PRINT_TEXT("46.3mm","114.6mm","42.3mm","34.4mm",content);
+LODOP.ADD_PRINT_TEXT("46.6mm","161.4mm","33.1mm","6.6mm",CurentTime(0,1));
+LODOP.ADD_PRINT_TEXT("60.3mm","162.7mm","33.1mm","5.3mm",'<%= current_user.unit.name %>');
+LODOP.ADD_PRINT_TEXT("75.9mm","171.4mm","21.4mm","5.3mm",'<%= @order.total_weight %>');
+LODOP.ADD_PRINT_TEXT("31.8mm","161.7mm","37.3mm","5.3mm",'<%= @order.no %>');
+  };
+</script>
+
+  	</body>
+</html>

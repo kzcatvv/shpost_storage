@@ -32,7 +32,13 @@
 	     return LODOP; 
 	}
 }
-function CurentTime(addtime)   
+
+String.prototype.trim = function()
+{
+    return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+
+function CurentTime(addtime,flag)   
     {   
         var now = new Date();    
         var year = now.getFullYear();       //年   
@@ -44,7 +50,7 @@ function CurentTime(addtime)
         if ((now.getMinutes() + addtime) / 60 > 1) {
             hh += Math.floor((now.getMinutes() + addtime) / 60);
         }
-         
+         if(flag==0){
         var clock = year + "-";   
          
         if(month < 10)   
@@ -62,7 +68,21 @@ function CurentTime(addtime)
              
         clock += hh + ":";   
         if (mm < 10) clock += '0';   
-        clock += mm;   
+        clock += mm;
+        }
+        if(flag==1){
+        	var clock = year + "年";   
+         
+        if(month < 10)   
+            clock += "0";   
+         
+        clock += month + "月";   
+         
+        if(day < 10)   
+            clock += "0";   
+             
+        clock += day + "日";
+        }   
         return(clock);
     }
 
@@ -70,4 +90,17 @@ function CurentTime(addtime)
 function stockin_preview() { 
     CreateStockinPage();  
     LODOP.PREVIEW();  
+  }; 
+  function tracking1_preview() {
+
+  	if(document.getElementById('num').value.trim()==''){
+		alert('请输入面单号');
+		return false;
+	}
+  	LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
+  	LODOP.PRINT_INITA("0mm","-0.8mm","232mm","130.7mm","");
+    LODOP.SET_PRINT_PAGESIZE(1,2090,1130,"");
+    CreateTracking1Page();  
+    LODOP.PREVIEW();
+    return true;
   }; 

@@ -106,6 +106,8 @@ ShpostStorage::Application.routes.draw do
      resources :orders, :controller => 'keyclientorder_orders'
   end
 
+  match "/print/tracking" => "print#tracking",via: [:get, :post]
+  match "/print/trackingnum" => "print#trackingnum",via: [:get, :post]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -63,10 +63,9 @@
                       order_path(order),
                        :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, order) << ' ' <<
 
-         (link_to t('.details', :default => t("helpers.links.details")),order_order_details_path(order), :class => 'btn btn-xs btn-info' if can? :details, order) 
+         (link_to t('.details', :default => t("helpers.links.details")),order_order_details_path(order), :class => 'btn btn-xs btn-info' if can? :details, order) << ' ' <<
 
-     
-       
+       (link_to t('打印面单'), "/print/tracking?id=#{order.id}", target: '_blank',:class => 'btn btn-xs btn-info')
       end
   end 
 %>
