@@ -1,13 +1,13 @@
 <%- model_class = StockLog -%>
-<%= form_tag('/stock_logs/checkall', method: :post) do -%>
+<%= form_tag('/stock_logs/updateall', method: :post) do -%>
 
 <%= grid(@stock_logs_grid) do |g|
 
-    g.column do |stock_log|
-      if stock_log.status == 'waiting'
-        hidden_field_tag "stock_logs[][id]", stock_log.id
-      end
-    end
+    # g.column do |stock_log|
+    #   if stock_log.status == 'waiting'
+    #     hidden_field_tag "stock_logs[][id]", stock_log.id
+    #   end
+    # end
 
     g.column name: model_class.human_attribute_name(:specification), attribute: 'name', model: 'Specification' do |stock_log|
       if stock_log.status == 'waiting'
@@ -19,8 +19,8 @@
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', model: 'Shelf' do |stock_log|
       if stock_log.status == 'waiting'
-        select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id))
-        stock_log.stock.shelf.shelf_code
+        select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onchange: 'clickout(this)', onblur: 'clickout(this)') <<
+        content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'})
       else
         stock_log.stock.shelf.shelf_code
       end
@@ -28,7 +28,12 @@
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount' do |stock_log|
       if stock_log.status == 'waiting'
-        text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", readonly: true, onclick: 'clickin(this);', onblur: 'clickout(this)')
+        text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+        if stock_log.amount == 0
+          content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);', style: 'background-color: red;'})
+        else
+          content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);'})
+        end
       else
         [stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"}]
       end
@@ -38,7 +43,7 @@
         StockLog::STATUS[stock_log.status.to_sym]
     end
 
-    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', html: {onclick: 'change(this);', id: 'createdat'} do |stock_log|
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |stock_log|
         stock_log.created_at.to_s(:db)
       end
 
@@ -46,15 +51,17 @@
         stock_log.checked_at.try :to_s, :db
     end
 
-    # g.column do |stock_log|
-    #   ActiveSupport::SafeBuffer.new <<
-        # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
-        # (submit_tag('check!!'))  #<< ' ' <<
-        # (button_tag() do
-        #   content_tag(:strong, 'check')
-        # end)  << ' ' <<
-        # (link_to t('.edit', :default => t("helpers.links.edit")), check_stock_logs_path(stock_log), :class => 'btn btn-xs btn-primary', method: :post)
-    # end
+    g.column do |stock_log|
+      if stock_log.status == 'waiting'
+        ActiveSupport::SafeBuffer.new <<
+          # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
+          # (submit_tag('check!!'))  #<< ' ' <<
+          # (button_tag() do
+          #   content_tag(:strong, 'check')
+          # end)  << ' ' <<
+          (link_to t('.split', :default => t("helpers.links.split")), split_stock_log_path(stock_log.id), :class => 'btn btn-xs btn-primary', onclick: 'addTr(this)', id: "test_#{stock_log.id}")
+      end
+    end
   end
 %>
 
@@ -69,60 +76,58 @@
 //   }
 // });
 
-function test()
-{
-  alert(1);
-}
-
 function clickin(current)
 {
-  // alert(current.cellIndex);
-  $("input#"+current.id).removeAttr("readonly");
-
-
-  // param = current.id.split('_');
-  // $("input#"+current.id).remove();
-  // text_field='<input id="stock_log11111s_#{param[2]_#{param[3]}}" type="text" value="' + current.value + '" name="stock_logs[][#{param[2]}]"></input>'
-  // $("input#"+current.id).append(text_field);
+  // text=$(current).text();
+  param = current.id.split('_');
+  if (param[2] == "amount") {
+    if ($("input#"+current.id).is(":hidden")){ 
+      $(current).hide();
+      $("input#"+current.id).show();
+      $("input#"+current.id).focus();
+      // text_field='<input id="'+current.id+'" type="text" value="' + text + '" name="stock_logs[]['+param[2]+']" onblur="clickout(this)"></input>'
+      // $("td#"+current.id).append(text_field);
+    }
+  } else {
+    if ($("select#"+current.id).is(":hidden")){ 
+      $(current).hide();
+      $("select#"+current.id).show();
+      $("select#"+current.id).focus();
+    }
+  }
 }
 
 function clickout(current)
 {
-  // alert(current.cellIndex);
-  $("input#"+current.id).attr("readonly","readonly");
+  param = current.id.split('_');
+  if (param[2] == "amount") {
+    $("p#"+current.id).show();
+    $("p#"+current.id).text($(current).val());
+    $(current).hide();
+  } else {
+    $("p#"+current.id).show();
+    $("p#"+current.id).text($(current).find("option:selected").text());
+    $(current).hide();
+  }
   modify(current);
-  // $("input#"+current.id).hide();
-  // text_field='<input id="stock_logs_amount" type="text" value="' + current.value + '" name="stock_logs[][amount]"></input>'
-  // $("#"+current.id).append(text_field);
+}
+
+function addTr(current) {
+  alert(current.id);
+
 }
 
 function modify(current)
 {
   param = current.id.split('_');
-  // alert(param[0]);
-  // alert(param[1]);
-  // alert(param[2]);
-  // alert(param[3]);
-  // alert(current.value);
-
-  // var id=param[3];
-  // var amount=2;
-  // var shelf_id=3;
   $.ajax({
-             type: "POST",
-             url: "/stock_logs/modify",
-             data: "id=" + param[3] + "&" + param[2] + "=" + current.value,
-             dataType: "json",
-             // success: function(data){
-             //             $('#resText').empty();   //清空resText里面的所有内容
-             //             var html = ''; 
-             //             $.each(data, function(commentIndex, comment){
-             //                   html += '<div class="comment"><h6>' + comment['username']
-             //                             + ':</h6><p class="para"' + comment['content']
-             //                             + '</p></div>';
-             //             });
-             //             $('#resText').html(html);
-             //          }
-         });
+    type: "POST",
+    url: "/stock_logs/modify",
+    data: "id=" + param[3] + "&" + param[2] + "=" + $(current).val(),
+    dataType: "json",
+    complete: function() {
+      $("p#"+current.id).css("background-color","transparent");
+    }
+  });
 }
 </script>
