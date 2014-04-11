@@ -46,14 +46,14 @@ ShpostStorage::Application.routes.draw do
   resources :stock_logs, only: [:index, :show] do
     member do
       patch 'check'
+      get 'split'
     end
     collection do
       get 'stockindex'
       post 'updateall'
       post 'modify'
-    end
-    member do
-      get 'split'
+      post 'removetr'
+      post 'addtr'
     end
   end
 
