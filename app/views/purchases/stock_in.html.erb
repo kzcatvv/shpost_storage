@@ -33,7 +33,7 @@ function CreateStockinPage(){
     LODOP.SET_PRINT_STYLE("Bold",0);
     <% @stock_logs_grid.all_pages_records.map(&:id).each do |j| %>
         h=h+33;
-        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'采购单明细');
+        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= StockLog.find(j).purchase_detail.purchase.no %>');
         LODOP.ADD_PRINT_TEXT(h,"20%",260,25,'<%= StockLog.find(j).stock.specification.commodity.name %>'+' '+'<%= StockLog.find(j).stock.specification.name %>');
         LODOP.ADD_PRINT_TEXT(h,"45%",260,25,'<%= StockLog.find(j).amount %>');
         LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= StockLog.find(j).stock.shelf.shelf_code %>');
