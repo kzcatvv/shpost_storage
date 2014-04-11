@@ -29,33 +29,27 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
-<<<<<<< HEAD
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status',
-    custom_filter: Purchase::STATUS.invert do |purchase| 
-      purchase.statusname
-=======
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Purchase::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |purchase| 
       purchase.status_name
->>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
+
     end
 
 
 
     g.column do |purchase|
       ActiveSupport::SafeBuffer.new << 
-<<<<<<< HEAD
+
       (link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_purchase_path(purchase), :class => 'btn btn-xs btn-primary' if can? :update, purchase) << ' ' <<
       (link_to t('.destroy', :default => t("helpers.links.destroy")),
                       purchase_path(purchase),
                        :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase)<< ' ' <<
       
-      (link_to t('.purchase_details', :default => t("helpers.links.purchase_details")),purchase_purchase_details_path(purchase), :class => 'btn btn-xs btn-info' if can? :purchase_detail, purchase) 
-=======
-      (link_to t('.edit', :default => t("helpers.links.edit")), edit_purchase_path(purchase), :class => 'btn btn-xs btn-primary' if can? :update, purchase) << ' ' <<
-      (link_to t('.edit', :default => t("helpers.links.stock_in")), stock_in_purchase_path(purchase), method: :patch, :class => 'btn btn-xs btn-primary' if can? :stock_in, purchase) << ' ' <<
-      (link_to t('.destroy', :default => t("helpers.links.destroy")), purchase_path(purchase), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase)
->>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
+      (link_to t('.purchase_details', :default => t("helpers.links.purchase_details")),purchase_purchase_details_path(purchase), :class => 'btn btn-xs btn-info' if can? :purchase_detail, purchase) << ' ' <<
+
+     
+      (link_to t('.edit', :default => t("helpers.links.stock_in")), stock_in_purchase_path(purchase), method: :patch, :class => 'btn btn-xs btn-primary' if can? :stock_in, purchase)
+     
       end
   end 
 %>

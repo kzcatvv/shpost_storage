@@ -20,6 +20,6 @@ class Order < ActiveRecord::Base
     Order::TRANSPORT_TYPE[transport_type.to_sym]
   end
    
-	  has_many :order_detail, dependent: :destroy
+	  has_many :order_details, dependent: :destroy
 		validates_presence_of :no, :message => '不能为空'
 end

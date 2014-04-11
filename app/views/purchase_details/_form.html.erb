@@ -1,4 +1,4 @@
-<%= form_for @purchase_detail, :html => { :class => 'form-horizontal' } do |f| %>
+<%= form_for ([ @purchase, @purchase_detail]), :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.error_messages %>
   <div class="control-group">
     <%= f.label :name, :class => 'control-label' %>
@@ -15,22 +15,16 @@
   <div class="control-group">
     <%= f.label :supplier_id, :class => 'control-label' %>
     <div class="controls">
-<<<<<<< HEAD
-      <%= f.select(:supplier_id, Supplier.all.map{|u| [u.name,u.id]})%>
-=======
+
+
       <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
->>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
+
     </div>
   </div>
   <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-<<<<<<< HEAD
-      <%= f.select(:specification_id, Specification.all.map{|u| [u.name,u.id]})%>
-     
-=======
       <%= f.select(:specification_id, Specification.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
->>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
     </div>
   </div>
   <div class="control-group">
@@ -63,7 +57,7 @@
       <%= f.text_area :desc, :class => 'text_field' %>
     </div>
   </div>
-<<<<<<< HEAD
+
     <div class="control-group">
     <%= f.label :status, :class => 'control-label' %>
     <div class="controls">
@@ -71,8 +65,7 @@
     </div>
   </div>
 
-=======
->>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
+
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <% if can? :index, PurchaseDetail %>

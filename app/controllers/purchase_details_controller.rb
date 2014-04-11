@@ -1,5 +1,7 @@
 class PurchaseDetailsController < ApplicationController
-  load_and_authorize_resource
+ 
+  load_and_authorize_resource :purchase
+  load_and_authorize_resource :purchase_detail, through: :purchase, parent: false
 
   # GET /purchase_detailes
   # GET /purchase_detailes.json
@@ -29,7 +31,7 @@ class PurchaseDetailsController < ApplicationController
 
     respond_to do |format|
       if @purchase_detail.save
-        format.html { redirect_to @purchase_detail, notice: 'Purchase was successfully created.' }
+        format.html { redirect_to purchase_purchase_detail_path(@purchase,@purchase_detail), notice: 'purchasedetail was successfully created.' }
         format.json { render action: 'show', status: :created, location: @purchase_detail }
       else
         format.html { render action: 'new' }
@@ -43,7 +45,7 @@ class PurchaseDetailsController < ApplicationController
   def update
     respond_to do |format|
       if @purchase_detail.update(purchase_detail_params)
-        format.html { redirect_to @purchase_detail, notice: 'Purchase was successfully updated.' }
+        format.html { redirect_to purchase_purchase_detail_path(@purchase,@purchase_detail), notice: 'purchasedetail was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -57,16 +59,16 @@ class PurchaseDetailsController < ApplicationController
   def destroy
     @purchase_detail.destroy
     respond_to do |format|
-      format.html { redirect_to purchase_details_url }
+      format.html { redirect_to purchase_purchase_details_path(@purchase) }
       format.json { head :no_content }
     end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_purchase_detail
-      @purchase_detail = PurchaseDetail.find(params[:id])
-    end
+    #def set_purchase_detail
+    #  @purchase_detail = PurchaseDetail.find(params[:id])
+    # end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_detail_params
