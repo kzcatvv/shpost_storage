@@ -155,7 +155,9 @@ zh-CN:
       custorders: 客户明细管理
       purchase_details: 采购单明细管理
       order_details: 订单明细管理
-      stock_in: 入库单管理
+      stock_in_purchase: 入库单
+      check_purchase: 确认入库
+      close_purchase: 关闭
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -511,15 +513,15 @@ zh-CN:
         area:
           name: "区域管理"
           link: "/areas/"
-          needrole:
-            can: :read
-            role: "area"
+          # needrole:
+          #   can: :read
+          #   role: "area"
         shelf:
           name: "货架管理"
           link: "/shelves/"
-          needrole:
-            can: :read
-            role: "shelf"
+          # needrole:
+          #   can: :read
+          #   role: "shelf"
     suppliers:
       name: "采购与供应商管理"
       submenu:

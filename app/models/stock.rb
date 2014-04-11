@@ -49,6 +49,10 @@ class Stock < ActiveRecord::Base
     stock = self.find_with_batch_no(specification, business, supplier, batch_no).where(shelf: shelf).first
   end
 
+  def self.find_out_stock(specification, business, supplier)
+    where(specification: specification, business: business, supplier: supplier)
+  end
+
   def stock_in_amount(amount)
     stock_in_amount = available_amount(amount)
     self.virtual_amount += stock_in_amount

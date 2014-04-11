@@ -4,6 +4,7 @@ ShpostStorage::Application.routes.draw do
   resources :orders do
      collection do
         get 'findprint'
+        get 'stockout'
       end
 
      resources :order_details
@@ -31,6 +32,8 @@ ShpostStorage::Application.routes.draw do
     resources :purchase_details
     member do
       patch 'stock_in'
+      patch 'check'
+      patch 'close'
     end
   end
 

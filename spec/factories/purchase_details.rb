@@ -13,7 +13,7 @@ FactoryGirl.define do
     amount 100
     sum 100.1
     desc "liuyingying company"
-    status "1"
+    status PurchaseDetail::STATUS[:waiting]
 
     factory :invalid_purchase_detail do
         name nil
