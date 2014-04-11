@@ -1,6 +1,6 @@
 <%- model_class = Order -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
   <div style="float:right">
     <% if can? :new, Order %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
@@ -9,65 +9,57 @@
     <% end %>
   </div>
 </div>
-
-
-
-
-<%= grid(@orders_grid, allow_showing_all_records: false) do |g|
-    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
- 
-    g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name'
-
-    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit'
-
-    g.column name: model_class.human_attribute_name(:customer_tel), attribute: 'customer_tel'
-
-    g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone'
-
-    g.column name: model_class.human_attribute_name(:customer_address), attribute: 'customer_address'
-
-    g.column name: model_class.human_attribute_name(:customer_postcode), attribute: 'customer_postcode'
-
-    g.column name: model_class.human_attribute_name(:customer_email), attribute: 'customer_email'
-
-    g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight'
-
-    g.column name: model_class.human_attribute_name(:total_amount), attribute: 'total_amount'
-
-    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type',
-     custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
-      order.transporttypename
-    end
-
-   
-    g.column name: model_class.human_attribute_name(:pay_type), attribute: 'pay_type',
-    custom_filter: Order::PAY_TYPE.invert do |order| 
-      order.paytypename
-    end
-
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name',
-     model: 'Business' do |order|
-        order.business.try :name
-    end
-    
-
-    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'keyclientorder_id'
-
-
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status',
-    custom_filter: Order::STATUS.invert do |order| 
-      order.statusname
-    end
-
-    g.column do |order|
-      ActiveSupport::SafeBuffer.new << 
-      (link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_order_path(order), :class => 'btn btn-xs btn-primary' if can? :update, order) << ' ' <<
-      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:no) %></th>
+      <th><%= model_class.human_attribute_name(:customer_name) %></th>
+      <th><%= model_class.human_attribute_name(:customer_unit) %></th>
+      <th><%= model_class.human_attribute_name(:customer_tel) %></th>
+      <th><%= model_class.human_attribute_name(:customer_phone) %></th>
+      <th><%= model_class.human_attribute_name(:customer_address) %></th>
+      <th><%= model_class.human_attribute_name(:customer_postcode) %></th>
+      <th><%= model_class.human_attribute_name(:customer_email) %></th>
+      <th><%= model_class.human_attribute_name(:total_weight) %></th>
+      <th><%= model_class.human_attribute_name(:total_amount) %></th>
+      <th><%= model_class.human_attribute_name(:transport_type) %></th>
+      <th><%= model_class.human_attribute_name(:pay_type) %></th>
+      <th><%= model_class.human_attribute_name(:business_id) %></th>
+      <th><%= model_class.human_attribute_name(:status) %></th>
+      <th><%= model_class.human_attribute_name(:unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:storage_id) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @orders.each do |order| %>
+      <tr>
+        <td><%= order.no %></td>
+        <td><%= order.customer_name %></td>
+        <td><%= order.customer_unit %></td>
+        <td><%= order.customer_tel %></td>
+        <td><%= order.customer_phone %></td>
+        <td><%= order.customer_address %></td>
+        <td><%= order.customer_postcode %></td>
+        <td><%= order.customer_email %></td>
+        <td><%= order.total_weight %></td>
+        <td><%= order.total_amount %></td>
+        <td><%= Order::TRANSPORT_TYPE[order.transport_type.to_sym] %></td>
+        <td><%= Order::PAY_TYPE[order.pay_type.to_sym] %></td>
+        <td><%= Business.find(order.business_id).name %></td>
+        <td><%= Order::STATUS[order.status.to_sym] %></td>
+        <td><%= Unit.find(order.unit_id).name %></td>
+        <td><%= Storage.find(order.storage_id).name %></td>
+        <td>
+          <%=link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_order_path(order), :class => 'btn btn-xs btn-primary' if can? :update, order %>
+          <%=link_to t('.destroy', :default => t("helpers.links.destroy")),
                       order_path(order),
-                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, order) << ' ' <<
+                       :method => :delete, :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, order %>
 
-       (link_to t('.order_details', :default => t("helpers.links.order_details")),order_order_details_path(order), :class => 'btn btn-xs btn-info' if can? :order_detail, order) 
-      end
-  end 
-%>
+          <%=link_to t('.order_details', :default => t("helpers.links.order_details")),order_order_details_path(order), :class => 'btn btn-xs btn-info' if can? :order_detail, order %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
