@@ -1,16 +1,14 @@
 ShpostStorage::Application.routes.draw do
 
-  resources :order_details
-
-  resources :orders
 
   resources :orders do
-     resources :order_details,:controller => 'order_details'
+     resources :order_details
   end
 
 
 
   resources :keyclientorders do
+    resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails
   end
 
@@ -24,25 +22,15 @@ ShpostStorage::Application.routes.draw do
 
   resources :shelves
 
-  resources :purchase_details
 
-  resources :purchases
-
-  resources :stocks
-
-  resources :purchases do |x|
+  resources :purchases do
+    resources :purchase_details
     member do
       patch 'stock_in'
     end
   end
 
   resources :stocks
-
-  resources :purchases
-
-  resources :purchases do
-     resources :purchase_details
-  end
 
   resources :areas
 
@@ -62,8 +50,6 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
-  resources :commodities
-
   resources :goodstypes
 
   resources :suppliers
@@ -74,20 +60,14 @@ ShpostStorage::Application.routes.draw do
 
   devise_for :users, controllers: { sessions: "users/sessions" }
 
-  resources :users
   
-  resources :units
- 
   resources :units do
+    resources :users, :controller => 'unit_users'
     resources :storages do
       member do
-          get 'change'
+        get 'change'
       end
     end
-  end
-
-  resources :units do
-     resources :users, :controller => 'unit_users'
   end
 
   resources :users do
@@ -102,9 +82,6 @@ ShpostStorage::Application.routes.draw do
      resources :specifications
   end
 
-  resources :keyclientorders do
-     resources :orders, :controller => 'keyclientorder_orders'
-  end
 
 
   # The priority is based upon order of creation: first created -> highest priority.
