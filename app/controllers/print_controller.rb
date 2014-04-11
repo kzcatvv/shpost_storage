@@ -30,4 +30,21 @@ class PrintController < ApplicationController
 		flash[:alert] = "正在打印"
 	end
 
+	def webtracking
+		@ids=params[:ids]
+	end
+
+	def webtrackingnum
+		start=params[:start].to_i
+	    ending=params[:end].to_i
+		@ids=params[:id].split(",").map(&:to_i)
+		(start..ending).each_with_index do |num,i|
+			order = Order.find(@ids[i])
+			order.tracking_number=num.to_s
+			order.status='printed'
+			order.save
+		end
+		flash[:alert] = "正在打印"
+	end
+
 end
