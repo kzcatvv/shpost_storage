@@ -31,10 +31,12 @@ describe StockLogsController do
   let(:valid_session) { {} }
 
   describe "admin access" do
-    before :each do 
+    before :each do
+      StockLog.destroy_all
       @stock_log1 = FactoryGirl.create(:stock_log)
-      @stock_log2 = FactoryGirl.create(:stock_log)
-      @stock_log3 = FactoryGirl.create(:stock_log)
+      @stock_log2 = FactoryGirl.create(:stock_log, operation_type: StockLog::OPERATION_TYPE[:out])
+      @stock_log3 = FactoryGirl.create(:stock_log, operation_type: StockLog::OPERATION_TYPE[:reset])
+      @checked_stock_log = FactoryGirl.create(:checked_stock_log)
 
       @user = FactoryGirl.create(:superadmin)
       #@user = User.first
@@ -45,7 +47,7 @@ describe StockLogsController do
     describe "GET index" do
       it "assigns all stock_logs as @stock_logs" do
         get :index
-        expect(assigns(:stock_logs)).to eq([@stock_log1, @stock_log2, @stock_log3])
+        expect(assigns(:stock_logs)).to eq([@stock_log1, @stock_log2, @stock_log3, @checked_stock_log])
       end
 
       it "renders the index view" do
@@ -63,6 +65,41 @@ describe StockLogsController do
       it "renders the show view" do
         get :show, id: @stock_log1
         expect(response).to render_template :show
+      end
+    end
+
+    describe "PATCH check" do
+      context "with waiting stock_log" do
+        it "assigns the requested @stock_log checked by waiting stock_log with operation_type in" do
+          patch :check, id: @stock_log1
+          amount1 = @stock_log1.stock.actual_amount
+          expect(assigns(:stock_log)).to be_checked
+          expect(assigns(:stock_log).checked_at).not_to be_blank
+          expect(assigns(:stock_log).stock.actual_amount).to eq(amount1 + @stock_log1.amount)
+        end
+
+        it "assigns the requested @stock_log checked by waiting stock_log with operation_type out" do
+          patch :check, id: @stock_log2
+          amount1 = @stock_log2.stock.actual_amount
+          expect(assigns(:stock_log)).to be_checked
+          expect(assigns(:stock_log).checked_at).not_to be_blank
+          expect(assigns(:stock_log).stock.actual_amount).to eq(amount1 - @stock_log1.amount)
+        end
+
+        it "assigns the requested @stock_log checked by waiting stock_log with operation_type reset" do
+          patch :check, id: @stock_log3
+          expect(assigns(:stock_log)).to be_checked
+          expect(assigns(:stock_log).checked_at).not_to be_blank
+          expect(assigns(:stock_log).stock.actual_amount).to eq(@stock_log3.amount)
+        end
+
+        it "assigns the requested @stock_log not change by checked stock_log with operation_type reset" do
+          patch :check, id: @checked_stock_log
+          amount1 = @checked_stock_log.stock.actual_amount
+          expect(assigns(:stock_log)).to be_checked
+          expect(assigns(:stock_log).checked_at).not_to be_blank
+          expect(assigns(:stock_log).stock.actual_amount).to eq(amount1)
+        end
       end
     end
   end

@@ -151,7 +151,8 @@ zh-CN:
       users: 用户管理
       roles: 角色管理
       specifications: 商品规格管理
-      details: 明细管理
+      pddetails: 商品明细管理
+      custorders: 客户明细管理
       purchase_details: 采购单明细管理
       order_details: 订单明细管理
       stock_in: 入库单管理
@@ -522,6 +523,9 @@ zh-CN:
         business:
           name: "商户管理"
           link: "/businesses"
+        keyclientorder:
+          name: "大客户订单管理"
+          link: "/keyclientorders"
     goodstypes:
       name: "商品与规格管理"
       submenu:

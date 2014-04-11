@@ -66,16 +66,18 @@ class PurchasesController < ApplicationController
   # PATCH /specifications/1
   def stock_in
     #@stock_logs = []
-    @purchase.purchase_details.each do |x|
-      while x.waiting_amount > 0
-        stock = Stock.get_available_stock(x.specification, @purchase.business, x.supplier, x.batch_no)
-        
-        stock_in_amount = stock.stock_in_amount(x.amount)
-        #x.amount -= stock_in_amount
+    Purchase.transaction do
+      @purchase.purchase_details.each do |x|
+        while x.waiting_amount > 0
+          stock = Stock.get_available_stock(x.specification, @purchase.business, x.supplier, x.batch_no)
+          
+          stock_in_amount = stock.stock_in_amount(x.amount)
+          #x.amount -= stock_in_amount
 
-        stock.save
+          stock.save
 
-        x.stock_logs.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], object_class: x.class.to_s, object_primary_key: x.id, object_symbol: x.name, amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
+          x.stock_logs.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], purchase_detail: x, amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
+        end
       end
     end
 
