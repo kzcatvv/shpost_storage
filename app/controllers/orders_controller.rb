@@ -106,7 +106,11 @@ class OrdersController < ApplicationController
   end
 
   def stockout
-     
+    if !params[:keyclientorder_id].nil?
+       keyorder=Keyclientorder.find(params[:keyclientorder_id])
+       @orders = keyorder.orders
+    end
+
     @orders.each do |order|
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
@@ -139,10 +143,11 @@ class OrdersController < ApplicationController
 
           end
           sklogs = orderdtl.stock_logs
-          @stock_logs += StockLog.where(id:,sklogs)
+          @stock_logs += StockLog.where(id: sklogs)
       end
     end
-    
+    @orders.update_all(status: "unchecked",user_id: nil)
+    binding.pry
     @stock_logs_grid = initialize_grid(@stock_logs)
     #binding.pry
   end
