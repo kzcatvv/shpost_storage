@@ -348,6 +348,8 @@ zh-CN:
         object_symbol: "对象标识"
         created_at: "创建时间"
         checked_at: "确认时间"
+        pd_name: "采购单明细"
+        shelf_code: "货架编号"
       supplier:
         sno: "供应商编号"
         name: "名称"

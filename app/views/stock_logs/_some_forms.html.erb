@@ -1,12 +1,4 @@
 <%- model_class = StockLog -%>
-  <div style="float:right">
-    <% if can? :new, Stock %>
-      <%= link_to t('.new', :default => t("helpers.links.new")),
-                 "javascript:void(0)", onclick: "add(#{@purchase.id})",
-                  :class => 'btn btn-primary' %>
-    <% end %>
-  </div>
-
 <!-- <%= form_tag('/stock_logs/updateall', method: :post) do -%> -->
 
 <%= grid(@stock_logs_grid, show_filters: :no) do |g|
@@ -83,3 +75,11 @@
 <!-- <%= submit_tag('check!!') %> -->
 
 <!-- <% end -%> -->
+
+  <div style="float:right">
+    <% if can? :new, Stock %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                 "javascript:void(0)", onclick: "add(#{@purchase.id})",
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
