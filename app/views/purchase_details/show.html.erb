@@ -24,20 +24,21 @@
 
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @purchase_detail.desc %></dd>
-<<<<<<< HEAD
+
 
   <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
-  <dd><%= @purchase_detail.statusname %></dd>
-=======
->>>>>>> 50716119104ecb16843c2c33a8c3af8fa1b59049
+  <dd><%= @purchase_detail.status_name %></dd>
+
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
-              purchase_details_path, :class => 'btn btn-default'  %>
+              purchase_purchase_details_path(@purchase), :class => 'btn btn-default'  %>
 <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_purchase_detail_path(@purchase_detail), :class => 'btn btn-default' %>
+              edit_purchase_purchase_detail_path(@purchase,@purchase_detail), :class => 'btn btn-default' %>
+
+
 <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-              purchase_detail_path(@purchase_detail),
+              purchase_purchase_detail_path(@purchase,@purchase_detail),
               :method => 'delete',
               :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
               :class => 'btn btn-danger' %>

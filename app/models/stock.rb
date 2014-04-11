@@ -38,6 +38,10 @@ class Stock < ActiveRecord::Base
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
   end
 
+  def self.get_stock(specification, business, supplier, batch_no, shelf, amount)
+    stock = self.find_with_batch_no(specification, business, supplier, batch_no).where(shelf: shelf).first
+  end
+
   def stock_in_amount(amount)
     stock_in_amount = available_amount(amount)
     self.virtual_amount += stock_in_amount
