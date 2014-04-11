@@ -77,7 +77,7 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-    @orders = Order.where(" order_type = ? and (status = ? or status = ?)","b2c","waiting","printed").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
+    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
     allcnt = {}
     @orders.each do |o|
       o.order_details.each do |d|
@@ -99,6 +99,10 @@ class OrdersController < ApplicationController
       end
     end
 
+  end
+
+  def findcheck
+    @orders = Order.where(" order_type = ? and status = ? and user_id = ?","b2c","printed",current_user).limit(25)
   end
 
   def stockout
@@ -134,9 +138,12 @@ class OrdersController < ApplicationController
               end
 
           end
+          sklogs = orderdtl.stock_logs
+          @stock_logs += StockLog.where(id:,sklogs)
       end
     end
-
+    
+    @stock_logs_grid = initialize_grid(@stock_logs)
     #binding.pry
   end
 
