@@ -14,6 +14,8 @@ class OrdersController < ApplicationController
 
   # GET /orderes/new
   def new
+     @order.order_type = Order::TYPE[:pubiicclient]
+
    # @order = Order.new
   end
 

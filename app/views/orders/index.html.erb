@@ -49,11 +49,7 @@
      model: 'Business' do |order|
         order.business.try :name
     end
-    
-
-    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'keyclientorder_id'
-
-
+   
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',
     custom_filter: Order::STATUS.invert do |order| 
       order.statusname
