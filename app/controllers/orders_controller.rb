@@ -84,8 +84,8 @@ class OrdersController < ApplicationController
     find_has_stock(@orders)
     time = Time.new
     batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
-    @orders.update_all(keyclientorder_id: keycorder)
+    @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
+    @orders.update_all(keyclientorder_id: @keycorder)
    else
     @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_id').first
     @orders=@keycorder.orders
@@ -171,13 +171,18 @@ class OrdersController < ApplicationController
 
    else
     sklogs=[]
+    chkout=0
+    @keyclientorder=Keyclientorder.find(params[:format])
+    @orders=@keyclientorder.orders
     @orders.each do |order|
+
+     if check_out_stocks(order)
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
             outstocks = Stock.find_out_stock(orderdtl.specification, order.business, orderdtl.supplier)
+            outbl = false
+            amount = orderdtl.amount
 
-              outbl = false
-              amount = orderdtl.amount
               while orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
                 amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
                  outstocks.each do |outstock|
@@ -202,11 +207,15 @@ class OrdersController < ApplicationController
                    end
                  end
               end
+
           end
           sklogs += orderdtl.stock_logs
       end
+     else
+       chkout += 1
+     end
     end
-    #binding.pry
+
    end
     #@orders.update_all(status: "unchecked",user_id: nil)
     @stock_logs = StockLog.where(id: sklogs)
@@ -214,19 +223,25 @@ class OrdersController < ApplicationController
     @stock_logs_grid = initialize_grid(@stock_logs)
   end
 
-  def check_out_stocks(stocks,amount)
-    chkout = false
-    stocks.each do |stock|
+  def check_out_stocks(order)
+   
+    orderchk = true 
+    order.order_details.each do |odl|
+     outstocks = Stock.find_out_stock(odl.specification, order.business, odl.supplier)
+     chkout = false
+     outstocks.each do |stock|
       if !chkout
-       if stock.virtual_amount - amount >= 0
+       if stock.virtual_amount - odl.amount >= 0
           chkout = true
        else 
-          amount = amount - stock.virtual_amount
+          amount = odl.amount - stock.virtual_amount
           chkout = false
        end
       end
+     end
+     orderchk= orderchk && chkout
     end
-    return chkout
+    return orderchk
   end
 
   def ordercheck

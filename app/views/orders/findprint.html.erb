@@ -5,7 +5,7 @@
       <%=link_to t('打印面单'), "/print/webtracking?ids=#{@orders.map{|o| o.id if (o.status=='waiting')}.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
       <% if can? :stockout, Order %>
       <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
-                  stockout_orders_url(@orders),
+                  stockout_orders_url(@keycorder),
                   :class => 'btn btn-primary' %>
     <% end %>
   </div>
