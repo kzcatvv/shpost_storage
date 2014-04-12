@@ -91,7 +91,7 @@ function pick_preview(){
 
     <% order.order_details.each do |detail| %>
     h=h+33;
-     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= detail.specification.commodity.cno %>');
+     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= detail.specification.commodity.no %>');
      LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= detail.specification.commodity.name %>'+' '+'<%= detail.specification.name %>');
      LODOP.ADD_PRINT_TEXT(h,"65%",260,25,'<%= detail.amount %>');
      LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= detail.price %>');

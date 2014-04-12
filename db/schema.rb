@@ -122,10 +122,10 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.string   "seller_desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "business_id",       default: 1,  null: false
-    t.integer  "unit_id",           default: 1,  null: false
-    t.integer  "storage_id",        default: 1,  null: false
-    t.integer  "keyclientorder_id", default: 1,  null: false
+    t.integer  "business_id",       default: 1,    null: false
+    t.integer  "unit_id",           default: 1,    null: false
+    t.integer  "storage_id",        default: 1,    null: false
+    t.integer  "keyclientorder_id", default: 1,    null: false
     t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
