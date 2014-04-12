@@ -31,15 +31,19 @@ class OrdersController < ApplicationController
   def create
 
    # @order = Order.new(order_params)
-    @order.order_type = "pubiicclient"
-    @order.unit_id = current_user.unit_id
+   # @order.order_type = "pubiicclient"
+   # @order.unit_id = current_user.unit_id
 #@order.storage_id = current_storage.id 
+
+    time=Time.new
+    @order = Order.new(order_params)
+    @order.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Order.count.to_s.rjust(5,'0')
 
     @order.order_type = Order::TYPE[:b2c]
     @order.status = Order::STATUS[:waiting]
     @order.unit = current_user.unit
     @order.storage = current_storage
-    
+   # @order.no = Time.now.to_s.split(':').first
 
     respond_to do |format|
       if @order.save
@@ -123,16 +127,55 @@ class OrdersController < ApplicationController
 
    if !params[:keyclientorder_id].nil?
        sklogs=[]
+       chkout=0
+       has_out=0
+       @keycorder=params[:keyclientorder_id]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
-       keyordercnt = keyorder.orders.count
+       
 
+       if key_check_out_stocks(keyorder)
+          keyordercnt = keyorder.orders.count
+          keyorder.orders.each do |od|
+            od.update_attribute(:is_shortage,"no")
+          end
+       else
+          keyordercnt = get_has_cnt(keyorder)
+
+          if keyorder.stock_logs.distinct.empty?
+            keyorder.orders.limit(keyordercnt).each do |order|
+              order.update_attribute(:is_shortage,"no")
+            end
+
+            keyorder.orders.offset(keyordercnt).each do |o|
+              o.update_attribute(:is_shortage,"yes")
+            end
+          else
+            keyorder.orders.where(is_shortage: "yes").limit(keyordercnt).each do |order|
+              order.update_attribute(:is_shortage,"no")
+            end
+
+            keyorder.orders.where(is_shortage: "yes").offset(keyordercnt).each do |o|
+              o.update_attribute(:is_shortage,"yes")
+            end
+          end
+       end
+       chkout=keyorder.orders.where(is_shortage: "yes").count
+   
+       if keyordercnt > 0
         keyorder.keyclientorderdetails.each do |keydtl|
          if keydtl.amount > 0
             outstocks = Stock.find_out_stock(keydtl.specification, keyorder.business, keydtl.supplier)
-
-              outbl = false
-              amount = keydtl.amount * keyordercnt
+             outbl = false
+             amount = keydtl.amount * keyordercnt
+             sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
+             sls.each do |sl|
+              has_out += sl.amount
+             end
+             koallcnt=keydtl.amount*keyorder.orders.count
+             offsetcnt=has_out
+             while koallcnt - has_out > 0
+               
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
                   if !outbl
@@ -143,21 +186,22 @@ class OrdersController < ApplicationController
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
                      sklogs += StockLog.where(id: stklog)
-                     ods=OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(amount/keydtl.amount)
+                     ods=keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount-1).limit(amount/keydtl.amount)
                      stklog.order_details << ods
                     else 
                      amount = amount - outstock.virtual_amount
                      outbl = false
-                     outstock.update_attribute(:virtual_amount , 0)
-                     outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
                      sklogs += StockLog.where(id: stklog)
-                     if amount == keydtl.amount * keyordercnt
-                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(0).limit(outstock.virtual_amount)
+                     if amount + outstock.virtual_amount == keydtl.amount * keyordercnt
+                      ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount-1).limit(outstock.virtual_amount/keydtl.amount)
+                      offsetcnt += outstock.virtual_amount
                      else
-                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(outstock.virtual_amount/keydtl.amount)
+                      ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount-1).limit(outstock.virtual_amount/keydtl.amount)
+                      offsetcnt += outstock.virtual_amount
                      end
-
+                     outstock.update_attribute(:virtual_amount , 0)
+                     outstock.save
                      stklog.order_details << ods
 
                     end
@@ -165,13 +209,19 @@ class OrdersController < ApplicationController
                  end
                 end
 
+
+              end
+
           end
 
         end
+       end
+        sklogs=StockLog.where(id: keyorder.stock_logs)
 
    else
     sklogs=[]
     chkout=0
+    @keycorder=params[:format]
     @keyclientorder=Keyclientorder.find(params[:format])
     @orders=@keyclientorder.orders
     @orders.each do |order|
@@ -211,8 +261,10 @@ class OrdersController < ApplicationController
           end
           sklogs += orderdtl.stock_logs
       end
+        order.update_attribute(:is_shortage,"no")
      else
        chkout += 1
+       order.update_attribute(:is_shortage,"yes")
      end
     end
 
@@ -221,6 +273,10 @@ class OrdersController < ApplicationController
     @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
     @stock_logs_grid = initialize_grid(@stock_logs)
+    if chkout > 0
+     flash.now[:notice] = "注意有"+chkout.to_s+"件订单缺货"
+    end
+    #binding.pry
   end
 
   def check_out_stocks(order)
@@ -244,10 +300,59 @@ class OrdersController < ApplicationController
     return orderchk
   end
 
+  def key_check_out_stocks(keyorder)
+       orderchk = true
+       has_out=0
+       keyorder.keyclientorderdetails.each do |kdl|
+         outstocks = Stock.find_out_stock(kdl.specification, keyorder.business, kdl.supplier)
+         sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
+         sls.each do |sl|
+           has_out += sl.amount
+         end
+         if outstocks.sum(:virtual_amount)- kdl.amount * keyorder.orders.count + has_out >= 0
+            chkout = true
+         else 
+            chkout = false
+         end
+         orderchk= orderchk && chkout
+       end
+    return orderchk
+  end
+
+  def get_has_cnt(keyorder)
+      mi_cnt=keyorder.orders.count
+      has_out=0
+      keyorder.keyclientorderdetails.each do |kdl|
+         outstocks = Stock.find_out_stock(kdl.specification, keyorder.business, kdl.supplier)
+         sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
+         sls.each do |sl|
+           has_out += sl.amount
+         end
+         if outstocks.sum(:virtual_amount)- kdl.amount * keyorder.orders.count + has_out < 0 
+            has_cnt = outstocks.sum(:virtual_amount)/kdl.amount
+            if has_cnt < mi_cnt
+              mi_cnt=has_cnt
+            end
+         end
+       end
+      return mi_cnt
+  end
+
   def ordercheck
-    @stock_logs.each do |stlog|
-       stlog.ordercheck
-    end
+
+      @keyclientorder=Keyclientorder.find(params[:format])
+      @orders=@keyclientorder.orders
+      @orders.each do |order|
+        order.stock_logs.each do |stlog|
+          stlog.order_check
+        end
+        order.stock_out
+      end
+      
+      respond_to do |format|
+        format.html { render action: 'findprint' }
+        format.json { head :no_content }
+      end
   end
 
   private

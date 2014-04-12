@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140421031635) do
+ActiveRecord::Schema.define(version: 20140421114434) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -32,10 +32,12 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "no"
+    t.string   "secret_key"
   end
 
   create_table "commodities", force: true do |t|
-    t.string   "cno"
+    t.string   "no"
     t.string   "name"
     t.integer  "goodstype_id"
     t.datetime "created_at"
@@ -99,7 +101,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
   end
 
   create_table "orders", force: true do |t|
-    t.string   "no",                default: "", null: false
+    t.string   "no",                default: "",   null: false
     t.string   "order_type"
     t.string   "need_invoice"
     t.string   "customer_name"
@@ -128,6 +130,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.string   "province"
     t.string   "city"
     t.integer  "user_id"
+    t.string   "is_shortage",       default: "no"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -192,7 +195,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.string   "name"
     t.string   "sixnine_code"
     t.string   "desc"
-    t.string   "product_no"
+    t.string   "sku"
   end
 
   create_table "stock_logs", force: true do |t|
@@ -231,7 +234,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
   end
 
   create_table "suppliers", force: true do |t|
-    t.string   "sno"
+    t.string   "no"
     t.string   "name"
     t.string   "address"
     t.string   "phone"
@@ -254,6 +257,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "no"
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true

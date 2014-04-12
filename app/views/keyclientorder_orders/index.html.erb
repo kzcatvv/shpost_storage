@@ -70,6 +70,10 @@
       order.keyclientorder.try :batch_id
     end
 
+    g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage',custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
+      order.shortage_type_name
+    end
+
 
     g.column do |order|
       ActiveSupport::SafeBuffer.new << 

@@ -11,6 +11,7 @@
 </div>
 
 <%= grid(@units_grid) do |g|
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
 
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 

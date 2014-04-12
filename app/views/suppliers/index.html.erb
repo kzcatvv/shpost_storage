@@ -10,10 +10,7 @@
   </div>
 </div>
 <%= grid(@suppliers, :show_filters => :always) do |g|
-
-    g.column name: model_class.human_attribute_name(:id), attribute: 'id', filter_type: :range
-
-    g.column name: model_class.human_attribute_name(:sno), attribute: 'sno'
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
 
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 

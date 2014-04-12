@@ -1,8 +1,8 @@
 <%= form_for ([ @commodity, @specification]), :html => { :class => 'form-horizontal' } do |f| %>
   <div class="form-group">
-    <%= f.label :product_no, :class => 'control-label' %>
+    <%= f.label :sku, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :product_no, :class => 'form-control' %>
+      <%= f.text_field :sku, :class => 'form-control' %>
     </div>
   </div>
   <div class="form-group">
