@@ -174,8 +174,8 @@ class OrdersController < ApplicationController
              end
              koallcnt=keydtl.amount*keyorder.orders.count
              offsetcnt=has_out
-             while koallcnt - has_out > 0
-               
+             
+              if keydtl.amount*keyorder.orders.count - has_out > 0
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
                   if !outbl
@@ -208,10 +208,7 @@ class OrdersController < ApplicationController
                   end
                  end
                 end
-
-
               end
-
           end
 
         end
@@ -349,10 +346,9 @@ class OrdersController < ApplicationController
         order.stock_out
       end
       
-      respond_to do |format|
-        format.html { render action: 'findprint' }
-        format.json { head :no_content }
-      end
+
+     redirect_to :action => 'findprint'
+
   end
 
   private
