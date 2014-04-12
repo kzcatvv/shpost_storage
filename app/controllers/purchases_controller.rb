@@ -88,6 +88,8 @@ class PurchasesController < ApplicationController
   end
 
   def check
+    @stock_logs = @purchase.stock_logs
+    @stock_logs_grid = initialize_grid(@stock_logs)
     respond_to do |format|
       if @purchase.check
         format.html { render action: 'stock_in' }

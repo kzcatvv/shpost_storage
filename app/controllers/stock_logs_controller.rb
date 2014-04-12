@@ -5,7 +5,10 @@ class StockLogsController < ApplicationController
   # GET /stock_logs
   # GET /stock_logs.json
   def index
-    @stock_logs_grid = initialize_grid(@stock_logs, include: [:user, :stock, :stock.shelf])
+    @stock_logs_grid = initialize_grid(@stock_logs, 
+      order: "stock_logs.status",
+      order_direction: 'desc', 
+      include: [:user, :stock, :stock.shelf])
   end
 
   # GET /stock_logs/1
@@ -132,7 +135,7 @@ class StockLogsController < ApplicationController
       @stock_log_new.user_id = @stock_log.user_id
       @stock_log_new.operation = @stock_log.operation
       @stock_log_new.purchase_detail = @stock_log.purchase_detail
-      @stock_log_new.status = 'waiting'
+      @stock_log_new.status = "waiting"
       @stock_log_new.operation_type = @stock_log.operation_type
       @stock_log_new.desc = @stock_log.desc
       @stock_log_new.stock = @stock_log.stock
