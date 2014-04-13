@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20140424083307) do
 
   create_table "areas", force: true do |t|
@@ -242,6 +243,7 @@ ActiveRecord::Schema.define(version: 20140424083307) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+    t.boolean  "default_storage", default: false
   end
 
   create_table "suppliers", force: true do |t|

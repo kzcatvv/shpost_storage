@@ -6,6 +6,14 @@ class Storage < ActiveRecord::Base
    validates_presence_of :name, :unit_id, :message => '不能为空字符'
    validates_uniqueness_of :name, :message => '该仓库已存在'
 
+   def default_type_name
+     if default_storage
+        name = "是"
+     else
+        name = "否"
+     end
+   end
+
    def self.get_default_storage(unit_id)
    	# todo: add a column to show which storage is default in the unit.
    	Storage.where("unit_id = ?",unit_id).first

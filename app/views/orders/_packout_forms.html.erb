@@ -1,0 +1,27 @@
+<%- model_class = OrderDetail -%>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:specification_id) %></th>
+      <th>69码</th>
+      <th><%= model_class.human_attribute_name(:amount) %></th>
+      <th>实际数量</th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @order_details.each do |orderdtl| %>
+      <tr>
+        <td><%= orderdtl.name %></td>
+        <td><%= Specification.find(orderdtl.specification_id).name %></td>
+        <td><%= Specification.find(orderdtl.specification_id).sixnine_code %></td>
+        <td><%= orderdtl.amount %></td>
+        <td></td>
+        <td>
+          
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -16,6 +16,10 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
+    g.column name: model_class.human_attribute_name(:default_storage), attribute: 'default_storage',filter_type: :boolean do |storage| 
+      storage.default_type_name
+    end
+
     g.column do |storage|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_unit_storage_path(@unit,storage), :class => 'btn btn-xs btn-primary' if can? :update, storage) << ' ' <<

@@ -52,7 +52,22 @@ describe StandardInterfaceController do
     end
 
     context "order_query" do
+      before :each do 
+        @format = 'JSON'
+        
+        @business = Business.find_by(no: '0001')
+        #@unit = Unit.find_by(no: '0001')
+        @context = {'ORDER_ID' => '00000000000'}.to_json
+        @sign = Digest::MD5.base64digest(@context + @business.secret_key)
+      end
 
+      it "should success " do
+        get :order_query, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign
+        response_hash = ActiveSupport::JSON.decode(response.body)
+        # expect(response.body).to eq '{"FLAG":"success"}'
+        expect(response_hash["FLAG"]).to eq "success"
+        expect(response_hash["STATUS"]).not_to be_nil
+      end
     end
 
     context "stock_query" do
