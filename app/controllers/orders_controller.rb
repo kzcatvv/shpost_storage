@@ -135,7 +135,7 @@ class OrdersController < ApplicationController
       else
         o.order_details.each do |dtl|
           product = [o.business_id,dtl.specification_id,dtl.supplier_id]
-          allcnt[product][1]=allcnt[product][1]-d.amount
+          allcnt[product][1]=allcnt[product][1]-dtl.amount
         end
       end
      end
