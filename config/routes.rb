@@ -6,6 +6,7 @@ ShpostStorage::Application.routes.draw do
         get 'findprint'
         get 'stockout'
         get 'ordercheck'
+        get 'nextbatch'
       end
 
      resources :order_details
