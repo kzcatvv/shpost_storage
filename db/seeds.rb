@@ -57,6 +57,7 @@ supplier2 = Supplier.create(no: 'G002',name: '供应商2',address: '供应商地
 
 business1 = Business.create(name: '商户1',email: 'business1@test.com',contactor: '商户1联系人',phone: '22334455667',address: '商户1地址',desc: '商户1备注',unit: unit1, no: '0001', secret_key: '12345')
 business2 = Business.create(name: '商户2',email: 'business2@test.com',contactor: '商户2联系人',phone: '22334455668',address: '商户2地址',desc: '商户2备注',unit: unit1, no: '0002', secret_key: '12345')
+bcm = Business.create(name: '交通银行',unit: unit1, no: '0003', secret_key: '12345')
 
 Thirdpartcode.create business_id: 1, specification_id: 1, external_code: '000000002', supplier_id: 1
 
