@@ -5,33 +5,16 @@ class StandardInterfaceController < ApplicationController
   #load_and_authorize_resource
 
   def commodity_enter
-    supplier_no = @context_hash["SUPPLIER"]
+    # supplier_no = @context_hash["SUPPLIER"]
     sku = @context_hash["SKU"]
     return render json: error_builder('0005', '商品sku编码为空') if sku.blank?
-    spec = @context_hash["SPEC"]
+    # spec = @context_hash["SPEC"]
     name = @context_hash["NAME"]
     return render json: error_builder('0005', '商品名称为空') if name.blank?
 
-    desc = @context_hash["DESC"]
+    # desc = @context_hash["DESC"]
 
-    supplier = nil
-    
-    if !supplier_no.blank?
-      supplier = Supplier.find_by(no: @business.no + '_' + supplier_no)
-
-      supplier ||= Supplier.create!(no: @business.no + '_' + supplier_no, name: @business.name + '_' + supplier_no, unit: @unit)
-    end
-    
-    #price = @context_hash["PRICE"]
-
-    thirdpartcode =  Thirdpartcode.find_by_keywords(sku, @business, @unit,supplier)
-    
-
-    if thirdpartcode.nil?
-      commodity = Commodity.create! name: name, unit: @unit, no: 'need_to_edit'
-      specification = Specification.create! commodity: commodity, desc: desc, name: spec, sku: 'need_to_edit', sixnine_code: 'need_to_edit'
-      thirdpartcode = Thirdpartcode.create! business: @business, supplier: supplier, specification: specification, external_code: sku
-    end
+    thirdpartcode = StandardInterface.commodity_enter(@context_hash, @business, @unit)
 
     if !thirdpartcode.blank?
       render json: success_builder({"SKU" => thirdpartcode.specification.sku })
@@ -41,6 +24,25 @@ class StandardInterfaceController < ApplicationController
   end
 
   def order_enter
+    order_id = @context_hash["ORDER_ID"]
+    return render json: error_builder('0005', '订单号为空') if order_id.blank?
+    trans_sn = @context_hash["TRANS_SN"]
+    return render json: error_builder('0005', '交易流水号为空') if trans_sn.blank?
+    cust_name = @context_hash["CUST_NAME"]
+    return render json: error_builder('0005', '收件人姓名为空') if cust_name.blank?
+    addr = @context_hash["ADDR"]
+    return render json: error_builder('0005', '收货人地址为空') if addr.blank?
+
+    order_details = @context_hash["ORDER_DETAILS"]
+    return render json: error_builder('0005', '商品列表为空') if order_details.blank?
+
+    order = StandardInterface.order_enter(@context_hash, @business, @unit)
+
+    if !order.blank?
+      render json: success_builder({"ORDER_NO" => order.no })
+    else
+      render json: error_builder('9999')
+    end
 
   end
 
