@@ -2,10 +2,22 @@ require 'spec_helper'
 
 describe KeyclientorderOrdersController do
 
-    before :each do 
-      @user1 = User.create(id: 1,name: "user1",email: "user1@111.com",username: "user1",unit_id: 1,password: "11111111",password_confirmation: "11111111",role: "user")
+    before :each do
+
       @superadmin = FactoryGirl.create(:superadmin)
+      #@unit1 = Unit.create(id: 1,name: "unit1")
+      @storage1 = Storage.create(id: 1,unit_id: 1,name: "storage1")
+      @role1 = Role.create(user: @superadmin,storage_id: 1,role: "admin")
       @order = FactoryGirl.create(:order)
+
+      @goodstype1 = Goodstype.create(id: 1,gtno: 1,name: "goodstype1",unit_id: 1)
+      @commodity1 = Commodity.create(id: 1,cno: 1,name: "commodity1",goodstype_id: 1,unit_id: 1)
+      @specification1 = FactoryGirl.create(:specification)
+      @keyclientorder1 = Keyclientorder.create(id: 1,keyclient_name: "keyclientorder1",keyclient_addr: "111",contact_person: "name1",unit_id: 1,phone: "11111111",storage_id: 1,batch_id: "2014041401")
+      @keyclientorder2 = Keyclientorder.create(id: 2,keyclient_name: "keyclientorder2",keyclient_addr: "222",contact_person: "name2",unit_id: 1,phone: "11111111",storage_id: 1,batch_id: "2014041402")
+      @keyclientorderdtl1 = Keyclientorderdetail.create(id: 1,keyclientorder_id: 2,specification_id: 1,amount: 2)
+
+      
       sign_in @superadmin
       #@role = role.first
     
@@ -32,7 +44,7 @@ describe KeyclientorderOrdersController do
 
       it " get the new order" do
           get :new, keyclientorder_id: 2
-          expect(assigns(:order)).to be_a_new(order)
+          expect(assigns(:order)).to be_a_new(Order)
       end
 
       it " get the create route action" do
@@ -40,7 +52,9 @@ describe KeyclientorderOrdersController do
       end
 
       it " get the create order" do
-          expect { post :create, keyclientorder_id: 2, order: FactoryGirl.attributes_for(:new_order) }.to change(order, :count).by(1)
+          session[:current_storage] = @storage1
+          expect { post :create, keyclientorder_id: 2, order: FactoryGirl.attributes_for(:new_order) }.to change(Order, :count).by(1)
+          expect { post :create, keyclientorder_id: 2, order: FactoryGirl.attributes_for(:new_order) }.to change(OrderDetail, :count).by(1)
       end
 
       it " get the edit route action" do

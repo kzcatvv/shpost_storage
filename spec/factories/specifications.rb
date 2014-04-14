@@ -3,8 +3,8 @@
 FactoryGirl.define do
   factory :specification do
     commodity_id 1
-    model "MyString"
-    size "MyString"
-    color "MyString"
+    name "specificationname"
+    sixnine_code "1234"
+    product_no "201401"
   end
 end
