@@ -79,6 +79,14 @@ describe KeyclientorderOrdersController do
         { :patch => "/keyclientorders/1/orders/1" }.should route_to("action"=>"update", "controller"=>"keyclientorder_orders", "keyclientorder_id"=>"1", "id"=>"1")
       end
 
+      it " get the destroy route action" do
+        { :delete => "/keyclientorders/1/orders/1" }.should route_to("action"=>"destroy", "controller"=>"keyclientorder_orders", "keyclientorder_id"=>"1", "id"=>"1")
+      end
+
+      it " delete the order" do
+          expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(Order, :count).by(-1)
+      end
+
     end
 
 end
