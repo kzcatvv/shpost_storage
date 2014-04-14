@@ -27,10 +27,11 @@ class KeyclientorderOrdersController < ApplicationController
   # POST /keyclientorderdetails.json
   def create
     #@keyclientorderdetail = Keyclientorderdetail.new(keyclientorderdetail_params)
-    @order.order_type = "keyclientorder"
-    @order.unit_id = current_user.unit_id
-    @order.storage_id = session[:current_storage].id
-    @order.status = "untreated"
+    @order.order_type = Order::TYPE[:b2b]
+    @order.status = Order::STATUS[:waiting]
+    @order.unit = current_user.unit
+    @order.storage = current_storage
+
     respond_to do |format|
       if @order.save
         @keyclientorderdetail = Keyclientorderdetail.where(keyclientorder_id: params[:keyclientorder_id])
