@@ -1,25 +1,41 @@
 <%- model_class = StockLog -%>
+  <div style="float:right">
+    <% if can? :new, Stock %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                 new_stock_path(@stock),
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+
 <%= form_tag('/stock_logs/updateall', method: :post) do -%>
 
 <%= grid(@stock_logs_grid) do |g|
 
-    # g.column do |stock_log|
-    #   if stock_log.status == 'waiting'
-    #     hidden_field_tag "stock_logs[][id]", stock_log.id
-    #   end
-    # end
-
-    g.column name: model_class.human_attribute_name(:specification), attribute: 'name', model: 'Specification' do |stock_log|
+    g.column do |stock_log|
       if stock_log.status == 'waiting'
-        text_field_tag("stock_logs[][specificationid]", stock_log.stock.specification.name)
-      else
-        stock_log.stock.specification.name
+        hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}")
+      end
+      # if @purchase
+      #   [@purchase.id, {id: "stock_logs_id_#{stock_log.id}"}]
+      # else
+      #   [stock_log.id, {id: "stock_logs_id_#{stock_log.id}"}]
+      # end
+    end
+
+    if @purchase
+      g.column name: model_class.human_attribute_name(:pd_name), attribute: 'name', model: 'PurchaseDetail' do |stock_log|
+        if stock_log.status == 'waiting'
+          select_tag("stock_logs[][pdid]", options_for_select(PurchaseDetail.accessible_by(current_ability).map{|u| [u.name+u.batch_no,u.id]}, stock_log.purchase_detail_id), id: "stock_logs_pdid_#{stock_log.id}", style: "display: none;", onchange: 'clickout(this)', onblur: 'hideit(this)') <<
+          content_tag(:p, stock_log.purchase_detail.name, {id: "stock_logs_pdid_#{stock_log.id}", onclick: 'clickin(this);'})
+        else
+          stock_log.purchase_detail.name
+        end
       end
     end
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', model: 'Shelf' do |stock_log|
       if stock_log.status == 'waiting'
-        select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onchange: 'clickout(this)', onblur: 'clickout(this)') <<
+        select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onchange: 'clickout(this)', onblur: 'hideit(this)') <<
         content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'})
       else
         stock_log.stock.shelf.shelf_code
@@ -59,7 +75,8 @@
           # (button_tag() do
           #   content_tag(:strong, 'check')
           # end)  << ' ' <<
-          (link_to t('.split', :default => t("helpers.links.split")), split_stock_log_path(stock_log.id), :class => 'btn btn-xs btn-primary', onclick: 'addTr(this)', id: "test_#{stock_log.id}")
+          # (link_to t('.delete', :default => t("helpers.links.delete")), split_stock_log_path(stock_log.id), :class => 'btn btn-xs btn-primary', id: "test_#{stock_log.id}")
+          (link_to t('.destroy', :default => t("helpers.links.destroy")), stock_path(stock_log.stock), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log.stock)
       end
     end
   end
@@ -97,23 +114,26 @@ function clickin(current)
   }
 }
 
-function clickout(current)
+function hideit(current)
 {
   param = current.id.split('_');
+  $("p#"+current.id).show();
   if (param[2] == "amount") {
-    $("p#"+current.id).show();
     $("p#"+current.id).text($(current).val());
-    $(current).hide();
   } else {
-    $("p#"+current.id).show();
     $("p#"+current.id).text($(current).find("option:selected").text());
-    $(current).hide();
   }
+  $(current).hide();
+}
+
+function clickout(current)
+{
+  hideit(current);
   modify(current);
 }
 
 function addTr(current) {
-  alert(current.id);
+  // alert(current.id);
 
 }
 
@@ -127,6 +147,7 @@ function modify(current)
     dataType: "json",
     complete: function() {
       $("p#"+current.id).css("background-color","transparent");
+      $("input#stock_logs_id_"+param[3]).val("1");
     }
   });
 }
