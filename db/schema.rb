@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20140414020807) do
 
   create_table "areas", force: true do |t|
@@ -122,6 +123,8 @@ ActiveRecord::Schema.define(version: 20140414020807) do
     t.integer  "unit_id",           default: 1,  null: false
     t.integer  "storage_id",        default: 1,  null: false
     t.integer  "keyclientorder_id", default: 1,  null: false
+    t.string   "province"
+    t.string   "city"
   end
 
   create_table "ptests", force: true do |t|
