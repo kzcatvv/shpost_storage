@@ -23,11 +23,8 @@
       <th><%= model_class.human_attribute_name(:total_weight) %></th>
       <th><%= model_class.human_attribute_name(:total_amount) %></th>
       <th><%= model_class.human_attribute_name(:transport_type) %></th>
-      <th><%= model_class.human_attribute_name(:pay_type) %></th>
       <th><%= model_class.human_attribute_name(:business_id) %></th>
       <th><%= model_class.human_attribute_name(:status) %></th>
-      <th><%= model_class.human_attribute_name(:unit_id) %></th>
-      <th><%= model_class.human_attribute_name(:storage_id) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
@@ -46,12 +43,9 @@
         <td><%= order.customer_email %></td>
         <td><%= order.total_weight %></td>
         <td><%= order.total_amount %></td>
-        <td><%= Order::TRANSPORT_TYPE[order.transport_type.to_sym] %></td>
-        <td><%= Order::PAY_TYPE[order.pay_type.to_sym] %></td>
-        <td><%= Business.find(order.business_id).name %></td>
-        <td><%= Order::STATUS[order.status.to_sym] %></td>
-        <td><%= Unit.find(order.unit_id).name %></td>
-        <td><%= Storage.find(order.storage_id).name %></td>
+        <td><%= order.transport_type_name %></td>
+        <td><%= order.business.try :name %></td>
+        <td><%= order.status_name %></td>
         <td>
           <%=link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_order_path(order), :class => 'btn btn-xs btn-primary' if can? :update, order %>
