@@ -65,7 +65,7 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-    @orders = Order.where(" order_type = ? and status = ?","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25)
+    @orders = Order.where(" order_type = ? and status = ?","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
 
   end
 
