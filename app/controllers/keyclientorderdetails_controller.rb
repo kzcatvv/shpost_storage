@@ -71,6 +71,6 @@ class KeyclientorderdetailsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def keyclientorderdetail_params
-      params.require(:keyclientorderdetail).permit(:keyclientorder_id, :specification_id, :desc, :amount)
+      params.require(:keyclientorderdetail).permit(:keyclientorder_id, :specification_id, :desc, :amount, :batch_no, :supplier_id)
     end
 end

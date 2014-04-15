@@ -37,7 +37,7 @@ class KeyclientorderOrdersController < ApplicationController
         @keyclientorderdetail = Keyclientorderdetail.where(keyclientorder_id: params[:keyclientorder_id])
         @keyclientorderdetail.each do |d|
            @specification = Specification.find(d.specification_id)
-           @orderdetail= OrderDetail.create(name: @specification.name,specification: @specification, amount: d.amount, order: @order)
+           @orderdetail= OrderDetail.create(name: @specification.name,specification: @specification, amount: d.amount, order: @order, batch_no: d.batch_no, supplier_id: d.supplier_id)
         end
         format.html { redirect_to keyclientorder_order_path(@keyclientorder,@order), notice: 'Order was successfully created.' }
         format.json { render action: 'show', status: :created, location: @order }

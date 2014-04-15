@@ -9,7 +9,7 @@ describe KeyclientorderOrdersController do
       @storage1 = Storage.create(id: 1,unit_id: 1,name: "storage1")
       @role1 = Role.create(user: @superadmin,storage_id: 1,role: "admin")
       @order = FactoryGirl.create(:order)
-
+      @orderdetail = FactoryGirl.create(:order_detail)
       @goodstype1 = Goodstype.create(id: 1,gtno: 1,name: "goodstype1",unit_id: 1)
       @commodity1 = Commodity.create(id: 1,cno: 1,name: "commodity1",goodstype_id: 1,unit_id: 1)
       @specification1 = FactoryGirl.create(:specification)
@@ -84,7 +84,9 @@ describe KeyclientorderOrdersController do
       end
 
       it " delete the order" do
+          #expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(Keyclientorder, :count).by(-1)
           expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(Order, :count).by(-1)
+          expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(OrderDetail, :count).by(-1)
       end
 
     end
