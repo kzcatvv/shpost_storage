@@ -4,7 +4,8 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    @orders_grid = initialize_grid(@orders)
+    @orders_grid = initialize_grid(@orders,
+                   :conditions => {:order_type => "b2c"})
   end
 
   # GET /orderes/1
@@ -14,6 +15,11 @@ class OrdersController < ApplicationController
 
   # GET /orderes/new
   def new
+
+    # @order.order_type = Order::TYPE[:pubiicclient]
+
+   # @order = Order.new
+
   end
 
   # GET /orderes/1/edit
@@ -23,11 +29,18 @@ class OrdersController < ApplicationController
   # POST /orderes
   # POST /orderes.json
   def create
+
+   # @order = Order.new(order_params)
+    @order.order_type = "pubiicclient"
+    @order.unit_id = current_user.unit_id
+#@order.storage_id = current_storage.id 
+
     @order.order_type = Order::TYPE[:b2c]
     @order.status = Order::STATUS[:waiting]
     @order.unit = current_user.unit
     @order.storage = current_storage
     
+
     respond_to do |format|
       if @order.save
         format.html { redirect_to @order, notice: 'Order was successfully created.' }
@@ -64,7 +77,7 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-    @orders = Order.where(" order_type = ? and status = ?","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25)
+    @orders = Order.where(" order_type = ? and status = ?","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
 
   end
 
