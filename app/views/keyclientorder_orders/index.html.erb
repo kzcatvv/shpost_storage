@@ -41,17 +41,13 @@
     g.column name: model_class.human_attribute_name(:total_amount), attribute: 'total_amount'
 
     g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type',custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
-      order.transporttypename
+      order.transport_type_name
     end
 
     g.column name: model_class.human_attribute_name(:transport_price), attribute: 'transport_price'
 
-    g.column name: model_class.human_attribute_name(:pay_type), attribute: 'pay_type',custom_filter: Order::PAY_TYPE.invert do |order| 
-      order.paytypename
-    end
-
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Order::STATUS.invert do |order| 
-      order.statusname
+      order.status_name
     end
 
     g.column name: model_class.human_attribute_name(:buyer_desc), attribute: 'buyer_desc'
