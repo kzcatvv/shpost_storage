@@ -480,6 +480,8 @@ zh-CN:
         specification_id: 商品规格
         desc: 备注
         amount: 数量
+        batch_no: 商品批次号
+        supplier_id: 供应商
       filetemp:
         filename: "文档"
         rename: "文件名"
