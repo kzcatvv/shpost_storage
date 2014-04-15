@@ -4,7 +4,8 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    @orders_grid = initialize_grid(@orders)
+    @orders_grid = initialize_grid(@orders,
+                   :conditions => {:order_type => "b2c"})
   end
 
   # GET /orderes/1
