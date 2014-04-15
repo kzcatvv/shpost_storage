@@ -16,8 +16,8 @@
         stock.shelf.try :shelf_code
       end
 
-    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'model', model: 'Specification' do |stock|
-      stock.specification.try :model
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'name', model: 'Specification' do |stock|
+      stock.specification.try :name
     end
 
     g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
