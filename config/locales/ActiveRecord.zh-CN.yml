@@ -538,6 +538,9 @@ zh-CN:
         keyclientorder:
           name: "大客户订单管理"
           link: "/keyclientorders"
+        b2cfindprint:
+          name: "电商订单打印"
+          link: "/orders/findprint"
     goodstypes:
       name: "商品与规格管理"
       submenu:
