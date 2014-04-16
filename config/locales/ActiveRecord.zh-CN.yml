@@ -378,7 +378,6 @@ zh-CN:
         phone: "电话"
         desc: "备注"
         unit: "所属机构"
-
       order:
         no: "订单编号"
         order_type: "订单类型"        
@@ -403,7 +402,18 @@ zh-CN:
         business_id: "所属商户"
         storage_id: "所属仓库"
         keyclientorder_id: "大客户订单编号"
-
+        type_b2b: "大客户订单"
+        type_b2c: "电商订单"
+        transport_type_tcsd: "同城速递"
+        transport_type_gnxb: "国内小包"
+        transport_type_ems: "EMS"
+        status_waiting: "待处理"
+        status_printed: "已打印面单"
+        status_picking: "拣货中"
+        status_delivering: "配送中"
+        status_delivered: "已签收"
+        status_declined: "拒收"
+        status_returned: "已退回"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -470,6 +480,8 @@ zh-CN:
         specification_id: 商品规格
         desc: 备注
         amount: 数量
+        batch_no: 商品批次号
+        supplier_id: 供应商
       filetemp:
         filename: "文档"
         rename: "文件名"
@@ -526,6 +538,9 @@ zh-CN:
         keyclientorder:
           name: "大客户订单管理"
           link: "/keyclientorders"
+        b2cfindprint:
+          name: "电商订单打印"
+          link: "/orders/findprint"
     goodstypes:
       name: "商品与规格管理"
       submenu:

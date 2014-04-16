@@ -27,16 +27,17 @@ class KeyclientorderOrdersController < ApplicationController
   # POST /keyclientorderdetails.json
   def create
     #@keyclientorderdetail = Keyclientorderdetail.new(keyclientorderdetail_params)
-    @order.order_type = "keyclientorder"
-    @order.unit_id = current_user.unit_id
-    @order.storage_id = session[:current_storage].id
-    @order.status = "untreated"
+    @order.order_type = Order::TYPE[:b2b]
+    @order.status = Order::STATUS[:waiting]
+    @order.unit = current_user.unit
+    @order.storage = current_storage
+
     respond_to do |format|
       if @order.save
         @keyclientorderdetail = Keyclientorderdetail.where(keyclientorder_id: params[:keyclientorder_id])
         @keyclientorderdetail.each do |d|
            @specification = Specification.find(d.specification_id)
-           @orderdetail= OrderDetail.create(name: @specification.name,specification: @specification, amount: d.amount, order: @order)
+           @orderdetail= OrderDetail.create(name: @specification.name,specification: @specification, amount: d.amount, order: @order, batch_no: d.batch_no, supplier_id: d.supplier_id)
         end
         format.html { redirect_to keyclientorder_order_path(@keyclientorder,@order), notice: 'Order was successfully created.' }
         format.json { render action: 'show', status: :created, location: @order }
@@ -79,6 +80,6 @@ class KeyclientorderOrdersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
-      params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
+      params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:customer_address,:customer_postcode,:customer_email,:province,:city,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
     end
 end

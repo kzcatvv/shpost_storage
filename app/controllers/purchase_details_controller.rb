@@ -17,7 +17,6 @@ class PurchaseDetailsController < ApplicationController
   # GET /purchase_detailes/new
   def new
   #  @purchase_detail = PurchaseDetail.new
-    @purchase_detail.status = PurchaseDetail::STATUS[:opened]
   end
 
   # GET /purchase_detailes/1/edit
@@ -28,7 +27,7 @@ class PurchaseDetailsController < ApplicationController
   # POST /purchase_detailes.json
   def create
    # @purchase_detail = PurchaseDetail.new(purchase_detail_params)
-
+   @purchase_detail.status = PurchaseDetail::STATUS[:opened]
     respond_to do |format|
       if @purchase_detail.save
         format.html { redirect_to purchase_purchase_detail_path(@purchase,@purchase_detail), notice: 'purchasedetail was successfully created.' }

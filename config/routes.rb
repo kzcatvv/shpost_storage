@@ -2,6 +2,10 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :orders do
+     collection do
+        get 'findprint'
+      end
+
      resources :order_details
   end
 

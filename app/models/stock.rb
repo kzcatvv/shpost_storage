@@ -23,17 +23,24 @@ class Stock < ActiveRecord::Base
   end
 
   def self.get_available_stock(specification, business, supplier, batch_no)
-    stocks = find_key(specification, business, supplier, batch_no)
+    stocks_with_batch_no = find_with_batch_no(specification, business, supplier, batch_no)
 
-    if !stocks.blank?
-      stocks.each do |stock|
-        return stock if stock.is_available?
-      end
-
-      shelf = Shelf.get_neighbor_shelf stocks
-    else
-      shelf = Shelf.get_empty_shelf
+    stocks_with_batch_no.each do |stock|
+      return stock if stock.is_available?
     end
+
+    stocks_without_batch_no = find_without_batch_no(specification, business, supplier, batch_no)
+
+    stocks_without_batch_no.each do |stock|
+      if stock.is_available?
+        available_stock = Stock.create(specification: specification, business: business, supplier: supplier, shelf: stock.shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
+        return available_stock
+      end
+    end
+
+    shelf = Shelf.get_neighbor_shelf stocks_with_batch_no
+    shelf ||= Shelf.get_neighbor_shelf stocks_without_batch_no
+    shelf ||= Shelf.get_empty_shelf
 
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
   end
