@@ -32,6 +32,8 @@ ShpostStorage::Application.routes.draw do
     resources :purchase_details
     member do
       patch 'stock_in'
+      patch 'check'
+      patch 'close'
     end
   end
 
