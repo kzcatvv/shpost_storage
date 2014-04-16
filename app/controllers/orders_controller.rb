@@ -16,7 +16,7 @@ class OrdersController < ApplicationController
 
   # GET /orderes/new
   def new
-     @order.order_type = Order::TYPE[:pubiicclient]
+    # @order.order_type = Order::TYPE[:pubiicclient]
 
    # @order = Order.new
   end
@@ -29,6 +29,7 @@ class OrdersController < ApplicationController
   # POST /orderes.json
   def create
    # @order = Order.new(order_params)
+    @order.order_type = "pubiicclient"
 @order.unit_id = current_user.unit_id
 #@order.storage_id = current_storage.id 
     respond_to do |format|
