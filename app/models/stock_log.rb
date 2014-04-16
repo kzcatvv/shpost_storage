@@ -2,8 +2,9 @@ class StockLog < ActiveRecord::Base
   belongs_to :user
   belongs_to :stock
   belongs_to :purchase_detail
+  has_and_belongs_to_many :order_details
 
-  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in'}
+  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out'}
   STATUS = {waiting: 'waiting', checked: 'checked'}
   OPERATION_TYPE = {in: 'in', out: 'out', reset: 'reset'}
 
