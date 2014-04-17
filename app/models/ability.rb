@@ -37,7 +37,12 @@ class Ability
         can :manage, Area, storage_id: storage.id
         can :manage, Shelf, area: {storage_id: storage.id}
         can :read, Stock, shelf: {area: {storage_id: storage.id}}
+        can :new, Stock, shelf: {area: {storage_id: storage.id}}
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
 
         can :read, UserLog, user: {unit_id: user.unit_id}
 
