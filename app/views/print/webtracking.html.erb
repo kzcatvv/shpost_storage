@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<%= stylesheet_link_tag "application", :media => "all" %>
+<%= javascript_include_tag :defaults %>
+      <%= javascript_include_tag "application" %>
+</head>
+  
+  <body>
+  	<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+	<embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
+</object>
+
+  	<center>
+<br><br>
+<h1>打印面单</h1>
+</center>
+<br><br><br><br><br><br><br>
+<center> 
+	<form action="/print/webtrackingnum" onsubmit="return check(this)" method="post">
+		<%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
+         <h3>开始面单号：<input type=text name='start' id='start' /></h3> 
+         <h3>结束面单号：<input type=text name='end' id='end' /></h3>
+         <input type=hidden id='id' name='id' value='<%= @ids%>'/>
+         <br><br>
+         <input type="submit" id='sub' value="打印面单" class='btn btn-primary'/> 
+    </form>
+ </center>
+<script language="javascript" type="text/javascript">
+function check() {
+
+    if(document.getElementById('start').value.trim()==''||document.getElementById('end').value.trim()==''){
+    alert('请输入面单号');
+    return false;
+  }
+  if(parseInt(document.getElementById('end').value.trim())-parseInt(document.getElementById('start').value.trim())>24){
+    alert('面单数目不对');
+    return false;
+  }
+    return true;
+  };
+
+</script>
+  	</body>
+</html>

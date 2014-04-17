@@ -27,7 +27,9 @@ class PurchasesController < ApplicationController
   def create
    # @purchase = Purchase.new(purchase_params)
     @purchase.unit = current_user.unit
-    @purchase.status = Purchase::STATUS[:waiting]
+    @purchase.status = Purchase::STATUS[:opened]
+    @purchase.storage = current_storage
+
     respond_to do |format|
       if @purchase.save
         format.html { redirect_to @purchase, notice: 'Purchase was successfully created.' }
@@ -71,7 +73,7 @@ class PurchasesController < ApplicationController
         while x.waiting_amount > 0
           stock = Stock.get_available_stock(x.specification, @purchase.business, x.supplier, x.batch_no)
           
-          stock_in_amount = stock.stock_in_amount(x.amount)
+          stock_in_amount = stock.stock_in_amount(x.waiting_amount)
           #x.amount -= stock_in_amount
 
           stock.save
@@ -83,6 +85,30 @@ class PurchasesController < ApplicationController
 
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
+  end
+
+  def check
+    respond_to do |format|
+      if @purchase.check
+        format.html { render action: 'stock_in' }
+        format.json { head :no_content }
+      else
+        format.html { render action: 'stock_in', javascript: "alert('123')" }
+        format.json { head :no_content }
+      end
+    end
+  end
+
+  def close
+    respond_to do |format|
+      if @purchase.close
+        format.html { redirect_to purchases_url }
+        format.json { head :no_content }
+      else
+        format.html { redirect_to purchases_url, javascript: "alert('123')" }
+        format.json { head :no_content }
+      end
+    end
   end
 
   private

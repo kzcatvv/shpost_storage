@@ -2,22 +2,7 @@ class PurchaseDetail < ActiveRecord::Base
 	belongs_to :specification
 	belongs_to :supplier
 	belongs_to :purchase
-
-
-	validates_presence_of :name, :message => '不能为空'
-
-STATUS = { untreated: '未处理', processing: '处理中', prepare: '发货' ,recevie: '已收货' ,processed: '处理完毕'}
-def statusname
-    PurchaseDetail::STATUS[status.to_sym]
-end
-
-
-
-  has_many :stock_logs, -> { where(object_class: 'PurchaseDetail') }, foreign_key: :object_primary_key, dependent: :destroy
-
   has_many :stock_logs, dependent: :destroy
-
-	validates_presence_of :name, :message => '不能为空'
 
 	validates_presence_of :name, :amount, message: '不能为空'
   validates_numericality_of :sum, allow_blank: true
@@ -29,7 +14,27 @@ end
     status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
   end
 
+  def stock_in?
+    self.status.eql? STATUS[:stock_in]
+  end
+
   def waiting_amount
     self.amount - stock_logs.sum(:amount)
+  end
+
+  def stock_in
+    if self.all_checked?
+      self.update(status: STATUS[:stock_in])
+    else
+      false
+    end
+  end
+
+  def all_checked?
+    self.amount.eql? self.checked_amount
+  end
+
+  def checked_amount
+    self.stock_logs.to_a.sum{|x| x.checked? ? x.amount : 0}
   end
 end
