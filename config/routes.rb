@@ -46,14 +46,14 @@ ShpostStorage::Application.routes.draw do
   resources :stock_logs, only: [:index, :show] do
     member do
       patch 'check'
+      get 'split'
     end
     collection do
       get 'stockindex'
       post 'updateall'
       post 'modify'
-    end
-    member do
-      get 'split'
+      post 'removetr'
+      post 'addtr'
     end
   end
 
@@ -90,7 +90,12 @@ ShpostStorage::Application.routes.draw do
   end
 
 
-
+  match "/print/tracking" => "print#tracking",via: [:get, :post]
+  match "/print/trackingnum" => "print#trackingnum",via: [:get, :post]
+  match "/print/keytracking" => "print#keytracking",via: [:get, :post]
+  match "/print/keytrackingnum" => "print#keytrackingnum",via: [:get, :post]
+  match "/print/webtracking" => "print#webtracking",via: [:get, :post]
+  match "/print/webtrackingnum" => "print#webtrackingnum",via: [:get, :post]
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
