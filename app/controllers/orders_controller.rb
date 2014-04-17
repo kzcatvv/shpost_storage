@@ -77,7 +77,7 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-    @orders = Order.where(" order_type = ? and status = ?","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
+    @orders = Order.where(" order_type = ? and (status = ? or status = ?)","b2c","waiting","printed").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
     allcnt = {}
     @orders.each do |o|
       o.order_details.each do |d|
@@ -87,13 +87,13 @@ class OrdersController < ApplicationController
           if allcnt[product][0]-allcnt[product][1]-d.amount >= 0
             allcnt[product][1]=allcnt[product][1]+d.amount
           else
-            @orders.DELETE(o)
+            @orders = @orders.where("orders.id not in (?)",o)
           end
         else
           if allamount - d.amount >= 0
             allcnt[product]=[allamount,d.amount]
           else
-            @orders.DELETE(o)
+            @orders = @orders.where("orders.id not in (?)",o)
           end
         end
       end
@@ -107,11 +107,11 @@ class OrdersController < ApplicationController
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
             outstocks = Stock.find_out_stock(orderdtl.specification, order.business, orderdtl.supplier)
-            if check_out_stocks(outstocks,orderdtl.amount)
+
               outbl = false
               amount = orderdtl.amount
-              while has_out_stocks(orderdtl) > 0
-                amount = has_out_stocks(orderdtl) 
+              while orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
+                amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
                 outstocks.each do |outstock|
                   if !outbl
                     if outstock.virtual_amount - amount >= 0
@@ -132,9 +132,6 @@ class OrdersController < ApplicationController
                   end
                 end
               end
-            else
-
-            end
 
           end
       end
@@ -143,24 +140,20 @@ class OrdersController < ApplicationController
     #binding.pry
   end
 
-  def check_out_stocks(stocks,amount)
-    chkout = false
-    stocks.each do |stock|
-      if !chkout
-       if stock.virtual_amount - amount >= 0
-          chkout = true
-       else 
-          amount = amount - stock.virtual_amount
-          chkout = false
-       end
-      end
-    end
-    return chkout
-  end
-
-  def has_out_stocks(orderdetail)
-    orderdetail.amount - orderdetail.stock_logs.sum(amount)    
-  end
+  # def check_out_stocks(stocks,amount)
+  #   chkout = false
+  #   stocks.each do |stock|
+  #     if !chkout
+  #      if stock.virtual_amount - amount >= 0
+  #         chkout = true
+  #      else 
+  #         amount = amount - stock.virtual_amount
+  #         chkout = false
+  #      end
+  #     end
+  #   end
+  #   return chkout
+  # end
 
   private
     # Use callbacks to share common setup or constraints between actions.
