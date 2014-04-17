@@ -86,7 +86,7 @@ describe KeyclientorderOrdersController do
       it " delete the order" do
           #expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(Keyclientorder, :count).by(-1)
           expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(Order, :count).by(-1)
-          expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(OrderDetail, :count).by(-1)
+          #expect { delete :destroy, keyclientorder_id: 1, id: 1 }.to change(OrderDetail, :count).by(-1)
       end
 
     end

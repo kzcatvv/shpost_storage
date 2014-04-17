@@ -2,6 +2,11 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :orders do
+     collection do
+        get 'findprint'
+        get 'stockout'
+      end
+
      resources :order_details
   end
 
@@ -27,6 +32,8 @@ ShpostStorage::Application.routes.draw do
     resources :purchase_details
     member do
       patch 'stock_in'
+      patch 'check'
+      patch 'close'
     end
   end
 
@@ -83,7 +90,12 @@ ShpostStorage::Application.routes.draw do
   end
 
 
-
+  match "/print/tracking" => "print#tracking",via: [:get, :post]
+  match "/print/trackingnum" => "print#trackingnum",via: [:get, :post]
+  match "/print/keytracking" => "print#keytracking",via: [:get, :post]
+  match "/print/keytrackingnum" => "print#keytrackingnum",via: [:get, :post]
+  match "/print/webtracking" => "print#webtracking",via: [:get, :post]
+  match "/print/webtrackingnum" => "print#webtrackingnum",via: [:get, :post]
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

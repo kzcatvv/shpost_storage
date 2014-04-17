@@ -4,8 +4,8 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    @orders = Order.where(order_type: Order::TYPE[:b2c]).joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25)
-
+    @orders_grid = initialize_grid(@orders,
+                   :conditions => {:order_type => "b2c"})
   end
 
   # GET /orderes/1
@@ -15,6 +15,11 @@ class OrdersController < ApplicationController
 
   # GET /orderes/new
   def new
+
+    # @order.order_type = Order::TYPE[:pubiicclient]
+
+   # @order = Order.new
+
   end
 
   # GET /orderes/1/edit
@@ -24,11 +29,18 @@ class OrdersController < ApplicationController
   # POST /orderes
   # POST /orderes.json
   def create
+
+   # @order = Order.new(order_params)
+    @order.order_type = "pubiicclient"
+    @order.unit_id = current_user.unit_id
+#@order.storage_id = current_storage.id 
+
     @order.order_type = Order::TYPE[:b2c]
     @order.status = Order::STATUS[:waiting]
     @order.unit = current_user.unit
     @order.storage = current_storage
     
+
     respond_to do |format|
       if @order.save
         format.html { redirect_to @order, notice: 'Order was successfully created.' }
@@ -62,6 +74,74 @@ class OrdersController < ApplicationController
       format.html { redirect_to orders_url }
       format.json { head :no_content }
     end
+  end
+
+  def findprint
+    @orders = Order.where(" order_type = ? and status = ?","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
+
+  end
+
+  def stockout
+     
+    @orders.each do |order|
+      puts "1"
+      order.order_details.each do |orderdtl|
+          if orderdtl.amount > 0
+            puts "2"
+            puts orderdtl.amount
+            outstocks = Stock.find_out_stock(orderdtl.specification, order.business, orderdtl.supplier)
+            if check_out_stocks(outstocks,orderdtl.amount)
+              outbl = false
+              amount = orderdtl.amount
+              outstocks.each do |outstock|
+                puts "3"
+                puts outbl
+                if !outbl
+                  if outstock.virtual_amount - amount >= 0
+                     setamount = outstock.virtual_amount - amount
+                     puts "4"
+                     puts amount
+                     puts outstock.virtual_amount
+                     puts setamount
+                     outbl = true
+                     outstock.update_attribute(:virtual_amount , setamount)
+                     outstock.save
+                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                  else 
+                     puts "5"
+                     puts outstock.virtual_amount
+                     amount = amount - outstock.virtual_amount
+                     outbl = false
+                     outstock.update_attribute(:virtual_amount , 0)
+                     outstock.save
+                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                  end
+                end
+              end
+            else
+
+            end
+
+          end
+      end
+    end
+
+    #binding.pry
+  end
+
+  def check_out_stocks(stocks,amount)
+    chkout = false
+    stocks.each do |stock|
+      if !chkout
+       if stock.virtual_amount - amount >= 0
+          chkout = true
+       else 
+          amount = amount - stock.virtual_amount
+          chkout = false
+       end
+      end
+    end
+    return chkout
   end
 
   private
