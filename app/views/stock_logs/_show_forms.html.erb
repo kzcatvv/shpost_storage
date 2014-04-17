@@ -1,0 +1,31 @@
+<%- model_class = StockLog -%>
+
+<%= grid(@stock_logs_grid, show_filters: :no) do |g|
+
+    if @purchase
+      g.column name: model_class.human_attribute_name(:pd_name), attribute: 'name', ordering: false, model: 'PurchaseDetail' do |stock_log|
+        stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', ordering: false, model: 'Shelf' do |stock_log|
+      stock_log.stock.shelf.shelf_code
+    end
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount',  ordering: false do |stock_log|
+        [stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"}]
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: false, custom_filter: StockLog::STATUS.invert do |stock_log|
+        StockLog::STATUS[stock_log.status.to_sym]
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', ordering: false do |stock_log|
+      stock_log.created_at.to_s(:db)
+    end
+
+    g.column name: model_class.human_attribute_name(:checked_at), attribute: 'checked_at', ordering: false do |stock_log|
+      stock_log.checked_at.try :to_s, :db
+    end
+  end
+%>

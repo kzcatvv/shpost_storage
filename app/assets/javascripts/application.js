@@ -42,3 +42,124 @@ function ajaxspecifications() {
    return false;
   }); 
 };
+
+function clickin(current)
+{
+  param = current.id.split('_');
+  if (param[2] == "amount") {
+    if ($("input#"+current.id).is(":hidden")){ 
+      $(current).hide();
+      $("input#"+current.id).show();
+      $("input#"+current.id).focus();
+    }
+  } else {
+    if ($("select#"+current.id).is(":hidden")){ 
+      $(current).hide();
+      $("select#"+current.id).show();
+      $("select#"+current.id).focus();
+    }
+  }
+}
+
+function hideit(current)
+{
+  param = current.id.split('_');
+  $("p#"+current.id).show();
+  if (param[2] == "amount") {
+    if ($(current).val() == "") {
+      $(current).val(0);
+    }
+    $("p#"+current.id).text($(current).val());
+  } else {
+    $("p#"+current.id).text($(current).find("option:selected").text());
+  }
+  $(current).hide();
+}
+
+function clickout(current)
+{
+  hideit(current);
+  modify(current);
+}
+
+function add(pid) {
+  var tr = $("table.wice-grid tr").eq(2).clone();
+  tr.appendTo("table.wice-grid");
+  slid=$('table.wice-grid tr:eq(2) input').first().val();
+  var index=tr.index()+2;
+  addTr(slid,index);
+}
+
+function tablereplace(index,column,type,value) {
+  $('table.wice-grid tr:eq('+index+') '+column).each(function(){
+    // alert($(this).attr(type).replace(/[0-9]+$/,value));
+    $(this).attr(type,$(this).attr(type).replace(/[0-9]+$/,value));
+  })
+}
+
+
+function destroy(current) {
+  if(confirm("确定删除？")){
+    removeTr(current);
+    var index=current.parentNode.parentNode.rowIndex;
+    $("table.wice-grid tr").eq(index+1).remove();
+  }
+}
+
+function modify(current)
+{
+  param = current.id.split('_');
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/modify",
+    data: "id=" + param[3] + "&" + param[2] + "=" + $(current).val(),
+    dataType: "json",
+    complete: function(data) {
+      $("p#"+current.id).css("background-color","transparent");
+    }
+  });
+}
+
+function addTr(slid,index)
+{
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/addtr",
+    data: "id=" + slid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+        tablereplace(index,"p","id",jsonData.id);
+        tablereplace(index,"a","id",jsonData.id);
+        tablereplace(index,"input","id",jsonData.id);
+        tablereplace(index,"select","id",jsonData.id);
+        amountset(index,jsonData.id,0);
+      }
+    }
+  });
+}
+
+function amountset(index,id,value) {
+  $('table.wice-grid tr:eq('+index+') p#stock_logs_amount_'+id).each(function(){
+    $(this).css('background-color','red');
+    $(this).text(value);
+  })
+  $('table.wice-grid tr:eq('+index+') input#stock_logs_amount_'+id).each(function(){
+    $(this).val(value);
+  })
+}
+
+function removeTr(current)
+{
+  param = current.id.split('_');
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/removetr",
+    data: "id=" + param[3],
+    dataType: "json",
+    complete: function() {
+      $("p#"+current.id).css("background-color","transparent");
+    }
+  });
+}

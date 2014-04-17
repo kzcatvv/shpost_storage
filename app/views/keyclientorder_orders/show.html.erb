@@ -19,7 +19,11 @@
   <dd><%= @order.customer_tel %></dd>
    <dt><strong><%= model_class.human_attribute_name(:customer_phone) %>:</strong></dt>
   <dd><%= @order.customer_phone %></dd>
-   <dt><strong><%= model_class.human_attribute_name(:customer_address) %>:</strong></dt>
+  <dt><strong><%= model_class.human_attribute_name(:province) %>:</strong></dt>
+  <dd><%= @order.province %></dd>
+   <dt><strong><%= model_class.human_attribute_name(:city) %>:</strong></dt>
+  <dd><%= @order.city %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:customer_address) %>:</strong></dt>
   <dd><%= @order.customer_address %></dd>
    <dt><strong><%= model_class.human_attribute_name(:customer_postcode) %>:</strong></dt>
   <dd><%= @order.customer_postcode %></dd>
@@ -38,11 +42,9 @@
   <dd><%= @order.transport_type %></dd>
   <dt><strong><%= model_class.human_attribute_name(:transport_price) %>:</strong></dt>
   <dd><%= @order.transport_price %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:pay_type) %>:</strong></dt>
-  <dd><%= @order.paytypename %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
-  <dd><%= @order.statusname %></dd>
+  <dd><%= @order.status_name %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:buyer_desc) %>:</strong></dt>
   <dd><%= @order.buyer_desc %></dd>

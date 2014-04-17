@@ -8,7 +8,7 @@
   <dd><%= @order.no %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:order_type) %>:</strong></dt>
-  <dd><%= @order.order_type %></dd>
+  <dd><%= @order.type_name %></dd>
 
    <dt><strong><%= model_class.human_attribute_name(:need_invoice) %>:</strong></dt>
   <dd><%= @order.need_invoice %></dd>
@@ -19,6 +19,10 @@
   <dd><%= @order.customer_tel %></dd>
    <dt><strong><%= model_class.human_attribute_name(:customer_phone) %>:</strong></dt>
   <dd><%= @order.customer_phone %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:provinec) %>:</strong></dt>
+  <dd><%= @order.province %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:city) %>:</strong></dt>
+  <dd><%= @order.city %></dd>
    <dt><strong><%= model_class.human_attribute_name(:customer_address) %>:</strong></dt>
   <dd><%= @order.customer_address %></dd>
    <dt><strong><%= model_class.human_attribute_name(:customer_postcode) %>:</strong></dt>
@@ -35,14 +39,12 @@
   <dt><strong><%= model_class.human_attribute_name(:total_amount) %>:</strong></dt>
   <dd><%= @order.total_amount %></dd>
   <dt><strong><%= model_class.human_attribute_name(:transport_type) %>:</strong></dt>
-  <dd><%= @order.transport_type %></dd>
+  <dd><%= @order.transport_type_name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:transport_price) %>:</strong></dt>
   <dd><%= @order.transport_price %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:pay_type) %>:</strong></dt>
-  <dd><%= @order.paytypename %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
-  <dd><%= @order.statusname %></dd>
+  <dd><%= @order.status_name %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:buyer_desc) %>:</strong></dt>
   <dd><%= @order.buyer_desc %></dd>
@@ -51,13 +53,13 @@
   <dd><%= @order.seller_desc %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
-  <dd><%= Business.find(@order.business_id).name %></dd>
+  <dd><%= @order.business.try :name %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
-  <dd><%= Unit.find(@order.unit_id).name %></dd>
+  <dd><%= @order.unit.try :name %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
-  <dd><%= Storage.find(@order.storage_id).name %></dd>
+  <dd><%= @order.storage.try :name %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

@@ -19,6 +19,18 @@
       <%= f.text_field :amount, :class => 'form-control' %>
     </div>
   </div>
+  <div class="form-group">
+    <%= f.label :batch_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :batch_no, :class => 'form-control' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :supplier_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+    </div>
+  </div>
 
   
   <%= f.submit nil, :class => 'btn btn-primary' %>

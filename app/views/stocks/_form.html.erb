@@ -8,7 +8,7 @@
   <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-    <%= f.select(:specification_id, Specification.accessible_by(current_ability).map{|s| [s.model,s.id]})%>
+    <%= f.select(:specification_id, Specification.accessible_by(current_ability).map{|s| [s.name,s.id]})%>
     </div>
   </div>
   <div class="control-group">

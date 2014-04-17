@@ -37,6 +37,11 @@ FactoryGirl.define do
         total_amount 200
         total_sum 200.1
     end
+
+    factory :new_order do
+        no "20140414010001"
+        keyclientorder_id 2
+    end
   end
 end
 

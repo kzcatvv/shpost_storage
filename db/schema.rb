@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140408144023) do
+
+ActiveRecord::Schema.define(version: 20140415105906) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -58,9 +59,11 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "amount"
+    t.string   "batch_no"
+    t.integer  "supplier_id"
   end
 
-  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+  add_index "keyclientorderdetails", ["keyclientorder_id", "specification_id"], name: "index_on_keyorderdtl_id_specification", unique: true
 
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
@@ -86,6 +89,11 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "order_details_stock_logs", id: false, force: true do |t|
+    t.integer "order_detail_id", null: false
+    t.integer "stock_log_id",    null: false
   end
 
   create_table "orders", force: true do |t|
@@ -114,6 +122,9 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.integer  "unit_id",           default: 1,  null: false
     t.integer  "storage_id",        default: 1,  null: false
     t.integer  "keyclientorder_id", default: 1,  null: false
+    t.string   "tracking_number"
+    t.string   "province"
+    t.string   "city"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -142,6 +153,7 @@ ActiveRecord::Schema.define(version: 20140408144023) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "name",        default: "", null: false
+    t.integer  "storage_id"
   end
 
   create_table "roles", force: true do |t|

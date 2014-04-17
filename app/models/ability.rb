@@ -13,11 +13,40 @@ class Ability
     elsif user.unitadmin?
 
         #can :manage, :all
+        can :manage, Business, unit_id: user.unit_id
         can :manage, Supplier, unit_id: user.unit_id
         can :manage, Goodstype, unit_id: user.unit_id
         can :manage, Commodity, unit_id: user.unit_id
+        can :manage, Specification, commodity: {unit_id: user.unit_id}
+        can :manage, Specification, commodity: {unit_id: user.unit_id}
+        can :manage, Thirdpartcode, specification: {commodity: {unit_id: user.unit_id}}
 
-        can :manage, :all
+        can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
+        can :manage, PurchaseDetail, purchase: {storage_id: storage.id,status: Purchase::STATUS[:opened]}
+        can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
+        can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
+
+        can :manage, Keyclientorder, storage_id: storage.id
+        can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
+        can :manage, Order, storage_id: storage.id
+        can :manage, OrderDetail, order: {storage_id: storage.id}
+
+        can :read, Unit, id: user.unit_id
+        can :manage, Storage, unit_id: user.unit_id
+
+        can :manage, Area, storage_id: storage.id
+        can :manage, Shelf, area: {storage_id: storage.id}
+        can :read, Stock, shelf: {area: {storage_id: storage.id}}
+        can :new, Stock, shelf: {area: {storage_id: storage.id}}
+        can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+
+        can :read, UserLog, user: {unit_id: user.unit_id}
+
+        can :manage, User, unit_id: user.unit_id
         can :role, :user
         cannot :role, :superadmin
         cannot :role, :unitadmin

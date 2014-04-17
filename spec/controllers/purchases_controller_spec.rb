@@ -161,11 +161,75 @@ describe PurchasesController do
     end
 
     #Kiat-mao
-    describe "Stock in" do
-      it "stock_in the requested purchase" do
+    describe "Check" do
+      it "all check" do
+        patch :stock_in, id: @purchase1
+        patch :check, id: @purchase1
+
+        @purchase1.reload
+        @purchase1.purchase_details.each do |x|
+          expect(x).to be_all_checked
+        end
+
+        @purchase1.purchase_details.each do |x|
+          expect(x).to be_stock_in
+        end
+
+        @purchase1.stock_logs.each do |x|
+          expect(x).to be_checked
+        end
+      end
+
+      it "not all check" do
+        patch :stock_in, id: @purchase1
+
+        assigns(:stock_logs).each do |x|
+          x.update(amount: x.amount - 1)
+        end
+
+        patch :check, id: @purchase1
+
+        assigns(:stock_logs).each do |x|
+          expect(x).to be_checked
+        end
+
+        @purchase1.purchase_details.each do |x|
+          expect(x).not_to be_stock_in
+          expect(x).not_to be_all_checked
+        end
+      end
+    end
+
+    describe "Close" do
+      it "close" do
+        patch :stock_in, id: @purchase1
+        patch :check, id: @purchase1
+        patch :close, id: @purchase1
+
+        @purchase1.reload
+        expect(@purchase1).to be_closed
+      end
+
+      it "not close" do
+        patch :stock_in, id: @purchase1
+        patch :close, id: @purchase1
+
+        @purchase1.reload
+        expect(@purchase1).not_to be_closed
+      end
+    end
+
+    describe "Stock In" do
+      it "add stock_logs count by stock_in the requested purchase" do
         expect {
           patch :stock_in, id: @purchase1
-        }.to change(StockLog, :count)
+        }.to change(StockLog, :count).by(3)
+      end
+
+      it "add stocks count by stock_in the requested purchase" do
+        expect {
+          patch :stock_in, id: @purchase1
+        }.to change(Stock, :count).by(3)
       end
 
       it "assigns newly stock_logs belongs_to @purchase1" do
@@ -176,6 +240,8 @@ describe PurchasesController do
 
       it "assigns purchase_details in @purchase1 waiting_amount eq 0" do
         patch :stock_in, id: @purchase1
+
+        @purchase1.reload
         @purchase1.purchase_details.each do |x|
           expect(x.waiting_amount).to eq(0)
         end
@@ -267,7 +333,8 @@ describe PurchasesController do
       @superadmin = User.find 1
       @purchase1 = FactoryGirl.create(:purchase)
       @purchase_detail1 = FactoryGirl.create(:purchase_detail)
-      @purchase_detail2 = FactoryGirl.create(:purchase_detail, specification_id: 2)
+      @purchase_detail2 = FactoryGirl.create(:purchase_detail)
+      @purchase_detail3 = FactoryGirl.create(:purchase_detail, specification_id: 2)
       @purchase2 = FactoryGirl.create(:purchase)
       @purchase3 = FactoryGirl.create(:purchase)
       sign_in @superadmin
