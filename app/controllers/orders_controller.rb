@@ -110,7 +110,7 @@ class OrdersController < ApplicationController
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
     end
-
+    sklogs=[]
     @orders.each do |order|
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
@@ -121,6 +121,7 @@ class OrdersController < ApplicationController
               while orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
                 amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
                 outstocks.each do |outstock|
+                 if outstock.virtual_amount > 0
                   if !outbl
                     if outstock.virtual_amount - amount >= 0
                      setamount = outstock.virtual_amount - amount
@@ -138,18 +139,18 @@ class OrdersController < ApplicationController
                      orderdtl.stock_logs << stklog
                     end
                   end
+                 end
                 end
               end
 
           end
-          sklogs = orderdtl.stock_logs
-          @stock_logs += StockLog.where(id: sklogs)
+          sklogs += orderdtl.stock_logs
       end
     end
     @orders.update_all(status: "unchecked",user_id: nil)
-    binding.pry
-    @stock_logs_grid = initialize_grid(@stock_logs)
+    @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
+    @stock_logs_grid = initialize_grid(@stock_logs)
   end
 
   # def check_out_stocks(stocks,amount)
