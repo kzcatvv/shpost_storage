@@ -106,10 +106,48 @@ class OrdersController < ApplicationController
   end
 
   def stockout
-    if !params[:keyclientorder_id].nil?
+   if !params[:keyclientorder_id].nil?
+       sklogs=[]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
-    end
+       keyordercnt = keyorder.orders.count
+
+       keyorder.keyclientorderdetails.each do |keydtl|
+         if keydtl.amount > 0
+            outstocks = Stock.find_out_stock(keydtl.specification, keyorder.business, keydtl.supplier)
+
+              outbl = false
+              amount = keydtl.amount * keyordercnt
+
+                outstocks.each do |outstock|
+                 if outstock.virtual_amount > 0
+                  if !outbl
+                    if outstock.virtual_amount - amount >= 0
+                     setamount = outstock.virtual_amount - amount
+                     outbl = true
+                     outstock.update_attribute(:virtual_amount , setamount)
+                     outstock.save
+                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                     sklogs += stklog
+                     stklog.order_details << OrderDetail.where(order_id: keyorder.orders).limit(amount).offset(keyordercnt-amount+1)
+                    else 
+                     amount = amount - outstock.virtual_amount
+                     outbl = false
+                     outstock.update_attribute(:virtual_amount , 0)
+                     outstock.save
+                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                     sklogs += stklog
+                     stklog.order_details << OrderDetail.where(order_id: keyorder.orders).limit(outstock.virtual_amount).offset(keyordercnt-amount+1)
+                    end
+                  end
+                 end
+                end
+
+          end
+
+        end
+
+   else
     sklogs=[]
     @orders.each do |order|
       order.order_details.each do |orderdtl|
@@ -147,7 +185,8 @@ class OrdersController < ApplicationController
           sklogs += orderdtl.stock_logs
       end
     end
-    @orders.update_all(status: "unchecked",user_id: nil)
+   end
+    #@orders.update_all(status: "unchecked",user_id: nil)
     @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
     @stock_logs_grid = initialize_grid(@stock_logs)
