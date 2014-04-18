@@ -21,7 +21,7 @@
   <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
   <dd><%= Storage.find(@keyclientorder.storage_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
-  <dd><%= @order.business.try :name %></dd>
+  <dd><%= @keyclientorder.business.try :name %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

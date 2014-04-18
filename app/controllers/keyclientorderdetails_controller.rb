@@ -44,6 +44,8 @@ class KeyclientorderdetailsController < ApplicationController
   def update
     respond_to do |format|
       if @keyclientorderdetail.update(keyclientorderdetail_params)
+        @specification = Specification.find(params[:keyclientorderdetail][:specification_id])
+        OrderDetail.where(order_id: @keyclientorder.orders).update_all(name: @specification.name,specification_id: params[:keyclientorderdetail][:specification_id],amount: params[:keyclientorderdetail][:amount],batch_no: params[:keyclientorderdetail][:batch_no],supplier_id: params[:keyclientorderdetail][:supplier_id])
         format.html { redirect_to keyclientorder_keyclientorderdetail_path(@keyclientorder,@keyclientorderdetail), notice: 'Keyclientorderdetail was successfully updated.' }
         format.json { head :no_content }
       else

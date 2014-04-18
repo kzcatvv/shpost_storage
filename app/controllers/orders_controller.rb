@@ -106,19 +106,19 @@ class OrdersController < ApplicationController
   end
 
   def stockout
+
    if !params[:keyclientorder_id].nil?
        sklogs=[]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
        keyordercnt = keyorder.orders.count
 
-       keyorder.keyclientorderdetails.each do |keydtl|
+        keyorder.keyclientorderdetails.each do |keydtl|
          if keydtl.amount > 0
             outstocks = Stock.find_out_stock(keydtl.specification, keyorder.business, keydtl.supplier)
 
               outbl = false
               amount = keydtl.amount * keyordercnt
-
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
                   if !outbl
@@ -128,16 +128,17 @@ class OrdersController < ApplicationController
                      outstock.update_attribute(:virtual_amount , setamount)
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                     sklogs += stklog
-                     stklog.order_details << OrderDetail.where(order_id: keyorder.orders).limit(amount).offset(keyordercnt-amount+1)
+                     sklogs += StockLog.where(id: stklog)
+                     ods=OrderDetail.where(order_id: @orders).limit(amount).offset(keyordercnt-amount)
+                     stklog.order_details << ods
                     else 
                      amount = amount - outstock.virtual_amount
                      outbl = false
                      outstock.update_attribute(:virtual_amount , 0)
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                     sklogs += stklog
-                     stklog.order_details << OrderDetail.where(order_id: keyorder.orders).limit(outstock.virtual_amount).offset(keyordercnt-amount+1)
+                     sklogs += StockLog.where(id: stklog)
+                     stklog.order_details << OrderDetail.where(order_id: @orders).limit(outstock.virtual_amount).offset(keyordercnt-amount)
                     end
                   end
                  end

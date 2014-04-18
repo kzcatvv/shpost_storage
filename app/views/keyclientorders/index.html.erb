@@ -43,7 +43,7 @@
         (link_to t('.pddetails', :default => t("helpers.links.pddetails")), keyclientorder_keyclientorderdetails_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :details, keyclientorder)<< ' ' <<
         (link_to t('.custorders', :default => t("helpers.links.custorders")), keyclientorder_orders_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :custorders, keyclientorder)<< ' ' <<
         (link_to t('打印面单'), "/print/keytracking?id=#{keyclientorder.id}", target: '_blank',:class => 'btn btn-xs btn-info')<< ' ' <<
-        (link_to t('.stockout', :default => t("helpers.links.stockout")), stockout_orders_url, :class => 'btn btn-xs btn-primary' if can? :stockout, keyclientorder)
+        (link_to t('生成出库单'), "/orders/stockout?keyclientorder_id=#{keyclientorder.id}", :class => 'btn btn-xs btn-info')
     end
   end 
 %>

@@ -122,9 +122,9 @@ ActiveRecord::Schema.define(version: 20140418080829) do
     t.integer  "unit_id",           default: 1,  null: false
     t.integer  "storage_id",        default: 1,  null: false
     t.integer  "keyclientorder_id", default: 1,  null: false
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
   end
 
   create_table "purchase_details", force: true do |t|
