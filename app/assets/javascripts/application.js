@@ -145,9 +145,9 @@ function amountset(index,id,value) {
     $(this).css('background-color','red');
     $(this).text(value);
   })
-  // $('table.wice-grid tr:eq('+index+') input#stock_logs_amount_'+id).each(function(){
-  //   $(this).css('background-color','red');
-  // })
+  $('table.wice-grid tr:eq('+index+') input#stock_logs_amount_'+id).each(function(){
+    $(this).val(value);
+  })
 }
 
 function removeTr(current)
