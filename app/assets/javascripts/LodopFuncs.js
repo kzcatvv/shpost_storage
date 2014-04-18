@@ -91,6 +91,10 @@ function stockin_preview() {
     CreateStockinPage();  
     LODOP.PREVIEW();  
   }; 
+  function stockout_preview() { 
+    CreateStockoutPage();  
+    LODOP.PREVIEW();  
+  }; 
   function tracking1_preview() {
 
   	if(document.getElementById('num').value.trim()==''){

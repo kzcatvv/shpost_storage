@@ -545,6 +545,9 @@ zh-CN:
         b2cfindprint:
           name: "电商订单打印"
           link: "/orders/findprint"
+        b2cfindcheck:
+          name: "电商订单生成出库单"
+          link: "/orders/findcheck"
     goodstypes:
       name: "商品与规格管理"
       submenu:

@@ -77,7 +77,7 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-    @orders = Order.where(" order_type = ? and (status = ? or status = ?)","b2c","waiting","printed").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
+    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
     allcnt = {}
     @orders.each do |o|
       o.order_details.each do |d|
@@ -101,8 +101,16 @@ class OrdersController < ApplicationController
 
   end
 
+  def findcheck
+    @orders = Order.where(" order_type = ? and status = ? and user_id = ?","b2c","printed",current_user).limit(25)
+  end
+
   def stockout
-     
+    if !params[:keyclientorder_id].nil?
+       keyorder=Keyclientorder.find(params[:keyclientorder_id])
+       @orders = keyorder.orders
+    end
+    sklogs=[]
     @orders.each do |order|
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
@@ -113,6 +121,7 @@ class OrdersController < ApplicationController
               while orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
                 amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
                 outstocks.each do |outstock|
+                 if outstock.virtual_amount > 0
                   if !outbl
                     if outstock.virtual_amount - amount >= 0
                      setamount = outstock.virtual_amount - amount
@@ -130,14 +139,18 @@ class OrdersController < ApplicationController
                      orderdtl.stock_logs << stklog
                     end
                   end
+                 end
                 end
               end
 
           end
+          sklogs += orderdtl.stock_logs
       end
     end
-
+    @orders.update_all(status: "unchecked",user_id: nil)
+    @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
+    @stock_logs_grid = initialize_grid(@stock_logs)
   end
 
   # def check_out_stocks(stocks,amount)

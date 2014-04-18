@@ -9,12 +9,12 @@ class Order < ActiveRecord::Base
 
   TYPE = { b2b: 'b2b', b2c: 'b2c' }
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
-  STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
+  STATUS = { waiting: 'waiting', printed: 'printed', unchecked: 'unchecked', picking: 'picking', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
 
   TRANSPORT_TYPE= { gnxb: 'gnxb', tcsd: 'tcsd', ems: 'ems'}
 
   def type_name
-    status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
+    order_type.blank? ? "" : self.class.human_attribute_name("order_type_#{order_type}")
   end
 
   def status_name
