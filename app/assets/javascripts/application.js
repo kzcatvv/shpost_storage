@@ -46,6 +46,9 @@ function ajaxspecifications() {
 function clickin(current)
 {
   param = current.id.split('_');
+  if ($("td#stock_logs_status_"+param[3]).text()!="waiting") {
+    return false;
+  }
   if (param[2] == "amount") {
     if ($("input#"+current.id).is(":hidden")){ 
       $(current).hide();
@@ -82,7 +85,7 @@ function clickout(current)
   modify(current);
 }
 
-function add(pid) {
+function add() {
   var tr = $("table.wice-grid tr").eq(2).clone();
   tr.appendTo("table.wice-grid");
   slid=$('table.wice-grid tr:eq(2) input').first().val();
@@ -90,12 +93,6 @@ function add(pid) {
   addTr(slid,index);
 }
 
-function tablereplace(index,column,type,value) {
-  $('table.wice-grid tr:eq('+index+') '+column).each(function(){
-    // alert($(this).attr(type).replace(/[0-9]+$/,value));
-    $(this).attr(type,$(this).attr(type).replace(/[0-9]+$/,value));
-  })
-}
 
 
 function destroy(current) {
@@ -135,9 +132,18 @@ function addTr(slid,index)
         tablereplace(index,"input","id",jsonData.id);
         tablereplace(index,"select","id",jsonData.id);
         amountset(index,jsonData.id,0);
+        statusset(slid,index,jsonData.id,"waiting");
+        linkset(index,jsonData.id);
       }
     }
   });
+}
+
+function tablereplace(index,column,type,value) {
+  $('table.wice-grid tr:eq('+index+') '+column).each(function(){
+    // alert($(this).attr(type).replace(/[0-9]+$/,value));
+    $(this).attr(type,$(this).attr(type).replace(/[0-9]+$/,value));
+  })
 }
 
 function amountset(index,id,value) {
@@ -148,6 +154,18 @@ function amountset(index,id,value) {
   $('table.wice-grid tr:eq('+index+') input#stock_logs_amount_'+id).each(function(){
     $(this).val(value);
   })
+}
+
+function statusset(slid,index,id,value) {
+  $('table.wice-grid tr:eq('+index+') td#stock_logs_status_'+slid).each(function(){
+    $(this).attr("id",$(this).attr("id").replace(/[0-9]+$/,id));
+    $(this).text(value);
+  })
+}
+
+function linkset(index,id) {
+  link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_link_'+id+'" onclick="destroy(this)">删除</a>';
+  $('table.wice-grid tr:eq('+index+') td').last().html(link_field);
 }
 
 function removeTr(current)
