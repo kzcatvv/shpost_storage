@@ -129,7 +129,7 @@ class OrdersController < ApplicationController
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
                      sklogs += StockLog.where(id: stklog)
-                     ods=OrderDetail.where(order_id: @orders).limit(amount).offset(keyordercnt-amount)
+                     ods=OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(amount)
                      stklog.order_details << ods
                     else 
                      amount = amount - outstock.virtual_amount
@@ -138,7 +138,14 @@ class OrdersController < ApplicationController
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
                      sklogs += StockLog.where(id: stklog)
-                     stklog.order_details << OrderDetail.where(order_id: @orders).limit(outstock.virtual_amount).offset(keyordercnt-amount)
+                     if amount == keydtl.amount * keyordercnt
+                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(0).limit(outstock.virtual_amount)
+                     else
+                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(outstock.virtual_amount)
+                     end
+
+                     stklog.order_details << ods
+
                     end
                   end
                  end
@@ -193,20 +200,20 @@ class OrdersController < ApplicationController
     @stock_logs_grid = initialize_grid(@stock_logs)
   end
 
-  # def check_out_stocks(stocks,amount)
-  #   chkout = false
-  #   stocks.each do |stock|
-  #     if !chkout
-  #      if stock.virtual_amount - amount >= 0
-  #         chkout = true
-  #      else 
-  #         amount = amount - stock.virtual_amount
-  #         chkout = false
-  #      end
-  #     end
-  #   end
-  #   return chkout
-  # end
+  def check_out_stocks(stocks,amount)
+    chkout = false
+    stocks.each do |stock|
+      if !chkout
+       if stock.virtual_amount - amount >= 0
+          chkout = true
+       else 
+          amount = amount - stock.virtual_amount
+          chkout = false
+       end
+      end
+    end
+    return chkout
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
