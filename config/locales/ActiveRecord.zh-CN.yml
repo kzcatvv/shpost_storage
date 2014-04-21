@@ -539,6 +539,9 @@ zh-CN:
         business:
           name: "商户管理"
           link: "/businesses"
+        order:
+          name: "订单管理"
+          link: "/orders"
         keyclientorder:
           name: "大客户订单管理"
           link: "/keyclientorders"

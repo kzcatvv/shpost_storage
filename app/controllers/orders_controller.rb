@@ -31,15 +31,17 @@ class OrdersController < ApplicationController
   def create
 
    # @order = Order.new(order_params)
-    @order.order_type = "pubiicclient"
-    @order.unit_id = current_user.unit_id
+   # @order.order_type = "pubiicclient"
+   # @order.unit_id = current_user.unit_id
 #@order.storage_id = current_storage.id 
 
+   
+    @order = Order.new(order_params)
     @order.order_type = Order::TYPE[:b2c]
     @order.status = Order::STATUS[:waiting]
     @order.unit = current_user.unit
     @order.storage = current_storage
-    
+   # @order.no = Time.now.to_s.split(':').first
 
     respond_to do |format|
       if @order.save
