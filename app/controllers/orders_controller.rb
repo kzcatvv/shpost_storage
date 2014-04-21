@@ -129,7 +129,7 @@ class OrdersController < ApplicationController
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
                      sklogs += StockLog.where(id: stklog)
-                     ods=OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(amount)
+                     ods=OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(amount/keydtl.amount)
                      stklog.order_details << ods
                     else 
                      amount = amount - outstock.virtual_amount
@@ -141,7 +141,7 @@ class OrdersController < ApplicationController
                      if amount == keydtl.amount * keyordercnt
                       ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(0).limit(outstock.virtual_amount)
                      else
-                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(outstock.virtual_amount)
+                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(outstock.virtual_amount/keydtl.amount)
                      end
 
                      stklog.order_details << ods
