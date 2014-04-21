@@ -5,6 +5,6 @@ FactoryGirl.define do
     commodity_id 1
     name "specificationname"
     sixnine_code "1234"
-    product_no "201401"
+    sku "201401"
   end
 end

@@ -20,8 +20,8 @@ Shelf.destroy_all()
 Stock.destroy_all()
 StockLog.destroy_all()
 
-unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc')
-unit2 = Unit.create(name: 'unit2_name', desc: 'unit2_desc')
+unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc', no: '0001')
+unit2 = Unit.create(name: 'unit2_name', desc: 'unit2_desc', no: '0002')
 
 storage11 = Storage.create(name: 's11', desc: 's11_desc', unit: unit1)
 storage12 = Storage.create(name: 's12', desc: 's12_desc', unit: unit1)
@@ -52,11 +52,11 @@ area121 = Area.create(storage: storage12, name: '退货区', desc: '退货区_de
 shelf1111 = Shelf.create(area: area111, shelf_code: 'A1-01-01-01-01-01', area_length: 1, area_width: 1, area_height: 1, shelf_row: 1, shelf_column: 1, max_weight: 100, max_volume: 200)
 shelf1112 = Shelf.create(area: area111, shelf_code: 'A1-01-01-01-01-02', area_length: 1, area_width: 1, area_height: 1, shelf_row: 1, shelf_column: 2, max_weight: 100, max_volume: 200)
 
-supplier1 = Supplier.create(sno: 'G001',name: '供应商1',address: '供应商地址1',phone: '12345123451',unit: unit1)
-supplier2 = Supplier.create(sno: 'G002',name: '供应商2',address: '供应商地址2',phone: '12345123452',unit: unit1)
+supplier1 = Supplier.create(no: 'G001',name: '供应商1',address: '供应商地址1',phone: '12345123451',unit: unit1)
+supplier2 = Supplier.create(no: 'G002',name: '供应商2',address: '供应商地址2',phone: '12345123452',unit: unit1)
 
-business1 = Business.create(name: '商户1',email: 'business1@test.com',contactor: '商户1联系人',phone: '22334455667',address: '商户1地址',desc: '商户1备注',unit: unit1)
-business2 = Business.create(name: '商户2',email: 'business2@test.com',contactor: '商户2联系人',phone: '22334455668',address: '商户2地址',desc: '商户2备注',unit: unit1)
+business1 = Business.create(name: '商户1',email: 'business1@test.com',contactor: '商户1联系人',phone: '22334455667',address: '商户1地址',desc: '商户1备注',unit: unit1, no: '0001', secret_key: '12345')
+business2 = Business.create(name: '商户2',email: 'business2@test.com',contactor: '商户2联系人',phone: '22334455668',address: '商户2地址',desc: '商户2备注',unit: unit1, no: '0002', secret_key: '12345')
 
 goodstype1 = Goodstype.create(gtno: 'SL01',name: '商品类型1', unit: unit1)
 goodstype2 = Goodstype.create(gtno: 'SL02',name: '商品类型2', unit: unit1)
@@ -64,8 +64,8 @@ goodstype2 = Goodstype.create(gtno: 'SL02',name: '商品类型2', unit: unit1)
 commodity1 = Commodity.create(cno: 'S001',name: '商品1',goodstype: goodstype1, unit: unit1)
 commodity2 = Commodity.create(cno: 'S002',name: '商品2',goodstype: goodstype1, unit: unit1)
 
-specification1 = Specification.create(commodity: commodity1, name: 'Sname1', product_no: '1')
-specification2 = Specification.create(commodity: commodity1, name: 'Sname2', product_no: '2')
+specification1 = Specification.create(commodity: commodity1, name: 'Sname1', sku: '1')
+specification2 = Specification.create(commodity: commodity1, name: 'Sname2', sku: '2')
 
 shelf1 = Shelf.create(shelf_code: "A2-01-01-01-01", area: area112, priority_level: 1)
 shelf2 = Shelf.create(shelf_code: "A2-01-01-01-02", area: area112, priority_level: 2)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140421031635) do
+ActiveRecord::Schema.define(version: 20140421111443) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -32,10 +32,12 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "no"
+    t.string   "secret_key"
   end
 
   create_table "commodities", force: true do |t|
-    t.string   "cno"
+    t.string   "no"
     t.string   "name"
     t.integer  "goodstype_id"
     t.datetime "created_at"
@@ -175,6 +177,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "priority_level"
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
@@ -182,7 +185,6 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
-    t.integer  "priority_level"
   end
 
   create_table "specifications", force: true do |t|
@@ -192,7 +194,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.string   "name"
     t.string   "sixnine_code"
     t.string   "desc"
-    t.string   "product_no"
+    t.string   "sku"
   end
 
   create_table "stock_logs", force: true do |t|
@@ -231,7 +233,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
   end
 
   create_table "suppliers", force: true do |t|
-    t.string   "sno"
+    t.string   "no"
     t.string   "name"
     t.string   "address"
     t.string   "phone"
@@ -254,6 +256,7 @@ ActiveRecord::Schema.define(version: 20140421031635) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "no"
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true
