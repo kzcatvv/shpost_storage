@@ -14,12 +14,12 @@ class StandardInterfaceController < ApplicationController
 
     desc = @context_hash["DESC"]
 
+    supplier = nil
+    
     if !supplier_no.blank?
       supplier = Supplier.find_by(no: @business.no + '_' + supplier_no)
 
       supplier ||= Supplier.create!(no: @business.no + '_' + supplier_no, name: @business.name + '_' + supplier_no, unit: @unit)
-    else
-      supplier = nil
     end
     
     #price = @context_hash["PRICE"]
