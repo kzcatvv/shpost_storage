@@ -124,6 +124,7 @@ class OrdersController < ApplicationController
    if !params[:keyclientorder_id].nil?
        sklogs=[]
        chkout=0
+       @keycorder=params[:keyclientorder_id]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
        keyordercnt = keyorder.orders.count
@@ -139,6 +140,7 @@ class OrdersController < ApplicationController
                if outstocks.sum(:amount) - amount < 0
                  keyordercnt = outstocks.sum(:amount)/keydtl.amount
                  chkout = keyorder.orders.count - outstocks.sum(:amount)/keydtl.amount
+                 
                end
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
@@ -180,6 +182,7 @@ class OrdersController < ApplicationController
    else
     sklogs=[]
     chkout=0
+    @keycorder=params[:format]
     @keyclientorder=Keyclientorder.find(params[:format])
     @orders=@keyclientorder.orders
     @orders.each do |order|
@@ -219,8 +222,10 @@ class OrdersController < ApplicationController
           end
           sklogs += orderdtl.stock_logs
       end
+        order.update_attribute(:is_shortage,"no")
      else
        chkout += 1
+       order.update_attribute(:is_shortage,"yes")
      end
     end
 
@@ -256,9 +261,16 @@ class OrdersController < ApplicationController
   end
 
   def ordercheck
-    @stock_logs.each do |stlog|
-       stlog.ordercheck
-    end
+
+      @keyclientorder=Keyclientorder.find(params[:format])
+      @orders=@keyclientorder.orders
+      @orders.each do |order|
+        order.stock_logs.each do |stlog|
+          stlog.ordercheck
+        end
+        order.stock_out
+      end
+    
   end
 
   private
