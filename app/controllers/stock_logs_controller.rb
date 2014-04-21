@@ -65,6 +65,7 @@ class StockLogsController < ApplicationController
   end
 
   def modify
+    stock_log = nil
     StockLog.transaction do
       @stock_log = StockLog.find(params[:id])
       @stock = @stock_log.stock
@@ -83,6 +84,8 @@ class StockLogsController < ApplicationController
             elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
               stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: params[:shelfid], batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: @stock_log.amount)
             end
+             # @stock_log.stock = stock
+             # @stock_log.save();
             stock_log = StockLog.update(@stock_log.id, stock: stock)
           else
             if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
@@ -104,7 +107,7 @@ class StockLogsController < ApplicationController
         @stock.save()
 
         @stock_log.amount = params[:amount]
-        @stock_log.save()
+        stock_log = @stock_log.save()
       end
 
       if !params[:pdid].nil?
@@ -124,7 +127,7 @@ class StockLogsController < ApplicationController
       end
     end
     # redirect_to request.referer
-    render json: {id: @stock_log.id, actual_amount: @stock_log.stock.actual_amount, operation_type: @stock_log.operation_type}
+    render json: {id: stock_log.id, actual_amount: stock_log.stock.actual_amount, operation_type: stock_log.operation_type}
   end
 
   def removetr

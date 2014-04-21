@@ -43,8 +43,9 @@ class StockLog < ActiveRecord::Base
     end
   end
 
-  def ordercheck
-    if self.printed?
+  def order_check
+    #binding.pry
+    if self.waiting?
       if self.operation_type.eql? OPERATION_TYPE[:in]
         self.stock.check_in_amount self.amount
       elsif self.operation_type.eql? OPERATION_TYPE[:out]
@@ -71,9 +72,5 @@ class StockLog < ActiveRecord::Base
 
   def waiting?
     self.status.eql? STATUS[:waiting]
-  end
-
-  def printed?
-    self.status.eql? STATUS[:printed]
   end
 end
