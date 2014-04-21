@@ -9,6 +9,7 @@ class PrintController < ApplicationController
 		order = Order.find(params[:id])
 		order.tracking_number=params[:num]
 		order.status='printed'
+		order.user_id=current_user.id
 		order.save
 		flash[:alert] = "正在打印"
 	end
@@ -25,6 +26,7 @@ class PrintController < ApplicationController
 		@orders.each_with_index do |order,i|
 			order.tracking_number=(start+i).to_s
 			order.status='printed'
+			order.user_id=current_user.id
 			order.save
 		end
 		flash[:alert] = "正在打印"
@@ -42,6 +44,7 @@ class PrintController < ApplicationController
 			order = Order.find(@ids[i])
 			order.tracking_number=num.to_s
 			order.status='printed'
+			order.user_id=current_user.id
 			order.save
 		end
 		flash[:alert] = "正在打印"

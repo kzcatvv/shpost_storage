@@ -14,11 +14,11 @@
   function webtracking_preview() {
 
   	LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
-  	LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","");
-    LODOP.PRINT_INITA("-5.5mm","-3mm","232mm","130.7mm","");
     <% @ids.each do |id| %>
     <% eorder=Order.find(id) %>
-    LODOP.NewPage();
+    //LODOP.NewPage();
+    LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","");
+    LODOP.PRINT_INITA("-5.5mm","-3mm","232mm","130.7mm","");
 	LODOP.ADD_PRINT_TEXT("41mm","86.8mm","25.1mm","6.6mm",'<%= eorder.province %><%= eorder.city %>');
 LODOP.ADD_PRINT_TEXT("49.5mm","36.5mm","26.5mm","5.3mm",'<%= eorder.customer_name %>');
 LODOP.ADD_PRINT_TEXT("48.7mm","82.8mm","27.8mm","6.6mm",'<%= eorder.customer_phone %>');
@@ -42,9 +42,11 @@ LODOP.ADD_PRINT_TEXT("46.3mm","114.6mm","42.3mm","34.4mm",content);
 LODOP.ADD_PRINT_TEXT("46.6mm","161.4mm","33.1mm","6.6mm",CurentTime(0,1));
 LODOP.ADD_PRINT_TEXT("59.5mm","162.7mm","33.1mm","5.3mm",'<%= current_user.unit.name %>');
 LODOP.ADD_PRINT_TEXT("75.9mm","171.4mm","21.4mm","5.3mm",'<%= eorder.total_weight %>');
-LODOP.ADD_PRINT_TEXT("31.8mm","161.7mm","37.3mm","5.3mm",'<%= eorder.no %>');			
+LODOP.ADD_PRINT_TEXT("31.8mm","161.7mm","37.3mm","5.3mm",'<%= eorder.no %>');	
+LODOP.PREVIEW();	
+//LODOP.PRINT();	
 	<% end %>
-    LODOP.PREVIEW();
+    
     
   };
 
