@@ -36,6 +36,7 @@ class Ability
 
         can :manage, Area, storage_id: storage.id
         can :manage, Shelf, area: {storage_id: storage.id}
+        can :new, Shelf
         can :read, Stock, shelf: {area: {storage_id: storage.id}}
         can :new, Stock, shelf: {area: {storage_id: storage.id}}
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
