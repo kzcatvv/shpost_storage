@@ -77,16 +77,18 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-   if Order.where("status = ? and user_id = ? and order_type = 'b2c' and keyclientorder_id is not null","waiting",current_user).nil?
+   @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
+   if @orders.empty?
 
     @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
     find_has_stock(@orders)
     time = Time.new
     batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user_id: current_user)
+    keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
     @orders.update_all(keyclientorder_id: keycorder)
    else
-    @orders=Order.where("status = ? and user_id = ? and order_type = 'b2c' and keyclientorder_id is not null","waiting",current_user)
+    @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_id').first
+    @orders=@keycorder.orders
     find_has_stock(@orders)
    end
 
@@ -116,9 +118,6 @@ class OrdersController < ApplicationController
     orders=orders.limit(25)
   end
 
-  def findcheck
-    @orders = Order.where(" order_type = ? and status = ? and user_id = ? and keyclientorder_id is not null","b2c","printed",current_user).limit(25)
-  end
 
   def stockout
 
@@ -181,33 +180,33 @@ class OrdersController < ApplicationController
               amount = orderdtl.amount
               while orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
                 amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
-                outstocks.each do |outstock|
-                 if outstock.virtual_amount > 0
-                  if !outbl
-                    if outstock.virtual_amount - amount >= 0
-                     setamount = outstock.virtual_amount - amount
-                     outbl = true
-                     outstock.update_attribute(:virtual_amount , setamount)
-                     outstock.save
-                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                     orderdtl.stock_logs << stklog
-                    else 
-                     amount = amount - outstock.virtual_amount
-                     outbl = false
-                     outstock.update_attribute(:virtual_amount , 0)
-                     outstock.save
-                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                     orderdtl.stock_logs << stklog
+                 outstocks.each do |outstock|
+                   if outstock.virtual_amount > 0
+                    if !outbl
+                      if outstock.virtual_amount - amount >= 0
+                       setamount = outstock.virtual_amount - amount
+                       outbl = true
+                       outstock.update_attribute(:virtual_amount , setamount)
+                       outstock.save
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                       orderdtl.stock_logs << stklog
+                      else 
+                       amount = amount - outstock.virtual_amount
+                       outbl = false
+                       outstock.update_attribute(:virtual_amount , 0)
+                       outstock.save
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                       orderdtl.stock_logs << stklog
+                      end
                     end
-                  end
+                   end
                  end
-                end
               end
-
           end
           sklogs += orderdtl.stock_logs
       end
     end
+    binding.pry
    end
     #@orders.update_all(status: "unchecked",user_id: nil)
     @stock_logs = StockLog.where(id: sklogs)

@@ -158,6 +158,7 @@ zh-CN:
       stock_in_purchase: 入库单
       check_purchase: 确认入库
       close_purchase: 关闭
+      stockout: 生成出库单
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -480,7 +481,7 @@ zh-CN:
         unit_id: 单位
         storage_id: 仓库
       keyclientorderdetail:
-        keyclientorder_id: 大客户订单批次编号
+        keyclientorder_id: 订单批次编号
         specification_id: 商品规格
         desc: 备注
         amount: 数量
@@ -539,15 +540,15 @@ zh-CN:
         business:
           name: "商户管理"
           link: "/businesses"
+        b2corder:
+          name: "电商订单管理"
+          link: "/orders"
         keyclientorder:
           name: "大客户订单管理"
           link: "/keyclientorders"
         b2cfindprint:
           name: "电商订单打印"
           link: "/orders/findprint"
-        b2cfindcheck:
-          name: "电商订单生成出库单"
-          link: "/orders/findcheck"
     goodstypes:
       name: "商品与规格管理"
       submenu:
