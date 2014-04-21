@@ -14,39 +14,39 @@
 
     if @purchase
       g.column name: model_class.human_attribute_name(:pd_name), attribute: 'name', ordering: false, model: 'PurchaseDetail' do |stock_log|
-        if stock_log.status == 'waiting'
+        # if stock_log.status == 'waiting'
           select_tag("stock_logs[][pdid]", options_for_select(PurchaseDetail.accessible_by(current_ability).map{|u| [u.batch_no+"_"+u.name,u.id]}, stock_log.purchase_detail_id), id: "stock_logs_pdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
           content_tag(:p, stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name, {id: "stock_logs_pdid_#{stock_log.id}", onclick: 'clickin(this);'})
-        else
-          stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
-        end
+        # else
+        #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
+        # end
       end
     end
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', ordering: false, model: 'Shelf' do |stock_log|
-      if stock_log.status == 'waiting'
+      # if stock_log.status == 'waiting'
         select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
         content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'})
-      else
-        stock_log.stock.shelf.shelf_code
-      end
+      # else
+      #   stock_log.stock.shelf.shelf_code
+      # end
     end
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount',  ordering: false do |stock_log|
-      if stock_log.status == 'waiting'
+      # if stock_log.status == 'waiting'
         text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", style: "display: none; width: 40px;", onblur: 'clickout(this)') <<
         if stock_log.amount == 0
           content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);', style: 'background-color: red;'})
         else
           content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);'})
         end
-      else
-        [stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"}]
-      end
+      # else
+      #   [stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"}]
+      # end
     end
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: false, custom_filter: StockLog::STATUS.invert do |stock_log|
-        StockLog::STATUS[stock_log.status.to_sym]
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: true, custom_filter: StockLog::STATUS.invert do |stock_log|
+        [StockLog::STATUS[stock_log.status.to_sym],{id: "stock_logs_status_#{stock_log.id}"}]
     end
 
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', ordering: false do |stock_log|
@@ -58,7 +58,7 @@
     end
 
     g.column do |stock_log|
-      if stock_log.status == 'waiting'
+      # if stock_log.status == 'waiting'
         ActiveSupport::SafeBuffer.new <<
           # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
           # (submit_tag('check!!'))  #<< ' ' <<
@@ -68,7 +68,7 @@
           # (link_to t('.delete', :default => t("helpers.links.delete")), split_stock_log_path(stock_log.id), :class => 'btn btn-xs btn-primary', id: "test_#{stock_log.id}")
           (link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'destroy(this)', id: "stock_logs_link_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log)
       end
-    end
+    # end
   end
 %>
 
@@ -78,8 +78,10 @@
 
   <div style="float:right">
     <% if can? :new, Stock %>
-      <%= link_to t('.new', :default => t("helpers.links.new")),
-                 "javascript:void(0)", onclick: "add(#{@purchase.id})",
-                  :class => 'btn btn-primary' %>
+      <% if @purchase %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+                   "javascript:void(0)", onclick: "add()",
+                    :class => 'btn btn-primary' %>
+      <% end %>
     <% end %>
   </div>

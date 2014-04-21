@@ -39,7 +39,7 @@ class Ability
         can :read, Stock, shelf: {area: {storage_id: storage.id}}
         can :new, Stock, shelf: {area: {storage_id: storage.id}}
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
-        can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}, status: StockLog::STATUS[:waiting]
         can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}

@@ -79,7 +79,7 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-    @orders = Order.where(" order_type = ? and (status = ? or status = ?)","b2c","waiting","printed").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
+    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
     allcnt = {}
     @orders.each do |o|
       o.order_details.each do |d|
@@ -103,8 +103,62 @@ class OrdersController < ApplicationController
 
   end
 
+  def findcheck
+    @orders = Order.where(" order_type = ? and status = ? and user_id = ?","b2c","printed",current_user).limit(25)
+  end
+
   def stockout
-     
+
+   if !params[:keyclientorder_id].nil?
+       sklogs=[]
+       keyorder=Keyclientorder.find(params[:keyclientorder_id])
+       @orders = keyorder.orders
+       keyordercnt = keyorder.orders.count
+
+        keyorder.keyclientorderdetails.each do |keydtl|
+         if keydtl.amount > 0
+            outstocks = Stock.find_out_stock(keydtl.specification, keyorder.business, keydtl.supplier)
+
+              outbl = false
+              amount = keydtl.amount * keyordercnt
+                outstocks.each do |outstock|
+                 if outstock.virtual_amount > 0
+                  if !outbl
+                    if outstock.virtual_amount - amount >= 0
+                     setamount = outstock.virtual_amount - amount
+                     outbl = true
+                     outstock.update_attribute(:virtual_amount , setamount)
+                     outstock.save
+                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                     sklogs += StockLog.where(id: stklog)
+                     ods=OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(amount/keydtl.amount)
+                     stklog.order_details << ods
+                    else 
+                     amount = amount - outstock.virtual_amount
+                     outbl = false
+                     outstock.update_attribute(:virtual_amount , 0)
+                     outstock.save
+                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                     sklogs += StockLog.where(id: stklog)
+                     if amount == keydtl.amount * keyordercnt
+                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(0).limit(outstock.virtual_amount)
+                     else
+                      ods = OrderDetail.where(order_id: @orders).where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(keyordercnt-amount/keydtl.amount).limit(outstock.virtual_amount/keydtl.amount)
+                     end
+
+                     stklog.order_details << ods
+
+                    end
+                  end
+                 end
+                end
+
+          end
+
+        end
+
+   else
+    sklogs=[]
     @orders.each do |order|
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
@@ -115,6 +169,7 @@ class OrdersController < ApplicationController
               while orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
                 amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
                 outstocks.each do |outstock|
+                 if outstock.virtual_amount > 0
                   if !outbl
                     if outstock.virtual_amount - amount >= 0
                      setamount = outstock.virtual_amount - amount
@@ -132,30 +187,35 @@ class OrdersController < ApplicationController
                      orderdtl.stock_logs << stklog
                     end
                   end
+                 end
                 end
               end
 
           end
+          sklogs += orderdtl.stock_logs
       end
     end
-
+   end
+    #@orders.update_all(status: "unchecked",user_id: nil)
+    @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
+    @stock_logs_grid = initialize_grid(@stock_logs)
   end
 
-  # def check_out_stocks(stocks,amount)
-  #   chkout = false
-  #   stocks.each do |stock|
-  #     if !chkout
-  #      if stock.virtual_amount - amount >= 0
-  #         chkout = true
-  #      else 
-  #         amount = amount - stock.virtual_amount
-  #         chkout = false
-  #      end
-  #     end
-  #   end
-  #   return chkout
-  # end
+  def check_out_stocks(stocks,amount)
+    chkout = false
+    stocks.each do |stock|
+      if !chkout
+       if stock.virtual_amount - amount >= 0
+          chkout = true
+       else 
+          amount = amount - stock.virtual_amount
+          chkout = false
+       end
+      end
+    end
+    return chkout
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
