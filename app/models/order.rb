@@ -4,6 +4,7 @@ class Order < ActiveRecord::Base
 	belongs_to :storage
   belongs_to :keyclientorder
   has_many :order_details, dependent: :destroy
+  has_many :stock_logs, through: :order_details
 
   validates_presence_of :no, :message => '不能为空'
 

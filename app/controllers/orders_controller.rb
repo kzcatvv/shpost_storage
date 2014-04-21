@@ -77,9 +77,24 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").limit(25).distinct
+   if Order.where("status = ? and user_id = ? and order_type = 'b2c' and keyclientorder_id is not null","waiting",current_user).nil?
+
+    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
+    find_has_stock(@orders)
+    time = Time.new
+    batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+    keycorder = Keyclientorder.create(unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user_id: current_user)
+    @orders.update_all(keyclientorder_id: keycorder)
+   else
+    @orders=Order.where("status = ? and user_id = ? and order_type = 'b2c' and keyclientorder_id is not null","waiting",current_user)
+    find_has_stock(@orders)
+   end
+
+  end
+
+  def find_has_stock(orders)
     allcnt = {}
-    @orders.each do |o|
+    orders.each do |o|
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
         allamount = Stock.find_stock_amount(d.specification,o.business,d.supplier)
@@ -87,22 +102,22 @@ class OrdersController < ApplicationController
           if allcnt[product][0]-allcnt[product][1]-d.amount >= 0
             allcnt[product][1]=allcnt[product][1]+d.amount
           else
-            @orders = @orders.where("orders.id not in (?)",o)
+            orders = orders.where("orders.id not in (?)",o)
           end
         else
           if allamount - d.amount >= 0
             allcnt[product]=[allamount,d.amount]
           else
-            @orders = @orders.where("orders.id not in (?)",o)
+            orders = orders.where("orders.id not in (?)",o)
           end
         end
       end
     end
-
+    orders=orders.limit(25)
   end
 
   def findcheck
-    @orders = Order.where(" order_type = ? and status = ? and user_id = ?","b2c","printed",current_user).limit(25)
+    @orders = Order.where(" order_type = ? and status = ? and user_id = ? and keyclientorder_id is not null","b2c","printed",current_user).limit(25)
   end
 
   def stockout
@@ -213,6 +228,12 @@ class OrdersController < ApplicationController
       end
     end
     return chkout
+  end
+
+  def ordercheck
+    @stock_logs.each do |stlog|
+       stlog.ordercheck
+    end
   end
 
   private
