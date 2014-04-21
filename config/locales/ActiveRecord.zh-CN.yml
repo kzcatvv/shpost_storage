@@ -158,6 +158,7 @@ zh-CN:
       stock_in_purchase: 入库单
       check_purchase: 确认入库
       close_purchase: 关闭
+      stockout: 生成出库单
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -342,6 +343,7 @@ zh-CN:
         operation: "操作"
         stock_id: "库存"
         status: "状态"
+        stock_amount: "库存数量"
         amount: "数量"
         object_class: "对象名称"
         object_id: "对象主键"
@@ -406,6 +408,7 @@ zh-CN:
         business_id: "所属商户"
         storage_id: "所属仓库"
         keyclientorder_id: "大客户订单编号"
+        is_shortage: "是否缺货"
         type_b2b: "大客户订单"
         type_b2c: "电商订单"
         transport_type_tcsd: "同城速递"
@@ -418,6 +421,10 @@ zh-CN:
         status_delivered: "已签收"
         status_declined: "拒收"
         status_returned: "已退回"
+        is_shortage_yes: "缺货"
+        is_shortage_no: "有货"
+        province: "省"
+        city: "市"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -479,8 +486,10 @@ zh-CN:
         batch_id: 订单批次编号
         unit_id: 单位
         storage_id: 仓库
+        business_id: 所属商户
+
       keyclientorderdetail:
-        keyclientorder_id: 大客户订单批次编号
+        keyclientorder_id: 订单批次编号
         specification_id: 商品规格
         desc: 备注
         amount: 数量
@@ -539,15 +548,15 @@ zh-CN:
         business:
           name: "商户管理"
           link: "/businesses"
+        b2corder:
+          name: "电商订单管理"
+          link: "/orders"
         keyclientorder:
           name: "大客户订单管理"
           link: "/keyclientorders"
         b2cfindprint:
           name: "电商订单打印"
           link: "/orders/findprint"
-        b2cfindcheck:
-          name: "电商订单生成出库单"
-          link: "/orders/findcheck"
     goodstypes:
       name: "商品与规格管理"
       submenu:

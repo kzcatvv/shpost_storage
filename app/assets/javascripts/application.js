@@ -112,7 +112,15 @@ function modify(current)
     data: "id=" + param[3] + "&" + param[2] + "=" + $(current).val(),
     dataType: "json",
     complete: function(data) {
-      $("p#"+current.id).css("background-color","transparent");
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+        $("p#stock_logs_actamount_"+param[3]).val(jsonData.actual_amount);
+        if (jsonData.actual_amount < $("p#stock_logs_amount_"+param[3]).text() && jsonData.operation_type == "out") {
+          $("p#stock_logs_amount_"+param[3]).css("background-color","red");
+        } else {
+          $("p#"+current.id).css("background-color","transparent");
+        }
+      }
     }
   });
 }
