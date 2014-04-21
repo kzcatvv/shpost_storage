@@ -123,6 +123,7 @@ class OrdersController < ApplicationController
 
    if !params[:keyclientorder_id].nil?
        sklogs=[]
+       chkout=0
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
        keyordercnt = keyorder.orders.count
@@ -130,9 +131,15 @@ class OrdersController < ApplicationController
         keyorder.keyclientorderdetails.each do |keydtl|
          if keydtl.amount > 0
             outstocks = Stock.find_out_stock(keydtl.specification, keyorder.business, keydtl.supplier)
-
-              outbl = false
-              amount = keydtl.amount * keyordercnt
+             outbl = false
+             amount = keydtl.amount * keyordercnt
+             has_out=keyorder.stock_logs.where(stock_id: outstocks).sum(:amount)
+              while amount - has_out > 0
+               amount = amount-has_out
+               if outstocks.sum(:amount) - amount < 0
+                 keyordercnt = outstocks.sum(:amount)/keydtl.amount
+                 chkout = keyorder.orders.count - outstocks.sum(:amount)/keydtl.amount
+               end
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
                   if !outbl
@@ -165,6 +172,7 @@ class OrdersController < ApplicationController
                  end
                 end
 
+              end
           end
 
         end
@@ -221,6 +229,9 @@ class OrdersController < ApplicationController
     @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
     @stock_logs_grid = initialize_grid(@stock_logs)
+    if chkout > 0
+     flash[:notice] = "注意有"+chkout+"件订单缺货"
+    end
   end
 
   def check_out_stocks(order)
