@@ -206,7 +206,7 @@ class OrdersController < ApplicationController
           sklogs += orderdtl.stock_logs
       end
     end
-    binding.pry
+    #binding.pry
    end
     #@orders.update_all(status: "unchecked",user_id: nil)
     @stock_logs = StockLog.where(id: sklogs)
