@@ -1,8 +1,12 @@
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+  <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
+</object>
 <%- model_class = Order -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human %></h1>
   <div style="float:right">
-      <%=link_to t('打印面单'), "/print/webtracking?ids=#{@orders.map{|o| o.id}.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
+      <%=link_to t('打印面单'), "/print/webtracking?ids=#{@orders.map{|o| o.id if (o.status=='waiting')}.compact.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
+      <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
       <% if can? :stockout, Order %>
       <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
                   stockout_orders_url(@keycorder),
@@ -28,6 +32,7 @@
       <th><%= model_class.human_attribute_name(:transport_type) %></th>
       <th><%= model_class.human_attribute_name(:business_id) %></th>
       <th><%= model_class.human_attribute_name(:status) %></th>
+      <th><%= model_class.human_attribute_name(:is_shortage) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
@@ -49,6 +54,7 @@
         <td><%= order.transport_type_name %></td>
         <td><%= order.business.try :name %></td>
         <td><%= order.status_name %></td>
+        <td><%= order.shortage_type_name %></td>
         <td>
           
         </td>
@@ -56,3 +62,46 @@
     <% end %>
   </tbody>
 </table>
+
+<script language="javascript" type="text/javascript"> 
+function pick_preview(){
+    LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));  
+    LODOP.PRINT_INIT("打印配货单");
+    <% @orders.each do |order| %>
+    LODOP.SET_PRINT_PAGESIZE(1,"210mm","297mm","");
+    LODOP.PRINT_INIT("打印配货单");
+    LODOP.SET_PRINT_STYLE("FontSize",18);
+    LODOP.SET_PRINT_STYLE("Bold",1);
+    LODOP.SET_PRINT_STYLE("ItemType",4);
+    LODOP.ADD_PRINT_TEXT(50,"45%",260,39,"配货单");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.ADD_PRINT_TEXT(90,"5%",260,25,"订单编号：<%= order.no %>");
+    LODOP.ADD_PRINT_TEXT(90,"30%",260,25,"打印时间："+CurentTime(0,0));
+    LODOP.ADD_PRINT_TEXT(90,"60%",160,25,"客户姓名：<%= order.customer_name %>");
+    LODOP.ADD_PRINT_TEXT(90,"80%",160,25,"商品总数：<%= order.total_amount %>");
+    LODOP.SET_PRINT_STYLE("FontSize",15);
+    h=140;
+    LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"商品编号");
+    LODOP.ADD_PRINT_TEXT(h,"25%",260,25,"商品名称规格");
+    LODOP.ADD_PRINT_TEXT(h,"65%",260,25,"数量");
+    LODOP.ADD_PRINT_TEXT(h,"75%",260,25,"价格 ");
+    LODOP.ADD_PRINT_TEXT(h,"85%",260,25,"小计");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+
+    <% order.order_details.each do |detail| %>
+    h=h+33;
+     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= detail.specification.commodity.cno %>');
+     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= detail.specification.commodity.name %>'+' '+'<%= detail.specification.name %>');
+     LODOP.ADD_PRINT_TEXT(h,"65%",260,25,'<%= detail.amount %>');
+     LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= detail.price %>');
+     LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= detail.amount*detail.price %>');
+    <% end %>
+
+    LODOP.PREVIEW();  
+    //LODOP.PRINT();  
+  <% end %>
+    
+      
+  };
+</script>
