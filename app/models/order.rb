@@ -29,7 +29,7 @@ class Order < ActiveRecord::Base
   end
 
   def shortage_type_name
-    shortage_type.blank? ? "" : self.class.human_attribute_name("shortage_type_#{shortage_type}")
+    is_shortage.blank? ? "" : self.class.human_attribute_name("is_shortage_#{is_shortage}")
   end
 
   def checked_amount
