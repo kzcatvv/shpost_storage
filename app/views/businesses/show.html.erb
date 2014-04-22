@@ -4,6 +4,8 @@
 </div>
 
 <dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:no) %>:</strong></dt>
+  <dd><%= @business.no %></dd>
   <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
   <dd><%= @business.name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:email) %>:</strong></dt>
@@ -16,6 +18,8 @@
   <dd><%= @business.address %></dd>
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @business.desc %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:secret_key) %>:</strong></dt>
+  <dd><%= @business.secret_key %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
