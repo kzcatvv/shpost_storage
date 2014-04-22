@@ -346,10 +346,9 @@ class OrdersController < ApplicationController
         order.stock_out
       end
       
-      respond_to do |format|
-        format.html { render action: 'findprint' }
-        format.json { head :no_content }
-      end
+
+     redirect_to :action => 'findprint'
+
   end
 
   private
