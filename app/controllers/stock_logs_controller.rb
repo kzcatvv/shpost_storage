@@ -124,7 +124,7 @@ class StockLogsController < ApplicationController
       end
     end
     # redirect_to request.referer
-    render json: {id: @stock_log_new.id, actual_amount: @stock_log.stock.actual_amount, operation_type: @stock_log.operation_type}
+    render json: {id: @stock_log.id, actual_amount: @stock_log.stock.actual_amount, operation_type: @stock_log.operation_type}
   end
 
   def removetr
