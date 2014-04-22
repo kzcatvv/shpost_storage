@@ -420,6 +420,8 @@ zh-CN:
         status_delivered: "已签收"
         status_declined: "拒收"
         status_returned: "已退回"
+        is_shortage_yes: "缺货"
+        is_shortage_no: "有货"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
