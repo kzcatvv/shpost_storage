@@ -28,6 +28,7 @@
       <th><%= model_class.human_attribute_name(:transport_type) %></th>
       <th><%= model_class.human_attribute_name(:business_id) %></th>
       <th><%= model_class.human_attribute_name(:status) %></th>
+      <th><%= model_class.human_attribute_name(:is_shortage) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
@@ -49,6 +50,7 @@
         <td><%= order.transport_type_name %></td>
         <td><%= order.business.try :name %></td>
         <td><%= order.status_name %></td>
+        <td><%= order.shortage_type_name %></td>
         <td>
           
         </td>
