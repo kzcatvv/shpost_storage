@@ -137,10 +137,21 @@ class OrdersController < ApplicationController
              has_out=keyorder.stock_logs.where(stock_id: outstocks).sum(:amount)
               while amount - has_out > 0
                amount = amount-has_out
-               if outstocks.sum(:amount) - amount < 0
+               if outstocks.sum(:amount) - amount >= 0
+                  @orders.each do |od|
+                    od.update_attribute(:is_shortage,"no")
+                  end
+               else
                  keyordercnt = outstocks.sum(:amount)/keydtl.amount
                  chkout = keyorder.orders.count - outstocks.sum(:amount)/keydtl.amount
                  
+                 @orders.limit(keyordercnt).each do |order|
+                    order.update_attribute(:is_shortage,"no")
+                 end
+
+                 @orders.offset(keyordercnt).each do |o|
+                      o.update_attribute(:is_shortage,"yes")
+                 end
                end
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
