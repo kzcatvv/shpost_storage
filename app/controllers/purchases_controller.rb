@@ -26,9 +26,12 @@ class PurchasesController < ApplicationController
   # POST /purchasees.json
   def create
    # @purchase = Purchase.new(purchase_params)
+    time=Time.new
     @purchase.unit = current_user.unit
     @purchase.status = Purchase::STATUS[:opened]
     @purchase.storage = current_storage
+    @purchase.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Purchase.count.to_s.rjust(5,'0')
+
 
     respond_to do |format|
       if @purchase.save

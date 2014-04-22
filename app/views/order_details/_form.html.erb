@@ -38,8 +38,8 @@
     <div class="control-group">
     <%= f.label :order_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :order_id, :class => 'text_field' %>
-    </div>
+      <%= f.label (Order.find(@order_detail.order_id).no ), :class => 'control-label' %>
+     </div>
     <div class="control-group">
     <%= f.label :desc, :class => 'control-label' %>
     <div class="controls">
