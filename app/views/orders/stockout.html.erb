@@ -28,19 +28,17 @@ function CreateStockoutPage(){
     LODOP.SET_PRINT_STYLE("FontSize",15);
     LODOP.SET_PRINT_STYLE("Bold",1);
     h=110;
-    LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"出库单");
-    LODOP.ADD_PRINT_TEXT(h,"20%",260,25,"商品名称规格");
-    LODOP.ADD_PRINT_TEXT(h,"45%",260,25,"数量");
-    LODOP.ADD_PRINT_TEXT(h,"55%",260,25,"货架");
-    LODOP.ADD_PRINT_TEXT(h,"75%",260,25,"69码");
+    LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"商品名称规格");
+    LODOP.ADD_PRINT_TEXT(h,"35%",260,25,"数量");
+    LODOP.ADD_PRINT_TEXT(h,"45%",260,25,"货架");
+    LODOP.ADD_PRINT_TEXT(h,"70%",260,25,"69码");
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
     <% @stock_logs_grid.all_pages_records.map(&:id).each do |j| %>
         h=h+33;
-        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'出库单明细');
-        LODOP.ADD_PRINT_TEXT(h,"20%",260,25,'<%= StockLog.find(j).stock.specification.commodity.name %>'+' '+'<%= StockLog.find(j).stock.specification.name %>');
-        LODOP.ADD_PRINT_TEXT(h,"45%",260,25,'<%= StockLog.find(j).amount %>');
-        LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= StockLog.find(j).stock.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= StockLog.find(j).stock.specification.commodity.name %>'+' '+'<%= StockLog.find(j).stock.specification.name %>');
+        LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= StockLog.find(j).amount %>');
+        LODOP.ADD_PRINT_TEXT(h,"45%",260,25,'<%= StockLog.find(j).stock.shelf.shelf_code %>');
         LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= StockLog.find(j).stock.specification.sixnine_code %>');
       <% end %>
       

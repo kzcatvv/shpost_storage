@@ -17,8 +17,8 @@
     <% @ids.each do |id| %>
     <% eorder=Order.find(id) %>
     //LODOP.NewPage();
-    LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","");
-    LODOP.PRINT_INITA("-5.5mm","-3mm","232mm","130.7mm","");
+    LODOP.PRINT_INITA("-5.5mm","-3mm","232mm","130.7mm","tracking");
+    LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
 	LODOP.ADD_PRINT_TEXT("41mm","86.8mm","25.1mm","6.6mm",'<%= eorder.province %><%= eorder.city %>');
 LODOP.ADD_PRINT_TEXT("49.5mm","36.5mm","26.5mm","5.3mm",'<%= eorder.customer_name %>');
 LODOP.ADD_PRINT_TEXT("48.7mm","82.8mm","27.8mm","6.6mm",'<%= eorder.customer_phone %>');
