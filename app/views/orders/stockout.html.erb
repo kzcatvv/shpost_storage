@@ -7,6 +7,12 @@
   <div style="float:right">   
       <a href="javascript:stockout_preview()" class='btn btn-primary' >打印出库单</a>
   </div>
+  <div style="float:right">
+
+      <%= link_to t('.ordercheck', :default => t("helpers.links.ordercheck")),
+                  check_orders_url,
+                  :class => 'btn btn-primary' %>
+  </div>
 </div>
 <%= render :partial => 'stock_logs/some_forms' %>
 

@@ -8,11 +8,11 @@
   <dd><%= @purchase_detail.name %></dd>
 
   <dt><strong><%= model_class.human_attribute_name(:purchase_id) %>:</strong></dt>
-  <dd><%= @purchase_detail.purchase_id %></dd>
+  <dd><%=Purchase.find(@purchase_detail.purchase_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:supplier_id) %>:</strong></dt>
-  <dd><%= @purchase_detail.supplier_id %></dd>
+  <dd><%= Supplier.find(@purchase_detail.supplier_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:specification_id) %>:</strong></dt>
-  <dd><%= @purchase_detail.specification_id %></dd>
+  <dd><%=Specification.find( @purchase_detail.specification_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:qg_period) %>:</strong></dt>
   <dd><%= @purchase_detail.qg_period %></dd>
   <dt><strong><%= model_class.human_attribute_name(:batch_no) %>:</strong></dt>

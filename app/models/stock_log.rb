@@ -42,6 +42,29 @@ class StockLog < ActiveRecord::Base
     end
   end
 
+  def ordercheck
+    if self.unchecked?
+      if self.operation_type.eql? OPERATION_TYPE[:in]
+        self.stock.check_in_amount self.amount
+      elsif self.operation_type.eql? OPERATION_TYPE[:out]
+        self.stock.check_out_amount self.amount
+      elsif self.operation_type.eql? OPERATION_TYPE[:reset]
+        self.stock.check_reset_amount self.amount
+      end
+      self.status = STATUS[:checked]
+      self.checked_at = Time.now
+
+      StockLog.transaction do
+        self.save
+        self.stock.save
+
+        if self.belongs_to_purchase?
+          self.purchase_detail.stock_in
+        end
+      end
+    end
+  end
+
   def belongs_to_purchase?
     ! self.purchase_detail.blank?
   end
@@ -51,5 +74,9 @@ class StockLog < ActiveRecord::Base
 
   def waiting?
     self.status.eql? STATUS[:waiting]
+  end
+
+  def unchecked?
+    self.status.eql? STATUS[:unchecked]
   end
 end

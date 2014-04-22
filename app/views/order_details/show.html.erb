@@ -18,7 +18,7 @@
    <dt><strong><%= model_class.human_attribute_name(:supplier_id) %>:</strong></dt>
   <dd><%= Supplier.find(@order_detail.supplier_id).name %></dd>
    <dt><strong><%= model_class.human_attribute_name(:order_id) %>:</strong></dt>
-  <dd><%= @order_detail.order_id %></dd>
+  <dd><%=Order.find(@order_detail.order_id).name %></dd>
    <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @order_detail.desc %></dd>
   
