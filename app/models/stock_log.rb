@@ -43,7 +43,7 @@ class StockLog < ActiveRecord::Base
   end
 
   def ordercheck
-    if self.unchecked?
+    if self.printed?
       if self.operation_type.eql? OPERATION_TYPE[:in]
         self.stock.check_in_amount self.amount
       elsif self.operation_type.eql? OPERATION_TYPE[:out]
@@ -57,10 +57,6 @@ class StockLog < ActiveRecord::Base
       StockLog.transaction do
         self.save
         self.stock.save
-
-        if self.belongs_to_purchase?
-          self.purchase_detail.stock_in
-        end
       end
     end
   end
@@ -76,7 +72,7 @@ class StockLog < ActiveRecord::Base
     self.status.eql? STATUS[:waiting]
   end
 
-  def unchecked?
-    self.status.eql? STATUS[:unchecked]
+  def printed?
+    self.status.eql? STATUS[:printed]
   end
 end

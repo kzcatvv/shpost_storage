@@ -81,16 +81,18 @@ class OrdersController < ApplicationController
   end
 
   def findprint
-   if Order.where("status = ? and user_id = ? and order_type = 'b2c' and keyclientorder_id is not null","waiting",current_user).nil?
+   @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
+   if @orders.empty?
 
     @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
     find_has_stock(@orders)
     time = Time.new
     batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user_id: current_user)
-    @orders.update_all(keyclientorder_id: keycorder)
+    @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
+    @orders.update_all(keyclientorder_id: @keycorder)
    else
-    @orders=Order.where("status = ? and user_id = ? and order_type = 'b2c' and keyclientorder_id is not null","waiting",current_user)
+    @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_id').first
+    @orders=@keycorder.orders
     find_has_stock(@orders)
    end
 
@@ -120,14 +122,13 @@ class OrdersController < ApplicationController
     orders=orders.limit(25)
   end
 
-  def findcheck
-    @orders = Order.where(" order_type = ? and status = ? and user_id = ? and keyclientorder_id is not null","b2c","printed",current_user).limit(25)
-  end
 
   def stockout
 
    if !params[:keyclientorder_id].nil?
        sklogs=[]
+       chkout=0
+       @keycorder=params[:keyclientorder_id]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
        keyordercnt = keyorder.orders.count
@@ -135,9 +136,27 @@ class OrdersController < ApplicationController
         keyorder.keyclientorderdetails.each do |keydtl|
          if keydtl.amount > 0
             outstocks = Stock.find_out_stock(keydtl.specification, keyorder.business, keydtl.supplier)
+             outbl = false
+             amount = keydtl.amount * keyordercnt
+             has_out=keyorder.stock_logs.where(stock_id: outstocks).sum(:amount)
+              while amount - has_out > 0
+               amount = amount-has_out
+               if outstocks.sum(:amount) - amount >= 0
+                  @orders.each do |od|
+                    od.update_attribute(:is_shortage,"no")
+                  end
+               else
+                 keyordercnt = outstocks.sum(:amount)/keydtl.amount
+                 chkout = keyorder.orders.count - outstocks.sum(:amount)/keydtl.amount
+                 
+                 @orders.limit(keyordercnt).each do |order|
+                    order.update_attribute(:is_shortage,"no")
+                 end
 
-              outbl = false
-              amount = keydtl.amount * keyordercnt
+                 @orders.offset(keyordercnt).each do |o|
+                      o.update_attribute(:is_shortage,"yes")
+                 end
+               end
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
                   if !outbl
@@ -170,74 +189,103 @@ class OrdersController < ApplicationController
                  end
                 end
 
+              end
           end
 
         end
 
    else
     sklogs=[]
+    chkout=0
+    @keycorder=params[:format]
+    @keyclientorder=Keyclientorder.find(params[:format])
+    @orders=@keyclientorder.orders
     @orders.each do |order|
+
+     if check_out_stocks(order)
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
             outstocks = Stock.find_out_stock(orderdtl.specification, order.business, orderdtl.supplier)
+            outbl = false
+            amount = orderdtl.amount
 
-              outbl = false
-              amount = orderdtl.amount
               while orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
                 amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
-                outstocks.each do |outstock|
-                 if outstock.virtual_amount > 0
-                  if !outbl
-                    if outstock.virtual_amount - amount >= 0
-                     setamount = outstock.virtual_amount - amount
-                     outbl = true
-                     outstock.update_attribute(:virtual_amount , setamount)
-                     outstock.save
-                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                     orderdtl.stock_logs << stklog
-                    else 
-                     amount = amount - outstock.virtual_amount
-                     outbl = false
-                     outstock.update_attribute(:virtual_amount , 0)
-                     outstock.save
-                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                     orderdtl.stock_logs << stklog
+                 outstocks.each do |outstock|
+                   if outstock.virtual_amount > 0
+                    if !outbl
+                      if outstock.virtual_amount - amount >= 0
+                       setamount = outstock.virtual_amount - amount
+                       outbl = true
+                       outstock.update_attribute(:virtual_amount , setamount)
+                       outstock.save
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                       orderdtl.stock_logs << stklog
+                      else 
+                       amount = amount - outstock.virtual_amount
+                       outbl = false
+                       outstock.update_attribute(:virtual_amount , 0)
+                       outstock.save
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+                       orderdtl.stock_logs << stklog
+                      end
                     end
-                  end
+                   end
                  end
-                end
               end
 
           end
           sklogs += orderdtl.stock_logs
       end
+        order.update_attribute(:is_shortage,"no")
+     else
+       chkout += 1
+       order.update_attribute(:is_shortage,"yes")
+     end
     end
+
    end
     #@orders.update_all(status: "unchecked",user_id: nil)
     @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
     @stock_logs_grid = initialize_grid(@stock_logs)
+    if chkout > 0
+     flash[:notice] = "注意有"+chkout+"件订单缺货"
+    end
   end
 
-  def check_out_stocks(stocks,amount)
-    chkout = false
-    stocks.each do |stock|
+  def check_out_stocks(order)
+   
+    orderchk = true 
+    order.order_details.each do |odl|
+     outstocks = Stock.find_out_stock(odl.specification, order.business, odl.supplier)
+     chkout = false
+     outstocks.each do |stock|
       if !chkout
-       if stock.virtual_amount - amount >= 0
+       if stock.virtual_amount - odl.amount >= 0
           chkout = true
        else 
-          amount = amount - stock.virtual_amount
+          amount = odl.amount - stock.virtual_amount
           chkout = false
        end
       end
+     end
+     orderchk= orderchk && chkout
     end
-    return chkout
+    return orderchk
   end
 
   def ordercheck
-    @stock_logs.each do |stlog|
-       stlog.ordercheck
-    end
+
+      @keyclientorder=Keyclientorder.find(params[:format])
+      @orders=@keyclientorder.orders
+      @orders.each do |order|
+        order.stock_logs.each do |stlog|
+          stlog.ordercheck
+        end
+        order.stock_out
+      end
+    
   end
 
   private
