@@ -343,6 +343,7 @@ zh-CN:
         operation: "操作"
         stock_id: "库存"
         status: "状态"
+        stock_amount: "库存数量"
         amount: "数量"
         object_class: "对象名称"
         object_id: "对象主键"
