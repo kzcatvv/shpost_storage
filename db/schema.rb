@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
+ActiveRecord::Schema.define(version: 20140421111443) do
+=======
 ActiveRecord::Schema.define(version: 20140421114434) do
+>>>>>>> b94bb72d4e492816ac576841de62fc795e74b57d
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -32,10 +36,12 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "no"
+    t.string   "secret_key"
   end
 
   create_table "commodities", force: true do |t|
-    t.string   "cno"
+    t.string   "no"
     t.string   "name"
     t.integer  "goodstype_id"
     t.datetime "created_at"
@@ -123,7 +129,7 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.integer  "business_id",       default: 1,    null: false
     t.integer  "unit_id",           default: 1,    null: false
     t.integer  "storage_id",        default: 1,    null: false
-    t.integer  "keyclientorder_id", default: 1,    null: false
+    t.integer  "keyclientorder_id"
     t.string   "province"
     t.string   "city"
     t.string   "tracking_number"
@@ -193,7 +199,7 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.string   "name"
     t.string   "sixnine_code"
     t.string   "desc"
-    t.string   "product_no"
+    t.string   "sku"
   end
 
   create_table "stock_logs", force: true do |t|
@@ -232,7 +238,7 @@ ActiveRecord::Schema.define(version: 20140421114434) do
   end
 
   create_table "suppliers", force: true do |t|
-    t.string   "sno"
+    t.string   "no"
     t.string   "name"
     t.string   "address"
     t.string   "phone"
@@ -255,6 +261,7 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "no"
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true

@@ -23,6 +23,17 @@
       end
     end
 
+    if @orders
+      g.column name: model_class.human_attribute_name(:kcorder_name), attribute: 'keyclient_name', ordering: false, model: 'Keyclientorder' do |stock_log|
+        # if stock_log.status == 'waiting'
+          select_tag("stock_logs[][pdid]", options_for_select(Keyclientorder.accessible_by(current_ability).map{|u| [u.id+"_"+u.keyclient_name,u.id]}, stock_log.order_detail_id), id: "stock_logs_odid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, stock_log.order_detail.keyclientorder.id+"_"+stock_log.order_detail.keyclientorder.keyclient_name, {id: "stock_logs_odid_#{stock_log.id}", onclick: 'clickin(this);'})
+        # else
+        #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
+        # end
+      end
+    end
+
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', ordering: false, model: 'Shelf' do |stock_log|
       # if stock_log.status == 'waiting'
         select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
@@ -30,6 +41,10 @@
       # else
       #   stock_log.stock.shelf.shelf_code
       # end
+    end
+
+    g.column name: model_class.human_attribute_name(:stock_amount), attribute: 'actual_amount',  ordering: false, model: 'Stock' do |stock_log|
+      [stock_log.stock.actual_amount,{id: "stock_logs_actamount_#{stock_log.id}"}]
     end
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount',  ordering: false do |stock_log|

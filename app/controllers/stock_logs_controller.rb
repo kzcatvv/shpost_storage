@@ -71,20 +71,36 @@ class StockLogsController < ApplicationController
       if !params[:shelfid].nil?
         if params[:shelfid] != @stock.shelf.id.to_s
           stock = Stock.get_stock(@stock.specification, @stock.business, @stock.supplier, @stock.batch_no, Shelf.find(params[:shelfid]), @stock_log.amount)
-          @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
+          if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+            @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
+          elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+            @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
+          end
           @stock.save()
           if !stock
-            stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: params[:shelfid], batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: @stock_log.amount)
+            if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+              stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: params[:shelfid], batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: 0 - @stock_log.amount)
+            elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+              stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: params[:shelfid], batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: @stock_log.amount)
+            end
             stock_log = StockLog.update(@stock_log.id, stock: stock)
           else
-            stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount + @stock_log.amount)
+            if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+              stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount - @stock_log.amount)
+            elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+              stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount + @stock_log.amount)
+            end
             stock_log = StockLog.update(@stock_log.id, stock: stock)
           end
         end
       end
 
       if !params[:amount].nil?
-        @stock.virtual_amount = @stock.virtual_amount.to_i - @stock_log.amount.to_i + params[:amount].to_i
+        if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+          @stock.virtual_amount = @stock.virtual_amount.to_i + @stock_log.amount.to_i - params[:amount].to_i
+        elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+          @stock.virtual_amount = @stock.virtual_amount.to_i - @stock_log.amount.to_i + params[:amount].to_i
+        end
         @stock.save()
 
         @stock_log.amount = params[:amount]
@@ -108,7 +124,7 @@ class StockLogsController < ApplicationController
       end
     end
     # redirect_to request.referer
-    render text: 'modified'
+    render json: {id: @stock_log.id, actual_amount: @stock_log.stock.actual_amount, operation_type: @stock_log.operation_type}
   end
 
   def removetr
@@ -122,7 +138,7 @@ class StockLogsController < ApplicationController
 
       @stock_log.destroy
     end
-    render text: 'test'
+    render text: 'removetr'
   end
 
   def addtr
@@ -135,7 +151,7 @@ class StockLogsController < ApplicationController
       @stock_log_new.user_id = @stock_log.user_id
       @stock_log_new.operation = @stock_log.operation
       @stock_log_new.purchase_detail = @stock_log.purchase_detail
-      @stock_log_new.status = "waiting"
+      @stock_log_new.status = StockLog::STATUS[:waiting]
       @stock_log_new.operation_type = @stock_log.operation_type
       @stock_log_new.desc = @stock_log.desc
       @stock_log_new.stock = @stock_log.stock
@@ -143,22 +159,7 @@ class StockLogsController < ApplicationController
       @stock_log_new.save();
 
       render json: {id: @stock_log_new.id}
-      # x = Purchase.find(params[:pid]).purchase_details.first
-      # if x
-      #   stock = Stock.get_available_stock(x.specification, Purchase.find(params[:pid]).business, x.supplier, x.batch_no)
-        
-      #   stock_in_amount = stock.stock_in_amount(0)
-
-      #   stock.save
-
-      #   stock_log = x.stock_logs.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], purchase_detail: x, amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
-
-      #   render json: {pid: stock_log.id}
-      # else
-      #   render text: 0
-      # end
     end
-
   end
 
   # def split

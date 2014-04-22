@@ -343,6 +343,7 @@ zh-CN:
         operation: "操作"
         stock_id: "库存"
         status: "状态"
+        stock_amount: "库存数量"
         amount: "数量"
         object_class: "对象名称"
         object_id: "对象主键"
@@ -422,6 +423,8 @@ zh-CN:
         status_returned: "已退回"
         is_shortage_yes: "缺货"
         is_shortage_no: "有货"
+        province: "省"
+        city: "市"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -483,6 +486,8 @@ zh-CN:
         batch_id: 订单批次编号
         unit_id: 单位
         storage_id: 仓库
+        business_id: 所属商户
+
       keyclientorderdetail:
         keyclientorder_id: 订单批次编号
         specification_id: 商品规格

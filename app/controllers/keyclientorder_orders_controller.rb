@@ -26,11 +26,14 @@ class KeyclientorderOrdersController < ApplicationController
   # POST /keyclientorderdetails
   # POST /keyclientorderdetails.json
   def create
+    time=Time.new
     #@keyclientorderdetail = Keyclientorderdetail.new(keyclientorderdetail_params)
     @order.order_type = Order::TYPE[:b2b]
     @order.status = Order::STATUS[:waiting]
     @order.unit = current_user.unit
     @order.storage = current_storage
+    @order.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Order.count.to_s.rjust(5,'0')
+
 
     respond_to do |format|
       if @order.save

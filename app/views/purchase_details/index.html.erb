@@ -21,9 +21,15 @@
 <%= grid(@purchase_details_grid) do |g|
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
-    g.column name: model_class.human_attribute_name(:purchase_id), attribute: 'purchase_id'
+    g.column name: model_class.human_attribute_name(:purchase_id), attribute: 'no',
+    model: 'Purchase' do |purchase_detail|
+        purchase_detail.purchase.try :no
+    end
 
-    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'supplier_id'
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name',
+     model: 'Supplier' do |purchase_detail|
+        purchase_detail.supplier.try :name
+    end
 
     g.column name: model_class.human_attribute_name(:specification_id), attribute: 'name',
         model: 'Specification' do |purchase_detail|
