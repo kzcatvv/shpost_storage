@@ -175,7 +175,7 @@ class OrdersController < ApplicationController
              koallcnt=keydtl.amount*keyorder.orders.count
              offsetcnt=has_out
              
-               
+              if keydtl.amount*keyorder.orders.count - has_out > 0
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
                   if !outbl
@@ -208,8 +208,7 @@ class OrdersController < ApplicationController
                   end
                  end
                 end
-
-
+              end
           end
 
         end
