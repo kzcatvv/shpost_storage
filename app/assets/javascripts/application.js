@@ -115,7 +115,7 @@ function modify(current)
       if(data.success){
         // alert(data.responseText)
         var jsonData = eval("("+data.responseText+")");
-        $("td#stock_logs_actamount_"+param[3]).text(jsonData.actual_amount);
+        $("p#stock_logs_actamount_"+param[3]).text(jsonData.actual_amount);
         if (jsonData.actual_amount < $("p#stock_logs_amount_"+param[3]).text() && jsonData.operation_type == "out") {
           $("p#stock_logs_amount_"+param[3]).css("background-color","red");
         } else {
