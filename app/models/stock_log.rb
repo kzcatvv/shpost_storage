@@ -2,6 +2,7 @@ class StockLog < ActiveRecord::Base
   belongs_to :user
   belongs_to :stock
   belongs_to :purchase_detail
+  belongs_to :keyclientorderdetail
   has_one :shelf, through: :stock
   has_and_belongs_to_many :order_details
 
