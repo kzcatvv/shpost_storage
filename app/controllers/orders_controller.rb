@@ -209,6 +209,7 @@ class OrdersController < ApplicationController
              end
              koallcnt=keydtl.amount*keyorder.orders.count
              offsetcnt=has_out
+             lastamount=0
              
               if koallcnt - has_out > 0
                 outstocks.each do |outstock|
@@ -221,7 +222,7 @@ class OrdersController < ApplicationController
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out], keyclientorderdetail_id: keydtl.id)
                      #sklogs += StockLog.where(id: stklog)
-                     ods=keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit(amount/keydtl.amount)
+                     ods=keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit((lastamount+amount)/keydtl.amount)
                      stklog.order_details << ods
                     else 
                      amount = amount - outstock.virtual_amount
@@ -232,15 +233,27 @@ class OrdersController < ApplicationController
                      if amount + outstock.virtual_amount == keydtl.amount * keyordercnt
                       if getamount/keydtl.amount == 0
                         ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount).limit(1)
+                        lastamount=getamount
                       else
-                        ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount).limit(getamount/keydtl.amount)
+                        lastamount=getamount%keydtl.amount
+                        if lastamount == 0 
+                          ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount).limit(getamount/keydtl.amount)
+                        else
+                          ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount).limit(getamount/keydtl.amount+1)
+                        end
                       end
                       offsetcnt += getamount
                      else
-                      if getamount/keydtl.amount == 0
+                      if (lastamount+getamount)/keydtl.amount == 0
                         ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit(1)
+                        lastamount=lastamount+getamount
                       else
-                        ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit(getamount/keydtl.amount)
+                        lastamount = (lastamount + getamount)%keydtl.amount
+                        if lastamount == 0
+                          ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit((lastamount+getamount)/keydtl.amount)
+                        else
+                          ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit((lastamount+getamount)/keydtl.amount + 1)
+                        end
                       end
                       offsetcnt += getamount
                      end
