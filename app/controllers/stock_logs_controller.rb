@@ -69,6 +69,7 @@ class StockLogsController < ApplicationController
     StockLog.transaction do
       @stock_log = StockLog.find(params[:id])
       @stock = @stock_log.stock
+      stock_log = @stock_log
       if !params[:shelfid].nil?
         if params[:shelfid] != @stock.shelf.id.to_s
           stock = Stock.get_stock(@stock.specification, @stock.business, @stock.supplier, @stock.batch_no, Shelf.find(params[:shelfid]), @stock_log.amount)
@@ -107,7 +108,8 @@ class StockLogsController < ApplicationController
         @stock.save()
 
         @stock_log.amount = params[:amount]
-        stock_log = @stock_log.save()
+        @stock_log.save()
+        stock_log = @stock_log
       end
 
       if !params[:pdid].nil?
@@ -125,6 +127,23 @@ class StockLogsController < ApplicationController
           end
         end
       end
+
+      if !params[:kcdid].nil?
+        # todo
+        if params[:kcdid] != @stock_log.keyclientorderdetail.id.to_s
+          kcd = Keyclientorderdetail.find(params[:kcdid])
+          stock = Stock.get_stock(kcd.specification, kcd.business, kcd.supplier, kcd.batch_no, @stock.shelf, @stock_log.amount)
+          @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
+          @stock.save()
+          if !stock
+            stock = Stock.create(specification: pd.specification, business: pd.purchase.business, supplier: pd.supplier, shelf_id: @stock.shelf.id, batch_no: pd.batch_no, actual_amount: 0, virtual_amount: 0-@stock_log.amount)
+            stock_log = StockLog.update(@stock_log.id, stock: stock, keyclientorderdetail_id: params[:kcdid])
+          else
+            stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount - @stock_log.amount)
+            stock_log = StockLog.update(@stock_log.id, stock: stock, keyclientorderdetail_id: params[:kcdid])
+          end
+        end
+      end
     end
     # redirect_to request.referer
     render json: {id: stock_log.id, actual_amount: stock_log.stock.actual_amount, operation_type: stock_log.operation_type}
@@ -134,11 +153,12 @@ class StockLogsController < ApplicationController
     StockLog.transaction do
       @stock_log = StockLog.find(params[:id])
       @stock = @stock_log.stock
-
-
-      @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
+      if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+        @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
+      elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+        @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
+      end
       @stock.save()
-
       @stock_log.destroy
     end
     render text: 'removetr'
