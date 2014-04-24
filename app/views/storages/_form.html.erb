@@ -11,6 +11,11 @@
       <%= f.text_field :desc, :class => 'text_field' %>
     </div>
   </div>
+  <div class="control-group">
+    <div class="controls">
+      <%= f.label :default_storage, :class => 'control-label' %> <%=f.check_box :default_storage,:class =>'check_box'%>
+    </div>
+  </div>
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
