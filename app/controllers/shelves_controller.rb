@@ -32,11 +32,11 @@ class ShelvesController < ApplicationController
   def create
     @shelf = Shelf.new(shelf_params)
     @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_length]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_width]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_height]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_row]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_column]
+    @shelf.shelf_code << "-" << change(shelf_params[:area_length])
+    @shelf.shelf_code << "-" << change(shelf_params[:area_width])
+    @shelf.shelf_code << "-" << change(shelf_params[:area_height])
+    @shelf.shelf_code << "-" << change(shelf_params[:shelf_row])
+    @shelf.shelf_code << "-" << change(shelf_params[:shelf_column])
 
     respond_to do |format|
       if @shelf.save
@@ -53,11 +53,11 @@ class ShelvesController < ApplicationController
   # PATCH/PUT /shelves/1.json
   def update
     @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_length]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_width]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:area_height]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_row]
-    @shelf.shelf_code << "-" << "%02d" % shelf_params[:shelf_column]
+    @shelf.shelf_code << "-" << change(shelf_params[:area_length])
+    @shelf.shelf_code << "-" << change(shelf_params[:area_width])
+    @shelf.shelf_code << "-" << change(shelf_params[:area_height])
+    @shelf.shelf_code << "-" << change(shelf_params[:shelf_row])
+    @shelf.shelf_code << "-" << change(shelf_params[:shelf_column])
     
     respond_to do |format|
       if @shelf.update(shelf_params)
@@ -89,5 +89,15 @@ class ShelvesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def shelf_params
       params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume)
+    end
+
+    def change(text)
+      str_space = "%02s" % text
+      str_0 = str_space.tr(" ","0");
+      if str_0.nil?
+        str_space
+      else
+        str_0
+      end
     end
 end

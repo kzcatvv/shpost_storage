@@ -150,6 +150,12 @@ class OrdersController < ApplicationController
     orders=Order.where(id: findorders)
   end
 
+  def nextbatch
+    @keycorder=params[:format]
+    @keyclientorder=Keyclientorder.find(params[:format])
+    @keyclientorder.update_attribute(:status,"checked")
+    redirect_to :action => 'findprint'
+  end
 
   def stockout
 
@@ -167,6 +173,7 @@ class OrdersController < ApplicationController
           keyorder.orders.each do |od|
             od.update_attribute(:is_shortage,"no")
           end
+
        else
           keyordercnt = get_has_cnt(keyorder)
 
@@ -203,7 +210,7 @@ class OrdersController < ApplicationController
              koallcnt=keydtl.amount*keyorder.orders.count
              offsetcnt=has_out
              
-              if keydtl.amount*keyorder.orders.count - has_out > 0
+              if koallcnt - has_out > 0
                 outstocks.each do |outstock|
                  if outstock.virtual_amount > 0
                   if !outbl
@@ -213,25 +220,33 @@ class OrdersController < ApplicationController
                      outstock.update_attribute(:virtual_amount , setamount)
                      outstock.save
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out], keyclientorderdetail_id: keydtl.id)
-                     sklogs += StockLog.where(id: stklog)
-                     ods=keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount-1).limit(amount/keydtl.amount)
+                     #sklogs += StockLog.where(id: stklog)
+                     ods=keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit(amount/keydtl.amount)
                      stklog.order_details << ods
                     else 
                      amount = amount - outstock.virtual_amount
+                     getamount = outstock.virtual_amount
                      outbl = false
                      stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out], keyclientorderdetail_id: keydtl.id)
-                     sklogs += StockLog.where(id: stklog)
+                     #sklogs += StockLog.where(id: stklog)
                      if amount + outstock.virtual_amount == keydtl.amount * keyordercnt
-                      ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount-1).limit(outstock.virtual_amount/keydtl.amount)
-                      offsetcnt += outstock.virtual_amount
+                      if getamount/keydtl.amount == 0
+                        ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount).limit(1)
+                      else
+                        ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(has_out/keydtl.amount).limit(getamount/keydtl.amount)
+                      end
+                      offsetcnt += getamount
                      else
-                      ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount-1).limit(outstock.virtual_amount/keydtl.amount)
-                      offsetcnt += outstock.virtual_amount
+                      if getamount/keydtl.amount == 0
+                        ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit(1)
+                      else
+                        ods = keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit(getamount/keydtl.amount)
+                      end
+                      offsetcnt += getamount
                      end
+                     stklog.order_details << ods
                      outstock.update_attribute(:virtual_amount , 0)
                      outstock.save
-                     stklog.order_details << ods
-
                     end
                   end
                  end
@@ -276,9 +291,9 @@ class OrdersController < ApplicationController
                        outbl = false
                        keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
                        stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out],keyclientorderdetail: keyorderdtl)
+                       orderdtl.stock_logs << stklog
                        outstock.update_attribute(:virtual_amount , 0)
                        outstock.save
-                       orderdtl.stock_logs << stklog
                       end
                     end
                    end
@@ -340,12 +355,14 @@ class OrdersController < ApplicationController
          sls.each do |sl|
            has_out += sl.amount
          end
-         if outstocks.sum(:virtual_amount)- kdl.amount * keyorder.orders.count + has_out >= 0
-            chkout = true
-         else 
-            chkout = false
+         if kdl.amount*keyorder.orders.count - has_out > 0
+           if outstocks.sum(:virtual_amount)- kdl.amount * keyorder.orders.count + has_out >= 0
+              chkout = true
+           else 
+              chkout = false
+           end
+           orderchk= orderchk && chkout
          end
-         orderchk= orderchk && chkout
        end
     return orderchk
   end
