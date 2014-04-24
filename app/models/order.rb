@@ -6,6 +6,8 @@ class Order < ActiveRecord::Base
   has_many :order_details, dependent: :destroy
   has_many :stock_logs, through: :order_details
 
+  before_save :set_no
+
   validates_presence_of :no, :message => '不能为空'
 
   TYPE = { b2b: 'b2b', b2c: 'b2c' }
@@ -45,6 +47,15 @@ class Order < ActiveRecord::Base
       self.update(status: STATUS[:checked])
     else
       false
+    end
+  end
+
+  protected
+
+  def set_no
+    if self.blank?
+      time = time.now
+      self.no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + Order.count.to_s.rjust(5,'0')
     end
   end
   # def paytypename

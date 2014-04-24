@@ -35,9 +35,8 @@ class OrdersController < ApplicationController
    # @order.unit_id = current_user.unit_id
 #@order.storage_id = current_storage.id 
 
-    time=Time.new
     @order = Order.new(order_params)
-    @order.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Order.count.to_s.rjust(5,'0')
+   
 
     @order.order_type = Order::TYPE[:b2c]
     @order.status = Order::STATUS[:waiting]
