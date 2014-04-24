@@ -85,12 +85,10 @@ class OrdersController < ApplicationController
    if @orders.empty?
 
     @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
-    
-    time = Time.new
-    batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
-    find_has_stock(@orders,@keycorder)
-    @orders.update_all(keyclientorder_id: @keycorder)
+    find_has_stock(@orders)
+    if !@orders.empty?
+      @orders.update_all(keyclientorder_id: @keycorder)
+    end
    else
     @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_id').first
     @orders=@keycorder.orders
@@ -99,7 +97,7 @@ class OrdersController < ApplicationController
 
   end
 
-  def find_has_stock(orders,keyclientorder)
+  def find_has_stock(orders)
     allcnt = {}
     findorders = []
     ordercnt = 0
@@ -135,16 +133,23 @@ class OrdersController < ApplicationController
       else
         o.order_details.each do |dtl|
           product = [o.business_id,dtl.specification_id,dtl.supplier_id]
-          allcnt[product][1]=allcnt[product][1]-d.amount
+          allcnt[product][1]=allcnt[product][1]-dtl.amount
         end
       end
      end
     end
     
-    allcnt.each do |k,v|
-       if v[1] > 0
+    if ordercnt > 0
+      time = Time.new
+      batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+      @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
+    
+
+      allcnt.each do |k,v|
+         if v[1] > 0
           Keyclientorderdetail.create(keyclientorder: keyclientorder,business_id: k[0],specification_id: k[1],supplier_id: k[2],amount: v[1])
-       end
+         end
+      end
     end
 
     orders=Order.where(id: findorders)
@@ -410,8 +415,11 @@ class OrdersController < ApplicationController
         order.stock_out
       end
       
-
-     redirect_to :action => 'findprint'
+     if @keyclientorder.keyclient_name == "auto"
+        redirect_to :action => 'findprint'
+     else
+        redirect_to "/keyclientorders"
+     end
 
   end
 
