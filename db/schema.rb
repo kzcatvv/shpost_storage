@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140421114434) do
+ActiveRecord::Schema.define(version: 20140423052647) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -62,6 +62,7 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.integer  "amount"
     t.string   "batch_no"
     t.integer  "supplier_id"
+    t.integer  "business_id"
   end
 
   add_index "keyclientorderdetails", ["keyclientorder_id", "specification_id"], name: "index_on_keyorderdtl_id_specification", unique: true
@@ -125,7 +126,7 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.integer  "business_id",       default: 1,    null: false
     t.integer  "unit_id",           default: 1,    null: false
     t.integer  "storage_id",        default: 1,    null: false
-    t.integer  "keyclientorder_id"
+    t.integer  "keyclientorder_id", default: 1,    null: false
     t.string   "province"
     t.string   "city"
     t.string   "tracking_number"
@@ -178,6 +179,7 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "priority_level"
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
@@ -185,7 +187,6 @@ ActiveRecord::Schema.define(version: 20140421114434) do
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
-    t.integer  "priority_level"
   end
 
   create_table "specifications", force: true do |t|
@@ -201,15 +202,16 @@ ActiveRecord::Schema.define(version: 20140421114434) do
   create_table "stock_logs", force: true do |t|
     t.integer  "user_id"
     t.integer  "stock_id"
-    t.string   "operation",          default: "", null: false
+    t.string   "operation",               default: "", null: false
     t.string   "status"
     t.integer  "purchase_detail_id"
-    t.integer  "amount",             default: 0,  null: false
+    t.integer  "amount",                  default: 0,  null: false
     t.datetime "checked_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "operation_type"
     t.string   "desc"
+    t.integer  "keyclientorderdetail_id"
   end
 
   create_table "stocks", force: true do |t|

@@ -159,6 +159,7 @@ zh-CN:
       check_purchase: 确认入库
       close_purchase: 关闭
       stockout: 生成出库单
+      ordercheck: 出库单确认
     titles:
       edit: 编辑%{model}
       new: 新增%{model}

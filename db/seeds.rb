@@ -61,8 +61,8 @@ business2 = Business.create(name: '商户2',email: 'business2@test.com',contacto
 goodstype1 = Goodstype.create(gtno: 'SL01',name: '商品类型1', unit: unit1)
 goodstype2 = Goodstype.create(gtno: 'SL02',name: '商品类型2', unit: unit1)
 
-commodity1 = Commodity.create(cno: 'S001',name: '商品1',goodstype: goodstype1, unit: unit1)
-commodity2 = Commodity.create(cno: 'S002',name: '商品2',goodstype: goodstype1, unit: unit1)
+commodity1 = Commodity.create(no: 'S001',name: '商品1',goodstype: goodstype1, unit: unit1)
+commodity2 = Commodity.create(no: 'S002',name: '商品2',goodstype: goodstype1, unit: unit1)
 
 specification1 = Specification.create(commodity: commodity1, name: 'Sname1', sku: '1')
 specification2 = Specification.create(commodity: commodity1, name: 'Sname2', sku: '2')
