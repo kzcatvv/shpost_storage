@@ -6,9 +6,10 @@ class Shelf < ActiveRecord::Base
 
 	validates_numericality_of :max_weight, :max_volume, :only_integer => true, :message => '不是数字'
 	validates_numericality_of :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :only_integer => true, :message => '不是数字'
-	validates_numericality_of :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :greater_than => 0, :less_than => 100
+	validates_numericality_of :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :greater_than => 0, :less_than => 100, :message => "超过最大值{99}"
 
-
+  validates_uniqueness_of :shelf_code, scope: :area_id, :message => "货架已存在"
+ 
   scope :prior, ->{ includes(:stocks).where(stocks: {id: nil}).order("priority_level ASC")}
 
 
