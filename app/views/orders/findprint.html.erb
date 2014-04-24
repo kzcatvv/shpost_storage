@@ -11,7 +11,10 @@
       <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
                   stockout_orders_url(@keycorder),
                   :class => 'btn btn-primary' %>
-    <% end %>
+      <%= link_to t('.nextbatch', :default => t("helpers.links.nextbatch")),
+                  nextbatch_orders_url(@keycorder),
+                  :class => 'btn btn-primary' %>
+      <% end %>
   </div>
 </div>
 <table class="table table-striped">
