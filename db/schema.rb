@@ -126,7 +126,7 @@ ActiveRecord::Schema.define(version: 20140423052647) do
     t.integer  "business_id",       default: 1,    null: false
     t.integer  "unit_id",           default: 1,    null: false
     t.integer  "storage_id",        default: 1,    null: false
-    t.integer  "keyclientorder_id", default: 1,    null: false
+    t.integer  "keyclientorder_id"
     t.string   "province"
     t.string   "city"
     t.string   "tracking_number"
@@ -179,7 +179,6 @@ ActiveRecord::Schema.define(version: 20140423052647) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "priority_level"
     t.integer  "shelf_row",      default: 1, null: false
     t.integer  "shelf_column",   default: 1, null: false
     t.integer  "max_weight",     default: 0, null: false
@@ -187,6 +186,7 @@ ActiveRecord::Schema.define(version: 20140423052647) do
     t.integer  "area_length",    default: 1, null: false
     t.integer  "area_width",     default: 1, null: false
     t.integer  "area_height",    default: 1, null: false
+    t.integer  "priority_level"
   end
 
   create_table "specifications", force: true do |t|
