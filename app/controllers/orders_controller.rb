@@ -146,7 +146,7 @@ class OrdersController < ApplicationController
 
       allcnt.each do |k,v|
          if v[1] > 0
-          Keyclientorderdetail.create(keyclientorder: keyclientorder,business_id: k[0],specification_id: k[1],supplier_id: k[2],amount: v[1])
+          Keyclientorderdetail.create(keyclientorder: @keycorder,business_id: k[0],specification_id: k[1],supplier_id: k[2],amount: v[1])
          end
       end
     end
