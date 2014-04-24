@@ -76,7 +76,7 @@ describe StandardInterfaceController do
         
         @business = Business.find_by(no: '0001')
         #@unit = Unit.find_by(no: '0001')
-        @context = {'ORDER_ID' => '00000000000'}.to_json
+        @context = {'SKU' => '000000002'}.to_json
         @sign = Digest::MD5.base64digest(@context + @business.secret_key)
       end
 

@@ -114,7 +114,7 @@ class StandardInterface
     
     thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit)
 
-    Stock.find_stock_amount(thirdpartcode.specification, business, supplier)
+    Stock.find_stock_amount(thirdpartcode.specification, business, thirdpartcode.supplier)
   end
 
   protected

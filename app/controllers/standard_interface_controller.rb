@@ -66,7 +66,7 @@ class StandardInterfaceController < ApplicationController
 
     amount = StandardInterface.order_stock(@context_hash, @business, @unit)
 
-    if !order.blank?
+    if !amount.blank?
       render json: success_builder({'AMT' => amount })
     else
       render json: error_builder('9999')
