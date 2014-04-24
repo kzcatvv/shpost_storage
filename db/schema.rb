@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140424075643) do
+ActiveRecord::Schema.define(version: 20140424083307) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -135,6 +135,7 @@ ActiveRecord::Schema.define(version: 20140424075643) do
     t.string   "is_shortage",       default: "no"
     t.string   "business_order_id"
     t.string   "business_trans_no"
+    t.string   "country"
   end
 
   create_table "purchase_details", force: true do |t|

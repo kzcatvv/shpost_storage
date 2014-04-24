@@ -26,8 +26,8 @@
     if @orders
       g.column name: model_class.human_attribute_name(:kcorder_name), attribute: 'batch_no', ordering: false, model: 'Keyclientorderdetail' do |stock_log|
         # if stock_log.status == 'waiting'
-          select_tag("stock_logs[][kcdid]", options_for_select(Keyclientorderdetail.accessible_by(current_ability).where(keyclientorder: @orders.first.keyclientorder).map{|u| [u.keyclientorder.keyclient_name+"_"+u.batch_no+"_"+u.specification.name,u.id]}, stock_log.keyclientorderdetail.id), id: "stock_logs_kcdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
-          content_tag(:p, stock_log.keyclientorderdetail.keyclientorder.keyclient_name+"_"+stock_log.keyclientorderdetail.batch_no+"_"+stock_log.keyclientorderdetail.specification.name, {id: "stock_logs_kcdid_#{stock_log.id}", onclick: 'clickin(this);'})
+          select_tag("stock_logs[][kcdid]", options_for_select(Keyclientorderdetail.accessible_by(current_ability).where(keyclientorder: @orders.first.keyclientorder).map{|u| [u.keyclientorder.keyclient_name+"_"+(u.batch_no==nil ? '' : u.bathc_no+"_")+u.specification.name,u.id]}, stock_log.keyclientorderdetail.id), id: "stock_logs_kcdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, stock_log.keyclientorderdetail.keyclientorder.keyclient_name+"_"+(stock_log.keyclientorderdetail.batch_no==nil ? '' : stock_log.keyclientorderdetail.batch_no+"_")+stock_log.keyclientorderdetail.specification.name, {id: "stock_logs_kcdid_#{stock_log.id}", onclick: 'clickin(this);'})
         # else
         #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
         # end
