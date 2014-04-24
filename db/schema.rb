@@ -135,7 +135,7 @@ ActiveRecord::Schema.define(version: 20140424083307) do
     t.string   "is_shortage",       default: "no"
     t.string   "business_order_id"
     t.string   "business_trans_no"
-    t.string   "country"
+    t.string   "county"
   end
 
   create_table "purchase_details", force: true do |t|

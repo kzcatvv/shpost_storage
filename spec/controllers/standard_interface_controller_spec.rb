@@ -31,13 +31,16 @@ describe StandardInterfaceController do
         
         @business = Business.find_by(no: '0001')
         #@unit = Unit.find_by(no: '0001')
-        @context = {'ORDER_ID' => '00000000001', 'TRANS_SN' => '00000000001', 'DATE' => '20140421123020', 'CUST_NAME' => 'test cust', 'ADDR' => '黑龙江省哈尔滨市特例县200弄20号12室' , 'TEL' => '18621673213', 'ZIP' => '2032322', 'DESC' => 'NO' , 'ORDER_DETAILS' => [{'DELIVER_NO' => '000001', 'SKU' => '000000001', 'QYT' => '1', 'DESC' => 'Apple Iphone5S WIFI 32g'}, {'DELIVER_NO' => '000002', 'SKU' => '000000002', 'QYT' => '2', 'DESC' => 'Apple Ipad air WIFI 32g'}] }.to_json
+        @context = {'ORDER_ID' => '00000000001', 'TRANS_SN' => '00000000001', 'DATE' => '20140421123020', 'CUST_NAME' => 'test cust', 'ADDR' => '黑龙江省哈尔滨市特例县200弄20号12室' , 'TEL' => '18621673213', 'ZIP' => '2032322', 'DESC' => 'NO' , 'ORDER_DETAILS' => [{'DELIVER_NO' => '000001', 'SKU' => '000000001', 'QTY' => '1', 'DESC' => 'Apple Iphone5S WIFI 32g'}, {'DELIVER_NO' => '000002', 'SKU' => '000000002', 'QTY' => '2', 'DESC' => 'Apple Ipad air WIFI 32g'}] }.to_json
         @sign = Digest::MD5.base64digest(@context + @business.secret_key)
       end
 
-      it "should change Thirdpartcode " do
+      it "should change Order " do
         expect{get :order_enter, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign}.to change(Order, :count).by(1)
+      end
 
+      it "should change OrderDetail " do
+        expect{get :order_enter, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign}.to change(OrderDetail, :count).by(1)
       end
 
       it "should success " do

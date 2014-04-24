@@ -6,7 +6,7 @@ class Order < ActiveRecord::Base
   has_many :order_details, dependent: :destroy
   has_many :stock_logs, through: :order_details
 
-  before_save :set_no
+  before_validation :set_no
 
   validates_presence_of :no, :message => '不能为空'
 
@@ -53,8 +53,8 @@ class Order < ActiveRecord::Base
   protected
 
   def set_no
-    if self.blank?
-      time = time.now
+    if self.no.blank?
+      time = Time.now
       self.no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + Order.count.to_s.rjust(5,'0')
     end
   end
