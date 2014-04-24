@@ -410,8 +410,11 @@ class OrdersController < ApplicationController
         order.stock_out
       end
       
-
-     redirect_to :action => 'findprint'
+     if @keyclientorder.keyclient_name == "auto"
+        redirect_to :action => 'findprint'
+     else
+        redirect_to "/keyclientorders"
+     end
 
   end
 
