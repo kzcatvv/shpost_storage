@@ -105,6 +105,18 @@ class StandardInterface
     order ||= Order.find_by_business_trans_no trans_sn
   end
 
+  def self.order_stock(context, business, unit)
+    supplier_no = context['SUPPLIER']
+    sku = context['SKU']
+    spec = context['SPEC']
+
+    # supplier = Supplier.find_by(no: business.no + '_' + supplier_no)
+    
+    thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit)
+
+    Stock.find_stock_amount(thirdpartcode.specification, business, supplier)
+  end
+
   protected
   def self.parse_province(addr)
     if addr.index '省'
