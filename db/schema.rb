@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140424082749) do
+
+ActiveRecord::Schema.define(version: 20140424083307) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -84,7 +85,7 @@ ActiveRecord::Schema.define(version: 20140424082749) do
   end
 
   create_table "order_details", force: true do |t|
-    t.string   "name",             default: "", null: false
+    t.string   "name",                default: "", null: false
     t.integer  "specification_id"
     t.integer  "amount"
     t.float    "price"
@@ -94,6 +95,7 @@ ActiveRecord::Schema.define(version: 20140424082749) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "business_deliver_no"
   end
 
   create_table "order_details_stock_logs", id: false, force: true do |t|
@@ -132,6 +134,9 @@ ActiveRecord::Schema.define(version: 20140424082749) do
     t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",       default: "no"
+    t.string   "business_order_id"
+    t.string   "business_trans_no"
+    t.string   "county"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -197,6 +202,11 @@ ActiveRecord::Schema.define(version: 20140424082749) do
     t.string   "sixnine_code"
     t.string   "desc"
     t.string   "sku"
+  end
+
+  create_table "standard_interfaces", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "stock_logs", force: true do |t|
