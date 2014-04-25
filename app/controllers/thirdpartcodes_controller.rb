@@ -16,7 +16,6 @@ class ThirdpartcodesController < ApplicationController
   # GET /thirdpartcodes/new
   def new
     #@thirdpartcode = Thirdpartcode.new
-    @commodities = ""
   end
 
   # GET /thirdpartcodes/1/edit

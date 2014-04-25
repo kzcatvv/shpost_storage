@@ -1,0 +1,15 @@
+<%- model_class = Order -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} PackOut'], :model => model_class.model_name.human.titleize %></h1>
+  <div style="float:right">   
+  </div>
+
+</div>
+<div>
+   <%= label_tag 'name', '面单号:', class: 'control-group' %><%= text_field(:order, :tracking_number, class: "controls") %>
+</div>
+
+<%= render :partial => 'orders/packout_forms' %>
+<script language="javascript" type="text/javascript"> 
+
+</script>

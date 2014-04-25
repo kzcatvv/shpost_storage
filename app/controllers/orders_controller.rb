@@ -422,6 +422,10 @@ class OrdersController < ApplicationController
 
   end
 
+  def packout
+      @order_details=[]
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
