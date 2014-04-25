@@ -5,41 +5,41 @@ class StandardInterfaceController < ApplicationController
   #load_and_authorize_resource
 
   def commodity_enter
-    # supplier_no = @context_hash["SUPPLIER"]
-    sku = @context_hash["SKU"]
+    # supplier_no = @context_hash['SUPPLIER']
+    sku = @context_hash['SKU']
     return render json: error_builder('0005', '商品sku编码为空') if sku.blank?
-    # spec = @context_hash["SPEC"]
-    name = @context_hash["NAME"]
+    # spec = @context_hash['SPEC']
+    name = @context_hash['NAME']
     return render json: error_builder('0005', '商品名称为空') if name.blank?
 
-    # desc = @context_hash["DESC"]
+    # desc = @context_hash['DESC']
 
     thirdpartcode = StandardInterface.commodity_enter(@context_hash, @business, @unit)
 
     if !thirdpartcode.blank?
-      render json: success_builder({"SKU" => thirdpartcode.specification.sku })
+      render json: success_builder({'SKU' => thirdpartcode.specification.sku })
     else
       render json: error_builder('9999')
     end
   end
 
   def order_enter
-    order_id = @context_hash["ORDER_ID"]
+    order_id = @context_hash['ORDER_ID']
     return render json: error_builder('0005', '订单号为空') if order_id.blank?
-    trans_sn = @context_hash["TRANS_SN"]
+    trans_sn = @context_hash['TRANS_SN']
     return render json: error_builder('0005', '交易流水号为空') if trans_sn.blank?
-    cust_name = @context_hash["CUST_NAME"]
+    cust_name = @context_hash['CUST_NAME']
     return render json: error_builder('0005', '收件人姓名为空') if cust_name.blank?
-    addr = @context_hash["ADDR"]
+    addr = @context_hash['ADDR']
     return render json: error_builder('0005', '收货人地址为空') if addr.blank?
 
-    order_details = @context_hash["ORDER_DETAILS"]
+    order_details = @context_hash['ORDER_DETAILS']
     return render json: error_builder('0005', '商品列表为空') if order_details.blank?
 
     order = StandardInterface.order_enter(@context_hash, @business, @unit)
 
     if !order.blank?
-      render json: success_builder({"ORDER_NO" => order.no })
+      render json: success_builder({'ORDER_NO' => order.no })
     else
       render json: error_builder('9999')
     end
@@ -47,7 +47,17 @@ class StandardInterfaceController < ApplicationController
   end
 
   def order_query
+    order_got = StandardInterface.order_query(@context_hash, @business, @unit)
 
+    if !order_got.blank?
+      if order_got.is_a? Order
+        render json: success_builder({'STATUS' => order_got.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_got.tracking_number})
+      else
+        render json: success_builder({'STATUS' => order_got.order.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_god.tracking_number})
+      end
+    else
+      render json: error_builder('9999')
+    end
   end
 
   def stock_query

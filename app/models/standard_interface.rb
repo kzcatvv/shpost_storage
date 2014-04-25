@@ -1,10 +1,10 @@
 class StandardInterface
   def self.commodity_enter(context, business, unit)
-    supplier_no = context["SUPPLIER"]
-    sku = context["SKU"]
-    spec = context["SPEC"]
-    name = context["NAME"]
-    desc = context["DESC"]
+    supplier_no = context['SUPPLIER']
+    sku = context['SKU']
+    spec = context['SPEC']
+    name = context['NAME']
+    desc = context['DESC']
 
     supplier = nil
 
@@ -14,7 +14,7 @@ class StandardInterface
       supplier ||= Supplier.create!(no: business.no + '_' + supplier_no, name: business.name + '_' + supplier_no, unit: unit)
     end
     
-    #price = context["PRICE"]
+    #price = context['PRICE']
 
     thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit, supplier)
     
@@ -27,28 +27,28 @@ class StandardInterface
   end
 
   def self.order_enter(context, business, unit)
-    order_id = context["ORDER_ID"]
-    trans_sn = context["TRANS_SN"]
-    date = context["DATE"]
-    exps = context["EXPS"]
-    cust_name = context["CUST_NAME"]
-    cust_unit = context["CUST_UNIT"]
-    province = context["PROVINCE"]
-    city = context["CITY"]
-    county = context["COUNTY"]
-    addr = context["ADDR"]
-    mobile = context["MOBILE"]
-    tel = context["TEL"]
-    zip = context["ZIP"]
-    email = context["email"]
-    desc = context["DESC"]
-    qty_sum = context["QTY_SUM"]
-    amt_sum = context["AMT_SUM"]
-    exps_sum = context["EXPS_SUM"]
-    send_addr = context["SEND_ADDR"]
-    send_name = context["SEND_NAME"]
-    send_zip = context["SEND_ZIP"]
-    send_mobile = context["SEND_MOBILE"]
+    order_id = context['ORDER_ID']
+    trans_sn = context['TRANS_SN']
+    date = context['DATE']
+    exps = context['EXPS']
+    cust_name = context['CUST_NAME']
+    cust_unit = context['CUST_UNIT']
+    province = context['PROVINCE']
+    city = context['CITY']
+    county = context['COUNTY']
+    addr = context['ADDR']
+    mobile = context['MOBILE']
+    tel = context['TEL']
+    zip = context['ZIP']
+    email = context['email']
+    desc = context['DESC']
+    qty_sum = context['QTY_SUM']
+    amt_sum = context['AMT_SUM']
+    exps_sum = context['EXPS_SUM']
+    send_addr = context['SEND_ADDR']
+    send_name = context['SEND_NAME']
+    send_zip = context['SEND_ZIP']
+    send_mobile = context['SEND_MOBILE']
 
     if province.blank?
       province = parse_province addr
@@ -64,7 +64,7 @@ class StandardInterface
 
     order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting']
 
-    order_details = context["ORDER_DETAILS"]
+    order_details = context['ORDER_DETAILS']
 
     order_details.each do |x|
       sku = x['SKU']
@@ -87,6 +87,22 @@ class StandardInterface
     end 
 
     return order 
+  end
+
+  def self.order_query(context, business, unit)
+    order_no = context['ORDER_NO']
+    deliver_no = context['DELIVER_NO']
+    order_id = context['ORDER_ID']
+    trans_sn = context['TRANS_SN']
+
+    order = nil
+    if !deliver_no.blank?
+      order = ORDERDETAIL.find_by_business_deliver_no deliver_no
+    end
+
+    order ||= Order.find_by_no order_no
+    order ||= Order.find_by_business_order_id order_id
+    order ||= Order.find_by_business_trans_no trans_sn
   end
 
   protected
