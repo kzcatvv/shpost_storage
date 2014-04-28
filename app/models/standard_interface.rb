@@ -105,16 +105,27 @@ class StandardInterface
     order ||= Order.find_by_business_trans_no trans_sn
   end
 
-  def self.order_stock(context, business, unit)
-    supplier_no = context['SUPPLIER']
-    sku = context['SKU']
-    spec = context['SPEC']
+  def self.stock_query(context, business, unit)
+    query_array = context['QUERY_ARRAY']
+    stock_array = []
+    query_array.each do |x| 
+      supplier_no = x['SUPPLIER']
+      sku = x['SKU']
+      spec = x['SPEC']
 
-    # supplier = Supplier.find_by(no: business.no + '_' + supplier_no)
-    
-    thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit)
+      # supplier = Supplier.find_by(no: business.no + '_' + supplier_no)
+      
+      thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit)
 
-    Stock.find_stock_amount(thirdpartcode.specification, business, thirdpartcode.supplier)
+      if thirdpartcode.blank?
+        amount = 0
+      else
+        amount = Stock.find_stock_amount(thirdpartcode.specification, business, thirdpartcode.supplier)
+      end
+
+      stock_array << {'SKU' => sku,'AMT' => amount}
+    end
+    return stock_array
   end
 
   protected

@@ -61,13 +61,13 @@ class StandardInterfaceController < ApplicationController
   end
 
   def stock_query
-    sku = @context_hash['SKU']
-    return render json: error_builder('0005', '商品sku编码为空') if sku.blank?
+    sku = @context_hash['QUERY_ARRAY']
+    return render json: error_builder('0005', '查询列表为空') if sku.blank?
 
-    amount = StandardInterface.order_stock(@context_hash, @business, @unit)
+    stock_array = StandardInterface.stock_query(@context_hash, @business, @unit)
 
-    if !amount.blank?
-      render json: success_builder({'AMT' => amount })
+    if !stock_array.blank?
+      render json: success_builder('STOCK_ARRAY' => stock_array)
     else
       render json: error_builder('9999')
     end
