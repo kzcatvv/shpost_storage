@@ -53,13 +53,12 @@ describe BcmInterfaceController do
 
     context "stock_query" do
       before :each do 
-        Supplier.create_supplier!(supplier_no, business, unit)
-
+        
 
         @format = 'JSON'
         @business = Business.find_by(no: '0001')
         #@plaintext={"transSn"=>"201211051643571000316", "goodsInfoS"=>[{"vendorId"=>"00001017", "prodId"=>"10000079", "prodName"=>"第一个商品", "prodSpecs"=>"第一个商品的商品规格"}]}.to_json
-        @plaintext={"transSn"=>"201211051643571000316","goodsInfoS"=>[{"serNo"=>"20121105164357100031601","vendorId"=>"00000108","prodId"=>"10000002","prodName"=>"iPhone5S","prodSpecs"=>"颜色：白色"}]}.to_json
+        @plaintext={"transSn"=>"201211051643571000316","goodsInfoS"=>[{"serNo"=>"20121105164357100031601","vendorId"=>"G001","prodId"=>"000","prodName"=>"商品1","prodSpecs"=>"Sname1"}]}.to_json
         @sign = Digest::MD5.base64digest(@plaintext + @business.secret_key)
       end
 
