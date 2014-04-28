@@ -23,7 +23,7 @@ ShpostStorage::Application.routes.draw do
   end
 
 
-  resources :thirdpartcodes do
+  resources :relationships do
       collection do
         get 'select_commodities'
         get 'select_specifications'

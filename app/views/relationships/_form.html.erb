@@ -1,4 +1,4 @@
-<%= form_for @thirdpartcode, :html => { :class => 'form-horizontal' } do |f| %>
+<%= form_for @relationship, :html => { :class => 'form-horizontal' } do |f| %>
   <div class="form-group">
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
@@ -14,7 +14,7 @@
   <div class="form-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-      <%= product_select("thirdpartcode") %>
+      <%= product_select("relationship") %>
     </div>
   </div>
   <div class="form-group">
@@ -23,10 +23,16 @@
       <%= f.text_field :external_code, :class => 'form-control' %>
     </div>
   </div>
+  <div class="form-group">
+    <%= f.label :spec_desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :spec_desc, :class => 'form-control' %>
+    </div>
+  </div>
 
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-            thirdpartcodes_path, :class => 'btn btn-default' %>
+            relationships_path, :class => 'btn btn-default' %>
  
 <% end %>

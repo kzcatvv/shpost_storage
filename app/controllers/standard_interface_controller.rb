@@ -14,10 +14,10 @@ class StandardInterfaceController < ApplicationController
 
     # desc = @context_hash['DESC']
 
-    thirdpartcode = StandardInterface.commodity_enter(@context_hash, @business, @unit)
+    relationship = StandardInterface.commodity_enter(@context_hash, @business, @unit)
 
-    if !thirdpartcode.blank?
-      render json: success_builder({'SKU' => thirdpartcode.specification.sku })
+    if !relationship.blank?
+      render json: success_builder({'SKU' => relationship.specification.sku })
     else
       render json: error_builder('9999')
     end
@@ -61,7 +61,16 @@ class StandardInterfaceController < ApplicationController
   end
 
   def stock_query
-  
+    sku = @context_hash['QUERY_ARRAY']
+    return render json: error_builder('0005', '查询列表为空') if sku.blank?
+
+    stock_array = StandardInterface.stock_query(@context_hash, @business, @unit)
+
+    if !stock_array.blank?
+      render json: success_builder('STOCK_ARRAY' => stock_array)
+    else
+      render json: error_builder('9999')
+    end
   end
 
   private
