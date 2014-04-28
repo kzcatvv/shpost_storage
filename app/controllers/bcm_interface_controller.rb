@@ -84,6 +84,19 @@ class BcmInterfaceController < ApplicationController
         end
     end
 
+    def stock_query
+        stock_return=Hash.new
+        stock_return["transSn"]=@plaintext["transSn"]
+        stock_return["stock"]=Array.new
+        @plaintext["goodsInfoS"].each_with_index do |goodsInfo,i|
+            stock_return["stock"][i]=Hash.new
+            stock_return["stock"][i]["serNo"]=goodsInfo["serNo"]
+            stock_return["stock"][i]["storeAmt"]=BcmInterface.queryStock(goodsInfo)
+        end
+        stock_return["sign"]=@sign
+        render json: stock_return.to_json
+    end
+
 	private
 	def verify_params
 		@format = params[:format]
