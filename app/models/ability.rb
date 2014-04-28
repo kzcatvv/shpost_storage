@@ -18,7 +18,8 @@ class Ability
         can :manage, Goodstype, unit_id: user.unit_id
         can :manage, Commodity, unit_id: user.unit_id
         can :manage, Specification, commodity: {unit_id: user.unit_id}
-        can :manage, Specification, commodity: {unit_id: user.unit_id}
+        can :new, Relationship
+       
         can :manage, Relationship, specification: {commodity: {unit_id: user.unit_id}}
 
         can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
