@@ -21,6 +21,7 @@ class KeyclientorderdetailsController < ApplicationController
 
   # GET /keyclientorderdetails/1/edit
   def edit
+    set_product_select(@keyclientorderdetail)
   end
 
   # POST /keyclientorderdetails

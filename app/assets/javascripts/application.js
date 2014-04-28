@@ -21,21 +21,21 @@
 
 
 function ajaxspecifications() {
-  $('#ajax_goodstype_id').change(function(){
+  $('#goodstype_id').change(function(){
    $.ajax({
       type : 'GET',
       url : '/relationships/select_commodities/',
-      data: { goodstype_id: $('#ajax_goodstype_id').val()},
+      data: { goodstype_id: $('#goodstype_id').val()},
       dataType : 'script'
     });
    return false;
   }); 
 
-  $('#ajax_commodity_id').change(function(){
+  $('#commodity_id').change(function(){
    $.ajax({
       type : 'GET',
       url : '/relationships/select_specifications/',
-      data: { commodity_id: $('#ajax_commodity_id').val(),
+      data: { commodity_id: $('#commodity_id').val(),
               object_id: $('#ajax_object_id').val()},
       dataType : 'script'
     });
