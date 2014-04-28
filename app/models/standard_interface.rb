@@ -16,13 +16,13 @@ class StandardInterface
     
     #price = context['PRICE']
 
-    thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit, supplier)
+    relationship =  Relationship.find_by_keywords(sku, business, unit, supplier, spec)
     
 
-    if thirdpartcode.nil?
+    if relationship.nil?
       commodity = Commodity.create! name: name, unit: unit, no: 'need_to_edit'
       specification = Specification.create! commodity: commodity, desc: desc, name: spec, sku: 'need_to_edit', sixnine_code: 'need_to_edit'
-      thirdpartcode = Thirdpartcode.create! business: business, supplier: supplier, specification: specification, external_code: sku
+      relationship = Relationship.create! business: business, supplier: supplier, specification: specification, external_code: sku, spec_desc: spec
     end
   end
 
@@ -79,11 +79,11 @@ class StandardInterface
       price = x['PRICE']
       amt = x['AMT']
 
-      thirdpartcode = Thirdpartcode.find_by_keywords(sku, business, unit, supplier_no)
+      relationship = Relationship.find_by_keywords(sku, business, unit, supplier_no, spec)
 
-      next if thirdpartcode.nil?
+      next if relationship.nil?
 
-      OrderDetail.create! business_deliver_no: deliver_no, specification: thirdpartcode.specification, amount: qyt, price: price, supplier: thirdpartcode.supplier, order: order, desc: desc
+      OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc
     end 
 
     return order 
@@ -103,6 +103,29 @@ class StandardInterface
     order ||= Order.find_by_no order_no
     order ||= Order.find_by_business_order_id order_id
     order ||= Order.find_by_business_trans_no trans_sn
+  end
+
+  def self.stock_query(context, business, unit)
+    query_array = context['QUERY_ARRAY']
+    stock_array = []
+    query_array.each do |x| 
+      supplier_no = x['SUPPLIER']
+      sku = x['SKU']
+      spec = x['SPEC']
+
+      # supplier = Supplier.find_by(no: business.no + '_' + supplier_no)
+      
+      relationship =  Relationship.find_by_keywords(sku, business, unit)
+
+      if relationship.blank?
+        amount = 0
+      else
+        amount = Stock.find_stock_amount(relationship.specification, business, relationship.supplier)
+      end
+
+      stock_array << {'SKU' => sku,'AMT' => amount}
+    end
+    return stock_array
   end
 
   protected
