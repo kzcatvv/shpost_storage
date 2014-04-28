@@ -85,13 +85,23 @@ class BcmInterfaceController < ApplicationController
     end
 
     def stock_query
+        context_hash=Hash.new
+        context_hash["QUERY_ARRY"]=Array.new
+        @plaintext["goodsInfoS"].each_with_index do |goodsInfo,i|
+            context_hash["QUERY_ARRY"][i]=Hash.new
+            context_hash["QUERY_ARRY"][i]["SUPPLIER"]=goodsInfo["vendorId"]
+            context_hash["QUERY_ARRY"][i]["SKU"]=goodsInfo["prodId"]
+            context_hash["QUERY_ARRY"][i]["SPEC"]=goodsInfo["prodSpecs"]
+        end
+        stock_array = StandardInterface.stock_query(context_hash, @business, @unit)
+
         stock_return=Hash.new
         stock_return["transSn"]=@plaintext["transSn"]
         stock_return["stock"]=Array.new
         @plaintext["goodsInfoS"].each_with_index do |goodsInfo,i|
             stock_return["stock"][i]=Hash.new
             stock_return["stock"][i]["serNo"]=goodsInfo["serNo"]
-            stock_return["stock"][i]["storeAmt"]=BcmInterface.queryStock(goodsInfo)
+            stock_return["stock"][i]["storeAmt"]=stock_array[i]["AMT"]
         end
         stock_return["sign"]=@sign
         render json: stock_return.to_json
