@@ -19,9 +19,10 @@ class BcmInterfaceController < ApplicationController
     		name = context_hash["NAME"]
     		return render json: error_builder('0005', '商品名称为空') if name.blank?
 
-    		thirdpartcode = StandardInterface.commodity_enter(context_hash, @business, @unit)
-    		if !thirdpartcode.blank?
-    			render json: success_builder({"SKU" => thirdpartcode.specification.sku })
+    		relationship = StandardInterface.commodity_enter(context_hash, @business, @unit)
+
+    		if !relationship.blank?
+    			render json: success_builder
     		else
     			render json: error_builder('9999')
     		end
@@ -31,7 +32,7 @@ class BcmInterfaceController < ApplicationController
     def order_enter
     	context_hash=Hash.new
     	context_hash["ORDER_ID"]=@plaintext["orderId"]
-    	context_hash["TRANS_SN"]=@plaintext["transSN"]
+    	context_hash["TRANS_SN"]=@plaintext["transSn"]
     	context_hash["DATE"]=""
     	context_hash["EXPS"]=""
     	context_hash["CUST_NAME"]=@plaintext["name"]
@@ -63,6 +64,7 @@ class BcmInterfaceController < ApplicationController
             context_hash["ORDER_DETAILS"][i]["PRICE"]=""
             context_hash["ORDER_DETAILS"][i]["AMT"]=""
     	end
+        #puts context_hash
         order_id = context_hash['ORDER_ID']
         return render json: error_builder('0005', '订单号为空') if order_id.blank?
         trans_sn = context_hash['TRANS_SN']
@@ -74,11 +76,11 @@ class BcmInterfaceController < ApplicationController
 
         order_details = context_hash['ORDER_DETAILS']
         return render json: error_builder('0005', '商品列表为空') if order_details.blank?
-
+        
         order = StandardInterface.order_enter(context_hash, @business, @unit)
 
         if !order.blank?
-            render json: success_builder({'ORDER_NO' => order.no })
+            render json: success_builder()
         else
             render json: error_builder('9999')
         end
