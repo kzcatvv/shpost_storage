@@ -4,3 +4,6 @@ zh-CN:
       order_update:
         uri: 'http://bankcomm.cn/order_update'
         interval: 10
+    csb:
+      update_order_status:
+        interval: 10
