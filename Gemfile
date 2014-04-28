@@ -78,6 +78,8 @@ gem 'minitest'
 gem 'dynamic_form'
 
 gem 'roo'
+
+gem 'httpclient'
 # Use unicorn as the app server
 # gem 'unicorn'
 
