@@ -422,6 +422,18 @@ class OrdersController < ApplicationController
 
   end
 
+  def packout
+      @order_details=[]
+  end
+
+  def findorderout
+      @order=Order.where(tracking_number: params[:tracking_number]).first
+      @order_details=@order.order_details
+      respond_to do |format|
+        format.js 
+      end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
@@ -430,6 +442,6 @@ class OrdersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
-      params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:province,:city,:country,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
+      params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:province,:city,:county,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
     end
 end

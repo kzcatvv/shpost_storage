@@ -1,0 +1,31 @@
+<%- model_class = Order -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} PackOut'], :model => model_class.model_name.human.titleize %></h1>
+  <div style="float:right">   
+  </div>
+
+</div>
+<div>
+   <%= label_tag 'name', '面单号:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls", onkeypress: "EnterPress(event)"  %>
+</div>
+<div id="outorders">
+    <%= render :partial => 'orders/packout_forms' %>
+</div>
+<script language="javascript" type="text/javascript"> 
+
+function EnterPress(e){ //传入 event   
+    var e = e || window.event;   
+    if(e.keyCode == 13){   
+      $.ajax({
+            type : 'GET',
+            url : '/orders/findorderout/',
+            data: { tracking_number: $('#tracking_number').val()},
+            dataType : 'script'
+            });
+      $('#tracking_number').val("");
+      return false;   
+    }   
+}
+
+
+</script>

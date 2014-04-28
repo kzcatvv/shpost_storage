@@ -1,35 +1,32 @@
 <%= form_for @order, :html => { :class => 'form-horizontal' } do |f| %>
+ 
   <div class="control-group">
-    <%= f.label :no, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :no, :class => 'text_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <div class="control-group">
-    <div class="controls">
-    <%= f.label :need_invoice, :class => 'control-label' %> <%=f.check_box :need_invoice,:class =>'check_box'%>
-    </div>
+   
+
     <div class="control-group">
     <%= f.label :customer_name, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :customer_name, :class => 'text_field' %>
     </div>
+
      <div class="control-group">
     <%= f.label :customer_unit, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :customer_unit, :class => 'text_field' %>
     </div>
+
     <div class="control-group">
     <%= f.label :customer_tel, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :customer_tel, :class => 'text_field' %>
     </div>
+
     <div class="control-group">
     <%= f.label :customer_phone, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :customer_phone, :class => 'text_field' %>
     </div>
+
    <div class="control-group">
     <%= f.label :province, :class => 'control-label' %>
     <div class="controls">
@@ -42,9 +39,9 @@
     </div>
 
      <div class="control-group">
-    <%= f.label :country, :class => 'control-label' %>
+    <%= f.label :county, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :country, :class => 'text_field' %>
+      <%= f.text_field :county, :class => 'text_field' %>
     </div>
 
     <div class="control-group">
