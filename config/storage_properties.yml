@@ -1,0 +1,13 @@
+test_mod: false
+business:
+    bst_id: 1 #号码百事通
+    jh_id: 2 #交通银行
+unit:
+    zb_id: 1 #闸北仓库
+csb_interface:
+    post_name: XX配送商 #XX配送商
+    bst_name: 积分平台 #积分平台
+    max_time_valve: 10 #每次发送的最大条数
+    order_type_1: 1 #原始订单
+    order_type_2: 2 #合并订单
+    active_code: '0991' #口令验证码
