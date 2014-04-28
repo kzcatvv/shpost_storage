@@ -108,23 +108,27 @@ class BcmInterfaceController < ApplicationController
     end
 
     def order_query
-        array = BcmInterface.notice_array(@business, @unit)
+        array = BcmInterface.notice_array(StorageConfig.config["business"]['jh_id'], StorageConfig.config["unit"]['zb_id'])
         if !array.blank?
-            status_return=Hash.new
-            status_return["format"]="JSON"
-            
+            plaintext=Hash.new
+            plaintext["goodsInfoS"]=Array.new
+            count=0
+            array.each do |order_notice|
+                order=Order.find(order_notice.id)
+                order.order_details.each do |detail|
+                    plaintext["goodsInfoS"][count]=Hash.new
+                    plaintext["goodsInfoS"][count]["transSn"]=order.business_trans_no
+                    plaintext["goodsInfoS"][count]["clubdeliverNo"]=detail.business_deliver_no
+                    plaintext["goodsInfoS"][count]["deliverState"]=order_notice.deliver_notices[0].send_type
+                    plaintext["goodsInfoS"][count]["deliverNotes"]=order.transport_type
+                    plaintext["goodsInfoS"][count]["deliverNo"]=order.tracking_number
+                end
+                count=count+1
+            end
+            totalno=count
+            sign=Business.find(StorageConfig.config["business"]['jh_id']).secret_key
         end
-
-
-      if order_got.is_a? Order
-        render json: success_builder({'STATUS' => order_got.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_got.tracking_number})
-      else
-        render json: success_builder({'STATUS' => order_got.order.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_god.tracking_number})
-      end
-    else
-      render json: error_builder('9999')
     end
-  end
 
 	private
 	def verify_params
@@ -138,7 +142,8 @@ class BcmInterfaceController < ApplicationController
 			return render json: error_builder('0002')
 		end
 
-		@business = Business.find_by(no: '0003')
+		@business = Business.find(StorageConfig.config["business"]['jh_id'])
+        @unit = Unit.find(StorageConfig.config["unit"]['zb_id'])
 	end
 
     def verify_sign
