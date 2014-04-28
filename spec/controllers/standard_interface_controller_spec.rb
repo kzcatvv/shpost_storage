@@ -12,8 +12,8 @@ describe StandardInterfaceController do
         @sign = Digest::MD5.base64digest(@context + @business.secret_key)
       end
 
-      it "should change Thirdpartcode " do
-        expect{get :commodity_enter, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign}.to change(Thirdpartcode, :count).by(1)
+      it "should change Relationship " do
+        expect{get :commodity_enter, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign}.to change(Relationship, :count).by(1)
 
       end
 
@@ -71,6 +71,24 @@ describe StandardInterfaceController do
     end
 
     context "stock_query" do
+      before :each do 
+        @format = 'JSON'
+        
+        @business = Business.find_by(no: '0001')
+        #@unit = Unit.find_by(no: '0001')
+        @context = {'QUERY_ARRAY' => [{'SKU' => '000000002'},{'SKU' => '000000001'}]}.to_json
+        @sign = Digest::MD5.base64digest(@context + @business.secret_key)
+      end
+
+      it "should success " do
+        get :stock_query, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign
+        response_hash = ActiveSupport::JSON.decode(response.body)
+        # expect(response.body).to eq '{"FLAG":"success"}'
+       
+        expect(response_hash["FLAG"]).to eq "success"
+        expect(response_hash["STOCK_ARRAY"]).not_to be_nil
+        expect(response_hash["STOCK_ARRAY"].size).to eq 2
+      end
     end
   end
 end

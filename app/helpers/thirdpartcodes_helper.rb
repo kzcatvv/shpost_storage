@@ -1,3 +1,0 @@
-module ThirdpartcodesHelper
-
-end
