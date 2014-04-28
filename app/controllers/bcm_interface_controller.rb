@@ -1,7 +1,7 @@
 class BcmInterfaceController < ApplicationController
 	skip_before_filter :authenticate_user!
-	before_filter :verify_params
-	before_filter :verify_sign
+	before_filter :verify_params, :only => [ :commodity_enter, :order_enter, :stock_query]
+	before_filter :verify_sign, :only => [ :commodity_enter, :order_enter, :stock_query]
 
     def commodity_enter
 
@@ -106,6 +106,25 @@ class BcmInterfaceController < ApplicationController
         stock_return["sign"]=@sign
         render json: stock_return.to_json
     end
+
+    def order_query
+        array = BcmInterface.notice_array(@business, @unit)
+        if !array.blank?
+            status_return=Hash.new
+            status_return["format"]="JSON"
+            
+        end
+
+
+      if order_got.is_a? Order
+        render json: success_builder({'STATUS' => order_got.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_got.tracking_number})
+      else
+        render json: success_builder({'STATUS' => order_got.order.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_god.tracking_number})
+      end
+    else
+      render json: error_builder('9999')
+    end
+  end
 
 	private
 	def verify_params
