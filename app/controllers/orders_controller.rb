@@ -424,11 +424,34 @@ class OrdersController < ApplicationController
 
   def packout
       @order_details=[]
+      @curr_order=""
   end
 
   def findorderout
-      @order=Order.where(tracking_number: params[:tracking_number]).first
-      @order_details=@order.order_details
+      @order=Order.where(tracking_number: params[:tracking_number],status: "checked").first
+      if @order.nil?
+        @order_details=[]
+      else
+        @curr_order=@order.id
+        @order_details=@order.order_details
+      end
+
+      respond_to do |format|
+          format.js 
+        end
+  end
+
+  def find69code
+      @order=Order.find(params[:orderid])
+      # @order_details=@order.order_details
+      # @curr_order=@order.id
+      curr_dtls=@order.order_details.includes(:specification).where("specifications.sixnine_code = ?",params[:sixnine_code]).distinct.first
+      if curr_dtls.nil?
+         @curr_dtl=0
+      else
+         @curr_dtl=curr_dtls.id
+      end 
+      #binding.pry
       respond_to do |format|
         format.js 
       end

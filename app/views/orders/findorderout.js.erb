@@ -1,1 +1,1 @@
-$('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
+$('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms",:object => @curr_order)) %> ");

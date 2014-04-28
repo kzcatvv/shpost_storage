@@ -1,0 +1,23 @@
+var id = <%= @curr_dtl %>;
+if (id == 0)
+{
+   alert("123");
+}
+else
+{
+	var tdraid = "#realam_"+<%= @curr_dtl %>;
+    var tddbid = "#dbam_"+<%= @curr_dtl %>;
+    var trid = "#tr_"+<%= @curr_dtl %>;
+
+    if ($(tddbid).val() > $(tdraid).val())
+    {
+       $(tdraid).val(parseInt($(tdraid).val())+1);
+    }
+
+    if ($(tddbid).val() == $(tdraid).val())
+    {
+       $(trid).css('color','blue');
+       $(trid).css('background','blue');
+    }
+}
+  

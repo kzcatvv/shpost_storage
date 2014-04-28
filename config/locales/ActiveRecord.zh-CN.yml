@@ -562,6 +562,9 @@ zh-CN:
         b2cfindprint:
           name: "电商订单打印"
           link: "/orders/findprint"
+        packout:
+          name: "包装出库"
+          link: "/orders/packout"
     goodstypes:
       name: "商品与规格管理"
       submenu:
