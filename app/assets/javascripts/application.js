@@ -24,7 +24,7 @@ function ajaxspecifications() {
   $('#ajax_goodstype_id').change(function(){
    $.ajax({
       type : 'GET',
-      url : '/thirdpartcodes/select_commodities/',
+      url : '/relationships/select_commodities/',
       data: { goodstype_id: $('#ajax_goodstype_id').val()},
       dataType : 'script'
     });
@@ -34,7 +34,7 @@ function ajaxspecifications() {
   $('#ajax_commodity_id').change(function(){
    $.ajax({
       type : 'GET',
-      url : '/thirdpartcodes/select_specifications/',
+      url : '/relationships/select_specifications/',
       data: { commodity_id: $('#ajax_commodity_id').val(),
               object_id: $('#ajax_object_id').val()},
       dataType : 'script'
