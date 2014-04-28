@@ -10,8 +10,8 @@ module ApplicationHelper
     end
 
     def span_commodity_select
-        content_tag(:span) do
-       	 concat select_tag("ajax_commodity_id", @commodities,{:prompt => "请选择"})
+       content_tag(:span) do
+       	concat select_tag("ajax_commodity_id", @commodities,{:prompt => "请选择"})
        end
     end
 
