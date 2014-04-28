@@ -9,14 +9,14 @@ class StandardInterface
     supplier = nil
 
     if !supplier_no.blank?
-      supplier = Supplier.find_by(no: business.no + '_' + supplier_no)
+      supplier = Supplier.find_supplier(supplier_no, business)
 
-      supplier ||= Supplier.create!(no: business.no + '_' + supplier_no, name: business.name + '_' + supplier_no, unit: unit)
+      supplier ||= Supplier.create_supplier!(supplier_no, business, unit)
     end
     
     #price = context['PRICE']
 
-    relationship =  Relationship.find_by_keywords(sku, business, unit, supplier, spec)
+    relationship =  Relationship.find_relationship(sku, supplier, spec, business, unit)
     
 
     if relationship.nil?
@@ -79,7 +79,12 @@ class StandardInterface
       price = x['PRICE']
       amt = x['AMT']
 
-      relationship = Relationship.find_by_keywords(sku, business, unit, supplier_no, spec)
+      supplier = nil
+      if !supplier_no.blank?
+        supplier = Supplier.find_supplier(supplier_no, business)
+      end
+
+      relationship = Relationship.find_relationship(sku, supplier, spec, business, unit)
 
       next if relationship.nil?
 
@@ -113,14 +118,17 @@ class StandardInterface
       sku = x['SKU']
       spec = x['SPEC']
 
-      # supplier = Supplier.find_by(no: business.no + '_' + supplier_no)
+      supplier = nil
+      if !supplier_no.blank?
+        supplier = Supplier.find_supplier(supplier_no, business)
+      end
       
-      relationship =  Relationship.find_by_keywords(sku, business, unit)
+      relationship =  Relationship.find_relationship(sku, supplier, spec, business, unit)
 
-      if relationship.blank?
+      if relationship.nil?
         amount = 0
       else
-        amount = Stock.find_stock_amount(relationship.specification, business, relationship.supplier)
+        amount = Stock.total_stock_in_unit(relationship.specification, relationship.supplier, business, unit)
       end
 
       stock_array << {'SKU' => sku,'AMT' => amount}

@@ -4,14 +4,14 @@ class Relationship < ActiveRecord::Base
   belongs_to :specification
   validates_presence_of :business_id, :specification_id, :external_code, :message => '不能为空'
 
-  def self.find_by_keywords(sku, business, unit, supplier = nil, spec_desc = nil)
+  def self.find_relationship(sku, supplier = nil, spec_desc = nil, business, unit)
     conditions =  where(business_id: business, external_code: sku)
     
     if !supplier.blank?
       conditions = conditions.where(supplier: supplier)
     end
 
-    if !desc.blank?
+    if !spec_desc.blank?
       conditions = conditions.where(spec_desc: spec_desc)
     end
 

@@ -8,6 +8,9 @@
 <div>
    <%= label_tag 'name', '面单号:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls", onkeypress: "EnterPress(event)"  %>
 </div>
+<div>
+   <%= label_tag '69name', '69码:', class: 'control-group' %><%= text_field_tag 'sixnine_code', nil, class: "controls", onkeypress: "CodeEnterPress(event)"  %>
+</div>
 <div id="outorders">
     <%= render :partial => 'orders/packout_forms' %>
 </div>
@@ -27,5 +30,19 @@ function EnterPress(e){ //传入 event
     }   
 }
 
+function CodeEnterPress(e){ //传入 event   
+    var e = e || window.event;   
+    if(e.keyCode == 13){   
+      $.ajax({
+            type : 'GET',
+            url : '/orders/find69code/',
+            data: { sixnine_code: $('#sixnine_code').val(),
+                    orderid: $('#orderid').val()},
+            dataType : 'script'
+            });
+      $('#sixnine_code').val("");
+      return false;   
+    }   
+}
 
 </script>

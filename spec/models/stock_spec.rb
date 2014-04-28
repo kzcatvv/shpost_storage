@@ -21,9 +21,10 @@ describe Stock do
     specification = Specification.find 1
     business = Business.find 1
     supplier = Supplier.find 1
+    storage = Storage.find 1
     batch_no = '00002'
     # amount = 100
-    stock = Stock.get_available_stock(specification, business, supplier, batch_no)
+    stock = Stock.get_available_stock(specification, supplier, business, batch_no, storage)
     # stocks.each do |stock|
     expect(stock).to be_a(Stock)
     expect(stock).to be_persisted
@@ -39,8 +40,9 @@ describe Stock do
     business = Business.find 1
     supplier = Supplier.find 1
     batch_no = '00003'
+    storage = Storage.find 1
     # amount = 100
-    stock = Stock.get_available_stock(specification, business, supplier, batch_no)
+    stock = Stock.get_available_stock(specification, supplier, business, batch_no, storage)
     # stocks.each do |stock|
     expect(stock).to be_a(Stock)
     expect(stock).to be_persisted
@@ -56,8 +58,9 @@ describe Stock do
     business = Business.find 1
     supplier = Supplier.find 1
     batch_no = '00003'
+    storage = Storage.find 1
     # amount = 100
-    stock = Stock.get_available_stock(specification, business, supplier, batch_no)
+    stock = Stock.get_available_stock(specification, supplier, business, batch_no, storage)
     # stocks.each do |stock|
     expect(stock).to be_a(Stock)
     expect(stock).to be_persisted

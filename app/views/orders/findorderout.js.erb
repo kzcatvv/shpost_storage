@@ -1,1 +1,9 @@
-$('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
+var oid = <%= @curr_order %>;
+if (oid == 0){
+      var myWindow = window.open("","myWindow","width=200,height=100");
+      myWindow.document.write("<p>无此面单号的订单</p>");
+      setTimeout(function(){myWindow.close()},3000);
+}
+$('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms",:object => @curr_order)) %> ");
+
+

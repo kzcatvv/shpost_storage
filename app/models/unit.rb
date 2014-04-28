@@ -9,6 +9,7 @@ class Unit < ActiveRecord::Base
   validates_uniqueness_of :name, :message => '该单位已存在'
 
   def default_storage
-    storages.first
+    storage = storages.where(default_storage: true).first
+    storage ||= storages.first
   end
 end

@@ -1,0 +1,25 @@
+var id = <%= @curr_dtl %>;
+if (id == 0)
+{
+      var myWindow = window.open("","myWindow","width=200,height=100");
+      myWindow.document.write("<p>该订单中无此69码的商品</p>");
+      setTimeout(function(){myWindow.close()},3000);  
+}
+else
+{
+	var tdraid = "#realam_"+<%= @curr_dtl %>;
+    var tddbid = "#dbam_"+<%= @curr_dtl %>;
+    var trid = "#tr_"+<%= @curr_dtl %>;
+
+    if ($(tddbid).val() > $(tdraid).val())
+    {
+       $(tdraid).val(parseInt($(tdraid).val())+1);
+    }
+
+    if ($(tddbid).val() == $(tdraid).val())
+    {
+       $(trid).css('color','blue');
+       $(trid).css('background','blue');
+    }
+}
+  

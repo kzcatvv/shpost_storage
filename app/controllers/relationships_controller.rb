@@ -20,6 +20,9 @@ class RelationshipsController < ApplicationController
 
   # GET /relationships/1/edit
   def edit
+    #binding.pry
+    ajax_cdid=Specification.find(@relationship.specification_id).commodity_id
+    ajax_gtid=Commodity.find(ajax_cdid).goodstype_id
   end
 
   # POST /relationships
@@ -62,11 +65,10 @@ class RelationshipsController < ApplicationController
     end
   end
 
-
   def select_commodities
       #@objid = params[:object_id]
 
-      @commodities = Commodity.where(goodstype_id: params[:goodstype_id]).collect{|c| [c.name,c.id]}.insert(0,"请选择")
+      @commodities = Commodity.where(goodstype_id: params[:goodstype_id]).accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择")
       #binding.pry
       respond_to do |format|
         format.js 
@@ -76,7 +78,7 @@ class RelationshipsController < ApplicationController
 
   def select_specifications
       @objid = params[:object_id]+"_specification_id"
-      @specifications = Specification.where(commodity_id: params[:commodity_id]).collect{|l| [l.name,l.id]}.insert(0,"请选择")
+      @specifications = Specification.where(commodity_id: params[:commodity_id]).accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择")
       #binding.pry
       respond_to do |format|
         format.js 
