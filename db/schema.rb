@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140425062626) do
+ActiveRecord::Schema.define(version: 20140428054204) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -135,6 +135,7 @@ ActiveRecord::Schema.define(version: 20140425062626) do
     t.string   "is_shortage",       default: "no"
     t.string   "business_order_id"
     t.string   "business_trans_no"
+    t.string   "county"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -164,6 +165,16 @@ ActiveRecord::Schema.define(version: 20140425062626) do
     t.datetime "updated_at"
     t.string   "name",        default: "", null: false
     t.integer  "storage_id"
+  end
+
+  create_table "relationships", force: true do |t|
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.string   "external_code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "spec_desc"
   end
 
   create_table "roles", force: true do |t|
@@ -251,15 +262,6 @@ ActiveRecord::Schema.define(version: 20140425062626) do
     t.string   "address"
     t.string   "phone"
     t.integer  "unit_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "thirdpartcodes", force: true do |t|
-    t.integer  "business_id"
-    t.integer  "supplier_id"
-    t.integer  "specification_id"
-    t.string   "external_code"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

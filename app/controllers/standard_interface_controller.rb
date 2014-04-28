@@ -14,10 +14,10 @@ class StandardInterfaceController < ApplicationController
 
     # desc = @context_hash['DESC']
 
-    thirdpartcode = StandardInterface.commodity_enter(@context_hash, @business, @unit)
+    relationship = StandardInterface.commodity_enter(@context_hash, @business, @unit)
 
-    if !thirdpartcode.blank?
-      render json: success_builder({'SKU' => thirdpartcode.specification.sku })
+    if !relationship.blank?
+      render json: success_builder({'SKU' => relationship.specification.sku })
     else
       render json: error_builder('9999')
     end

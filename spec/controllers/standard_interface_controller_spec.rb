@@ -12,8 +12,8 @@ describe StandardInterfaceController do
         @sign = Digest::MD5.base64digest(@context + @business.secret_key)
       end
 
-      it "should change Thirdpartcode " do
-        expect{get :commodity_enter, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign}.to change(Thirdpartcode, :count).by(1)
+      it "should change Relationship " do
+        expect{get :commodity_enter, format: @format, context: @context, business: '0001', unit: '0001', sign: @sign}.to change(Relationship, :count).by(1)
 
       end
 

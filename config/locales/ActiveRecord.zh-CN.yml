@@ -265,7 +265,7 @@ zh-CN:
       specification:
         one: 商品规格管理
         other: 商品规格管理
-      thirdpartcode:
+      relationship:
         one: 第三方商品编码管理
         other: 第三方商品编码管理
       business:
@@ -376,7 +376,7 @@ zh-CN:
         desc: "规格描述"
         sixnine_code: "69码"
         name: "规格名称"
-      thirdpartcode:
+      relationship:
         business_id: "商户"
         supplier_id: "供应商"
         specification_id: "商品规格"
@@ -571,9 +571,9 @@ zh-CN:
         commodity:
           name: "商品管理"
           link: "/commodities"
-        thirdpartcode:
+        relationship:
           name: "第三方商品编码管理"
-          link: "/thirdpartcodes"
+          link: "/relationships"
     stocks:
       name: "库存管理"
       submenu:

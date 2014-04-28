@@ -16,13 +16,13 @@ class StandardInterface
     
     #price = context['PRICE']
 
-    thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit, supplier)
+    relationship =  Relationship.find_by_keywords(sku, business, unit, supplier, spec)
     
 
-    if thirdpartcode.nil?
+    if relationship.nil?
       commodity = Commodity.create! name: name, unit: unit, no: 'need_to_edit'
       specification = Specification.create! commodity: commodity, desc: desc, name: spec, sku: 'need_to_edit', sixnine_code: 'need_to_edit'
-      thirdpartcode = Thirdpartcode.create! business: business, supplier: supplier, specification: specification, external_code: sku
+      relationship = Relationship.create! business: business, supplier: supplier, specification: specification, external_code: sku, spec_desc: spec
     end
   end
 
@@ -79,11 +79,11 @@ class StandardInterface
       price = x['PRICE']
       amt = x['AMT']
 
-      thirdpartcode = Thirdpartcode.find_by_keywords(sku, business, unit, supplier_no)
+      relationship = Relationship.find_by_keywords(sku, business, unit, supplier_no, spec)
 
-      next if thirdpartcode.nil?
+      next if relationship.nil?
 
-      OrderDetail.create! business_deliver_no: deliver_no, specification: thirdpartcode.specification, amount: qyt, price: price, supplier: thirdpartcode.supplier, order: order, desc: desc
+      OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc
     end 
 
     return order 
@@ -115,12 +115,12 @@ class StandardInterface
 
       # supplier = Supplier.find_by(no: business.no + '_' + supplier_no)
       
-      thirdpartcode =  Thirdpartcode.find_by_keywords(sku, business, unit)
+      relationship =  Relationship.find_by_keywords(sku, business, unit)
 
-      if thirdpartcode.blank?
+      if relationship.blank?
         amount = 0
       else
-        amount = Stock.find_stock_amount(thirdpartcode.specification, business, thirdpartcode.supplier)
+        amount = Stock.find_stock_amount(relationship.specification, business, relationship.supplier)
       end
 
       stock_array << {'SKU' => sku,'AMT' => amount}

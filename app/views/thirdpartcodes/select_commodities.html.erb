@@ -1,8 +1,0 @@
-<%= hidden_field_tag('object_id',@objid)
-%>
-<%= select(:commodity_id, :id, @commodities,{:prompt => "选择"},{"onchange" => remote_function(
-          :update => 'specification_select',
-          :with => "'commodity_id='+value+'&object_id='+$('object_id').value", 
-          :url => {:controller => :thirdpartcodes, :action => :select_specifications}
-        )})
-      %>
