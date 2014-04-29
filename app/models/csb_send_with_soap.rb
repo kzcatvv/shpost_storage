@@ -431,11 +431,11 @@ class CSBSendWithSOAP
 		xml_get = xml_get.gsub('&quot;','"')
 	end
 
-	def self.getClient(ServiceName)
+	def self.getClient(serviceName)
 		Savon.client(wsdl: StorageConfig.config["csb_interface"]["csb_url"],
 		soap_header: {
 			'CSBHeader' => {
-				'ServiceName' => ServiceName,
+				'ServiceName' => "#{serviceName}",
 				'ServiceVer' => '1.0',
 				'Consumer' => '网厅',
 				'RequestTime' => Time.now.strftime("%Y-%m-%d %H:%m:%S")
