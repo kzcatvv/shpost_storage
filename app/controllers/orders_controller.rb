@@ -446,10 +446,17 @@ class OrdersController < ApplicationController
         @curr_order=@order.id
         @order_details=@order.order_details
         @curr_dtl=0
+        @dtl_cnt=@order.order_details.count
+        @act_cnt=0
       end
       respond_to do |format|
           format.js 
       end
+  end
+
+  def setoutstatus
+      @order=Order.find(params[:orderid])
+      @order.update_attribute(:status, "packed")
   end
 
   private

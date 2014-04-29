@@ -1,6 +1,8 @@
 <%- model_class = OrderDetail -%>
 <div>
   <%= hidden_field_tag('orderid',@curr_order )%>
+  <%= hidden_field_tag('dtlcnt',@dtl_cnt )%>
+  <%= hidden_field_tag('actcnt',@act_cnt )%>
 </div>
 <table class="table table-striped">
   <thead>
