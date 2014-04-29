@@ -105,7 +105,7 @@ class OrdersController < ApplicationController
      if ordercnt < 25
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
-        allamount = Stock.find_stock_amount(d.specification,o.business,d.supplier)
+        allamount = Stock.total_stock_in_storage(d.specification, d.supplier, o.business, current_storage)
         if allcnt.has_key?(product)
           if allcnt[product][0]-allcnt[product][1]-d.amount >= 0
             allcnt[product][1]=allcnt[product][1]+d.amount
@@ -204,7 +204,7 @@ class OrdersController < ApplicationController
        if keyordercnt > 0
         keyorder.keyclientorderdetails.each do |keydtl|
          if keydtl.amount > 0
-            outstocks = Stock.find_out_stock(keydtl.specification, keyorder.business, keydtl.supplier)
+            outstocks = Stock.find_stock_in_storage(keydtl.specification, keydtl.supplier, keyorder.business, current_storage)
              outbl = false
              amount = keydtl.amount * keyordercnt
              sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
@@ -286,7 +286,7 @@ class OrdersController < ApplicationController
      if check_out_stocks(order)
       order.order_details.each do |orderdtl|
           if orderdtl.amount > 0
-            outstocks = Stock.find_out_stock(orderdtl.specification, order.business, orderdtl.supplier)
+            outstocks = Stock.find_stock_in_storage(orderdtl.specification, orderdtl.supplier, order.business, current_storage)
             outbl = false
             amount = orderdtl.amount
 
@@ -344,7 +344,7 @@ class OrdersController < ApplicationController
     order.order_details.each do |odl|
       hasout=odl.stock_logs.sum(:amount)
       if odl.amount - hasout > 0
-       outstocks = Stock.find_out_stock(odl.specification, order.business, odl.supplier)
+       outstocks = Stock.find_stock_in_storage(odl.specification, odl.supplier, order.business, current_storage)
        chkout = false
        amount = odl.amount - hasout
        outstocks.each do |stock|
@@ -367,7 +367,7 @@ class OrdersController < ApplicationController
        orderchk = true
        has_out=0
        keyorder.keyclientorderdetails.each do |kdl|
-         outstocks = Stock.find_out_stock(kdl.specification, keyorder.business, kdl.supplier)
+         outstocks = Stock.find_stock_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage)
          sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
          sls.each do |sl|
            has_out += sl.amount
@@ -388,7 +388,7 @@ class OrdersController < ApplicationController
       mi_cnt=keyorder.orders.count
       has_out=0
       keyorder.keyclientorderdetails.each do |kdl|
-         outstocks = Stock.find_out_stock(kdl.specification, keyorder.business, kdl.supplier)
+         outstocks = Stock.find_stock_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage)
          sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
          sls.each do |sl|
            has_out += sl.amount

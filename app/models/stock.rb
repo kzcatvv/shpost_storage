@@ -3,6 +3,10 @@ class Stock < ActiveRecord::Base
   belongs_to :shelf
   belongs_to :business
   belongs_to :supplier
+  # belongs_to :storage
+  has_one :area, through: :shelf
+  has_one :storage, through: :area
+  has_one :unit, through: :storage
   has_many :stock_logs
 
   validates_presence_of :specification_id, :actual_amount, :virtual_amount
@@ -10,51 +14,44 @@ class Stock < ActiveRecord::Base
   scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, virtual_amount DESC")}
   scope :available, -> { where("1 = 1")}
 
-  def self.find_with_batch_no(specification, business, supplier, batch_no)
-    where(specification: specification, business: business, supplier: supplier, batch_no: batch_no)
-  end
 
-  def self.find_without_batch_no(specification, business, supplier, batch_no)
-    where(specification: specification, business: business, supplier: supplier).where(["batch_no != ?", batch_no])
-  end
+  def self.get_available_stock(specification, supplier, business, batch_no, storage)
+    stocks_in_storage_with_batch_no = in_storage(storage).find_stock(specification, supplier, business).with_batch_no(batch_no).available.prior
 
-  def self.find_key(specification, business, supplier, batch_no)
-    find_with_batch_no(specification, business, supplier, batch_no).available.prior + find_without_batch_no(specification, business, supplier, batch_no).available.prior
-  end
-
-  def self.get_available_stock(specification, business, supplier, batch_no)
-    stocks_with_batch_no = find_with_batch_no(specification, business, supplier, batch_no)
-
-    stocks_with_batch_no.each do |stock|
+    stocks_in_storage_with_batch_no.each do |stock|
       return stock if stock.is_available?
     end
 
-    stocks_without_batch_no = find_without_batch_no(specification, business, supplier, batch_no)
+    stocks_in_storage_without_batch_no = in_storage(storage).find_stock(specification, supplier, business).without_batch_no(batch_no).available.prior
 
-    stocks_without_batch_no.each do |stock|
+    stocks_in_storage_without_batch_no.each do |stock|
       if stock.is_available?
         available_stock = Stock.create(specification: specification, business: business, supplier: supplier, shelf: stock.shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
         return available_stock
       end
     end
 
-    shelf = Shelf.get_neighbor_shelf stocks_with_batch_no
-    shelf ||= Shelf.get_neighbor_shelf stocks_without_batch_no
+    shelf = Shelf.get_neighbor_shelf stocks_in_storage_with_batch_no
+    shelf ||= Shelf.get_neighbor_shelf stocks_in_storage_without_batch_no
     shelf ||= Shelf.get_empty_shelf
 
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
   end
 
-  def self.get_stock(specification, business, supplier, batch_no, shelf, amount)
-    stock = self.find_with_batch_no(specification, business, supplier, batch_no).where(shelf: shelf).first
+  def self.find_stock_in_shelf_with_batch_no(specification, supplier, business, batch_no, shelf)
+    in_shelf(shelf).find_stock(specification, supplier, business).with_batch_no(batch_no).first
   end
 
-  def self.find_out_stock(specification, business, supplier)
-    where(specification: specification, business: business, supplier: supplier)
+  def self.find_stock_in_storage(specification, supplier, business, storage)
+    in_storage(storage).find_stock(specification, supplier, business).available.prior.first
   end
 
-  def self.find_stock_amount(specification, business, supplier)
-    where(specification: specification, business: business, supplier: supplier, ).sum(:virtual_amount)
+  def self.total_stock_in_unit(specification, supplier, business, unit)
+    in_unit(unit).find_stock(specification, supplier, business).sum_virtual_amount
+  end
+
+  def self.total_stock_in_storage(specification, supplier, business, storage)
+    in_storage(storage).find_stock(specification, supplier, business).sum_virtual_amount
   end
 
   def stock_in_amount(amount)
@@ -81,5 +78,38 @@ class Stock < ActiveRecord::Base
 
   def is_available?
     true
+  end
+
+  protected
+  def self.sum_virtual_amount
+    sum(:virtual_amount)
+  end
+
+  def self.find_stock(specification, supplier, business)
+    conditions = where(specification: specification, business: business)
+
+    if ! supplier.nil?
+      conditions.where(supplier: supplier)
+    end
+  end
+
+  def self.with_batch_no(batch_no)
+    where(batch_no: batch_no)
+  end
+
+  def self.without_batch_no(batch_no)
+    where(["batch_no != ?", batch_no])
+  end
+
+  def self.in_unit(unit)
+    includes(:unit).where('units.id' => unit)
+  end
+
+  def self.in_storage(storage)
+    includes(:storage).where('storages.id' => storage)
+  end
+
+  def self.in_shelf(shelf)
+    includes(:shelf).where('shelves.id' => shelf)
   end
 end
