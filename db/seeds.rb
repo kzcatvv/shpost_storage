@@ -20,10 +20,11 @@ Shelf.destroy_all()
 Stock.destroy_all()
 StockLog.destroy_all()
 
-unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc', no: '0001')
+unit1 = Unit.create(id: StorageConfig.config["unit"]['zb_id'], name: '闸北区局', desc: '闸北区局', no: '0001')
+# unit1 = Unit.create(name: 'unit1_name', desc: 'unit1_desc', no: '0001')
 unit2 = Unit.create(name: 'unit2_name', desc: 'unit2_desc', no: '0002')
 
-storage11 = Storage.create(name: 's11', desc: 's11_desc', unit: unit1)
+storage11 = Storage.create(name: '闸北仓库', desc: '闸北仓库', unit: unit1)
 storage12 = Storage.create(name: 's12', desc: 's12_desc', unit: unit1)
 storage21 = Storage.create(name: 's21', desc: 's21_desc', unit: unit2)
 
@@ -55,10 +56,10 @@ shelf1112 = Shelf.create(area: area111, shelf_code: 'A1-01-01-01-01-02', area_le
 supplier1 = Supplier.create(no: 'G001',name: '供应商1',address: '供应商地址1',phone: '12345123451',unit: unit1)
 supplier2 = Supplier.create(no: 'G002',name: '供应商2',address: '供应商地址2',phone: '12345123452',unit: unit1)
 
-business1 = Business.create(name: '商户1',email: 'business1@test.com',contactor: '商户1联系人',phone: '22334455667',address: '商户1地址',desc: '商户1备注',unit: unit1, no: '0001', secret_key: '12345')
-business2 = Business.create(name: '商户2',email: 'business2@test.com',contactor: '商户2联系人',phone: '22334455668',address: '商户2地址',desc: '商户2备注',unit: unit1, no: '0002', secret_key: '12345')
+business1 = Business.create(id: StorageConfig.config["business"]['bst_id'],name: '号码百事通',email: 'business1@test.com',contactor: '号码百事通联系人',phone: '22334455667',address: '号码百事通地址',desc: '号码百事通备注',unit: unit1, no: '0001', secret_key: '12345')
+business2 = Business.create(id: StorageConfig.config["business"]['jh_id'],name: '交通银行',email: 'business2@test.com',contactor: '交通银行联系人',phone: '22334455668',address: '交通银行地址',desc: '交通银行备注',unit: unit1, no: '0002', secret_key: '12345')
 
-Thirdpartcode.create business_id: 1, specification_id: 1, external_code: '000000002', supplier_id: 1
+# Thirdpartcode.create business_id: 1, specification_id: 1, external_code: '000000002', supplier_id: 1
 
 
 goodstype1 = Goodstype.create(gtno: 'SL01',name: '商品类型1', unit: unit1)
@@ -75,20 +76,20 @@ shelf2 = Shelf.create(shelf_code: "A2-01-01-01-02", area: area112, priority_leve
 shelf3 = Shelf.create(shelf_code: "A2-01-01-02-01", area: area112, priority_level: 3)
 shelf4 = Shelf.create(shelf_code: "A2-01-01-02-02", area: area112, priority_level: 4)
 
-stock_0_1 = Stock.create(shelf: shelf1, specification: specification1, supplier: supplier1, business: business1, actual_amount: 5, virtual_amount: 5, batch_no: '00001')
-stock_0_2 = Stock.create(shelf: shelf2, specification: specification1, supplier: supplier1, business: business1, actual_amount: 5, virtual_amount: 5, batch_no: '00002')
-#stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00003')
-#stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00004')
+# stock_0_1 = Stock.create(shelf: shelf1, specification: specification1, supplier: supplier1, business: business1, actual_amount: 5, virtual_amount: 5, batch_no: '00001')
+# stock_0_2 = Stock.create(shelf: shelf2, specification: specification1, supplier: supplier1, business: business1, actual_amount: 5, virtual_amount: 5, batch_no: '00002')
+# #stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00003')
+# #stock3 = Stock.create(shelf: shelf2, specification: specification2, supplier: supplier2, business: business2, batch_no: '00004')
 
 
-stock1 = Stock.create(shelf: shelf1111, business: business1, supplier: supplier1, batch_no: '1', specification: specification1, actual_amount: 5, virtual_amount: 5, desc: 'desc')
-stock2 = Stock.create(shelf: shelf1111, business: business1, supplier: supplier2, batch_no: '2', specification: specification2, actual_amount: 7, virtual_amount: 8, desc: 'desc')
-stock3 = Stock.create(shelf: shelf1112, business: business2, supplier: supplier1, batch_no: '3', specification: specification1, actual_amount: 13, virtual_amount: 17, desc: 'desc')
-stock4 = Stock.create(shelf: shelf1111, business: business2, supplier: supplier2, batch_no: '4', specification: specification1, actual_amount: 2, virtual_amount: 3, desc: 'desc')
-stock5 = Stock.create(shelf: shelf1112, business: business1, supplier: supplier1, batch_no: '5', specification: specification2, actual_amount: 0, virtual_amount: 0, desc: 'desc')
+# stock1 = Stock.create(shelf: shelf1111, business: business1, supplier: supplier1, batch_no: '1', specification: specification1, actual_amount: 5, virtual_amount: 5, desc: 'desc')
+# stock2 = Stock.create(shelf: shelf1111, business: business1, supplier: supplier2, batch_no: '2', specification: specification2, actual_amount: 7, virtual_amount: 8, desc: 'desc')
+# stock3 = Stock.create(shelf: shelf1112, business: business2, supplier: supplier1, batch_no: '3', specification: specification1, actual_amount: 13, virtual_amount: 17, desc: 'desc')
+# stock4 = Stock.create(shelf: shelf1111, business: business2, supplier: supplier2, batch_no: '4', specification: specification1, actual_amount: 2, virtual_amount: 3, desc: 'desc')
+# stock5 = Stock.create(shelf: shelf1112, business: business1, supplier: supplier1, batch_no: '5', specification: specification2, actual_amount: 0, virtual_amount: 0, desc: 'desc')
 
-stock_log1 = StockLog.create(user: user11, stock: stock1, operation: 'create_stock', status: 'waiting', amount: 3, operation_type: 'in', desc: 'desc')
-stock_log2 = StockLog.create(user: user11, stock: stock2, operation: 'create_stock', status: 'waiting', amount: 15, operation_type: 'in', desc: 'desc')
-stock_log3 = StockLog.create(user: user11, stock: stock3, operation: 'create_stock', status: 'checked', amount: 8, operation_type: 'in', desc: 'desc')
-stock_log4 = StockLog.create(user: unit1admin, stock: stock4, operation: 'create_stock', status: 'waiting', amount: 10, operation_type: 'in', desc: 'desc')
-stock_log5 = StockLog.create(user: unit1admin, stock: stock5, operation: 'create_stock', status: 'waiting', amount: 46, operation_type: 'in', desc: 'desc')
+# stock_log1 = StockLog.create(user: user11, stock: stock1, operation: 'create_stock', status: 'waiting', amount: 3, operation_type: 'in', desc: 'desc')
+# stock_log2 = StockLog.create(user: user11, stock: stock2, operation: 'create_stock', status: 'waiting', amount: 15, operation_type: 'in', desc: 'desc')
+# stock_log3 = StockLog.create(user: user11, stock: stock3, operation: 'create_stock', status: 'checked', amount: 8, operation_type: 'in', desc: 'desc')
+# stock_log4 = StockLog.create(user: unit1admin, stock: stock4, operation: 'create_stock', status: 'waiting', amount: 10, operation_type: 'in', desc: 'desc')
+# stock_log5 = StockLog.create(user: unit1admin, stock: stock5, operation: 'create_stock', status: 'waiting', amount: 46, operation_type: 'in', desc: 'desc')
