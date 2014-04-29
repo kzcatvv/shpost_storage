@@ -17,4 +17,10 @@ class Relationship < ActiveRecord::Base
 
     conditions.includes(:specification).includes(specification: :commodity).where(commodities: { unit_id: unit}).first
   end
+
+  def self.find_relationship(specification, business, unit)
+    conditions =  where(business_id: business, specification_id: specification)
+    
+    conditions.includes(:specification).includes(specification: :commodity).where(commodities: { unit_id: unit}).first
+  end
 end
