@@ -21,6 +21,8 @@ class RelationshipsController < ApplicationController
   # GET /relationships/1/edit
   def edit
     #binding.pry
+    ajax_cdid=Specification.find(@relationship.specification_id).commodity_id
+    ajax_gtid=Commodity.find(ajax_cdid).goodstype_id
   end
 
   # POST /relationships
@@ -62,7 +64,6 @@ class RelationshipsController < ApplicationController
       format.json { head :no_content }
     end
   end
-
 
   def select_commodities
       #@objid = params[:object_id]

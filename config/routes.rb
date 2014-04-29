@@ -24,10 +24,10 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :relationships do
-      collection do
+    collection do
         get 'select_commodities'
         get 'select_specifications'
-      end
+       end
   end
 
   resources :shelves
