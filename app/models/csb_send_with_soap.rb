@@ -2,18 +2,6 @@ class CSBSendWithSOAP
 	require "rexml/document"
 
 	# @@startrow = 1
-	@@client = Savon.client(wsdl: StorageConfig.config["csb_interface"]["csb_url"],
-		soap_header: {
-			'CSBHeader' => {
-				'ServiceName' => 'SendPointOrder',
-				'ServiceVer' => '1.0',
-				'Consumer' => '网厅',
-				'RequestTime' => Time.now.strftime("%Y-%m-%d %H:%m:%S")
-			}
-		},
-		env_namespace: 'SOAP-ENV'.to_sym,
-		namespace_identifier: :m,
-		namespaces: {'xmlns:m0'=>'http://www.shtel.com.cn/csb/v2/'})
 
 	def self.sendPointOrder()
 		for order_type in 1..2
@@ -28,13 +16,15 @@ class CSBSendWithSOAP
 				# puts decode_xml(xml_file)
 				# puts '----------------------------'
 	      send_hash = { "xmlFile" => xml_file}
-	      response = @@client.call("sendQueryOrder".to_sym, message: send_hash)
+	      client = getClient('SendPointOrder')
+	      response = client.call("sendQueryOrder".to_sym, message: send_hash)
 
 	      xml_file_return = response.body[:sendQueryOrder][:sendQueryOrderReturn].to_s
 		    xml_file_trans_status = parseAndSaveSendPointOrder(xml_file_return,order_type)
 
 		    send_hash_trans_status = { "xmlFile" => xml_file_trans_status}
-	      response_trans_status = @@client.call("updateTransportStatus".to_sym, message: send_hash_trans_status)
+	      client = getClient('PointUpdateTransStatus')
+	      response_trans_status = client.call("updateTransportStatus".to_sym, message: send_hash_trans_status)
 	      parsePointUpdateTransStatus(response_trans_status)
 			# end while call_flg
 		end
@@ -43,7 +33,8 @@ class CSBSendWithSOAP
   def self.updatePointOrderStatus(orders)
 	  	xml_file = setUpdatePointOrderStatus(orders)
 	  	send_hash = { "xmlFile" => xml_file}
-      response = @@client.call("updateQueryOrderStatus".to_sym, message: send_hash)
+	    client = getClient('UpdatePointOrderStatus')
+      response = client.call("updateQueryOrderStatus".to_sym, message: send_hash)
 
       xml_file_return = response.body[:updateQueryOrderStatus][:updateQueryOrderStatusReturn].to_s
 	    parseUpdatePointOrderStatus(xml_file_return)
@@ -53,7 +44,8 @@ class CSBSendWithSOAP
 		puts '------------todo:pointOrderStatus function--------------'
 		xml_file = setPointOrderStatus(orders)
 	  	send_hash = { "inputXml" => xml_file}
-      response = @@client.call("OrderStatus".to_sym, message: send_hash)
+	    client = getClient('PointOrderStatus')
+      response = client.call("OrderStatus".to_sym, message: send_hash)
 
       xml_file_return = response.body[:OrderStatus][:OrderStatusReturn].to_s
       parsePointOrderStatus(xml_file_return)
@@ -437,5 +429,20 @@ class CSBSendWithSOAP
 		xml_get = xml_get.gsub('&gt;','>')
 		xml_get = xml_get.gsub('&amp;','=')
 		xml_get = xml_get.gsub('&quot;','"')
+	end
+
+	def self.getClient(ServiceName)
+		Savon.client(wsdl: StorageConfig.config["csb_interface"]["csb_url"],
+		soap_header: {
+			'CSBHeader' => {
+				'ServiceName' => ServiceName,
+				'ServiceVer' => '1.0',
+				'Consumer' => '网厅',
+				'RequestTime' => Time.now.strftime("%Y-%m-%d %H:%m:%S")
+			}
+		},
+		env_namespace: 'SOAP-ENV'.to_sym,
+		namespace_identifier: :m,
+		namespaces: {'xmlns:m0'=>'http://www.shtel.com.cn/csb/v2/'})
 	end
 end
