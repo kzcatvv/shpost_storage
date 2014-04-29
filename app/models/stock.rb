@@ -54,7 +54,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stock_amount(specification, business, supplier)
-    where(specification: specification, business: business, supplier: supplier).sum(:virtual_amount)
+    where(specification: specification, business: business, supplier: supplier, ).sum(:virtual_amount)
   end
 
   def stock_in_amount(amount)

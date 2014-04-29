@@ -431,6 +431,7 @@ class OrdersController < ApplicationController
       @order=Order.where(tracking_number: params[:tracking_number],status: "checked").first
       if @order.nil?
         @order_details=[]
+        @curr_order=0
       else
         @curr_order=@order.id
         @order_details=@order.order_details
