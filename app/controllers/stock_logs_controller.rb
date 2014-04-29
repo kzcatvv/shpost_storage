@@ -72,7 +72,7 @@ class StockLogsController < ApplicationController
       stock_log = @stock_log
       if !params[:shelfid].nil?
         if params[:shelfid] != @stock.shelf.id.to_s
-          stock = Stock.get_stock(@stock.specification, @stock.business, @stock.supplier, @stock.batch_no, Shelf.find(params[:shelfid]), @stock_log.amount)
+          stock = Stock.find_stock_in_shelf_with_batch_no(@stock.specification, @stock.supplier, @stock.business, @stock.batch_no, Shelf.find(params[:shelfid]))
           if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
             @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
           elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
@@ -115,7 +115,7 @@ class StockLogsController < ApplicationController
       if !params[:pdid].nil?
         if params[:pdid] != @stock_log.purchase_detail.id.to_s
           pd = PurchaseDetail.find(params[:pdid])
-          stock = Stock.get_stock(pd.specification, pd.purchase.business, pd.supplier, pd.batch_no, @stock.shelf, @stock_log.amount)
+          stock = Stock.find_stock_in_shelf_with_batch_no(pd.specification, pd.supplier, pd.purchase.business, pd.batch_no, @stock.shelf)
           @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
           @stock.save()
           if !stock
@@ -132,7 +132,7 @@ class StockLogsController < ApplicationController
         # todo
         if params[:kcdid] != @stock_log.keyclientorderdetail.id.to_s
           kcd = Keyclientorderdetail.find(params[:kcdid])
-          stock = Stock.get_stock(kcd.specification, kcd.business, kcd.supplier, kcd.batch_no, @stock.shelf, @stock_log.amount)
+          stock = Stock.find_stock_in_shelf_with_batch_no(kcd.specification, kcd.supplier, kcd.business, kcd.batch_no, @stock.shelf)
           @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
           @stock.save()
           if !stock

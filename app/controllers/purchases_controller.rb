@@ -74,7 +74,7 @@ class PurchasesController < ApplicationController
     Purchase.transaction do
       @purchase.purchase_details.each do |x|
         while x.waiting_amount > 0
-          stock = Stock.get_available_stock(x.specification, @purchase.business, x.supplier, x.batch_no)
+          stock = Stock.get_available_stock(x.specification, x.supplier, @purchase.business, x.batch_no, current_storage)
           
           stock_in_amount = stock.stock_in_amount(x.waiting_amount)
           #x.amount -= stock_in_amount
