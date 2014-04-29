@@ -58,7 +58,15 @@ namespace :transmitter do
         while 1==1 do
           @count += 1
           begin
-            orders = BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'])
+            orders = BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'waiting')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'printed')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'checked')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'picking')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'packed')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'delivering')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'delivered')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'declined')
+            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'returned')
             return_array = CSBSendWithSOAP.updatePointOrderStatus(orders)
             if return_array[0]=="0"
               orders.each do |order|
