@@ -20,6 +20,10 @@ class OrderDetailsController < ApplicationController
 
   # GET /order_detailes/1/edit
   def edit
+    commodityid=Specification.find(@relationship.specification_id).commodity_id
+    goodstypeid=Commodity.find(commodityid).goodstype_id
+    @commodity=Commodity.find(commodityid)
+    @goodstype=Goodstype.find(goodstypeid)
   end
 
   # POST /order_detailes

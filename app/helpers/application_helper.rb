@@ -2,7 +2,7 @@ module ApplicationHelper
 
 	def product_select(obj_id)
        
-       concat  select_tag("ajax_goodstype_id", options_for_select(Goodstype.accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择") ))
+       concat  select("goodstype","id", Goodstype.accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择") )
        concat hidden_field_tag('ajax_object_id', obj_id)
        span_commodity_select+span_specification_select(obj_id)
 
@@ -10,7 +10,7 @@ module ApplicationHelper
 
     def span_commodity_select
        content_tag(:span) do
-       	concat select_tag("ajax_commodity_id", options_for_select(Commodity.accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择") ))
+       	concat select("commodity","id", Commodity.accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择") )
        end
     end
 
