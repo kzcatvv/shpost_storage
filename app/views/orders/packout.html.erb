@@ -6,10 +6,7 @@
 
 </div>
 <div>
-   <%= label_tag 'name', '面单号:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls", onkeypress: "EnterPress(event)"  %>
-</div>
-<div>
-   <%= label_tag '69name', '69码:', class: 'control-group' %><%= text_field_tag 'sixnine_code', nil, class: "controls", onkeypress: "CodeEnterPress(event)"  %>
+   <%= label_tag 'name', '面单号或69码:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls", onkeypress: "EnterPress(event)"  %><%= content_tag(:p, "注意:请先扫面单号再扫69码") %>
 </div>
 <div id="outorders">
     <%= render :partial => 'orders/packout_forms' %>
@@ -22,25 +19,11 @@ function EnterPress(e){ //传入 event
       $.ajax({
             type : 'GET',
             url : '/orders/findorderout/',
-            data: { tracking_number: $('#tracking_number').val()},
-            dataType : 'script'
-            });
-      $('#tracking_number').val("");
-      return false;   
-    }   
-}
-
-function CodeEnterPress(e){ //传入 event   
-    var e = e || window.event;   
-    if(e.keyCode == 13){   
-      $.ajax({
-            type : 'GET',
-            url : '/orders/find69code/',
-            data: { sixnine_code: $('#sixnine_code').val(),
+            data: { tracking_number: $('#tracking_number').val(),
                     orderid: $('#orderid').val()},
             dataType : 'script'
             });
-      $('#sixnine_code').val("");
+      $('#tracking_number').val("");
       return false;   
     }   
 }

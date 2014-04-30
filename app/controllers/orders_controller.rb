@@ -432,29 +432,23 @@ class OrdersController < ApplicationController
       if @order.nil?
         @order_details=[]
         @curr_order=0
+
+        @order=Order.find(params[:orderid])
+      # @order_details=@order.order_details
+      # @curr_order=@order.id
+        curr_dtls=@order.order_details.includes(:specification).where("specifications.sixnine_code = ?",params[:tracking_number]).distinct.first
+        if curr_dtls.nil?
+           @curr_dtl=0
+        else
+           @curr_dtl=curr_dtls.id
+        end 
       else
         @curr_order=@order.id
         @order_details=@order.order_details
+        @curr_dtl=0
       end
-
       respond_to do |format|
           format.js 
-        end
-  end
-
-  def find69code
-      @order=Order.find(params[:orderid])
-      # @order_details=@order.order_details
-      # @curr_order=@order.id
-      curr_dtls=@order.order_details.includes(:specification).where("specifications.sixnine_code = ?",params[:sixnine_code]).distinct.first
-      if curr_dtls.nil?
-         @curr_dtl=0
-      else
-         @curr_dtl=curr_dtls.id
-      end 
-      #binding.pry
-      respond_to do |format|
-        format.js 
       end
   end
 
