@@ -22,6 +22,11 @@ ActiveRecord::Schema.define(version: 20140429044115) do
     t.string   "name",       default: "", null: false
   end
 
+  create_table "bcm_interfaces", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false
     t.string   "email"
@@ -43,6 +48,15 @@ ActiveRecord::Schema.define(version: 20140429044115) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "deliver_notices", force: true do |t|
+    t.integer  "order_id"
+    t.string   "status"
+    t.string   "send_type"
+    t.integer  "send_times", default: 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "goodstypes", force: true do |t|
@@ -128,9 +142,9 @@ ActiveRecord::Schema.define(version: 20140429044115) do
     t.integer  "unit_id",           default: 1,    null: false
     t.integer  "storage_id",        default: 1,    null: false
     t.integer  "keyclientorder_id", default: 1,    null: false
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",       default: "no"
     t.string   "business_order_id"

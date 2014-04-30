@@ -2,5 +2,5 @@ zh-CN:
   transmitter:
     bankcomm:
       order_update:
-        url: 'http://bankcomm.cn/order_update'
+        uri: 'http://bankcomm.cn/order_update'
         interval: 10

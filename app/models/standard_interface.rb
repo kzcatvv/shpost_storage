@@ -85,7 +85,7 @@ class StandardInterface
       end
 
       relationship = Relationship.find_relationship(sku, supplier, spec, business, unit)
-
+    
       next if relationship.nil?
 
       OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc

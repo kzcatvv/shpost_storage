@@ -5,6 +5,7 @@ class Order < ActiveRecord::Base
   belongs_to :keyclientorder
   has_many :order_details, dependent: :destroy
   has_many :stock_logs, through: :order_details
+  has_many :deliver_notices
 
   before_validation :set_no
 

@@ -99,6 +99,11 @@ ShpostStorage::Application.routes.draw do
   match "/standard_interface/order_query" => "standard_interface#order_query", via: [:get, :post]
   match "/standard_interface/stock_query" => "standard_interface#stock_query", via: [:get, :post]
 
+  match "/bcm_interface/commodity_enter" => "bcm_interface#commodity_enter", via: [:get, :post]
+  match "/bcm_interface/order_enter" => "bcm_interface#order_enter", via: [:get, :post]
+  match "/bcm_interface/order_query" => "bcm_interface#order_query", via: [:get, :post]
+  match "/bcm_interface/stock_query" => "bcm_interface#stock_query", via: [:get, :post]
+
 
   match "/print/tracking" => "print#tracking",via: [:get, :post]
   match "/print/trackingnum" => "print#trackingnum",via: [:get, :post]
