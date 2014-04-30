@@ -9,7 +9,6 @@ ShpostStorage::Application.routes.draw do
         get 'nextbatch'
         get 'packout'
         get 'findorderout'
-        get 'find69code'
       end
 
      resources :order_details
