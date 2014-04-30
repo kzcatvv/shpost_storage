@@ -3,11 +3,14 @@ business:
     bst_id: 1 #号码百事通
     jh_id: 2 #交通银行
 unit:
-    zb_id: 1 #闸北仓库
+    zb_id: 1 #闸北区局
 csb_interface:
-    post_name: XX配送商 #XX配送商
-    bst_name: 积分平台 #积分平台
+	csb_url: 'http://222.68.185.223:8080/scoreProject/services/0rderWS?wsdl'
+    post_name: 'XX配送商' #XX配送商
+    bst_name: '积分平台' #积分平台
     max_time_valve: 10 #每次发送的最大条数
     order_type_1: 1 #原始订单
     order_type_2: 2 #合并订单
     active_code: '0991' #口令验证码
+    query_time: '13:00:00' #查询订单截止时间
+    query_period: 1 #查询订单周期(天)
