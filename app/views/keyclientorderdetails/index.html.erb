@@ -2,7 +2,7 @@
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-    <% if can? :new, Thirdpartcode %>
+    <% if can? :new, Keyclientorderdetail %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
                   new_keyclientorder_keyclientorderdetail_path(@keyclientorder),
                   :class => 'btn btn-primary' %>

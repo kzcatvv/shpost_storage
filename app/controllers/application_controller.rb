@@ -57,6 +57,13 @@ class ApplicationController < ActionController::Base
       @user_log.save
     end
   end
+
+  def set_product_select(objid)
+      commodityid=Specification.find(objid.specification_id).commodity_id
+      goodstypeid=Commodity.find(commodityid).goodstype_id
+      @commodity=Commodity.find(commodityid)
+      @goodstype=Goodstype.find(goodstypeid)
+  end
      
   private
   def access_denied exception
