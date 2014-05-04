@@ -13,7 +13,7 @@ class Order < ActiveRecord::Base
 
   TYPE = { b2b: 'b2b', b2c: 'b2c' }
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
-  STATUS = { waiting: 'waiting', printed: 'printed', checked: 'checked', picking: 'picking', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
+  STATUS = { waiting: 'waiting', printed: 'printed', checked: 'checked', picking: 'picking', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
 
   TRANSPORT_TYPE= { gnxb: 'gnxb', tcsd: 'tcsd', ems: 'ems'}
 
