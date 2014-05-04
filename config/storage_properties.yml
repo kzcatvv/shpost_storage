@@ -5,7 +5,7 @@ business:
 unit:
     zb_id: 1 #闸北区局
 csb_interface:
-	csb_url: 'http://222.68.185.223:8080/scoreProject/services/0rderWS?wsdl'
+    csb_url: 'http://222.68.185.223:8080/scoreProject/services/0rderWS?wsdl'
     post_name: 'XX配送商' #XX配送商
     bst_name: '积分平台' #积分平台
     max_time_valve: 10 #每次发送的最大条数

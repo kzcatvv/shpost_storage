@@ -2,18 +2,18 @@ class CSBSendWithSOAP
 	require "rexml/document"
 
 	@@startrow = 1
-	@@client = Savon.client(wsdl: StorageConfig.config["csb_interface"]["csb_url"])
-		# soap_header: {
-		# 	'CSBHeader' => {
-		# 		'ServiceName' => 'SendPointOrder',
-		# 		'ServiceVer' => '1.0',
-		# 		'Consumer' => '网厅',
-		# 		'RequestTime' => Time.now.strftime("%Y-%m-%d %H:%m:%S")
-		# 	}
-		# },
-		# env_namespace: 'SOAP-ENV'.to_sym,
-		# namespace_identifier: :m,
-		# namespaces: {'xmlns:m0'=>'http://www.shtel.com.cn/csb/v2/'})
+	@@client = Savon.client(wsdl: StorageConfig.config["csb_interface"]["csb_url"],
+		soap_header: {
+			'CSBHeader' => {
+				'ServiceName' => 'SendPointOrder',
+				'ServiceVer' => '1.0',
+				'Consumer' => '网厅',
+				'RequestTime' => Time.now.strftime("%Y-%m-%d %H:%m:%S")
+			}
+		},
+		env_namespace: 'SOAP-ENV'.to_sym,
+		namespace_identifier: :m,
+		namespaces: {'xmlns:m0'=>'http://www.shtel.com.cn/csb/v2/'})
 
 	def self.sendPointOrder()
 		for order_type in 1..2
@@ -45,11 +45,86 @@ class CSBSendWithSOAP
 	    parseUpdatePointOrderStatus(xml_file_return)
   end
 
-	def self.pointOrderStatus()
+	def self.pointOrderStatus(orders)
 		puts '------------todo:pointOrderStatus function--------------'
+		xml_file = setPointOrderStatus(orders)
+	  	send_hash = { "inputXml" => xml_file}
+      response = @@client.call("OrderStatus".to_sym, message: send_hash)
+
+      xml_file_return = response.body[:OrderStatus][:OrderStatusReturn].to_s
+      parsePointOrderStatus(xml_file_return)
   end
 
   private
+  def self.setPointOrderStatus(orders)
+    xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
+  	doc = REXML::Document.new       #创建XML内容 
+
+  	scoreOrderInfo = doc.add_element('ScoreOrderInfo')
+		head = scoreOrderInfo.add_element('Head')
+		sender = head.add_element('Sender')
+		reciver = head.add_element('Reciver')
+		orderTotal = head.add_element('OrderTotal')
+		maxTimeValve = head.add_element('MaxTimeValve')
+		startRow = head.add_element('startRow')
+		rowCount = head.add_element('rowCount')
+		messageCode = head.add_element('MessageCode')
+		description = head.add_element('Description')
+		activeCode = head.add_element('ActiveCode')
+
+		orderDetail = scoreOrderInfo.add_element('OrderDetail')
+		# 原始订单
+		originalityOrder  = scoreOrderInfo.add_element('OriginalityOrder')
+		# 合并订单
+		combinationOrder = scoreOrderInfo.add_element('CombinationOrder')
+
+  	originalityOrder.add_attributes('isnull','xxxxxxxxxxxxxxxxxx')
+  	combinationOrder.add_attributes('isnull','xxxxxxxxxxxxxxxxxx')
+
+		orders.each do |order|
+			if order.order_details.first.business_deliver_no.blank?
+				orderLabel = originalityOrder.add_element('OrderLabel')
+				# 原始订单中的listid和orderID数据是原始订单号
+				orderLabel.add_attributes('listID',order.business_order_id)
+
+				order.order_details.each do |detail|
+					giftInfo  = originalityOrder.add_element('GiftInfo')
+
+					relationship = Relationship.find_relationship(detail.specification_id,StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'])
+					giftInfo.add_attributes('ItemNo', relationship.external_code)
+					# 原始订单中的listid和orderID数据是原始订单号
+					giftInfo.add_attributes('OrderId', order.business_order_id)
+					# 4：本人签收，5：他人代收，7：退货
+					if order.status == ORDER::STATUS[:delivered]
+						giftDetail.add_attributes('realStatus', '4')
+					elsif order.status == ORDER::STATUS[:declined]
+						giftDetail.add_attributes('realStatus', '7')
+					end
+				end
+			else
+				combinationOrder  = originalityOrder.add_element('CombinationOrder')
+				# MergerOrderLabel BigOrderId="B105"归并的大订单号
+				combinationOrder.add_attributes('BigOrderId',order.business_order_id)
+
+				order.order_details.each do |detail|
+					giftDetail = originalityOrder.add_element('GiftDetail')
+
+					relationship = Relationship.find_relationship(detail.specification_id,StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'])
+					giftDetail.add_attributes('MergerItemNo', relationship.external_code)
+					# 原始订单中的listid和orderID数据是原始订单号
+					giftDetail.add_attributes('MergerListID', detail.business_deliver_no)
+					giftDetail.add_attributes('MergerOrderId', detail.business_deliver_no)
+					# 4：本人签收，5：他人代收，7：退货
+					if order.status == ORDER::STATUS[:delivered]
+						giftDetail.add_attributes('MergerRealStatus', '4')
+					elsif order.status == ORDER::STATUS[:declined]
+						giftDetail.add_attributes('MergerRealStatus', '7')
+					end
+				end
+			end
+		end
+  end
+
   def self.setUpdatePointOrderStatus(orders)
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
   	doc = REXML::Document.new       #创建XML内容 
@@ -270,6 +345,26 @@ class CSBSendWithSOAP
 
   	return_array = []
   	return_array << result.text << message.text
+  	return return_array
+	end
+
+	def self.parsePointOrderStatus(xml_file)
+		doc = REXML::Document.new(decode_xml(xml_file)) 
+  	root = doc.root
+  	head = root.elements['Head']
+  	sender = head.elements['Sender']
+  	reciver = head.elements['Reciver']
+  	total = head.elements['Total']
+  	processCode = head.elements['ProcessCode']
+  	description = head.elements['Description']
+  	activeCode = head.elements['ActiveCode']
+
+  	return_array = []
+  	if processCode.text.blank?
+  		return_array << '0' << ''
+  	else
+  		return_array << processCode.text << description.text
+  	end
   	return return_array
 	end
 

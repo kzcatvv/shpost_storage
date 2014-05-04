@@ -88,3 +88,7 @@ gem 'httpclient'
 
 # Use debugger
 # gem 'debugger', group: [:development, :test]
+
+gem "soap4r"
+
+gem "savon"
