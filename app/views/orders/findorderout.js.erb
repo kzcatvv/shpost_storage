@@ -4,25 +4,42 @@ if (oid == 0)
 {
     if (id == 0)
     {
+      $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
       var myWindow = window.open("","myWindow","width=200,height=100,left=500,top=200");
-      myWindow.document.write("<p>无此面单号或无此69码的商品</p>");
+      myWindow.document.write("<p>无符合条件的面单号或商品</p>");
       setTimeout(function(){myWindow.close()},3000);  
     }
     else
     {
-	  var tdraid = "#realam_"+<%= @curr_dtl %>;
+	    var tdraid = "#realam_"+<%= @curr_dtl %>;
       var tddbid = "#dbam_"+<%= @curr_dtl %>;
       var trid = "#tr_"+<%= @curr_dtl %>;
 
-      if ($(tddbid).val() > $(tdraid).val())
+      if ($(tddbid).val() != $(tdraid).val())
       {
-         $(tdraid).val(parseInt($(tdraid).val())+1);
-      }
 
-      if ($(tddbid).val() == $(tdraid).val())
-      {
-         $(trid).css("color","blue");
-         $(trid).css("background-color","blue");
+        if ($(tddbid).val() > $(tdraid).val())
+        {
+           $(tdraid).val(parseInt($(tdraid).val())+1);
+        }
+
+        if ($(tddbid).val() == $(tdraid).val())
+        {
+           $(trid).css("color","blue");
+           $('#actcnt').val(parseInt($('#actcnt').val())+1);
+
+           //alert($('#orderid').val()+"+"+$('#dtlcnt').val()+"+"+$('#actcnt').val());
+
+           if ( $('#dtlcnt').val() == $('#actcnt').val() )
+           {
+             $.ajax({
+                     type : 'GET',
+                     url : '/orders/setoutstatus/',
+                     data: { orderid: $('#orderid').val() },
+                     dataType : 'script'
+                    });
+           }
+        }
       }
     }
 
@@ -30,6 +47,7 @@ if (oid == 0)
 else
 {
 	$('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms",:object => @curr_order)) %> ");
+
 }
 
 
