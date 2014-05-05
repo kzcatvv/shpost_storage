@@ -1,7 +1,7 @@
 class CSBSendWithSOAP
 	require "rexml/document"
 
-	@@startrow = 1
+	# @@startrow = 1
 	@@client = Savon.client(wsdl: StorageConfig.config["csb_interface"]["csb_url"],
 		soap_header: {
 			'CSBHeader' => {
@@ -18,9 +18,9 @@ class CSBSendWithSOAP
 	def self.sendPointOrder()
 		for order_type in 1..2
 			puts order_type
-			call_flg = false
-			@@startrow = 1
-			begin 
+			# call_flg = false
+			# @@startrow = 1
+			# begin 
 				xml_file = setSendPointOrder(order_type)
 				# puts '----------------------------'
 				# puts xml_file
@@ -31,8 +31,12 @@ class CSBSendWithSOAP
 	      response = @@client.call("sendQueryOrder".to_sym, message: send_hash)
 
 	      xml_file_return = response.body[:sendQueryOrder][:sendQueryOrderReturn].to_s
-		    call_flg = parseAndSaveSendPointOrder(xml_file_return,order_type)
-			end while call_flg
+		    xml_file_trans_status = parseAndSaveSendPointOrder(xml_file_return,order_type)
+
+		    send_hash_trans_status = { "xmlFile" => xml_file_trans_status}
+	      response_trans_status = @@client.call("updateTransportStatus".to_sym, message: send_hash_trans_status)
+	      parsePointUpdateTransStatus(response_trans_status)
+			# end while call_flg
 		end
   end
 
@@ -212,18 +216,14 @@ class CSBSendWithSOAP
 		reciver.add_text StorageConfig.config["csb_interface"]["bst_name"]
 		# orderTotal.add_text "7"
 		maxTimeValve.add_text StorageConfig.config["csb_interface"]["max_time_valve"].to_s
-		if order_type == StorageConfig.config["csb_interface"]["order_type_1"]
-			orderType.add_text StorageConfig.config["csb_interface"]["order_type_1"].to_s
-		else
-			orderType.add_text StorageConfig.config["csb_interface"]["order_type_2"].to_s
-		end
-		startRow.add_text @@startrow.to_s
+		orderType.add_text order_type.to_s
+		startRow.add_text '1'
 		# rowCount.add_text "行数统计"
 		# messageCode.add_text "错误信息code"
 		# description.add_text "错误信息描述"
 		activeCode.add_text StorageConfig.config["csb_interface"]["active_code"]
-		puts current_date
-		puts start_date
+		# puts current_date
+		# puts start_date
 		beginDate.add_text start_date+' '+StorageConfig.config["csb_interface"]["query_time"]
 		endDate.add_text current_date+' '+StorageConfig.config["csb_interface"]["query_time"]
 
@@ -257,6 +257,8 @@ class CSBSendWithSOAP
   end
 
   def self.parseAndSaveSendPointOrder(xml_file,order_type)
+  	orderTransStatus = Array.new
+
   	doc = REXML::Document.new(decode_xml(xml_file)) 
   	root = doc.root
   	head = root.elements['Head']
@@ -323,12 +325,54 @@ class CSBSendWithSOAP
   		puts order_hash
   		order = StandardInterface.order_enter(order_hash, Business.find(StorageConfig.config["business"]['bst_id']), Business.find(StorageConfig.config["unit"]['zb_id']))
   		if !order.blank?
-	      @@startrow += 1
+  			orderTransStatus << orderId
+	      # @@startrow += 1
 	    else
-	      return true
+	    	next
+	      # return true
 	    end
   	}
-  	return orderTotal.text.to_i > @@startrow - 1
+  	setPointUpdateTransStatus(orderTransStatus, order_type)
+  	# return orderTotal.text.to_i > @@startrow - 1
+	end
+
+	def self.setPointUpdateTransStatus(order_ids, order_type)
+		xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
+  	doc = REXML::Document.new       #创建XML内容 
+
+  	scoreOrderInfo = doc.add_element('ScoreOrderInfo')
+		head = scoreOrderInfo.add_element('Head')
+		sender = head.add_element('Sender')
+		reciver = head.add_element('Reciver')
+		orderTotal = head.add_element('OrderTotal')
+		maxTimeValve = head.add_element('MaxTimeValve')
+		orderType = head.add_element('OrderType')
+		startRow = head.add_element('startRow')
+		rowCount = head.add_element('rowCount')
+		messageCode = head.add_element('MessageCode')
+		description = head.add_element('Description')
+		activeCode = head.add_element('ActiveCode')
+
+		sender.add_text StorageConfig.config["csb_interface"]["post_name"]
+		reciver.add_text StorageConfig.config["csb_interface"]["bst_name"]
+		# orderTotal.add_text "7"
+		# maxTimeValve.add_text StorageConfig.config["csb_interface"]["max_time_valve"].to_s
+		orderType.add_text order_type.to_s
+		# startRow.add_text '1'
+		# rowCount.add_text "行数统计"
+		# messageCode.add_text "错误信息code"
+		description.add_text "配送商接收到订单返回信息"
+		activeCode.add_text StorageConfig.config["csb_interface"]["active_code"]
+
+		orderDetail = scoreOrderInfo.add_element('OrderDetail')
+		order_ids.each do |id|
+			orderLabel = orderDetail.add_element('OrderLabel')
+			orderLabel.add_attributes('orderId', id)
+			orderLabel.add_attributes('isReceive', 'y')
+		end
+
+		xml_file << doc.to_s
+		xml_file.encode(:xml => :text)
 	end
 
 	def self.parseUpdatePointOrderStatus(xml_file)
@@ -364,6 +408,26 @@ class CSBSendWithSOAP
   		return_array << '0' << ''
   	else
   		return_array << processCode.text << description.text
+  	end
+  	return return_array
+	end
+
+	def self.parsePointUpdateTransStatus(xml_file)
+		doc = REXML::Document.new(decode_xml(xml_file)) 
+  	root = doc.root
+  	head = root.elements['Head']
+  	sender = head.elements['Sender']
+  	reciver = head.elements['Reciver']
+  	orderTotal = head.elements['OrderTotal']
+  	messageCode = head.elements['MessageCode']
+  	description = head.elements['Description']
+  	activeCode = head.elements['ActiveCode']
+
+  	return_array = []
+  	if messageCode.text.blank?
+  		return_array << '0' << ''
+  	else
+  		return_array << messageCode.text << description.text
   	end
   	return return_array
 	end
