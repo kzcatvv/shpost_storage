@@ -46,6 +46,10 @@ class Stock < ActiveRecord::Base
     in_storage(storage).find_stock(specification, supplier, business).available.prior.first
   end
 
+  def self.find_stocks_in_storage(specification, supplier, business, storage)
+    in_storage(storage).find_stock(specification, supplier, business).available
+  end
+
   def self.total_stock_in_unit(specification, supplier, business, unit)
     in_unit(unit).find_stock(specification, supplier, business).sum_virtual_amount
   end
