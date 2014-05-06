@@ -51,51 +51,134 @@ namespace :transmitter do
   end
 
   namespace :csb do
-    desc "CSB Transmitter"
-      task :update_order_status => :environment do
-        generate_params 'transmitter.csb.update_order_status'
+    desc "CSB Transmitter update_order_status"
+    task :update_order_status => :environment do
+      generate_params 'transmitter.csb.update_order_status'
 
-        while 1==1 do
-          @count += 1
-          begin
-            orders = BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'waiting')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'printed')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'checked')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'picking')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'packed')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'delivering')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'delivered')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'declined')
-            orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'returned')
-            return_array = CSBSendWithSOAP.updatePointOrderStatus(orders)
-            if return_array[0]=="0"
-              orders.each do |order|
-                # todo: order:deliver_notice=1:N
-                notice=order.deliver_notices[0]
-                notice.status="success"
-                notice.send_times=notice.send_times+1
-                notice.save
-              end
-            else
-              orders.each do |order|
-                notice=order.deliver_notices[0]
-                notice.status=return_array[0]+':'+return_array[1]
-                notice.send_times=notice.send_times+1
-                notice.save
-              end
-            end
-          rescue Exception => e
+      while 1==1 do
+        @count += 1
+        begin
+          orders = BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'waiting')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'printed')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'checked')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'picking')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'packed')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'delivering')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'delivered')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'declined')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'returned')
+          return_array = CSBSendWithSOAP.updatePointOrderStatus(orders)
+          if return_array[0]=="0"
             orders.each do |order|
+              # todo: order:deliver_notice=1:N
               notice=order.deliver_notices[0]
-              notice.status="HTTP Exception"
+              notice.status="success"
               notice.send_times=notice.send_times+1
               notice.save
             end
-            Rails.errors e.message
-          ensure
-            ActiveRecord::Base.connection_pool.release_connection
-            puts "#{@title} : #{@count}"
+          else
+            orders.each do |order|
+              notice=order.deliver_notices[0]
+              notice.status=return_array[0]+':'+return_array[1]
+              notice.send_times=notice.send_times+1
+              notice.save
+            end
           end
+        rescue Exception => e
+          orders.each do |order|
+            notice=order.deliver_notices[0]
+            notice.status="HTTP Exception"
+            notice.send_times=notice.send_times+1
+            notice.save
+          end
+          Rails.errors e.message
+        ensure
+          ActiveRecord::Base.connection_pool.release_connection
+          puts "#{@title} : #{@count}"
+        end
+        sleep @interval
+      end
+    end
+
+    desc "CSB Transmitter order_status"
+    task :order_status => :environment do
+      generate_params 'transmitter.csb.order_status'
+
+      while 1==1 do
+        @count += 1
+        begin
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'delivered')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'declined')
+          orders << BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],'returned')
+          return_array = CSBSendWithSOAP.pointOrderStatus(orders)
+          if return_array[0]=="0"
+            orders.each do |order|
+              # todo: order:deliver_notice=1:N
+              notice=order.deliver_notices[0]
+              notice.status="success"
+              notice.send_times=notice.send_times+1
+              notice.save
+            end
+          else
+            orders.each do |order|
+              notice=order.deliver_notices[0]
+              notice.status=return_array[0]+':'+return_array[1]
+              notice.send_times=notice.send_times+1
+              notice.save
+            end
+          end
+        rescue Exception => e
+          orders.each do |order|
+            notice=order.deliver_notices[0]
+            notice.status="HTTP Exception"
+            notice.send_times=notice.send_times+1
+            notice.save
+          end
+          Rails.errors e.message
+        ensure
+          ActiveRecord::Base.connection_pool.release_connection
+          puts "#{@title} : #{@count}"
+        end
+        sleep @interval
+      end
+    end
+
+    desc "CSB Transmitter send_point_order"
+    task :send_point_order => :environment do
+      generate_params 'transmitter.csb.send_point_order'
+
+      while 1==1 do
+        @count += 1
+        begin
+          return_array = CSBSendWithSOAP.sendPointOrder()
+          # if return_array[0]=="0"
+          #   orders.each do |order|
+          #     # todo: order:deliver_notice=1:N
+          #     notice=order.deliver_notices[0]
+          #     notice.status="success"
+          #     notice.send_times=notice.send_times+1
+          #     notice.save
+          #   end
+          # else
+          #   orders.each do |order|
+          #     notice=order.deliver_notices[0]
+          #     notice.status=return_array[0]+':'+return_array[1]
+          #     notice.send_times=notice.send_times+1
+          #     notice.save
+          #   end
+          # end
+        rescue Exception => e
+          # orders.each do |order|
+          #   notice=order.deliver_notices[0]
+          #   notice.status="HTTP Exception"
+          #   notice.send_times=notice.send_times+1
+          #   notice.save
+          # end
+          Rails.errors e.message
+        ensure
+          ActiveRecord::Base.connection_pool.release_connection
+          puts "#{@title} : #{@count}"
+        end
         sleep @interval
       end
     end
