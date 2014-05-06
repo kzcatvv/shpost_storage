@@ -1,0 +1,69 @@
+<%- model_class = Order -%>
+<%= define_grid(@orders_grid, hide_submit_button: true, hide_reset_button: true) do |g|
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no', detach_with_id: :no_filter
+
+    g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name', detach_with_id: :customer_name_filter
+
+    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit', detach_with_id: :customer_unit_filter
+
+   
+    g.column name: model_class.human_attribute_name(:customer_tel), attribute: 'customer_tel', detach_with_id: :customer_tel_filter
+
+    g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone', detach_with_id: :customer_phone_filter
+
+    g.column name: model_class.human_attribute_name(:province), attribute: 'province', detach_with_id: :province_filter
+
+    g.column name: model_class.human_attribute_name(:city), attribute: 'city',detach_with_id: :city_filter
+
+    g.column name: model_class.human_attribute_name(:county), attribute: 'county',detach_with_id: :county_filter
+
+    g.column name: model_class.human_attribute_name(:customer_address), attribute: 'customer_address',detach_with_id: :customer_address_filter
+
+    g.column name: model_class.human_attribute_name(:customer_postcode), attribute: 'customer_postcode',detach_with_id: :customer_postcode_filter
+
+    g.column name: model_class.human_attribute_name(:customer_email), attribute: 'customer_email',detach_with_id: :customer_email_filter
+
+    g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight',detach_with_id: :total_weight_filter
+
+    g.column name: model_class.human_attribute_name(:total_amount), attribute: 'total_amount',detach_with_id: :total_amount_filter
+
+    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type', detach_with_id: :transport_type_filter,custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
+      order.transport_type_name
+    end
+
+    g.column name: model_class.human_attribute_name(:transport_price), attribute: 'transport_price',detach_with_id: :transport_price_filter
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status', detach_with_id: :status_filter,custom_filter: Order::STATUS.invert do |order| 
+      order.status_name
+    end
+
+    g.column name: model_class.human_attribute_name(:buyer_desc), attribute: 'buyer_desc',detach_with_id: :buyer_desc_filter
+
+    g.column name: model_class.human_attribute_name(:seller_desc), attribute: 'seller_desc', detach_with_id: :seller_desc_filter
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', detach_with_id: :business_id_filter, model: 'Business' do |order|
+      order.business.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'name', detach_with_id: :storage_id_filter,model: 'Storage' do |order|
+      order.storage.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'name', detach_with_id: :unit_id_filter,model: 'Unit' do |order|
+      order.unit.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_id', detach_with_id: :keyclientorder_id_filter,model: 'Keyclientorder' do |order|
+      order.keyclientorder.try :batch_id
+    end
+
+    g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage', detach_with_id: :is_shortage_filter,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
+      order.shortage_type_name
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', detach_with_id: :created_at_filter do |order|
+       order.created_at.to_s(:short)
+    end
+
+  end 
+%>
