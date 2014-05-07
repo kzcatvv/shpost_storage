@@ -92,3 +92,5 @@ gem 'httpclient'
 gem "soap4r"
 
 gem "savon"
+
+gem 'jquery_datepicker'

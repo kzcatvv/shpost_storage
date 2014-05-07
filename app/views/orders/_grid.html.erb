@@ -62,7 +62,7 @@
     end
 
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', detach_with_id: :created_at_filter do |order|
-       order.created_at.to_s(:short)
+       order.created_at.to_s(:db)
     end
 
   end 
