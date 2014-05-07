@@ -464,6 +464,20 @@ class OrdersController < ApplicationController
      @orders_grid = initialize_grid(@orders,
                    :include => [:business],
                    :conditions => {:order_type => "b2c",:status => "waiting"})
+
+     @allcnt = {}
+     @allcnt.clear
+     @selectorders=Order.where(id: @orders_grid.resultset.limit(nil).to_ary)
+     @selectorders.each do |o|
+      o.order_details.each do |d|
+        product = [o.business_id,d.specification_id,d.supplier_id]
+        if @allcnt.has_key?(product)
+            @allcnt[product][0]=@allcnt[product][0]+d.amount
+        else
+            @allcnt[product]=[d.amount]
+        end
+      end
+     end
      #binding.pry
 
   end
