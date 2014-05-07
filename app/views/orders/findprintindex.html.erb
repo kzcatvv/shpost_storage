@@ -10,12 +10,11 @@
 <%= render partial: 'grid'%>
 
 
-     <span>商户:</span>
+     <div>商户:</div>
+     <div style="width:200px"><%= grid_filter(@orders_grid, :business_id_filter)%></div>
 
-     <span><%= grid_filter(@orders_grid, :business_id_filter)%></span>
-
-     <span>日期:</span>
-     <span><%= grid_filter(@orders_grid, :created_at_filter)%></span>
+     <div>日期:</div>
+     <div><%= grid_filter(@orders_grid, :created_at_filter)%></div>
 
 
     <td><button class="wg-external-submit-button" data-grid-name="grid">Submit</button></td>
