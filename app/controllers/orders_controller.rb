@@ -85,9 +85,7 @@ class OrdersController < ApplicationController
 
     @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
     find_has_stock(@orders)
-    if !@orders.empty?
-      @orders.update_all(keyclientorder_id: @keycorder)
-    end
+    
    else
     @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_id').first
     @orders=@keycorder.orders
@@ -142,7 +140,8 @@ class OrdersController < ApplicationController
       time = Time.new
       batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
       @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
-    
+      orders=Order.where(id: findorders)
+      orders.update_all(keyclientorder_id: @keycorder)
 
       allcnt.each do |k,v|
          if v[1] > 0
@@ -152,6 +151,7 @@ class OrdersController < ApplicationController
     end
 
     orders=Order.where(id: findorders)
+
   end
 
   def nextbatch
@@ -467,7 +467,20 @@ class OrdersController < ApplicationController
 
      @allcnt = {}
      @allcnt.clear
-     @selectorders=Order.where(id: @orders_grid.resultset.limit(nil).to_ary)
+     @slorders=@orders_grid.resultset.limit(nil).to_ary
+     @selectorders=Order.where(id: @slorders)
+     if !params[:grid].nil?
+       if !params[:grid][:f]["businesses.name".to_sym].nil?
+        businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
+        @selectorders=@selectorders.where(:business_id,businessid)
+       end
+
+       if !params[:grid][:f][:created_at].nil?
+        @selectorders=@selectorders.where(["created_at >= ? and created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
+       end
+     end
+
+     @selectorders=@selectorders.to_ary
      @selectorders.each do |o|
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
