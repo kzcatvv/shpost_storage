@@ -430,6 +430,7 @@ zh-CN:
         is_shortage_no: "有货"
         province: "省"
         city: "市"
+        county: "区"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
