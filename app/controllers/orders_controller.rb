@@ -464,10 +464,9 @@ class OrdersController < ApplicationController
      @orders_grid = initialize_grid(@orders,
                    :include => [:business],
                    :conditions => {:order_type => "b2c",:status => "waiting"})
-
-     @allcnt = {}
+      @allcnt = {}
      @allcnt.clear
-     @slorders=@orders_grid.resultset.limit(nil).to_ary
+     @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary
      @selectorders=Order.where(id: @slorders)
      if !params[:grid].nil?
        if !params[:grid][:f]["businesses.name".to_sym].nil?
