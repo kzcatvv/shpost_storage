@@ -1,5 +1,6 @@
 var oid = <%= @curr_order %>;
 var id = <%= @curr_dtl %>;
+
 if (oid == 0)
 {
     if (id == 0)
@@ -15,22 +16,23 @@ if (oid == 0)
       var tddbid = "#dbam_"+<%= @curr_dtl %>;
       var trid = "#tr_"+<%= @curr_dtl %>;
       
-      if ($(tddbid).val() != $(tdraid).val())
+      if ( parseInt( $(tddbid).val() ) != parseInt( $(tdraid).val() ) )
       {
-
-        if ($(tddbid).val() > $(tdraid).val())
+        //alert($(tddbid).val()+"+"+$(tdraid).val());
+        if ( parseInt( $(tddbid).val() ) > parseInt( $(tdraid).val() ) )
         {
            $(tdraid).val(parseInt($(tdraid).val())+1);
+           //alert($(tdraid).val());
         }
 
-        if ($(tddbid).val() == $(tdraid).val())
+        if ( parseInt( $(tddbid).val() ) == parseInt( $(tdraid).val() ) )
         {
            $(trid).css("color","blue");
            $('#actcnt').val(parseInt($('#actcnt').val())+1);
 
            //alert($('#orderid').val()+"+"+$('#dtlcnt').val()+"+"+$('#actcnt').val());
 
-           if ( $('#dtlcnt').val() == $('#actcnt').val() )
+           if ( parseInt( $('#dtlcnt').val() ) == parseInt( $('#actcnt').val() ) )
            {
              $.ajax({
                      type : 'GET',
