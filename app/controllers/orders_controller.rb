@@ -464,7 +464,7 @@ class OrdersController < ApplicationController
      @orders_grid = initialize_grid(@orders,
                    :include => [:business],
                    :conditions => {:order_type => "b2c",:status => "waiting"})
-      @allcnt = {}
+     @allcnt = {}
      @allcnt.clear
      @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary
      @selectorders=Order.where(id: @slorders)
