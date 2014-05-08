@@ -14,6 +14,16 @@
   <dd><%= @specification.desc %></dd>
   <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
   <dd><%= @specification.name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:long) %>:</strong></dt>
+  <dd><%= @specification.long %></dd>
+   <dt><strong><%= model_class.human_attribute_name(:wide) %>:</strong></dt>
+  <dd><%= @specification.wide %></dd>
+   <dt><strong><%= model_class.human_attribute_name(:high) %>:</strong></dt>
+  <dd><%= @specification.high %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:weight) %>:</strong></dt>
+  <dd><%= @specification.weight %></dd>
+   <dt><strong><%= model_class.human_attribute_name(:volume) %>:</strong></dt>
+  <dd><%= @specification.volume %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

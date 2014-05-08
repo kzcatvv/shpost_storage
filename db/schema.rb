@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140505014000) do
+ActiveRecord::Schema.define(version: 20140508055851) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -223,6 +223,11 @@ ActiveRecord::Schema.define(version: 20140505014000) do
     t.string   "sixnine_code"
     t.string   "desc"
     t.string   "sku"
+    t.float    "long"
+    t.float    "wide"
+    t.float    "high"
+    t.float    "weight"
+    t.float    "volume"
   end
 
   create_table "standard_interfaces", force: true do |t|
