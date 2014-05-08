@@ -414,6 +414,7 @@ zh-CN:
         storage_id: "所属仓库"
         keyclientorder_id: "大客户订单编号"
         is_shortage: "是否缺货"
+        created_at: "创建时间"
         type_b2b: "大客户订单"
         type_b2c: "电商订单"
         transport_type_tcsd: "同城速递"
@@ -562,6 +563,9 @@ zh-CN:
         b2cfindprint:
           name: "电商订单打印"
           link: "/orders/findprint"
+        b2cfindprintindex:
+          name: "电商订单筛选打印"
+          link: "/orders/findprintindex"
         packout:
           name: "包装出库"
           link: "/orders/packout"
