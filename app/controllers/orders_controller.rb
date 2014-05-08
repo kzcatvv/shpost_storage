@@ -207,7 +207,7 @@ class OrdersController < ApplicationController
             outstocks = Stock.find_stocks_in_storage(keydtl.specification, keydtl.supplier, keyorder.business, current_storage).to_ary
              outbl = false
              amount = keydtl.amount * keyordercnt
-             sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
+             sls=keyorder.stock_logs.where(stock_id: outstocks.to_ary).distinct
              sls.each do |sl|
               has_out += sl.amount
              end
@@ -367,8 +367,8 @@ class OrdersController < ApplicationController
        orderchk = true
        has_out=0
        keyorder.keyclientorderdetails.each do |kdl|
-         outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage).to_ary
-         sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
+         outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage)
+         sls=keyorder.stock_logs.where(stock_id: outstocks.to_ary).distinct
          sls.each do |sl|
            has_out += sl.amount
          end
@@ -389,8 +389,8 @@ class OrdersController < ApplicationController
       mi_cnt=keyorder.orders.count
       has_out=0
       keyorder.keyclientorderdetails.each do |kdl|
-         outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage).to_ary
-         sls=keyorder.stock_logs.where(stock_id: outstocks).distinct
+         outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage)
+         sls=keyorder.stock_logs.where(stock_id: outstocks.to_ary).distinct
          sls.each do |sl|
            has_out += sl.amount
          end
@@ -490,7 +490,7 @@ class OrdersController < ApplicationController
         end
       end
      end
-     binding.pry
+     #binding.pry
 
   end
 
