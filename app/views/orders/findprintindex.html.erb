@@ -2,7 +2,11 @@
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-
+     <% if can? :stockout, Order %>
+      <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
+                  stockout_orders_url(@keycorder),
+                  :class => 'btn btn-primary' %>
+      <% end %>
   </div>
 </div>
 
