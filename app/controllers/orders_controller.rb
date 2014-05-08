@@ -374,7 +374,7 @@ class OrdersController < ApplicationController
          end
 
          if kdl.amount*keyorder.orders.count - has_out > 0
-           if outstocks.sum(:virtual_amount)- kdl.amount * keyorder.orders.count + has_out >= 0
+           if outstocks.sum(:virtual_amount) - kdl.amount * keyorder.orders.count + has_out >= 0
               chkout = true
            else 
               chkout = false
