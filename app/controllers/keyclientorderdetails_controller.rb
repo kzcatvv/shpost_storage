@@ -6,7 +6,7 @@ class KeyclientorderdetailsController < ApplicationController
   # GET /keyclientorderdetails.json
   def index
     #@keyclientorderdetails = Keyclientorderdetail.all
-    @keyclientorderdetails_grid = initialize_grid(@keyclientorderdetails,include: [:keyclientorder, :specificaton, :supplier])
+    @keyclientorderdetails_grid = initialize_grid(@keyclientorderdetails,include: [:keyclientorder, :specification, :supplier])
   end
 
   # GET /keyclientorderdetails/1

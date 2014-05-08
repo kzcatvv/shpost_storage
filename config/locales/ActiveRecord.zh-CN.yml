@@ -367,7 +367,7 @@ zh-CN:
         name: "类型名称"
         unit_id: "所属机构"
       commodity:
-        cno: "商品编号"
+        no: "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
       specification:
@@ -386,6 +386,7 @@ zh-CN:
         supplier_id: "供应商"
         specification_id: "商品规格"
         external_code: "第三方商品编码"
+        spec_desc: "规格描述"
       business:
         name: "名称"
         email: "电子邮件"
