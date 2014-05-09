@@ -62,6 +62,10 @@ class ContactsController < ApplicationController
     end
   end
 
+  def relation
+    @contacts_grid_r = Relationship.find(params[:rid]).contacts
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_contact

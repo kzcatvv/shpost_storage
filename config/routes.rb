@@ -1,7 +1,9 @@
 ShpostStorage::Application.routes.draw do
 
 
-  resources :contacts
+  resources :contacts do
+    get 'relation', on: :collection
+  end
 
   resources :orders do
      collection do
@@ -31,6 +33,7 @@ ShpostStorage::Application.routes.draw do
         get 'select_commodities'
         get 'select_specifications'
        end
+    resources :contacts
   end
 
   resources :shelves do
