@@ -14,6 +14,7 @@
 //= require jquery_ujs
 //= require jquery.ui.all
 //= require wice_grid
+//= require autocomplete-rails
 
 //= require twitter/bootstrap
 //= require turbolinks
@@ -49,33 +50,33 @@ function clickin(current)
   if ($("td#stock_logs_status_"+param[3]).text()!="waiting") {
     return false;
   }
-  if (param[2] == "amount") {
+  // if (param[2] == "amount") {
     if ($("input#"+current.id).is(":hidden")){ 
       $(current).hide();
       $("input#"+current.id).show();
       $("input#"+current.id).focus();
     }
-  } else {
-    if ($("select#"+current.id).is(":hidden")){ 
-      $(current).hide();
-      $("select#"+current.id).show();
-      $("select#"+current.id).focus();
-    }
-  }
+  // } else {
+  //   if ($("select#"+current.id).is(":hidden")){ 
+  //     $(current).hide();
+  //     $("select#"+current.id).show();
+  //     $("select#"+current.id).focus();
+  //   }
+  // }
 }
 
 function hideit(current)
 {
   param = current.id.split('_');
   $("p#"+current.id).show();
-  if (param[2] == "amount") {
+  // if (param[2] == "amount") {
     if ($(current).val() == "") {
       $(current).val(0);
     }
     $("p#"+current.id).text($(current).val());
-  } else {
-    $("p#"+current.id).text($(current).find("option:selected").text());
-  }
+  // } else {
+  //   $("p#"+current.id).text($(current).find("option:selected").text());
+  // }
   $(current).hide();
 }
 

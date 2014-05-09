@@ -93,4 +93,11 @@ gem "soap4r"
 
 gem "savon"
 
+gem 'rails3-jquery-autocomplete'
+gem 'nifty-generators'
+
 gem 'jquery_datepicker'
+
+gem 'ruby-oci8'
+
+gem "activerecord-oracle_enhanced-adapter"

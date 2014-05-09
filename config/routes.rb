@@ -31,7 +31,9 @@ ShpostStorage::Application.routes.draw do
        end
   end
 
-  resources :shelves
+  resources :shelves do
+    get :autocomplete_shelf_shelf_code, :on => :collection
+  end
 
 
   resources :purchases do
@@ -43,7 +45,12 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
-  resources :stocks
+  resources :stocks do
+    collection do
+       get 'findstock'
+       get 'getstock'
+    end
+  end
 
   resources :areas
 

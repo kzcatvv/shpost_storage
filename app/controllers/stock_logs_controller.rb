@@ -71,31 +71,38 @@ class StockLogsController < ApplicationController
       @stock = @stock_log.stock
       stock_log = @stock_log
       if !params[:shelfid].nil?
-        if params[:shelfid] != @stock.shelf.id.to_s
-          stock = Stock.find_stock_in_shelf_with_batch_no(@stock.specification, @stock.supplier, @stock.business, @stock.batch_no, Shelf.find(params[:shelfid]))
-          if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
-            @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
-          elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
-            @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
-          end
-          @stock.save()
-          if !stock
+        puts current_storage.id
+        # puts Area.where(storage: current_storage).ids
+        shelf_modify = Shelf.where(area_id: Area.where(storage: current_storage).ids, shelf_code: params[:shelfid]).first
+        if !shelf_modify.blank?
+          if shelf_modify.id != @stock.shelf.id.to_s
+            stock = Stock.find_stock_in_shelf_with_batch_no(@stock.specification, @stock.supplier, @stock.business, @stock.batch_no, shelf_modify)
             if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
-              stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: params[:shelfid], batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: 0 - @stock_log.amount)
+              @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
             elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
-              stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: params[:shelfid], batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: @stock_log.amount)
+              @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
             end
-             # @stock_log.stock = stock
-             # @stock_log.save();
-            stock_log = StockLog.update(@stock_log.id, stock: stock)
-          else
-            if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
-              stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount - @stock_log.amount)
-            elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
-              stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount + @stock_log.amount)
+            @stock.save()
+            if !stock
+              if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+                stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: shelf_modify.id, batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: 0 - @stock_log.amount)
+              elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+                stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: shelf_modify.id, batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: @stock_log.amount)
+              end
+               # @stock_log.stock = stock
+               # @stock_log.save();
+              stock_log = StockLog.update(@stock_log.id, stock: stock)
+            else
+              if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+                stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount - @stock_log.amount)
+              elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+                stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount + @stock_log.amount)
+              end
+              stock_log = StockLog.update(@stock_log.id, stock: stock)
             end
-            stock_log = StockLog.update(@stock_log.id, stock: stock)
           end
+        else
+          # error shelf_code
         end
       end
 
