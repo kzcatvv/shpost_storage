@@ -1,5 +1,6 @@
 class Supplier < ActiveRecord::Base
 	belongs_to :unit
+	has_many :contacts, dependent: :destroy
 	validates_presence_of :no, :name, :message => '不能为空'
 	validates_uniqueness_of :no, :message => '该编号已存在'
 
