@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140513082548) do
+ActiveRecord::Schema.define(version: 20140513083852) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -202,11 +202,6 @@ ActiveRecord::Schema.define(version: 20140513082548) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "spec_desc"
-  end
-
-  create_table "relationships_contacts", id: false, force: true do |t|
-    t.integer "relationship_id"
-    t.integer "contact_id"
   end
 
   create_table "roles", force: true do |t|
