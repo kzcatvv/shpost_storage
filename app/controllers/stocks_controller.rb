@@ -78,6 +78,16 @@ class StocksController < ApplicationController
 
     @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).first
     @stocks=Stock.where(specification_id: @specification)
+    @allcnt={}
+    @stocks.each do |s|
+        product = [s.business_id,s.specification_id,s.supplier_id]
+        if @allcnt.has_key?(product)
+            @allcnt[product][0]=@allcnt[product][0]+s.actual_amount
+            @allcnt[product][1]=@allcnt[product][1]+s.virtual_amount
+        else
+            @allcnt[product]=[s.actual_amount,s.virtual_amount]
+        end
+     end
     #binding.pry
 
   end
