@@ -24,6 +24,16 @@
 
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
+    g.column name: model_class.human_attribute_name(:long), attribute: 'long'
+
+    g.column name: model_class.human_attribute_name(:wide), attribute: 'wide'
+
+    g.column name: model_class.human_attribute_name(:high), attribute: 'high'
+
+    g.column name: model_class.human_attribute_name(:weight), attribute: 'weight'
+
+    g.column name: model_class.human_attribute_name(:volume), attribute: 'volume'
+
     g.column do |specification|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_commodity_specification_path(@commodity,specification), :class => 'btn btn-xs btn-primary' if can? :update, specification) << ' ' <<

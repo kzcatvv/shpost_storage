@@ -23,7 +23,37 @@
       <%= f.text_field :name, :class => 'form-control' %>
     </div>
   </div>
+    <div class="form-group">
+    <%= f.label :long, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :long, :class => 'form-control' %>
+    </div>
+  </div>
+    <div class="form-group">
+    <%= f.label :wide, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :wide, :class => 'form-control' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :high, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :high, :class => 'form-control' %>
+    </div>
+  </div>
 
+    <div class="form-group">
+    <%= f.label :weight, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :weight, :class => 'form-control' %>
+    </div>
+  </div>
+    <div class="form-group">
+    <%= f.label :volume, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :volume, :class => 'form-control' %>
+    </div>
+  </div>
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

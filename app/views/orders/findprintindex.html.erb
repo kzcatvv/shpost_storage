@@ -1,83 +1,36 @@
 <%- model_class = Order -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
-  <div style="float:right">
-
-  </div>
+  
 </div>
 
 
+<%= render partial: 'grid'%>
+  <% @keycorder=@orders_grid.current_page_records.first.keyclientorder_id %>
+  <div style="float:right">
+     <% if can? :stockout, Order %>
+      <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
+                  stockout_orders_url(@keycorder),
+                  :class => 'btn btn-primary' %>
+      <% end %>
+  </div>
 
 
-<%= grid(@orders_grid) do |g|
-    g.column name: model_class.human_attribute_name(:no), attribute: 'no',filter: false
+     <div>商户:</div>
+     <div style="width:200px"><%= grid_filter(@orders_grid, :business_id_filter)%></div>
 
-    g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name',filter: false
+     <div>日期:</div>
+     <div><%= grid_filter(@orders_grid, :created_at_filter)%></div>
 
-    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit',filter: false
 
-   
-    g.column name: model_class.human_attribute_name(:customer_tel), attribute: 'customer_tel',filter: false
+    <td><button class="wg-external-submit-button" data-grid-name="grid">Submit</button></td>
+    <td><button class="wg-external-reset-button" data-grid-name="grid">Reset</button></td>
 
-    g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone',filter: false
+ 
+ <%= render_grid(@orders_grid)%>
 
-    g.column name: model_class.human_attribute_name(:province), attribute: 'province',filter: false
 
-    g.column name: model_class.human_attribute_name(:city), attribute: 'city',filter: false
-
-    g.column name: model_class.human_attribute_name(:county), attribute: 'county',filter: false
-
-    g.column name: model_class.human_attribute_name(:customer_address), attribute: 'customer_address',filter: false
-
-    g.column name: model_class.human_attribute_name(:customer_postcode), attribute: 'customer_postcode',filter: false
-
-    g.column name: model_class.human_attribute_name(:customer_email), attribute: 'customer_email',filter: false
-
-    g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight',filter: false
-
-    g.column name: model_class.human_attribute_name(:total_amount), attribute: 'total_amount',filter: false
-
-    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type',filter: false,custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
-      order.transport_type_name
-    end
-
-    g.column name: model_class.human_attribute_name(:transport_price), attribute: 'transport_price',filter: false
-
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status',filter: false,custom_filter: Order::STATUS.invert do |order| 
-      order.status_name
-    end
-
-    g.column name: model_class.human_attribute_name(:buyer_desc), attribute: 'buyer_desc',filter: false
-
-    g.column name: model_class.human_attribute_name(:seller_desc), attribute: 'seller_desc',filter: false
-
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |order|
-      order.business.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'name',filter: false, model: 'Storage' do |order|
-      order.storage.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'name',filter: false, model: 'Unit' do |order|
-      order.unit.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_id',filter: false, model: 'Keyclientorder' do |order|
-      order.keyclientorder.try :batch_id
-    end
-
-    g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage',filter: false,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
-      order.shortage_type_name
-    end
-
-    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |order|
-      order.created_at.to_s(:short)
-    end
-
-  end 
-%>
-
+<div>
 <p>订单明细汇总</p>
 <table class="table table-striped">
   <thead>
@@ -99,3 +52,4 @@
     <% end %>
   </tbody>
 </table>
+</div>

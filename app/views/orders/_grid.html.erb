@@ -41,8 +41,8 @@
 
     g.column name: model_class.human_attribute_name(:seller_desc), attribute: 'seller_desc', detach_with_id: :seller_desc_filter
 
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', detach_with_id: :business_id_filter, model: 'Business' do |order|
-      order.business.try :name
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id', detach_with_id: :business_id_filter,custom_filter: Business.all.map{|b| [b.name,b.id]} do |order|
+      Business.find(order.business_id).name
     end
 
     g.column name: model_class.human_attribute_name(:storage_id), attribute: 'name', detach_with_id: :storage_id_filter,model: 'Storage' do |order|
@@ -62,7 +62,7 @@
     end
 
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', detach_with_id: :created_at_filter do |order|
-       order.created_at.to_s(:short)
+       order.created_at.to_s(:db)
     end
 
   end 

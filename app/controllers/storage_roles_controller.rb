@@ -70,6 +70,6 @@ class StorageRolesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def role_params
-      params.require(:role).permit( :user_id, :role)
+      params.require(:role).permit( :user_id, :storage_id, :role)
     end
 end

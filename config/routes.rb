@@ -45,7 +45,12 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
-  resources :stocks
+  resources :stocks do
+    collection do
+       get 'findstock'
+       get 'getstock'
+    end
+  end
 
   resources :areas
 

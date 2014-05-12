@@ -376,6 +376,11 @@ zh-CN:
         desc: "规格描述"
         sixnine_code: "69码"
         name: "规格名称"
+        long: "长"
+        wide: "宽"
+        high: "高"
+        weight: "重量"
+        volume: "体积"
       relationship:
         business_id: "商户"
         supplier_id: "供应商"
@@ -414,6 +419,7 @@ zh-CN:
         storage_id: "所属仓库"
         keyclientorder_id: "大客户订单编号"
         is_shortage: "是否缺货"
+        created_at: "创建时间"
         type_b2b: "大客户订单"
         type_b2c: "电商订单"
         transport_type_tcsd: "同城速递"
@@ -430,6 +436,7 @@ zh-CN:
         is_shortage_no: "有货"
         province: "省"
         city: "市"
+        county: "区"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -562,6 +569,9 @@ zh-CN:
         b2cfindprint:
           name: "电商订单打印"
           link: "/orders/findprint"
+        b2cfindprintindex:
+          name: "电商订单筛选打印"
+          link: "/orders/findprintindex"
         packout:
           name: "包装出库"
           link: "/orders/packout"
@@ -586,6 +596,9 @@ zh-CN:
         stock_log:
           name: "库存操作查询"
           link: "/stock_logs"
+        findstock:
+          name: "库存汇总查询"
+          link: "/stocks/findstock"
     logs:
       name: "日志查询"
       submenu:

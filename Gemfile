@@ -95,3 +95,5 @@ gem "savon"
 
 gem 'rails3-jquery-autocomplete'
 gem 'nifty-generators'
+
+gem 'jquery_datepicker'
