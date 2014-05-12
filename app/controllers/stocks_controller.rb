@@ -75,9 +75,14 @@ class StocksController < ApplicationController
   end
 
   def getstock
+   if !params[:ex_code].empty?
+      @relationship=Relationship.where("external_code=?",params[:ex_code]).first
+      @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
 
+   elsif !params[:sixnine_code].empty?
     @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).first
     @stocks=Stock.where(specification_id: @specification)
+   end
     @allcnt={}
     @stocks.each do |s|
         product = [s.business_id,s.specification_id,s.supplier_id]
@@ -88,6 +93,7 @@ class StocksController < ApplicationController
             @allcnt[product]=[s.actual_amount,s.virtual_amount]
         end
      end
+   
     #binding.pry
 
   end
