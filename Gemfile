@@ -92,3 +92,6 @@ gem 'httpclient'
 gem "soap4r"
 
 gem "savon"
+
+gem 'rails3-jquery-autocomplete'
+gem 'nifty-generators'
