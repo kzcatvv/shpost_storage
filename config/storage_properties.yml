@@ -1,9 +1,11 @@
 test_mod: false
 business:
-    bst_id: 1 #号码百事通
-    jh_id: 2 #交通银行
+    bst_id: 10001 #号码百事通
+    jh_id: 10002 #交通银行万里行
+    pajf_id: 10003 #平安银行积分商城
+    padkh_id: 10004 #平安银行大客户
 unit:
-    zb_id: 1 #闸北区局
+    zb_id: 10000 #闸北区局
 csb_interface:
     csb_url: 'http://222.68.185.224:10088/scoreProject/services/0rderWS?wsdl'
     post_name: '邮政快递' #XX配送商

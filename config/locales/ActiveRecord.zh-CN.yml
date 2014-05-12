@@ -266,8 +266,8 @@ zh-CN:
         one: 商品规格管理
         other: 商品规格管理
       relationship:
-        one: 第三方商品编码管理
-        other: 第三方商品编码管理
+        one: 商品对应关系管理
+        other: 商品对应关系管理
       business:
         one: 商户管理
         other: 商户管理
@@ -531,7 +531,7 @@ zh-CN:
             can: :read
             role: :User
     storagemanage:
-      name: "仓内管理"
+      name: "仓库管理"
       submenu:
         area:
           name: "区域管理"
@@ -545,38 +545,8 @@ zh-CN:
           # needrole:
           #   can: :read
           #   role: "shelf"
-    suppliers:
-      name: "采购与供应商管理"
-      submenu:
-        supplier:
-          name: "供应商管理"
-          link: "/suppliers"
-        purchase:
-          name: "采购单管理"
-          link: "/purchases"
-    business:
-      name: "商户与订单管理"
-      submenu:
-        business:
-          name: "商户管理"
-          link: "/businesses"
-        b2corder:
-          name: "电商订单管理"
-          link: "/orders"
-        keyclientorder:
-          name: "大客户订单管理"
-          link: "/keyclientorders"
-        b2cfindprint:
-          name: "电商订单打印"
-          link: "/orders/findprint"
-        b2cfindprintindex:
-          name: "电商订单筛选打印"
-          link: "/orders/findprintindex"
-        packout:
-          name: "包装出库"
-          link: "/orders/packout"
     goodstypes:
-      name: "商品与规格管理"
+      name: "商品管理"
       submenu:
         goodstype:
           name: "商品类型管理"
@@ -585,8 +555,44 @@ zh-CN:
           name: "商品管理"
           link: "/commodities"
         relationship:
-          name: "第三方商品编码管理"
+          name: "商品对应关系管理"
           link: "/relationships"
+    shop:
+      name: "商户与供应商管理"
+      submenu:
+        business:
+          name: "商户管理"
+          link: "/businesses"
+        supplier:
+          name: "供应商管理"
+          link: "/suppliers"
+    suppliers:
+      name: "采购管理"
+      submenu:
+        purchase:
+          name: "采购单管理"
+          link: "/purchases"
+    business:
+      name: "订单管理"
+      submenu:
+        b2cfindprintindex:
+          name: "电商订单作业"
+          link: "/orders/findprintindex"
+        b2corder:
+          name: "电商订单查询"
+          link: "/orders"
+        keyclientorder:
+          name: "大批次订单查询"
+          link: "/keyclientorders"
+        # b2cfindprint:
+        #   name: "电商订单打印"
+        #   link: "/orders/findprint"
+    packout:
+      name: "包装出库"
+      submenu:
+        packout:
+          name: "包装出库"
+          link: "/orders/packout"
     stocks:
       name: "库存管理"
       submenu:
@@ -605,9 +611,6 @@ zh-CN:
         user_log:
           name: "日志查询"
           link: "/user_logs"
-        stock_log:
-          name: "库存操作查询"
-          link: "/stock_logs"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 
