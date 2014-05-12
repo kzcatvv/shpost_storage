@@ -1,0 +1,58 @@
+<%- model_class = Stock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} StockFind'], :model => model_class.model_name.human.titleize %></h1>
+  <div style="float:right">   
+  </div>
+
+</div>
+<div>
+   <%= form_tag("/stocks/getstock", method: "get") do -%>
+       <%= label_tag(:sixnine_code, "69码:") %>
+       <%= text_field_tag(:sixnine_code) %>
+       <%= submit_tag("查询") %>
+   <% end -%>
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>69码</th>
+      <th>商品名称</th>
+      <th>实际总数量</th>
+      <th>虚拟总数量</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><%= @specification.sixnine_code %></td>
+        <td><%= @specification.name %></td>
+        <td><%= @stocks.sum(:actual_amount) %></td>
+        <td><%= @stocks.sum(:virtual_amount) %></td>
+      </tr>
+  </tbody>
+</table>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:shelf_id) %></th>
+      <th><%= model_class.human_attribute_name(:business_id) %></th>
+      <th><%= model_class.human_attribute_name(:supplier_id) %></th>
+      <th><%= model_class.human_attribute_name(:actual_amount) %></th>
+      <th><%= model_class.human_attribute_name(:virtual_amount) %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @stocks.each do |stock| %>
+      <tr>
+        <td><%= Shelf.find(stock.shelf_id).shelf_code %></td>
+        <td><%= Business.find(stock.business_id).name %></td>
+        <td><%= Supplier.find(stock.supplier_id).name %></td>
+        <td><%= stock.actual_amount %></td>
+        <td><%= stock.virtual_amount %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+

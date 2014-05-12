@@ -3,6 +3,16 @@ class ShelvesController < ApplicationController
   before_filter :find_current_storage
   load_and_authorize_resource :shelf
 
+  autocomplete :shelf, :shelf_code
+
+  def autocomplete_shelf_shelf_code
+    term = params[:term]
+    # brand_id = params[:brand_id]
+    # country = params[:country]
+    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where('shelf_code LIKE ?', "%#{term}%").order(:shelf_code).all
+    render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
+  end
+
   def find_current_storage
     @areas = Area.where("storage_id = ?", session[:current_storage].id)
     @shelves = Shelf.where("area_id in (?)", @areas.ids)

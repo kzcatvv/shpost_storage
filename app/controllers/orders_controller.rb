@@ -463,7 +463,7 @@ class OrdersController < ApplicationController
   def findprintindex
      @orders_grid = initialize_grid(@orders,
                    :include => [:business],
-                   :conditions => {:order_type => "b2c",:status => "waiting"})
+                   :conditions => {:order_type => "b2c"})
      @allcnt = {}
      @allcnt.clear
      @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary

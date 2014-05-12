@@ -70,6 +70,18 @@ class StocksController < ApplicationController
     end
   end
 
+  def findstock
+
+  end
+
+  def getstock
+
+    @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).first
+    @stocks=Stock.where(specification_id: @specification)
+    #binding.pry
+
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     # def set_stock

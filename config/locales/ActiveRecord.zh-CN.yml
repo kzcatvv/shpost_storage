@@ -597,6 +597,9 @@ zh-CN:
         stock_log:
           name: "库存操作查询"
           link: "/stock_logs"
+        findstock:
+          name: "库存汇总查询"
+          link: "/stocks/findstock"
     logs:
       name: "日志查询"
       submenu:

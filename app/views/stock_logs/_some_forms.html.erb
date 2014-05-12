@@ -1,5 +1,6 @@
 <%- model_class = StockLog -%>
 <!-- <%= form_tag('/stock_logs/updateall', method: :post) do -%> -->
+<!--        <%= autocomplete_field_tag 'shelf_code', '', autocomplete_shelf_shelf_code_shelves_path, {id: "1"} %> -->
 
 <%= grid(@stock_logs_grid, show_filters: :no) do |g|
 
@@ -36,8 +37,10 @@
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', ordering: false, model: 'Shelf' do |stock_log|
       # if stock_log.status == 'waiting'
-        select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
-        content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'})
+        # select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+        content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'}) <<
+        text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")
+
       # else
       #   stock_log.stock.shelf.shelf_code
       # end
