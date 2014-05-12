@@ -9,6 +9,8 @@
    <%= form_tag("/stocks/getstock", method: "get") do -%>
        <%= label_tag(:sixnine_code, "69码:") %>
        <%= text_field_tag(:sixnine_code) %>
+       <%= label_tag(:ex_code, "商品编码:") %>
+       <%= text_field_tag(:ex_code) %>
        <%= submit_tag("查询") %>
    <% end -%>
 </div>

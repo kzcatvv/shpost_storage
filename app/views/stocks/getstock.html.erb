@@ -9,50 +9,53 @@
    <%= form_tag("/stocks/getstock", method: "get") do -%>
        <%= label_tag(:sixnine_code, "69码:") %>
        <%= text_field_tag(:sixnine_code) %>
+       <%= label_tag(:ex_code, "商品编码:") %>
+       <%= text_field_tag(:ex_code) %>
        <%= submit_tag("查询") %>
    <% end -%>
 </div>
-
+<% @allcnt.each do |key,value| %>
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>69码</th>
-      <th>商品名称</th>
-      <th>实际总数量</th>
-      <th>虚拟总数量</th>
+      <th>商户</th>
+      <th>产品规格</th>
+      <th>供应商</th>
+      <th>实际库存</th>
+      <th>虚拟库存</th>
     </tr>
   </thead>
   <tbody>
       <tr>
-        <td><%= @specification.sixnine_code %></td>
-        <td><%= @specification.name %></td>
-        <td><%= @stocks.sum(:actual_amount) %></td>
-        <td><%= @stocks.sum(:virtual_amount) %></td>
+        <td><%= Business.find(key[0]).name %></td>
+        <td><%= Specification.find(key[1]).name %></td>
+        <td><%= Supplier.find(key[2]).name %></td>
+        <td><%= value[0] %></td>
+        <td><%= value[1] %></td>
       </tr>
+      <table align="center" width="80%" rules=groups>
+        <thead>
+          <tr>
+             <th><%= model_class.human_attribute_name(:shelf_id) %></th>
+             <th><%= model_class.human_attribute_name(:batch_no) %></th>
+             <th><%= model_class.human_attribute_name(:actual_amount) %></th>
+             <th><%= model_class.human_attribute_name(:virtual_amount) %></th>
+         </tr>
+       </thead>
+       <tbody>
+         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]) %>
+         <% @selectstocks.each do |stock| %>
+           <tr>
+              <td><%= Shelf.find(stock.shelf_id).shelf_code %></td>
+              <td><%= stock.batch_no %></td>
+              <td><%= stock.actual_amount %></td>
+              <td><%= stock.virtual_amount %></td>
+           </tr>
+         <% end %>
+       </tbody>
+      </table>
   </tbody>
 </table>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th><%= model_class.human_attribute_name(:shelf_id) %></th>
-      <th><%= model_class.human_attribute_name(:business_id) %></th>
-      <th><%= model_class.human_attribute_name(:supplier_id) %></th>
-      <th><%= model_class.human_attribute_name(:actual_amount) %></th>
-      <th><%= model_class.human_attribute_name(:virtual_amount) %></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @stocks.each do |stock| %>
-      <tr>
-        <td><%= Shelf.find(stock.shelf_id).shelf_code %></td>
-        <td><%= Business.find(stock.business_id).name %></td>
-        <td><%= Supplier.find(stock.supplier_id).name %></td>
-        <td><%= stock.actual_amount %></td>
-        <td><%= stock.virtual_amount %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<% end %>
 
 
