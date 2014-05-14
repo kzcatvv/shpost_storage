@@ -12,7 +12,7 @@
 
 <%= grid(@contacts_grid) do |g|
 
-    g.column name: model_class.human_attribute_name(:suppler_id), attribute: 'name', model: 'Supplier' do |contact|
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |contact|
       contact.supplier.try :name
     end
 

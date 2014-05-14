@@ -160,6 +160,7 @@ zh-CN:
       close_purchase: 关闭
       stockout: 生成出库单
       ordercheck: 出库单确认
+      contacts: 联系人管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -298,6 +299,9 @@ zh-CN:
       keyclientorderdetail:
         one: 大客户订单明细管理
         other: 大客户订单明细管理
+      contact:
+        one: 联系人管理
+        other: 联系人管理
     attributes:
       user:
         email: "电子邮件"
@@ -507,6 +511,12 @@ zh-CN:
         desc: 备注
         amount: 数量
         batch_no: 商品批次号
+        supplier_id: 供应商
+      contact:
+        name: 联系人姓名
+        email: 邮件
+        phone: 电话
+        desc: 备注
         supplier_id: 供应商
       filetemp:
         filename: "文档"
