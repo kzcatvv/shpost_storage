@@ -41,12 +41,14 @@ class ShelvesController < ApplicationController
   # POST /shelves.json
   def create
     @shelf = Shelf.new(shelf_params)
-    @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
-    @shelf.shelf_code << "-" << change(shelf_params[:area_length])
-    @shelf.shelf_code << "-" << change(shelf_params[:area_width])
-    @shelf.shelf_code << "-" << change(shelf_params[:area_height])
-    @shelf.shelf_code << "-" << change(shelf_params[:shelf_row])
-    @shelf.shelf_code << "-" << change(shelf_params[:shelf_column])
+    @shelf.shelf_code = setShelfCode(shelf_params)
+
+    # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
+    # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
+    # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
+    # @shelf.shelf_code << "-" << change(shelf_params[:area_height])
+    # @shelf.shelf_code << "-" << change(shelf_params[:shelf_row])
+    # @shelf.shelf_code << "-" << change(shelf_params[:shelf_column])
 
     respond_to do |format|
       if @shelf.save
@@ -62,12 +64,14 @@ class ShelvesController < ApplicationController
   # PATCH/PUT /shelves/1
   # PATCH/PUT /shelves/1.json
   def update
-    @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
-    @shelf.shelf_code << "-" << change(shelf_params[:area_length])
-    @shelf.shelf_code << "-" << change(shelf_params[:area_width])
-    @shelf.shelf_code << "-" << change(shelf_params[:area_height])
-    @shelf.shelf_code << "-" << change(shelf_params[:shelf_row])
-    @shelf.shelf_code << "-" << change(shelf_params[:shelf_column])
+    @shelf.shelf_code = setShelfCode(shelf_params)
+    
+    # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
+    # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
+    # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
+    # @shelf.shelf_code << "-" << change(shelf_params[:area_height])
+    # @shelf.shelf_code << "-" << change(shelf_params[:shelf_row])
+    # @shelf.shelf_code << "-" << change(shelf_params[:shelf_column])
     
     respond_to do |format|
       if @shelf.update(shelf_params)
@@ -102,12 +106,23 @@ class ShelvesController < ApplicationController
     end
 
     def change(text)
-      str_space = "%02s" % text
-      str_0 = str_space.tr(" ","0");
-      if str_0.nil?
-        str_space
-      else
-        str_0
-      end
+      # str_space = "%02s" % text
+      # str_0 = str_space.tr(" ","0");
+      # if str_0.nil?
+      #   str_space
+      # else
+      #   str_0
+      # end
+      text.blank?? "" : ('-'<<text)
+
+    end
+
+    def setShelfCode(shelf_params)
+      shelf_code = @areas.find(shelf_params[:area_id]).area_code
+      shelf_code << change(shelf_params[:area_length])
+      shelf_code << change(shelf_params[:area_width])
+      shelf_code << change(shelf_params[:area_height])
+      shelf_code << change(shelf_params[:shelf_row])
+      shelf_code << change(shelf_params[:shelf_column])
     end
 end
