@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/seyhunak/twitter-bootstrap-rails.git
-  revision: 128f373e151528c9516ea8df32831fc60ac1c35d
+  revision: 0d430bc229e4e61591ca1615aae513a3416cc5f1
   branch: bootstrap3
   specs:
     twitter-bootstrap-rails (3.1.1)
@@ -121,8 +121,8 @@ GEM
     minitest (4.7.5)
     multi_json (1.10.0)
     nifty-generators (0.4.6)
-    nokogiri (1.6.1)
-      mini_portile (~> 0.5.0)
+    nokogiri (1.6.2)
+      mini_portile (~> 0.5.2)
     nori (2.4.0)
     orm_adapter (0.5.0)
     polyglot (0.3.4)

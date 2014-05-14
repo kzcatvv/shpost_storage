@@ -1,0 +1,34 @@
+<%- model_class = Contact -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Contact %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_supplier_contact_path(@supplier),
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@contacts_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:suppler_id), attribute: 'name', model: 'Supplier' do |contact|
+      contact.supplier.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:email), attribute: 'email'
+
+    g.column name: model_class.human_attribute_name(:phone), attribute: 'phone'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column do |contact|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_supplier_contact_path(@supplier,contact), :class => 'btn btn-xs btn-primary' if can? :update, contact) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), supplier_contact_path(@supplier,contact), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, contact)
+    end
+  end
+%>

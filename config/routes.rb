@@ -1,6 +1,8 @@
 ShpostStorage::Application.routes.draw do
 
 
+  resources :contacts
+
   resources :orders do
      collection do
         get 'findprint'
@@ -72,7 +74,9 @@ ShpostStorage::Application.routes.draw do
 
   resources :goodstypes
 
-  resources :suppliers
+  resources :suppliers do
+    resources :contacts
+  end
 
   resources :user_logs, only: [:index, :show]
 
