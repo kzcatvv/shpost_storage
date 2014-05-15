@@ -3,6 +3,7 @@ ShpostStorage::Application.routes.draw do
 
   resources :contacts do
     get 'relation', on: :collection
+    get 'deleterelation', on: :member
   end
 
   resources :orders do
@@ -127,6 +128,9 @@ ShpostStorage::Application.routes.draw do
   match "/print/keytrackingnum" => "print#keytrackingnum",via: [:get, :post]
   match "/print/webtracking" => "print#webtracking",via: [:get, :post]
   match "/print/webtrackingnum" => "print#webtrackingnum",via: [:get, :post]
+
+  match "/contact/add" => "contacts#add",via: [:get, :post]
+  match "/contact/confirmadd" => "contacts#confirmadd",via: [:get, :post]
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
