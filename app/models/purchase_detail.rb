@@ -4,6 +4,8 @@ class PurchaseDetail < ActiveRecord::Base
 	belongs_to :purchase
   has_many :stock_logs, dependent: :destroy
 
+  before_validation :set_batch_no
+
 	validates_presence_of :name, :amount, message: '不能为空'
   validates_numericality_of :sum, allow_blank: true
   validates_numericality_of :amount, only_integer: true # 必須是整數  
@@ -36,5 +38,12 @@ class PurchaseDetail < ActiveRecord::Base
 
   def checked_amount
     self.stock_logs.to_a.sum{|x| x.checked? ? x.amount : 0}
+  end
+
+  def set_batch_no
+    if self.batch_no.blank?
+      time = Time.now
+      self.batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + PurchaseDetail.count.to_s.rjust(5,'0')
+    end
   end
 end

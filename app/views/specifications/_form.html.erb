@@ -1,11 +1,5 @@
 <%= form_for ([ @commodity, @specification]), :html => { :class => 'form-horizontal' } do |f| %>
   <div class="form-group">
-    <%= f.label :sku, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :sku, :class => 'form-control' %>
-    </div>
-  </div>
-  <div class="form-group">
     <%= f.label :sixnine_code, :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :sixnine_code, :class => 'form-control' %>
