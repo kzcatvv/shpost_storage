@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
-  load_and_authorize_resource :supplier
-  load_and_authorize_resource :contact, through: :supplier, parent: false
+  load_and_authorize_resource :supplier,:except => [:add, :confirmadd, :relation, :deleterelation]
+  load_and_authorize_resource :contact, through: :supplier, parent: false,:except => [:add, :confirmadd, :relation, :deleterelation]
 
   # GET /contacts
   # GET /contacts.json
@@ -60,6 +60,32 @@ class ContactsController < ApplicationController
       format.html { redirect_to supplier_contacts_path(@supplier) }
       format.json { head :no_content }
     end
+  end
+
+  def relation
+    @RelationshipId=params[:rid]
+    @Rcontacts = Relationship.find(@RelationshipId).contacts
+  end
+
+  def add
+    @RelationshipId=params[:rid]
+    @contacts = Relationship.find(@RelationshipId).supplier.contacts
+    render :layout=> false
+  end
+
+  def confirmadd
+    relationship=Relationship.find(params[:rid])
+    contacts=params[:contacts]
+    contacts.each do |id|
+      contact=Contact.find(id)
+      relationship.contacts<<contact
+    end
+  end
+
+  def deleterelation
+    relationship=Relationship.find(params[:rid])
+    relationship.contacts.delete(Contact.find(params[:id]))
+    redirect_to relation_contacts_path(:rid=>params[:rid])
   end
 
   private

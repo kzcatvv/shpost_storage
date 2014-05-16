@@ -88,13 +88,14 @@ class BcmInterfaceController < ApplicationController
 
     def stock_query
         context_hash=Hash.new
-        context_hash["QUERY_ARRY"]=Array.new
+        context_hash["QUERY_ARRAY"]=Array.new
         @plaintext["goodsInfoS"].each_with_index do |goodsInfo,i|
-            context_hash["QUERY_ARRY"][i]=Hash.new
-            context_hash["QUERY_ARRY"][i]["SUPPLIER"]=goodsInfo["vendorId"]
-            context_hash["QUERY_ARRY"][i]["SKU"]=goodsInfo["prodId"]
-            context_hash["QUERY_ARRY"][i]["SPEC"]=goodsInfo["prodSpecs"]
+            context_hash["QUERY_ARRAY"][i]=Hash.new
+            context_hash["QUERY_ARRAY"][i]["SUPPLIER"]=goodsInfo["vendorId"]
+            context_hash["QUERY_ARRAY"][i]["SKU"]=goodsInfo["prodId"]
+            context_hash["QUERY_ARRAY"][i]["SPEC"]=goodsInfo["prodSpecs"]
         end
+
         stock_array = StandardInterface.stock_query(context_hash, @business, @unit)
 
         stock_return=Hash.new
@@ -110,7 +111,8 @@ class BcmInterfaceController < ApplicationController
     end
 
     def order_query
-        array = BcmInterface.notice_array(StorageConfig.config["business"]['jh_id'], StorageConfig.config["unit"]['zb_id'])
+        array=[]
+        array<<BcmInterface.notice_array(StorageConfig.config["business"]['jh_id'], StorageConfig.config["unit"]['zb_id'],"delivering")<<BcmInterface.notice_array(StorageConfig.config["business"]['jh_id'], StorageConfig.config["unit"]['zb_id'],"delivered")
         if !array.blank?
             plaintext=Hash.new
             plaintext["goodsInfoS"]=Array.new

@@ -17,6 +17,7 @@
     <% @ids.each do |id| %>
     <% eorder=Order.find(id) %>
     //LODOP.NewPage();
+    <% if @transport_type=='gnxb'%>
     LODOP.PRINT_INITA("-5.5mm","-3mm","232mm","130.7mm","tracking");
     LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
 	LODOP.ADD_PRINT_TEXT("41mm","86.8mm","25.1mm","6.6mm",'<%= eorder.province %><%= eorder.city %>');
@@ -45,6 +46,63 @@ LODOP.ADD_PRINT_TEXT("75.9mm","171.4mm","21.4mm","5.3mm",'<%= eorder.total_weigh
 LODOP.ADD_PRINT_TEXT("31.8mm","161.7mm","37.3mm","5.3mm",'<%= eorder.no %>');	
 LODOP.PREVIEW();	
 //LODOP.PRINT();	
+<% elsif @transport_type=='ems' %>
+LODOP.PRINT_INITA("0mm","0mm","230.2mm","127.3mm","tracking");
+LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
+LODOP.ADD_PRINT_TEXT("25.7mm","29.6mm","27.8mm","5.3mm",'<%= eorder.business.name %>');
+LODOP.ADD_PRINT_TEXT("25.4mm","72.2mm","31.8mm","5.3mm",'<%= eorder.business.phone %>');
+LODOP.ADD_PRINT_TEXT("33.6mm","33.3mm","80.4mm","10.6mm",'<%= eorder.business.name %>');
+LODOP.ADD_PRINT_TEXT("46.6mm","87.3mm","4.8mm","5.3mm","2");
+LODOP.ADD_PRINT_TEXT("46.6mm","92.3mm","4.5mm","5.3mm","0");
+LODOP.ADD_PRINT_TEXT("46.6mm","97.9mm","4mm","5.3mm","0");
+LODOP.ADD_PRINT_TEXT("46.6mm","103.2mm","4.5mm","5.3mm","4");
+LODOP.ADD_PRINT_TEXT("46.6mm","108mm","3.7mm","5.3mm","3");
+LODOP.ADD_PRINT_TEXT("46.6mm","113mm","5.3mm","5.3mm","5");
+LODOP.ADD_PRINT_TEXT("56.6mm","32mm","23.8mm","5.3mm",'<%= eorder.customer_name %>');
+LODOP.ADD_PRINT_TEXT("56.1mm","74.1mm","41mm","5.3mm",'<%= eorder.customer_phone %>');
+LODOP.ADD_PRINT_TEXT("67.7mm","29.4mm","86mm","13.2mm",'<%= eorder.customer_address %>');
+LODOP.ADD_PRINT_TEXT("82.6mm","33.6mm","42.3mm","5.3mm",'<%= eorder.province %><%= eorder.city %>');
+LODOP.ADD_PRINT_TEXT("83.9mm","87.6mm","4.2mm","5.3mm",'<%= eorder.customer_postcode[0] %>');
+LODOP.ADD_PRINT_TEXT("83.9mm","93.1mm","4mm","5.3mm",'<%= eorder.customer_postcode[1] %>');
+LODOP.ADD_PRINT_TEXT("83.9mm","98.4mm","4mm","5.3mm",'<%= eorder.customer_postcode[2] %>');
+LODOP.ADD_PRINT_TEXT("83.9mm","103.2mm","3.7mm","5.3mm",'<%= eorder.customer_postcode[3] %>');
+LODOP.ADD_PRINT_TEXT("83.9mm","108.2mm","3.7mm","5.3mm",'<%= eorder.customer_postcode[4] %>');
+LODOP.ADD_PRINT_TEXT("83.9mm","112.7mm","4.5mm","5.3mm",'<%= eorder.customer_postcode[5] %>');
+LODOP.ADD_PRINT_TEXT("107.7mm","47.1mm","4mm","5.3mm","X");
+LODOP.ADD_PRINT_TEXT("113.8mm","35.7mm","4.5mm","4mm","X");
+LODOP.ADD_PRINT_TEXT("49.2mm","178.3mm","27.8mm","6.6mm",'<%= eorder.business.name %>');
+LODOP.ADD_PRINT_TEXT("57.4mm","169.3mm","10.1mm","5.3mm",'<%= Time.now.year %>');
+LODOP.ADD_PRINT_TEXT("57.4mm","182.8mm","5.8mm","5.3mm",'<%= Time.now.month %>');
+LODOP.ADD_PRINT_TEXT("57.7mm","191.6mm","5.3mm","5.3mm",'<%= Time.now.day %>');
+content='';
+<% eorder.order_details.each do |j| %>
+content=content+'<%= j.name %>  数量：<%= j.amount %>,    '
+<% end %>
+LODOP.ADD_PRINT_TEXT("97.9mm","32.8mm","85.5mm","9.3mm",content);
+LODOP.PREVIEW();  
+//LODOP.PRINT();
+<% elsif @transport_type=='tcsd' %>
+LODOP.PRINT_INITA("0mm","0mm","229.7mm","127mm","tracking");
+LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
+LODOP.ADD_PRINT_TEXT("35.5mm","36.2mm","29.1mm","5.3mm",'<%= current_user.unit.name %>'+'函件局');
+LODOP.ADD_PRINT_TEXT("35.5mm","81.8mm","29.1mm","5.3mm",CurentTime(0,1));
+LODOP.ADD_PRINT_TEXT("42.1mm","44.7mm","40.5mm","5.3mm",'<%= eorder.customer_name %>');
+LODOP.ADD_PRINT_TEXT("47.6mm","41mm","61.1mm","5.3mm",'<%= eorder.customer_phone %>');
+LODOP.ADD_PRINT_TEXT("60.6mm","39.2mm","72mm","7.9mm",'<%= eorder.customer_address %>');
+LODOP.ADD_PRINT_TEXT("70.1mm","85.2mm","26.5mm","5.3mm",'<%= eorder.customer_postcode %>');
+LODOP.ADD_PRINT_TEXT("81.8mm","38.9mm","64.6mm","5.3mm",'<%= eorder.business.phone %>');
+LODOP.ADD_PRINT_TEXT("88.4mm","39.4mm","64mm","5.3mm",'<%= eorder.business.name %>');
+LODOP.ADD_PRINT_TEXT("96mm","41mm","66.1mm","6.6mm",'<%= eorder.business.name %>');
+content='';
+<% eorder.order_details.each do |j| %>
+content=content+'<%= j.name %>  数量：<%= j.amount %>,    '
+<% end %>
+LODOP.ADD_PRINT_TEXT("41mm","115.1mm","33.6mm","28.6mm",content);
+LODOP.ADD_PRINT_TEXT("69.8mm","123mm","16.9mm","5.3mm",'<%= eorder.total_weight %>');
+
+LODOP.PREVIEW();  
+//LODOP.PRINT();
+<% end %>
 	<% end %>
     
     

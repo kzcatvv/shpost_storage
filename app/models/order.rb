@@ -15,7 +15,9 @@ class Order < ActiveRecord::Base
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
   STATUS = { waiting: 'waiting', printed: 'printed', checked: 'checked', picking: 'picking', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
 
-  TRANSPORT_TYPE= { gnxb: 'gnxb', tcsd: 'tcsd', ems: 'ems'}
+  TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS'}
+
+  TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems'}
 
   SHORTAGE_TYPE = { yes: 'yes', no: 'no' }
 

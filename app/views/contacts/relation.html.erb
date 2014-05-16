@@ -1,0 +1,38 @@
+<SCRIPT LANGUAGE="JavaScript">
+  
+  function opennew(rid)
+  {
+    window.open("/contact/add?rid="+rid,'theNewWindow','width=1000,height=500,top='+(screen.height-500)/2+',left='+(screen.width-1000)/2+',toolbar=no,menubar=no,resizable=no,location=no, status=no,scrollbars=yes')
+  }
+</SCRIPT>
+<%- model_class = Contact -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <a href="###" class='btn btn-primary' onclick="opennew('<%= @RelationshipId %>')">添加联系人</a>
+  </div>
+</div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+      <th><%= t("供应商") %></th>
+      <th><%= t("activerecord.attributes.contact.name") %></th>
+      <th><%= t("activerecord.attributes.contact.email") %></th>
+      <th><%= t("activerecord.attributes.contact.phone") %></th>
+      <th><%= t("activerecord.attributes.contact.desc") %></th>
+      <th><%= t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @Rcontacts.each do |contact| %>
+      <tr>
+        <td><%= contact.supplier.try :name %></td>
+        <td><%= contact.name %></td>
+        <td><%= contact.email %></td>
+        <td><%= contact.phone %></td>
+        <td><%= contact.desc %></td>
+        <td><%= link_to t('.destroy', :default => t("helpers.links.destroy")), deleterelation_contact_path(contact,:rid=>@RelationshipId), :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm")) }, :class => 'btn btn-xs btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

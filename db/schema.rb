@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140514013137) do
+ActiveRecord::Schema.define(version: 20140515021441) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -64,6 +64,8 @@ ActiveRecord::Schema.define(version: 20140514013137) do
     t.integer "contact_id",      null: false
     t.integer "relationship_id", null: false
   end
+
+  add_index "contacts_relationships", ["contact_id", "relationship_id"], name: "index_contacts_relationships_on_contact_id_and_relationship_id", unique: true
 
   create_table "deliver_notices", force: true do |t|
     t.integer  "order_id"
@@ -128,6 +130,8 @@ ActiveRecord::Schema.define(version: 20140514013137) do
     t.integer "order_detail_id", null: false
     t.integer "stock_log_id",    null: false
   end
+
+  add_index "order_details_stock_logs", ["order_detail_id", "stock_log_id"], name: "od_sl_by_id", unique: true
 
   create_table "orders", force: true do |t|
     t.string   "no",                default: "",   null: false

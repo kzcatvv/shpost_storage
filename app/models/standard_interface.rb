@@ -119,6 +119,7 @@ class StandardInterface
     query_array = context['QUERY_ARRAY']
     stock_array = []
     query_array.each do |x| 
+
       supplier_no = x['SUPPLIER']
       sku = x['SKU']
       spec = x['SPEC']
@@ -127,7 +128,7 @@ class StandardInterface
       if !supplier_no.blank?
         supplier = Supplier.find_supplier(supplier_no, business)
       end
-      
+
       relationship =  Relationship.find_relationship(sku, supplier, spec, business, unit)
 
       if relationship.nil?
