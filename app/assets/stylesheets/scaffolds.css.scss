@@ -98,4 +98,20 @@ dt, dd {
   line-height: 20px;
   /* Keep this the same as line-height */
   min-height: 20px;
+
+}
+
+.form-horizontal .control-label {
+    float: left;
+    padding-top: 5px;
+    text-align: right;
+    width: 160px;
+}
+
+.form-horizontal .controls {
+    margin-left: 180px;
+}
+
+.form-horizontal .control-group {
+    margin-bottom: 20px;
 }

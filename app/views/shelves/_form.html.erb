@@ -3,7 +3,7 @@
   <div class="control-group">
     <%= f.label :area, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:area_id, Area.where(storage_id: session[:current_storage].id).map{|u| [u.name,u.id]})%>
+      <%= f.select(:area_id, Area.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="control-group">

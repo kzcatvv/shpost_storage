@@ -19,6 +19,7 @@ class AreasController < ApplicationController
 
   # GET /areas/new
   def new
+    @area.storage_id = session[:current_storage].id
   end
 
   # GET /areas/1/edit
@@ -28,7 +29,7 @@ class AreasController < ApplicationController
   # POST /areas
   # POST /areas.json
   def create
-    @area = Area.new(area_params)
+    # @area = Area.new(area_params)
     @area.storage_id = session[:current_storage].id
 
     respond_to do |format|
