@@ -37,7 +37,7 @@ group :doc do
   gem 'sdoc', require: false
 end
 
-gem 'twitter-bootstrap-rails', git: 'https://github.com/seyhunak/twitter-bootstrap-rails.git', branch: 'bootstrap3'
+gem 'twitter-bootstrap-rails'#, git: 'https://github.com/seyhunak/twitter-bootstrap-rails.git', branch: 'bootstrap3'
 
 #maybe not work in Windows
 gem 'less-rails'

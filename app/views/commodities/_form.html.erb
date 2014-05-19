@@ -14,7 +14,7 @@
   <div class="form-group">
     <%= f.label :goodstype_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select :goodstype_id, Goodstype.all.collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
+      <%= f.select :goodstype_id, Goodstype.accessible_by(current_ability).collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
     </div>
   </div>
   

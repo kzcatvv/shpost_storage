@@ -315,6 +315,7 @@ zh-CN:
         role_name: "角色"
         unit_id: "所属单位"
       unit:
+        "no": "编号"
         name: "单位名"
         desc: "单位描述"
       storage:
@@ -345,6 +346,7 @@ zh-CN:
         actual_amount: 实际库存
         virtual_amount: 预计库存
         desc: 备注
+
       stock_log:
         user_id: "用户"
         username: "操作用户"
@@ -360,18 +362,21 @@ zh-CN:
         checked_at: "确认时间"
         pd_name: "采购单明细"
         shelf_code: "货架编号"
+        "shelf": "货架编号"
       supplier:
-        sno: "供应商编号"
+        "no": "供应商编号"
         name: "名称"
         address: "地址"
         phone: "电话"
         unit_id: "所属机构"
       goodstype:
+        "id": "序列号"
         gtno: "商品类型编号"
         name: "类型名称"
         unit_id: "所属机构"
       commodity:
-        no: "商品编号"
+        "id": "序列号"
+        "no": "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
       specification:
@@ -392,6 +397,7 @@ zh-CN:
         external_code: "第三方商品编码"
         spec_desc: "规格描述"
       business:
+        "no": "编号"
         name: "名称"
         email: "电子邮件"
         contactor: "联系人"
@@ -399,6 +405,7 @@ zh-CN:
         phone: "电话"
         desc: "备注"
         unit: "所属机构"
+        secret_key: "安全码"
       order:
         no: "订单编号"
         order_type: "订单类型"        
@@ -442,6 +449,7 @@ zh-CN:
         province: "省"
         city: "市"
         county: "区"
+
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -452,7 +460,7 @@ zh-CN:
         order_id: "订单编号"
         desc: "备注"
       purchase:
-        no: "编号"
+        "no": "编号"
         name: "名称"
         unit_id: "所属机构"
         business_id: "所属商户"
@@ -542,7 +550,10 @@ zh-CN:
             can: :read
             role: :User
     storagemanage:
-      name: "仓库管理"
+      name: "仓内管理"
+      needrole:
+        can: :read
+        role: :Area
       submenu:
         area:
           name: "区域管理"
@@ -558,6 +569,9 @@ zh-CN:
           #   role: "shelf"
     goodstypes:
       name: "商品管理"
+      needrole:
+        can: :read
+        role: :Commodity
       submenu:
         goodstype:
           name: "商品类型管理"
@@ -570,6 +584,9 @@ zh-CN:
           link: "/relationships"
     shop:
       name: "商户与供应商管理"
+      needrole:
+        can: :read
+        role: :Business
       submenu:
         business:
           name: "商户管理"
@@ -579,12 +596,18 @@ zh-CN:
           link: "/suppliers"
     suppliers:
       name: "采购管理"
+      needrole:
+        can: :read
+        role: :Purchase
       submenu:
         purchase:
           name: "采购单管理"
           link: "/purchases"
     business:
       name: "订单管理"
+      needrole:
+        can: :read
+        role: :Order
       submenu:
         b2cfindprintindex:
           name: "电商订单作业"
@@ -600,12 +623,18 @@ zh-CN:
         #   link: "/orders/findprint"
     packout:
       name: "包装出库"
+      needrole:
+        can: :packout
+        role: :Order
       submenu:
         packout:
           name: "包装出库"
           link: "/orders/packout"
     stocks:
       name: "库存管理"
+      needrole:
+        can: :read
+        role: :Stock
       submenu:
         stock:
           name: "库存管理"
