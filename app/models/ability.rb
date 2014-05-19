@@ -34,9 +34,10 @@ class Ability
 
         can :read, Unit, id: user.unit_id
         can :manage, Storage, unit_id: user.unit_id
-
+        can :manage, Contact
         can :manage, Area, storage_id: storage.id
         can :manage, Shelf, area: {storage_id: storage.id}
+        can :manage, Stock
         can :new, Shelf
         can :read, Stock, shelf: {area: {storage_id: storage.id}}
         can :new, Stock, shelf: {area: {storage_id: storage.id}}
