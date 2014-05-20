@@ -1,13 +1,17 @@
 class Ability
   include CanCan::Ability
 
-  def initialize(user,storage)
+  def initialize(user,storage = nil)
     if user.superadmin?
-        can :manage, :all
-        # can :role, :unitadmin
-        # can :role, :user
-        cannot :role, :superadmin
-        cannot [:create, :destroy, :update], User, role: 'superadmin'
+        can :manage, User
+        can :manage, Unit
+        can :manage, UserLog
+        can :manage, Role
+        can :manage, Storage
+        can :role, :unitadmin
+        can :role, :user
+        # cannot :role, :superadmin
+        cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
         can :update, User, id: user.id
         #can :manage, User
     elsif user.unitadmin?
@@ -15,6 +19,7 @@ class Ability
         #can :manage, :all
         can :manage, Business, unit_id: user.unit_id
         can :manage, Supplier, unit_id: user.unit_id
+        can :manage, Contact, supplier: {unit_id: user.unit_id}
         can :manage, Goodstype, unit_id: user.unit_id
         can :manage, Commodity, unit_id: user.unit_id
         can :manage, Specification, commodity: {unit_id: user.unit_id}
@@ -22,8 +27,14 @@ class Ability
        
         can :manage, Relationship, specification: {commodity: {unit_id: user.unit_id}}
 
+        can [:read, :update], Unit, id: user.unit_id
+        can :manage, Storage, unit_id: user.unit_id
+        can :storage, Unit, id: user.unit_id
+
+        if ! storage.nil?
+
         can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
-        can :manage, PurchaseDetail, purchase: {storage_id: storage.id,status: Purchase::STATUS[:opened]}
+        can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
         can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
         can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
 
@@ -34,24 +45,29 @@ class Ability
 
         can :read, Unit, id: user.unit_id
         can :manage, Storage, unit_id: user.unit_id
+        can :manage, Contact
+
+        can :manage, Role, storage_id: storage.id
 
         can :manage, Area, storage_id: storage.id
         can :manage, Shelf, area: {storage_id: storage.id}
+        can :manage, Stock
         can :new, Shelf
-        can :read, Stock, shelf: {area: {storage_id: storage.id}}
+        can [:read, :getstock, :findstock], Stock, shelf: {area: {storage_id: storage.id}}
         can :new, Stock, shelf: {area: {storage_id: storage.id}}
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}, status: StockLog::STATUS[:waiting]
         can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        end
 
         can :read, UserLog, user: {unit_id: user.unit_id}
 
         can :manage, User, unit_id: user.unit_id
         can :role, :user
-        cannot :role, :superadmin
-        cannot :role, :unitadmin
+        cannot :role, User, role: 'superadmin'
+        cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
     else

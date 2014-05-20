@@ -39,19 +39,19 @@
 
 
   <% if can? :role, @user %>
-  <div class="control-group">
-    <%= f.label :unit_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select(:unit_id, Unit.all.map{|u| [u.name,u.id]})%>
+    <div class="control-group">
+      <%= f.label :unit_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select(:unit_id, Unit.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+      </div>
     </div>
-  </div>
 
-  <div class="control-group">
-    <%= f.label :role, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select(:role, User::ROLE.invert.select{|k, v| (can? :role, v.to_sym)}) %>
+    <div class="control-group">
+      <%= f.label :role, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select(:role, User::ROLE.invert.select{|k, v| (can? :role, v.to_sym)}) %>
+      </div>
     </div>
-  </div>
   <% else %>
     <dl class="dl-horizontal">
       <dt><strong><%= f.label :unit_id%></strong></dt>
