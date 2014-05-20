@@ -77,11 +77,19 @@ class StocksController < ApplicationController
   def getstock
    if !params[:ex_code].empty?
       @relationship=Relationship.where("external_code=?",params[:ex_code]).first
-      @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
+      if @relationship.nil?
+        @stocks=[]
+      else
+        @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
+      end
 
    elsif !params[:sixnine_code].empty?
     @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).first
-    @stocks=Stock.where(specification_id: @specification)
+    if @specification.nil?
+        @stocks=[]
+    else
+        @stocks=Stock.where(specification_id: @specification)
+    end
    end
     @allcnt={}
     @stocks.each do |s|
