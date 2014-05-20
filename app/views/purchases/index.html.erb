@@ -20,10 +20,7 @@
         purchase.business.try :name
     end
   
-    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'
-
-    g.column name: model_class.human_attribute_name(:sum), attribute: 'sum', filter: false
-
+    
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Purchase::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |purchase| 
