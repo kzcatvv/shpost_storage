@@ -46,6 +46,7 @@ class SpecificationsController < ApplicationController
   def update
     respond_to do |format|
       if @specification.update(specification_params)
+        @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s)
         format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: 'Specification was successfully updated.' }
         format.json { head :no_content }
       else
