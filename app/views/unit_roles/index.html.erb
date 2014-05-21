@@ -1,0 +1,37 @@
+<%- model_class = Role -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Role %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_role_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:user_id) %></th>
+      <th><%= model_class.human_attribute_name(:storage_id) %></th>
+      <th><%= model_class.human_attribute_name(:role) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @userstoragerole.each do |key,value| %>
+      <tr>
+        <td><%= User.find(key[0]).name %></td>
+        <td><%= Storage.find(key[1]).name %></td>
+        <% usroles = "" %>
+        <% value.each { |v| usroles += (Role::ROLE.fetch(v.to_sym)+" ") }%>
+        <td><%= usroles %></td>
+        <td>
+         <%= (link_to t('.roledtl', :default => t("helpers.links.roledtl")),
+                    "/roles/findroledtl?usrid=#{key[0]}&stid=#{key[1]}", :class => 'btn btn-xs btn-primary') %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
