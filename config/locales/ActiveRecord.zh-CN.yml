@@ -559,6 +559,9 @@ zh-CN:
         can: :read
         role: :Area
       submenu:
+        storage:
+          name: "仓库管理"
+          link: "/storages"
         area:
           name: "区域管理"
           link: "/areas/"

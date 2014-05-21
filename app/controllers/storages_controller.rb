@@ -1,8 +1,8 @@
 class StoragesController < ApplicationController
   #before_action :set_storage, only: [:show, :edit, :update, :destroy]
   #before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
-  load_and_authorize_resource :unit
-  load_and_authorize_resource :storage, through: :unit, parent: false
+load_and_authorize_resource :unit
+load_and_authorize_resource :storage, through: :unit, parent: false
   #skip_load_resource :storage, :only => :create
 
   # GET /units/1/storages/1/change
@@ -15,13 +15,16 @@ class StoragesController < ApplicationController
   # GET /storages.json
   def index
     #@storages = Storage.all
-    @storages_grid = initialize_grid(@storages)
+
+    @storages_grid = initialize_grid(@storages,
+                     :conditions => {:unit_id => session[:current_unit].id})
   end
 
   # GET /storages/1
   # GET /storages/1.json
   def show
     #@storage = @unit.storages.find(params[:id])
+   # @storage = Storages.find(@user.unit_id)
   end
 
   # GET /storages/new
