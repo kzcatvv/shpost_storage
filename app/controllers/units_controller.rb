@@ -27,6 +27,7 @@ class UnitsController < ApplicationController
   def create
     respond_to do |format|
       if @unit.save
+        set_default_storage
         format.html { redirect_to @unit, notice: 'Unit was successfully created.' }
         format.json { render action: 'show', status: :created, location: @unit }
       else
@@ -41,6 +42,7 @@ class UnitsController < ApplicationController
   def update
     respond_to do |format|
       if @unit.update(unit_params)
+        set_default_storage
         format.html { redirect_to @unit, notice: 'Unit was successfully updated.' }
         format.json { head :no_content }
       else
@@ -65,6 +67,11 @@ class UnitsController < ApplicationController
     #def set_unit
       #@unit = Unit.find(params[:id])
     #end
+    def set_default_storage
+       if @unit.storages.where("default_storage=?",true).empty?
+          @defaultstorage=Storage.create(name: @unit.name+"仓库",desc: @unit.name+"仓库",unit: @unit,default_storage: true)
+       end
+    end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def unit_params

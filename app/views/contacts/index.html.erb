@@ -1,6 +1,6 @@
 <%- model_class = Contact -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <h1><%=@supplier.name%>--<%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
     <% if can? :new, Contact %>
       <%= link_to t('.new', :default => t("helpers.links.new")),

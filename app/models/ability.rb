@@ -24,11 +24,12 @@ class Ability
         can :manage, Commodity, unit_id: user.unit_id
         can :manage, Specification, commodity: {unit_id: user.unit_id}
         can :new, Relationship
-       
+        
         can :manage, Relationship, specification: {commodity: {unit_id: user.unit_id}}
 
         can [:read, :update], Unit, id: user.unit_id
         can :manage, Storage, unit_id: user.unit_id
+        
         can :storage, Unit, id: user.unit_id
 
         if ! storage.nil?
