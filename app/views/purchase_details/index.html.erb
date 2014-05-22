@@ -31,9 +31,9 @@
         purchase_detail.supplier.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'name',
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name',
         model: 'Specification' do |purchase_detail|
-        purchase_detail.specification.try :name
+        purchase_detail.specification.try :all_name
     end
 
     g.column name: model_class.human_attribute_name(:qg_period), attribute: 'qg_period'

@@ -116,6 +116,10 @@ ShpostStorage::Application.routes.draw do
      resources :specifications
   end
 
+  resources :areas do
+     resources :shelves, :controller => 'area_shelf'
+  end
+
   #stabdar_interface
   match "/standard_interface/commodity_enter" => "standard_interface#commodity_enter", via: [:get, :post]
   match "/standard_interface/order_enter" => "standard_interface#order_enter", via: [:get, :post]

@@ -1,0 +1,57 @@
+<%= form_for ([ @area, @shelf]), :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+  <div class="control-group">
+    <%= f.label :area_length, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :area_length, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :area_width, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :area_width, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :area_height, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :area_height, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :shelf_row, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :shelf_row, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :shelf_column, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :shelf_column, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :max_weight, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :max_weight, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :max_volume, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :max_volume, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :desc, :class => 'text_field' %>
+    </div>
+  </div>
+
+  
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+            area_shelves_path(@area), :class => 'btn btn-default' %>
+ 
+<% end %>
