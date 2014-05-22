@@ -16,8 +16,7 @@ load_and_authorize_resource :storage, through: :unit, parent: false
   def index
     #@storages = Storage.all
 
-    @storages_grid = initialize_grid(@storages,
-                     :conditions => {:unit_id => session[:current_unit].id})
+    @storages_grid = initialize_grid(@storages)
   end
 
   # GET /storages/1
