@@ -7,7 +7,7 @@
   <dt><strong><%= model_class.human_attribute_name(:keyclientorder_id) %>:</strong></dt>
   <dd><%= Keyclientorder.find(@keyclientorderdetail.keyclientorder_id).batch_id %></dd>
   <dt><strong><%= model_class.human_attribute_name(:specification_id) %>:</strong></dt>
-  <dd><%= Specification.find(@keyclientorderdetail.specification_id).name %></dd>
+  <dd><%= Specification.find(@keyclientorderdetail.specification_id).all_name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @keyclientorderdetail.desc %></dd>
   <dt><strong><%= model_class.human_attribute_name(:amount) %>:</strong></dt>

@@ -1,0 +1,2 @@
+module AreaShelfHelper
+end

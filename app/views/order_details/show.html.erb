@@ -7,7 +7,7 @@
   <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
   <dd><%= @order_detail.name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:specification_id) %>:</strong></dt>
-  <dd><%= Specification.find(@order_detail.specification_id).name %></dd>
+  <dd><%= Specification.find(@order_detail.specification_id).all_name %></dd>
    <dt><strong><%= model_class.human_attribute_name(:amount) %>:</strong></dt>
   <dd><%= @order_detail.amount %></dd>
   

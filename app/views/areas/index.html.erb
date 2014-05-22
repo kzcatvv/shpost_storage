@@ -21,7 +21,8 @@
     g.column do |area|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_area_path(area), :class => 'btn btn-xs btn-primary' if can? :update, area) << ' ' <<
-        (link_to t('.destroy', :default => t("helpers.links.destroy")), area_path(area), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, area)
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), area_path(area), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, area) << ' ' <<
+        (link_to t('.shelves', :default => t("helpers.links.shelves")), area_shelves_path(area), :class => 'btn btn-xs btn-primary' if can? :update, area)
     end
   end 
 %>
