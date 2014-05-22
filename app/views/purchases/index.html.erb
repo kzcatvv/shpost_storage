@@ -15,8 +15,7 @@
   
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name',
-     model: 'Business' do |purchase|
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name' do |purchase|
         purchase.business.try :name
     end
   

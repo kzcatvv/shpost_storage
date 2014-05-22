@@ -46,10 +46,7 @@ zh-CN:
         password_confirmation: 再次输入
     sessions:
       new:
-        manages_title: 上海邮政网上考试系统后台管理
-        exam_title: 上海邮政网上考试系统
-        to_manages: 进入后台管理
-        to_exam: 进入考试系统
+        title: 上海邮政仓储一体化系统
         sign_in: 登录
         email: 电子邮件
         username: 用户名

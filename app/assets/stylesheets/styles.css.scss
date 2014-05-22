@@ -1,0 +1,220 @@
+/* CSS Document by Dieter Schneider for www.csstemplateheaven.com */
+
+#bg {
+  background-image: image-url("logo2.png");
+        position:fixed; 
+        top:0; 
+        left:0; 
+        bottom:0; 
+        right:0; 
+        z-index:-1;
+}
+
+#bg_reg {
+  background-image: image-url("logo2.png");
+        position:fixed; 
+        top:0; 
+        left:0; 
+        bottom:0; 
+        right:0; 
+        z-index:-1;
+}
+
+#bg_welcome {
+  background-image: image-url("logo3.png") ;
+        position:fixed; 
+        top:0; 
+        left:0; 
+        bottom:0; 
+        right:0; 
+        z-index:-1;
+}
+
+.clear {
+                clear: both;
+                }
+
+
+/************ Button ************/
+.button {
+        font-family: Verdana, Arial, sans-serif;
+                display: inline-block;
+                background: #459300 image-url("bg-button-green.gif") top left repeat-x !important;
+                border: 1px solid #459300 !important;
+                padding: 4px 7px 4px 7px !important;
+                color: #fff !important;
+                font-size: 11px !important;
+                cursor: pointer;
+                }
+                
+.button:hover {
+                text-decoration: underline;
+                }
+                
+.button:active {
+                padding: 5px 7px 3px 7px !important;
+                }
+        
+a.remove-link {
+        color: #bb0000;
+        }
+
+a.remove-link:hover {
+        color: #000;
+        }
+
+
+
+/*************** Forms ***************/
+
+form label {
+                display: block;
+                padding: 0 0 10px;
+                font-weight: bold;
+                }
+             
+form fieldset legend {
+                font-weight: bold;
+                margin-bottom: 10px;
+                padding-top: 10px;
+                }
+                
+form p small {
+                font-size: 0.75em;
+                color: #777;
+                }
+        
+        
+form input.text-input,
+form select,
+form textarea,
+form .wysiwyg {
+                padding: 6px;
+                font-size: 13px;
+                #background: #fff image-url("bg-button-green.gif") top left repeat-x;
+                border: 1px solid #d5d5d5;
+        color: #333;
+                }
+            
+form .small-input {
+                width: 25% !important;
+                }
+                
+form .medium-input {
+                width: 50% !important;
+                }
+                
+form .large-input {
+                width: 97.5% !important;
+        font-size: 16px !important;
+        padding: 8px !important;
+                }
+        
+form input[type="checkbox"] {
+        padding: 0;
+                background: none;
+        border: 0;
+                }
+
+/********************************      Login Page      ********************************/
+
+        
+#login-wrapper {
+                
+        }
+
+#login-wrapper #login-top {
+        width: 100%;
+        padding: 100px 0 50px 0;
+        text-align: center;
+        }
+        
+#login-wrapper #login-content {
+        text-align: left;
+        width: 300px;
+        margin: 0 auto;
+        }
+        
+#login-wrapper #login-content label {
+        
+        font-weight: normal;
+        font-size: 14px;
+        font-family: Helvetica, Arial, sans-serif;
+        float: left;
+        width: 70px;
+        padding: 0;
+        }
+        
+#login-wrapper #login-content input {
+        width: 200px;
+        float: right;
+        margin: 0 0 20px 0;
+        border: 0;
+        background: #C4E1FF;
+        }
+
+        
+#login-wrapper #login-content p {
+        padding: 0;
+        }
+        
+#login-wrapper #login-content p#remember-password {
+        float: right;
+        }
+        
+#login-wrapper #login-content p#remember-password input {
+        float: none;
+        width: auto;
+        border: 0;
+        background: none;
+        margin: 0 10px 0 0;
+        }
+        
+#login-wrapper #login-content p .button {
+        width: auto;
+        margin-top: 20px;
+        }
+
+
+#login-wrapper #reg-content {
+        text-align: left;
+        width: 300px;
+        margin: 0 auto;
+        }
+#login-wrapper #reg-content label {
+        
+        font-weight: normal;
+        font-size: 14px;
+        font-family: Helvetica, Arial, sans-serif;
+        float: left;
+        width: 70px;
+        padding: 0;
+        }
+        
+#login-wrapper #reg-content input {
+        width: 200px;
+        float: right;
+        margin: 0 0 20px 0;
+        border: 0;
+        background: #FFEBCD;
+        }
+#login-wrapper #reg-content p {
+        padding: 0;
+        }
+        
+#login-wrapper #reg-content p#remember-password {
+        float: right;
+        }
+        
+#login-wrapper #reg-content p#remember-password input {
+        float: none;
+        width: auto;
+        border: 0;
+        background: none;
+        margin: 0 10px 0 0;
+        }
+        
+#login-wrapper #reg-content p .button {
+        width: auto;
+        margin-top: 20px;
+        }

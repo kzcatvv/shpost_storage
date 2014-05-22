@@ -113,7 +113,7 @@
       </div>
     </div>
   </nav>
-  <% end %>
+  
   <div class="container">
     <div class="row">
       <div class="span12">
@@ -126,6 +126,10 @@
     </footer>
 
   </div> <!-- /container -->
-
+<% else %>
+      <div>
+        <%= yield %>
+      </div>
+    <% end %>
 </body>
 </html>

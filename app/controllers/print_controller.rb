@@ -23,7 +23,7 @@ class PrintController < ApplicationController
 		start=params[:start].to_i
 	    ending=params[:end].to_i
 		@keyclientorder = Keyclientorder.find(params[:id])
-		@orders=@keyclientorder.orders.limit(ending-start+1)
+		@orders=@keyclientorder.orders.order("customer_postcode").limit(ending-start+1)
 		@orders.each_with_index do |order,i|
 			order.tracking_number=(start+i).to_s
 			order.status='printed'

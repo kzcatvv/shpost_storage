@@ -59,6 +59,7 @@ class Ability
         can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}, status: StockLog::STATUS[:waiting]
         can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :check, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         end
 

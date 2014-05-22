@@ -8,7 +8,8 @@ class StoragesController < ApplicationController
   # GET /units/1/storages/1/change
   def change
     session[:current_storage] = Storage.find(params[:id])
-    redirect_to request.referer
+    #redirect_to request.referer
+    redirect_to '/'
   end
 
   # GET /storages

@@ -79,6 +79,7 @@
     g.column do |stock_log|
       # if stock_log.status == 'waiting'
         ActiveSupport::SafeBuffer.new <<
+        (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
           # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
           # (submit_tag('check!!'))  #<< ' ' <<
           # (button_tag() do
