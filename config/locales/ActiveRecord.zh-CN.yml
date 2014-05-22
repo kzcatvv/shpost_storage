@@ -161,6 +161,7 @@ zh-CN:
       stockout: 生成出库单
       ordercheck: 出库单确认
       contacts: 联系人管理
+      roledtl: 角色明细
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -346,6 +347,8 @@ zh-CN:
         actual_amount: 实际库存
         virtual_amount: 预计库存
         desc: 备注
+        status: "状态"
+        status_checked: "已确认"
 
       stock_log:
         user_id: "用户"
@@ -361,8 +364,9 @@ zh-CN:
         created_at: "创建时间"
         checked_at: "确认时间"
         pd_name: "采购单明细"
-        shelf_code: "货架编号"
+        "shelf_code": "货架编号"
         "shelf": "货架编号"
+        status_checked: "已确认"
       supplier:
         "no": "供应商编号"
         name: "名称"
@@ -503,6 +507,7 @@ zh-CN:
         shelf_code: "货架编号"
         desc: "货架描述"
       keyclientorder:
+
         keyclient_name: 大客户名称
         keyclient_addr: 大客户地址
         contact_person: 联系人
@@ -546,6 +551,12 @@ zh-CN:
         unit_admin:
           name: "单位管理"
           link: "/units/"
+          needrole:
+            can: :read
+            role: :User
+        role_admin:
+          name: "角色管理"
+          link: "/roles/"
           needrole:
             can: :read
             role: :User

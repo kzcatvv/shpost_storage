@@ -106,6 +106,12 @@ ShpostStorage::Application.routes.draw do
      resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
   end
 
+  resources :roles, controller: 'unit_roles', only: [:index, :new, :create, :show, :destroy] do
+    collection do
+        get 'findroledtl'
+    end
+  end
+
   resources :commodities do
      resources :specifications
   end
