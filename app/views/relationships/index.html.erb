@@ -33,7 +33,7 @@
         (link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_relationship_path(relationship), :class => 'btn btn-xs btn-primary' if can? :update, relationship) << ' ' <<
         (link_to t('.destroy', :default => t("helpers.links.destroy")), relationship_path(relationship), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, relationship)<< ' ' <<
-        (link_to t('联系人'),
+        (link_to t('设置联系人'),
                       relation_contacts_path(:rid=>relationship), :class => 'btn btn-xs btn-primary')
     end
   end 

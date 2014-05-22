@@ -9,7 +9,7 @@
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-    <a href="###" class='btn btn-primary' onclick="opennew('<%= @RelationshipId %>')">添加联系人</a>
+    <a href="###" class='btn btn-primary' onclick="opennew('<%= @RelationshipId %>')">设置联系人</a>
   </div>
 </div>
 <table class="table table-striped">
@@ -20,7 +20,6 @@
       <th><%= t("activerecord.attributes.contact.email") %></th>
       <th><%= t("activerecord.attributes.contact.phone") %></th>
       <th><%= t("activerecord.attributes.contact.desc") %></th>
-      <th><%= t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody>
@@ -31,7 +30,6 @@
         <td><%= contact.email %></td>
         <td><%= contact.phone %></td>
         <td><%= contact.desc %></td>
-        <td><%= link_to t('.destroy', :default => t("helpers.links.destroy")), deleterelation_contact_path(contact,:rid=>@RelationshipId), :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm")) }, :class => 'btn btn-xs btn-danger' %></td>
       </tr>
     <% end %>
   </tbody>

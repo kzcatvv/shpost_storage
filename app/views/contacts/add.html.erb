@@ -9,7 +9,7 @@
   
   <body>
     <div class="page-header">
-  <h1>添加联系人</h1>
+  <h1>设置联系人</h1>
 </div>
     <form action="/contact/confirmadd"  method="post">
       <%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
@@ -27,7 +27,11 @@
   <tbody>
     <% @contacts.each do |contact| %>
       <tr>
-        <td><%= check_box_tag 'contacts[]', contact.id%></td>
+        <% if Relationship.find(@RelationshipId).contacts.include?(contact) %>
+        <td><%= check_box_tag 'contacts[]', contact.id, checked = true %></td>
+        <% else %>
+        <td><%= check_box_tag 'contacts[]', contact.id, checked = false %></td>
+        <% end %>
         <td><%= contact.supplier.try :name %></td>
         <td><%= contact.name %></td>
         <td><%= contact.email %></td>

@@ -75,6 +75,7 @@ class ContactsController < ApplicationController
 
   def confirmadd
     relationship=Relationship.find(params[:rid])
+    relationship.contacts.delete_all
     contacts=params[:contacts]
     contacts.each do |id|
       contact=Contact.find(id)
