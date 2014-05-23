@@ -1,0 +1,30 @@
+<%- model_class = Storage -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Storage %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_storage_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@storages_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:default_storage), attribute: 'default_storage',filter_type: :boolean do |storage| 
+      storage.default_type_name
+    end
+
+    g.column do |storage|
+      ActiveSupport::SafeBuffer.new << 
+       (link_to t('.edit', :default => t("helpers.links.edit")), edit_storage_path(storage), :class => 'btn btn-xs btn-primary' if can? :update, storage) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), storage_path(storage), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, storage)<< ' ' <<
+        (link_to t('.roles', :default => t("helpers.links.roles")), storage_roles_path(storage), :class => 'btn btn-xs btn-primary' if can? :roles, storage)
+    end
+  end 
+%>

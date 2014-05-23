@@ -568,7 +568,10 @@ zh-CN:
       submenu:
         storage:
           name: "仓库管理"
-          link: "/storages"
+          link: "/storages/"
+          needrole:
+           can: :read
+           role: :User
         area:
           name: "区域管理"
           link: "/areas/"
