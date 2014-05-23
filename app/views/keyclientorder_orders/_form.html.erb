@@ -98,12 +98,6 @@
       <%= f.text_field :seller_desc, :class => 'text_field' %>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :business_id, :class => 'control-label' %>
-    <div class="controls">
-    <%= f.select(:business_id, Business.all.map{|u| [u.name,u.id]})%>
-    </div>
-  </div>
 
   
   <%= f.submit nil, :class => 'btn btn-primary' %>

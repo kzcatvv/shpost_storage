@@ -32,6 +32,7 @@ class KeyclientorderOrdersController < ApplicationController
     @order.status = Order::STATUS[:waiting]
     @order.unit = current_user.unit
     @order.storage = current_storage
+    @order.business_id = @keyclientorder.business_id
     @order.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Order.count.to_s.rjust(5,'0')
 
 
