@@ -43,6 +43,7 @@ zh-CN:
         sign_up: 注册
         username: 用户名
         password: 密码
+        sign_in: 登录
         password_confirmation: 再次输入
     sessions:
       new:
@@ -54,7 +55,7 @@ zh-CN:
         email: 电子邮件
         username: 用户名
         password: 密码
-        remember_me: 记住我
+        remember_me:  记住我
     shared:
       links:
         didn_t_receive_confirmation_instructions: 没有收到确认指令？

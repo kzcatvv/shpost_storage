@@ -23,6 +23,7 @@ ShpostStorage::Application.routes.draw do
 
 
 
+
   resources :keyclientorders do
     resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails
@@ -102,15 +103,22 @@ ShpostStorage::Application.routes.draw do
      resources :roles, only: [:index, :new, :create, :show, :destroy]
   end
 
-  resources :storages do
-     resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
-  end
+  #resources :storages do
+  #   resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
+  #end
 
-  resources :roles, controller: 'unit_roles', only: [:index, :new, :create, :show, :destroy] do
+  resources :roles,controller: 'unit_roles', only: [:index, :new, :create, :show, :destroy] do
     collection do
         get 'findroledtl'
     end
   end
+
+ resources :storages, controller: 'unit_storage', only: [:index, :new, :create, :show, :destroy,:edit,:update] do
+     resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
+  collection do
+        get 'findroledtl'
+    end
+   end
 
   resources :commodities do
      resources :specifications
