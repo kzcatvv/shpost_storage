@@ -113,7 +113,7 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
- resources :storages, controller: 'unit_storage', only: [:index, :new, :create, :show, :destroy,:edit] do
+ resources :storages, controller: 'unit_storage', only: [:index, :new, :create, :show, :destroy,:edit,:update] do
      resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
   collection do
         get 'findroledtl'

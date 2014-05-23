@@ -20,7 +20,7 @@ class UnitStorageController < ApplicationController
 
   # GET /storages/1/edit
   def edit
-
+      @storage=Storage.find(params[:id])
 
   end
 
@@ -44,6 +44,7 @@ class UnitStorageController < ApplicationController
   # PATCH/PUT /storages/1
   # PATCH/PUT /storages/1.json
   def update
+     @storage=Storage.find(params[:id])
      respond_to do |format|
       if @storage.update(storage_params)
         format.html { redirect_to @storage, notice: 'storage was successfully updated.' }
