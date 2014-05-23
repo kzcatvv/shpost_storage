@@ -82,10 +82,6 @@ class StoragesController < ApplicationController
       @storage = Storage.find(params[:id])
     end
 
-    #def find_unit
-      #@unit = Unit.find(params[:unit_id])
-    #end
-
     # Never trust parameters from the scary internet, only allow the white list through.
     def storage_params
       params.require(:storage).permit(:name, :desc, :default_storage)
