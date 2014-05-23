@@ -162,6 +162,7 @@ zh-CN:
       ordercheck: 出库单确认
       contacts: 联系人管理
       roledtl: 角色明细
+      shelves: 货架管理
     titles:
       edit: 编辑%{model}
       new: 新增%{model}

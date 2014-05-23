@@ -16,9 +16,9 @@
 <%= grid(@order_details_grid) do |g|
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
-    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'name',
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name',
      model: 'Specification' do |order_detail|
-        order_detail.specification.try :name
+        order_detail.specification.try :all_name
     end
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'

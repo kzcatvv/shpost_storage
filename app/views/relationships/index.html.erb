@@ -20,8 +20,8 @@
       relationship.supplier.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'name', model: 'Specification' do |relationship|
-      relationship.specification.try :name
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name', model: 'Specification' do |relationship|
+      relationship.specification.try :all_name
     end
 
     g.column name: model_class.human_attribute_name(:external_code), attribute: 'external_code'

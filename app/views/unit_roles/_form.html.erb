@@ -4,13 +4,13 @@
   <div class="control-group">
     <%= f.label :user_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:user_id, User.all.accessible_by(current_ability).map{|u| [u.name,u.id]}) %>
+      <%= f.select(:user_id, User.accessible_by(current_ability).map{|u| [u.name,u.id]}) %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :storage_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:storage_id, Storage.all.accessible_by(current_ability).map{|u| [u.name,u.id]}) %>
+      <%= f.select(:storage_id, Storage.accessible_by(current_ability).map{|u| [u.name,u.id]}) %>
     </div>
   </div>
   <div class="control-group">
