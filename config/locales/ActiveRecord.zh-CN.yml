@@ -317,7 +317,7 @@ zh-CN:
         role_name: "角色"
         unit_id: "所属单位"
       unit:
-        "no": "编号"
+        no: "编号"
         name: "单位名"
         desc: "单位描述"
       storage:
@@ -365,23 +365,23 @@ zh-CN:
         created_at: "创建时间"
         checked_at: "确认时间"
         pd_name: "采购单明细"
-        "shelf_code": "货架编号"
-        "shelf": "货架编号"
+        shelf_code: "货架编号"
+        shelf: "货架编号"
         status_checked: "已确认"
       supplier:
-        "no": "供应商编号"
+        no: "供应商编号"
         name: "名称"
         address: "地址"
         phone: "电话"
         unit_id: "所属机构"
       goodstype:
-        "id": "序列号"
+        id: "序列号"
         gtno: "商品类型编号"
         name: "类型名称"
         unit_id: "所属机构"
       commodity:
-        "id": "序列号"
-        "no": "商品编号"
+        id: "序列号"
+        no: "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
       specification:
@@ -402,7 +402,7 @@ zh-CN:
         external_code: "第三方商品编码"
         spec_desc: "规格描述"
       business:
-        "no": "编号"
+        no: "编号"
         name: "名称"
         email: "电子邮件"
         contactor: "联系人"
@@ -411,6 +411,7 @@ zh-CN:
         desc: "备注"
         unit: "所属机构"
         secret_key: "安全码"
+        alertday: "预警天数"
       order:
         no: "订单编号"
         order_type: "订单类型"        
@@ -465,7 +466,7 @@ zh-CN:
         order_id: "订单编号"
         desc: "备注"
       purchase:
-        "no": "编号"
+        no: "编号"
         name: "名称"
         unit_id: "所属机构"
         business_id: "所属商户"
@@ -636,6 +637,9 @@ zh-CN:
         keyclientorder:
           name: "大批次订单查询"
           link: "/keyclientorders"
+        orderalert:
+          name: "预警订单"
+          link: "/orders/order_alert"
         # b2cfindprint:
         #   name: "电商订单打印"
         #   link: "/orders/findprint"

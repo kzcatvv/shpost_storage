@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140523052209) do
+ActiveRecord::Schema.define(version: 20140526154517) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20140523052209) do
     t.datetime "updated_at"
     t.string   "no"
     t.string   "secret_key"
+    t.integer  "alertday",   default: 0
   end
 
   create_table "commodities", force: true do |t|

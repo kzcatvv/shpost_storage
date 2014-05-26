@@ -8,6 +8,11 @@ class OrdersController < ApplicationController
                    :conditions => {:order_type => "b2c"})
   end
 
+  def order_alert
+    @orders = Order.where( [ "status = ? and created_at < ?", 'waiting', Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders_grid = initialize_grid(@orders)
+  end
+
   # GET /orderes/1
   # GET /orderes/1.json
   def show
