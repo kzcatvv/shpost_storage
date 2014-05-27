@@ -1,0 +1,33 @@
+<%- model_class = Relationship -%>
+<div class="page-header">
+  <h1>预警库存查询</h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:business_id) %></th>
+      <th><%= model_class.human_attribute_name(:specification_id) %></th>
+      <th><%= model_class.human_attribute_name(:supplier_id) %></th>
+      <th>现有库存/预警数量</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @allcnt.each do |key,value| %>
+      <% if value[0] < value[1] %>
+        <tr style='Color:#ff0000'>
+          <td><%= Business.find(key[0]).name %></td>
+          <td><%= Specification.find(key[1]).name %></td>
+          <td><%= Supplier.find(key[2]).name %></td>
+          <td><%= value[0] %>/<%= value[1] %></td>
+        </tr>
+      <% else %>
+        <tr>
+          <td><%= Business.find(key[0]).name %></td>
+          <td><%= Specification.find(key[1]).name %></td>
+          <td><%= Supplier.find(key[2]).name %></td>
+          <td><%= value[0] %>/<%= value[1] %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

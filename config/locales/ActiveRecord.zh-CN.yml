@@ -401,6 +401,7 @@ zh-CN:
         specification_id: "商品规格"
         external_code: "第三方商品编码"
         spec_desc: "规格描述"
+        warning_amt: "预警数量"
       business:
         "no": "编号"
         name: "名称"

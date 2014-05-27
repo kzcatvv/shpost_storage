@@ -68,6 +68,8 @@ class RelationshipsController < ApplicationController
       #@objid = params[:object_id]
 
       @commodities = Commodity.where(goodstype_id: params[:goodstype_id]).accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择")
+      @objid = params[:object_id]+"_specification_id"
+      @specifications = {"请选择" => 0 }.map
       #binding.pry
       respond_to do |format|
         format.js 
@@ -84,6 +86,18 @@ class RelationshipsController < ApplicationController
       end
   end
 
+  def findwarningamt
+    @relationships=Relationship.includes(:specification).includes(specification: :commodity).where(commodities: { unit_id: current_storage.unit_id})
+    @allcnt = {}
+    @relationships.each do |r|
+       product = [r.business_id,r.specification_id,r.supplier_id]
+       allamount = Stock.total_stock_in_storage(r.specification, r.supplier, r.business, current_storage)
+       @allcnt[product]=[allamount,r.warning_amt]
+    end
+  end
+
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_relationship
@@ -94,6 +108,6 @@ class RelationshipsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def relationship_params
-      params.require(:relationship).permit(:business_id, :supplier_id, :specification_id, :external_code, :spec_desc)
+      params.require(:relationship).permit(:business_id, :supplier_id, :specification_id, :external_code, :spec_desc, :warning_amt)
     end
 end

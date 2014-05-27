@@ -34,6 +34,7 @@ ShpostStorage::Application.routes.draw do
     collection do
         get 'select_commodities'
         get 'select_specifications'
+        get 'findwarningamt'
        end
     resources :contacts
   end

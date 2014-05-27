@@ -26,7 +26,8 @@ function ajaxspecifications() {
    $.ajax({
       type : 'GET',
       url : '/relationships/select_commodities/',
-      data: { goodstype_id: $('#goodstype_id').val()},
+      data: { goodstype_id: $('#goodstype_id').val(),
+              object_id: $('#ajax_object_id').val()},
       dataType : 'script'
     });
    return false;
