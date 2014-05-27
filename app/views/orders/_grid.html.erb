@@ -41,7 +41,7 @@
 
     g.column name: model_class.human_attribute_name(:seller_desc), attribute: 'seller_desc', detach_with_id: :seller_desc_filter
 
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id', detach_with_id: :business_id_filter,custom_filter: Business.all.map{|b| [b.name,b.id]} do |order|
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id', detach_with_id: :business_id_filter,custom_filter: Business.accessible_by(current_ability).map{|b| [b.name,b.id]} do |order|
       Business.find(order.business_id).name
     end
 

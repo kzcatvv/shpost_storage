@@ -4,7 +4,7 @@
   <div class="control-group">
     <%= f.label :storage_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:storage_id, Storage.all.map{|u| [u.name,u.id]}) %>
+      <%= f.select(:storage_id, Storage.accessible_by(current_ability).map{|u| [u.name,u.id]}) %>
     </div>
   </div>
   <div class="control-group">

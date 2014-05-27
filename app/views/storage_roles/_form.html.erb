@@ -4,7 +4,7 @@
   <div class="control-group">
     <%= f.label :user_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:user_id, User.all.map{|u| [u.name,u.id]}) %>
+      <%= f.select(:user_id, User.accessible_by(current_ability).map{|u| [u.name,u.id]}) %>
     </div>
   </div>
   <div class="control-group">
