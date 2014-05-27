@@ -18,7 +18,7 @@
 
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
-    g.column name: model_class.human_attribute_name(:goodstype_id), attribute: 'goodstype_id',custom_filter: Goodstype.all.map{|g| [g.name,g.id]} do |commodity|
+    g.column name: model_class.human_attribute_name(:goodstype_id), attribute: 'goodstype_id',custom_filter: Goodstype.accessible_by(current_ability).collect {|g| [g.name,g.id]} do |commodity|
       if !commodity.goodstype_id.blank?
         Goodstype.find(commodity.goodstype_id).name
       end
