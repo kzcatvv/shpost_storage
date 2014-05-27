@@ -3,7 +3,7 @@ class Role < ActiveRecord::Base
   belongs_to :storage
 
   validates_presence_of :user_id, :storage_id, :role, :message => '不能为空字符'
-  validates_uniqueness_of :user_id, scope: [:storage_id, :role] => '该角色在该仓库中角色已存在'
+  validates_uniqueness_of :user_id, scope: [:storage_id, :role], :message => '该角色在该仓库中角色已存在'
   
   ROLE = { admin: '管理员', purchase: '采购员', sorter: '拣货员' }
 
