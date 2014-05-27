@@ -40,6 +40,7 @@ class Purchase < ActiveRecord::Base
         return false
       end
     end
+    return true
   end
 
   def closed?
