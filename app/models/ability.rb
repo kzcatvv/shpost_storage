@@ -35,10 +35,13 @@ class Ability
         if ! storage.nil?
 
         can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
+
         can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
         can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
         can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
-
+        cannot :close, Purchase do |purchase|
+            (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
+        end
         can :manage, Keyclientorder, storage_id: storage.id
         can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
         can :manage, Order, storage_id: storage.id
