@@ -365,8 +365,13 @@ zh-CN:
         created_at: "创建时间"
         checked_at: "确认时间"
         pd_name: "采购单明细"
+<<<<<<< HEAD
         shelf_code: "货架编号"
         shelf: "货架编号"
+=======
+        "shelf_code": "货架编号"
+        "Shelf": "货架编号"
+>>>>>>> 16d71a1ba123d93210f320287e9de93e2a5ed13c
         status_checked: "已确认"
       supplier:
         no: "供应商编号"
@@ -414,7 +419,7 @@ zh-CN:
         secret_key: "安全码"
         alertday: "预警天数"
       order:
-        no: "订单编号"
+        "no": "订单编号"
         order_type: "订单类型"        
         need_invoice: "是否需要发票"      
         customer_name: "客户名称"    
@@ -456,7 +461,7 @@ zh-CN:
         province: "省"
         city: "市"
         county: "区"
-
+        tracking_number: "面单号"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -647,6 +652,9 @@ zh-CN:
         pinganb2cimport:
           name: "平安线上订单导入"
           link: "/orders/pingan_b2c_import"
+        findwarning:
+          name: "退件入库"
+          link: "/orderreturns/packreturn"
         # b2cfindprint:
         #   name: "电商订单打印"
         #   link: "/orders/findprint"
@@ -674,6 +682,9 @@ zh-CN:
         findstock:
           name: "库存汇总查询"
           link: "/stocks/findstock"
+        findwarning:
+          name: "库存预警查询"
+          link: "/relationships/findwarningamt"
     logs:
       name: "日志查询"
       submenu:
@@ -703,3 +714,5 @@ zh-CN:
     create: 新增
     update: 更新
     destroy: 删除
+    check: 确认
+    close: 关闭

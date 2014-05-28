@@ -6,4 +6,8 @@ zh-CN:
         interval: 10
     csb:
       update_order_status:
-        interval: 10
+        interval: 1800
+      order_status:
+        interval: 1800
+      send_point_order:
+        interval: 1800

@@ -42,7 +42,48 @@ function ajaxspecifications() {
       dataType : 'script'
     });
    return false;
-  }); 
+  });
+
+  $('#return_reason').change(function(){
+   if ($('#return_reason').val() == "其他")
+   {
+      $('#reasondtl').show();
+   }
+   else
+  {
+      $('#reasondtl').hide();
+  }
+   return false;
+  });
+
+  $("#setreason").click(function(){ 
+    $("input[name='cbids[]']:checked").each(function () { 
+
+          if ($('#return_reason').val() == "其他")
+          {
+            var textid = "#rereason_"+$(this).val();
+            $(textid).val($('#reasondtl').val());
+          }
+          else
+          {
+            var textid = "#rereason_"+$(this).val();
+            $(textid).val($('#return_reason').val());
+          }
+          $(this).attr('checked',false);
+               
+    })
+ 
+    return false; 
+  })
+
+  $("#selectall").click(function(){ 
+    $("input[name='cbids[]']").each(function () { 
+          $(this).prop("checked",true);
+               
+    })
+ 
+    return false; 
+  })
 };
 
 function clickin(current)

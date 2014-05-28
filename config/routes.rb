@@ -1,6 +1,15 @@
 ShpostStorage::Application.routes.draw do
 
 
+  resources :orderreturns do
+    collection do
+      get 'packreturn'
+      get 'doreturn'
+      get 'findtrackingnumber'
+      get 'returncheck'
+    end
+  end
+
   resources :contacts do
     get 'relation', on: :collection
     get 'deleterelation', on: :member
@@ -21,6 +30,7 @@ ShpostStorage::Application.routes.draw do
         post 'pingan_b2b_import' => 'orders#pingan_b2b_import'
         get 'pingan_b2c_import'
         post 'pingan_b2c_import' => 'orders#pingan_b2c_import'
+
       end
 
      resources :order_details

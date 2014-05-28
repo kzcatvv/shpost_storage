@@ -1,6 +1,7 @@
 class OrdersController < ApplicationController
   load_and_authorize_resource
 
+  user_logs_filter only: [:ordercheck], symbol: :batch_id, operation: '确认出库', object: :keyclientorder
   # GET /orderes
   # GET /orderes.json
   def index
@@ -284,6 +285,9 @@ class OrdersController < ApplicationController
     sklogs=[]
     chkout=0
     @keycorder=params[:format]
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts @keycorder
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     @keyclientorder=Keyclientorder.find(params[:format])
     @orders=@keyclientorder.orders
     @orders.each do |order|
@@ -305,14 +309,14 @@ class OrdersController < ApplicationController
                        outbl = true
                        outstock.update_attribute(:virtual_amount , setamount)
                        outstock.save
-                       keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
-                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out],keyclientorderdetail: keyorderdtl)
+                       #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
                        orderdtl.stock_logs << stklog
                       else 
                        amount = amount - outstock.virtual_amount
                        outbl = false
-                       keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
-                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out],keyclientorderdetail: keyorderdtl)
+                       #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
                        orderdtl.stock_logs << stklog
                        outstock.update_attribute(:virtual_amount , 0)
                        outstock.save
@@ -474,6 +478,7 @@ class OrdersController < ApplicationController
      @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary
      @selectorders=Order.where(id: @slorders)
      if !params[:grid].nil?
+      if !params[:grid][:f].nil?
        if !params[:grid][:f]["businesses.name".to_sym].nil?
         businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
         @selectorders=@selectorders.where(:business_id,businessid)
@@ -482,6 +487,7 @@ class OrdersController < ApplicationController
        if !params[:grid][:f][:created_at].nil?
         @selectorders=@selectorders.where(["created_at >= ? and created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
        end
+      end
      end
 
      @selectorders=@selectorders.to_ary
@@ -525,7 +531,7 @@ class OrdersController < ApplicationController
               
               order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('.0')[0],business_trans_no: instance.cell(line,'K').to_s.split('.0')[0], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I'), keyclientorder: keyclientorder
               
-              relationship = Relationship.find_relationship(instance.cell(line,'B').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+              relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
               
               OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('.0')[0], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
         
@@ -555,7 +561,7 @@ class OrdersController < ApplicationController
 
             keyclientorder=Keyclientorder.create! keyclient_name: "平安线下 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
     
-            relationship = Relationship.find_relationship(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+            relationship = Relationship.find_relationships(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
             keyclientorderdetails=Keyclientorderdetail.create! specification: relationship.specification, keyclientorder: keyclientorder, amount: 1, supplier: relationship.supplier, business_id: StorageConfig.config["business"]['pajf_id']
             
             2.upto(instance.last_row) do |line|

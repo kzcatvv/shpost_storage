@@ -16,7 +16,7 @@ class StandardInterface
     
     #price = context['PRICE']
 
-    relationship =  Relationship.find_relationship(sku, supplier, spec, business, unit)
+    relationship =  Relationship.find_relationships(sku, supplier, spec, business, unit)
     
 
     if relationship.nil?
@@ -64,10 +64,10 @@ class StandardInterface
     # business_order_id重复check
     order = Order.where(business_order_id: order_id, business: business, unit: unit)
     if !order.blank?
-      return nil
+      return order
     end
 
-    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting']
+    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
 
     order_details = context['ORDER_DETAILS']
 
@@ -89,7 +89,7 @@ class StandardInterface
         supplier = Supplier.find_supplier(supplier_no, business)
       end
 
-      relationship = Relationship.find_relationship(sku, supplier, spec, business, unit)
+      relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
     
       next if relationship.nil?
 
@@ -119,7 +119,6 @@ class StandardInterface
     query_array = context['QUERY_ARRAY']
     stock_array = []
     query_array.each do |x| 
-
       supplier_no = x['SUPPLIER']
       sku = x['SKU']
       spec = x['SPEC']
@@ -128,8 +127,8 @@ class StandardInterface
       if !supplier_no.blank?
         supplier = Supplier.find_supplier(supplier_no, business)
       end
-
-      relationship =  Relationship.find_relationship(sku, supplier, spec, business, unit)
+      
+      relationship =  Relationship.find_relationships(sku, supplier, spec, business, unit)
 
       if relationship.nil?
         amount = 0

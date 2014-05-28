@@ -92,7 +92,9 @@ class RelationshipsController < ApplicationController
     @relationships.each do |r|
        product = [r.business_id,r.specification_id,r.supplier_id]
        allamount = Stock.total_stock_in_storage(r.specification, r.supplier, r.business, current_storage)
-       @allcnt[product]=[allamount,r.warning_amt]
+       if allamount < r.warning_amt
+         @allcnt[product]=[allamount,r.warning_amt]
+       end
     end
   end
 

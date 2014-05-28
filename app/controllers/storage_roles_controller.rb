@@ -3,19 +3,29 @@ class StorageRolesController < ApplicationController
   load_and_authorize_resource :role, through: :storage, parent: false
   # GET /roles
   # GET /roles.json
-  def index
-    #@roles = Role.all
-    @storageroles_grid = initialize_grid(@roles, include: [:storage, :user])
+    def index
+    #binding.pry
+    @roles = Role.includes(:storage).where("storages.unit_id=?",current_user.unit_id)
+    @userstoragerole={}
+    @roles.each do |r|
+       userstorage=[r.user_id,r.storage_id]
+       if @userstoragerole.has_key?(userstorage)
+            @userstoragerole[userstorage].push(r.role)
+       else
+            @userstoragerole[userstorage]=[r.role]
+       end
+    end
   end
 
   # GET /roles/1
   # GET /roles/1.json
   def show
+    @role=Role.find(params[:id])
   end
 
   # GET /roles/new
   def new
-    #@role = Role.new
+    @role = Role.new
   end
 
   # GET /roles/1/edit
@@ -25,11 +35,11 @@ class StorageRolesController < ApplicationController
   # POST /roles
   # POST /roles.json
   def create
-    #@role = Role.new(role_params)
+    @role = Role.new(role_params)
 
     respond_to do |format|
       if @role.save
-        format.html { redirect_to storage_role_path(@storage,@role), notice: 'Role was successfully created.' }
+        format.html { redirect_to role_path(@role), notice: 'Role was successfully created.' }
         format.json { render action: 'show', status: :created, location: @role }
       else
         format.html { render action: 'new' }
@@ -41,25 +51,21 @@ class StorageRolesController < ApplicationController
   # PATCH/PUT /roles/1
   # PATCH/PUT /roles/1.json
   def update
-    respond_to do |format|
-      if @role.update(role_params)
-        format.html { redirect_to storage_role_path(@storage,@role), notice: 'Role was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @role.errors, status: :unprocessable_entity }
-      end
-    end
   end
 
   # DELETE /roles/1
   # DELETE /roles/1.json
   def destroy
+    @role=Role.find(params[:id])
     @role.destroy
     respond_to do |format|
-      format.html { redirect_to storage_roles_path(@storage) }
+      format.html { redirect_to roles_path }
       format.json { head :no_content }
     end
+  end
+
+  def findroledtl
+    @roles=Role.where("user_id=? and storage_id=?",params[:usrid],params[:stid])
   end
 
   private

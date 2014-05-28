@@ -13,21 +13,12 @@
   </thead>
   <tbody>
     <% @allcnt.each do |key,value| %>
-      <% if value[0] < value[1] %>
-        <tr style='Color:#ff0000'>
-          <td><%= Business.find(key[0]).name %></td>
-          <td><%= Specification.find(key[1]).name %></td>
-          <td><%= Supplier.find(key[2]).name %></td>
-          <td><%= value[0] %>/<%= value[1] %></td>
-        </tr>
-      <% else %>
         <tr>
           <td><%= Business.find(key[0]).name %></td>
           <td><%= Specification.find(key[1]).name %></td>
           <td><%= Supplier.find(key[2]).name %></td>
           <td><%= value[0] %>/<%= value[1] %></td>
         </tr>
-      <% end %>
     <% end %>
   </tbody>
 </table>
