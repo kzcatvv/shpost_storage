@@ -1,31 +1,37 @@
 <%- model_class = Role -%>
 <div class="page-header">
-  <h1><%=@storage.name%>--<%=t '.title', :default => model_class.model_name.human%></h1>
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
     <% if can? :new, Role %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
-                  new_storage_role_path(@storage),
+                  new_role_path,
                   :class => 'btn btn-primary' %>
     <% end %>
   </div>
 </div>
 
-<%= grid(@storageroles_grid) do |g|
-
-    g.column name: model_class.human_attribute_name(:user_id), attribute: 'name', model: 'User' do |role|
-      role.user.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'name',model: 'Storage' do |role|
-      role.storage.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:role), attribute: 'role',custom_filter: Role::ROLE.invert  do |role|
-      Role::ROLE.fetch(role.role.to_sym)
-    end
-
-    g.column do |role|
-      (link_to t('.destroy', :default => t("helpers.links.destroy")), storage_role_path(@storage,role), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, role)
-    end
-  end 
-%>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:user_id) %></th>
+      <th><%= model_class.human_attribute_name(:storage_id) %></th>
+      <th><%= model_class.human_attribute_name(:role) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @userstoragerole.each do |key,value| %>
+      <tr>
+        <td><%= User.find(key[0]).name %></td>
+        <td><%= Storage.find(key[1]).name %></td>
+        <% usroles = "" %>
+        <% value.each { |v| usroles += (Role::ROLE.fetch(v.to_sym)+" ") }%>
+        <td><%= usroles %></td>
+        <td>
+         <%= (link_to t('.roledtl', :default => t("helpers.links.roledtl")),
+                    "/roles/findroledtl?usrid=#{key[0]}&stid=#{key[1]}", :class => 'btn btn-xs btn-primary') %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

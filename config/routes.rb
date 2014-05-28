@@ -17,6 +17,10 @@ ShpostStorage::Application.routes.draw do
         get 'setoutstatus'
         get 'findprintindex'
         get 'order_alert'
+        get 'pingan_b2b_import'
+        post 'pingan_b2b_import' => 'orders#pingan_b2b_import'
+        get 'pingan_b2c_import'
+        post 'pingan_b2c_import' => 'orders#pingan_b2c_import'
       end
 
      resources :order_details
@@ -35,6 +39,7 @@ ShpostStorage::Application.routes.draw do
     collection do
         get 'select_commodities'
         get 'select_specifications'
+        get 'findwarningamt'
        end
     resources :contacts
   end

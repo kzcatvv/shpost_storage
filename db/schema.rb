@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140526154517) do
+ActiveRecord::Schema.define(version: 20140527171344) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -168,6 +168,9 @@ ActiveRecord::Schema.define(version: 20140526154517) do
     t.string   "business_order_id"
     t.string   "business_trans_no"
     t.string   "county"
+    t.string   "pingan_ordertime"
+    t.string   "pingan_operate"
+    t.string   "customer_idnumber"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -207,6 +210,7 @@ ActiveRecord::Schema.define(version: 20140526154517) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "spec_desc"
+    t.integer  "warning_amt"
   end
 
   create_table "roles", force: true do |t|

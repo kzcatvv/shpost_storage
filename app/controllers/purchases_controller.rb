@@ -104,14 +104,11 @@ class PurchasesController < ApplicationController
     end
   end
 
-def onecheck
-  @stock_logs = @purchase.stock_logs
+  def onecheck
+    @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
-    respond_to do |format|
-      if StockLog.find(params[:stock_log]).check
-      format.html { render action: 'stock_in' }
-    end
-    end
+    StockLog.find(params[:stock_log]).check
+    render action: 'stock_in'
   end
 
 
