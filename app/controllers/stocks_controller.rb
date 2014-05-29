@@ -114,6 +114,6 @@ class StocksController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def stock_params
-      params.require(:stock).permit(:shelf_id, :business_id, :supplier_id, :purchase_detail_id, :specification_id, :actual_amount, :virtual_amount)
+      params.require(:stock).permit(:shelf_id,:batch_no, :business_id, :supplier_id, :purchase_detail_id, :specification_id, :actual_amount, :virtual_amount,:desc)
     end
 end

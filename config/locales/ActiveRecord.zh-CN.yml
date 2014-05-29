@@ -366,7 +366,7 @@ zh-CN:
         checked_at: "确认时间"
         pd_name: "采购单明细"
         "shelf_code": "货架编号"
-        "shelf": "货架编号"
+        "Shelf": "货架编号"
         status_checked: "已确认"
       supplier:
         "no": "供应商编号"
@@ -413,7 +413,7 @@ zh-CN:
         unit: "所属机构"
         secret_key: "安全码"
       order:
-        no: "订单编号"
+        "no": "订单编号"
         order_type: "订单类型"        
         need_invoice: "是否需要发票"      
         customer_name: "客户名称"    

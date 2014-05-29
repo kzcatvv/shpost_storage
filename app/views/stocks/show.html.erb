@@ -5,7 +5,8 @@
 
 <dl class="dl-horizontal">
   <dt><strong><%= model_class.human_attribute_name(:shelf_id) %>:</strong></dt>
-  <dd><%= @stock.shelf.try(:name) %></dd>
+  <dd><%= @stock.shelf.try(:shelf_code) %></dd>
+
   <dt><strong><%= model_class.human_attribute_name(:specification_id) %>:</strong></dt>
   <dd><%= @stock.specification.try(:all_name) %></dd>
   <dt><strong><%= model_class.human_attribute_name(:batch_no) %>:</strong></dt>
