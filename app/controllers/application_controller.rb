@@ -46,8 +46,8 @@ class ApplicationController < ActionController::Base
         @user_log.object_class = object.class.to_s
         @user_log.object_primary_key = object.id
 
-        if symbol && object[:symbol]
-          @user_log.object_symbol = object[:symbol]
+        if symbol && object[symbol.to_sym]
+          @user_log.object_symbol = object[symbol.to_sym]
         else
           @user_log.object_symbol = object.id
         end

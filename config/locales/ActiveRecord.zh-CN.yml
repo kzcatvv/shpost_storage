@@ -693,3 +693,5 @@ zh-CN:
     create: 新增
     update: 更新
     destroy: 删除
+    check: 确认
+    close: 关闭
