@@ -514,6 +514,11 @@ class OrdersController < ApplicationController
   end
 
   def doreturn
+    params[:cbids].each do |id|
+      reason=params[("rereason_"+id).to_sym]
+      isbad=params[("st_"+id).to_sym]
+      @order=OrderDetail.find(id).order
+    end
     redirect_to :action => 'packreturn'
   end
 
