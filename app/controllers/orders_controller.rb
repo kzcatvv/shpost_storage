@@ -517,7 +517,9 @@ class OrdersController < ApplicationController
     params[:cbids].each do |id|
       reason=params[("rereason_"+id).to_sym]
       isbad=params[("st_"+id).to_sym]
-      @order=OrderDetail.find(id).order
+      @orderdtl=OrderDetail.find(id)
+      @order=@orderdtl.order
+      @order.update_attributes(status: "return",seller_desc: reason)
     end
     redirect_to :action => 'packreturn'
   end
