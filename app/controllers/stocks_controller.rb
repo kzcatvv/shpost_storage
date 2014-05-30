@@ -94,11 +94,12 @@ class StocksController < ApplicationController
     @allcnt={}
     @stocks.each do |s|
         product = [s.business_id,s.specification_id,s.supplier_id]
+        warning_amount=Relationship.where("business_id=? and specification_id=? and supplier_id=?",s.business_id,s.specification_id,s.supplier_id).first.warning_amt
         if @allcnt.has_key?(product)
             @allcnt[product][0]=@allcnt[product][0]+s.actual_amount
             @allcnt[product][1]=@allcnt[product][1]+s.virtual_amount
         else
-            @allcnt[product]=[s.actual_amount,s.virtual_amount]
+            @allcnt[product]=[s.actual_amount,s.virtual_amount,warning_amount]
         end
      end
    

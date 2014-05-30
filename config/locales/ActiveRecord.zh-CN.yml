@@ -455,7 +455,7 @@ zh-CN:
         province: "省"
         city: "市"
         county: "区"
-
+        tracking_number: "面单号"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        

@@ -16,6 +16,10 @@ ShpostStorage::Application.routes.draw do
         get 'findorderout'
         get 'setoutstatus'
         get 'findprintindex'
+        get 'packreturn'
+        get 'findtrackingnumber'
+        get 'set_reason'
+        get 'doreturn'
       end
 
      resources :order_details

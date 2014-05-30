@@ -494,6 +494,29 @@ class OrdersController < ApplicationController
 
   end
 
+  def packreturn
+    @order_details=[]
+  end
+
+  def findtrackingnumber
+    @order=Order.where(tracking_number: params[:tracking_number]).first
+    @order_details=@order.order_details
+    respond_to do |format|
+          format.js 
+    end
+
+  end
+
+  def set_reason
+    respond_to do |format|
+          format.js 
+    end
+  end
+
+  def doreturn
+    redirect_to :action => 'packreturn'
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
