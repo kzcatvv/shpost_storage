@@ -66,6 +66,15 @@ class OrderreturnsController < ApplicationController
     @order_details=[]
   end
 
+  def findtrackingnumber
+    @order=Order.where(tracking_number: params[:tracking_number]).first
+    @order_details=@order.order_details
+    respond_to do |format|
+          format.js 
+    end
+
+  end
+
   def doreturn
     sklogs=[]
     params[:cbids].each do |id|

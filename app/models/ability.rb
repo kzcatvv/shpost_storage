@@ -65,6 +65,8 @@ class Ability
         can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :check, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+
+        can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
         end
 
         can :read, UserLog, user: {unit_id: user.unit_id}

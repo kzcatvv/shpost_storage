@@ -494,15 +494,6 @@ class OrdersController < ApplicationController
 
   end
 
-  def findtrackingnumber
-    @order=Order.where(tracking_number: params[:tracking_number]).first
-    @order_details=@order.order_details
-    respond_to do |format|
-          format.js 
-    end
-
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order

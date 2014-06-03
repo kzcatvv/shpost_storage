@@ -12,7 +12,7 @@
    <%= text_field_tag("reasondtl") %>
    <input type="button" id="setreason" value="设置">
 </div>
-<%= form_tag("/orders/doreturn/", :method => "get") do %>
+<%= form_tag("/orderreturns/doreturn/", :method => "get") do %>
 <div style="float:right">
     <%= submit_tag("退件入库", :class=>"btn btn-primary") %>  
 </div>
@@ -32,7 +32,7 @@
     </thead>
     <tbody>
       
-        <%= render :partial => 'orders/packreturn_forms',object: @orders %>
+        <%= render :partial => 'orderreturns/packreturn_forms',object: @orders %>
      
     </tbody>
 </table>
@@ -51,7 +51,7 @@ function ReEnterPress(e){ //传入 event
     if(e.keyCode == 13){   
       $.ajax({
             type : 'GET',
-            url : '/orders/findtrackingnumber/',
+            url : '/orderreturns/findtrackingnumber/',
             data: { tracking_number: $('#tracking_number').val()},
             dataType : 'script'
             });
