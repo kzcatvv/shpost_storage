@@ -639,7 +639,7 @@ zh-CN:
           link: "/keyclientorders"
         findwarning:
           name: "退件入库"
-          link: "/orders/packreturn"
+          link: "/orderreturns/packreturn"
         # b2cfindprint:
         #   name: "电商订单打印"
         #   link: "/orders/findprint"
