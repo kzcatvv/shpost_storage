@@ -455,7 +455,7 @@ zh-CN:
         province: "省"
         city: "市"
         county: "区"
-
+        tracking_number: "面单号"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -637,6 +637,9 @@ zh-CN:
         keyclientorder:
           name: "大批次订单查询"
           link: "/keyclientorders"
+        findwarning:
+          name: "件入库"
+          link: "/orders/packreturn"
         # b2cfindprint:
         #   name: "电商订单打印"
         #   link: "/orders/findprint"
@@ -664,6 +667,9 @@ zh-CN:
         findstock:
           name: "库存汇总查询"
           link: "/stocks/findstock"
+        findwarning:
+          name: "库存预警查询"
+          link: "/relationships/findwarningamt"
     logs:
       name: "日志查询"
       submenu:
