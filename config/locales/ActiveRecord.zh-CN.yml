@@ -638,7 +638,7 @@ zh-CN:
           name: "大批次订单查询"
           link: "/keyclientorders"
         findwarning:
-          name: "件入库"
+          name: "退件入库"
           link: "/orders/packreturn"
         # b2cfindprint:
         #   name: "电商订单打印"
