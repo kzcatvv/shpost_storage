@@ -367,7 +367,7 @@ zh-CN:
         pd_name: "采购单明细"
         "shelf_code": "货架编号"
         "Shelf": "货架编号"
-        status_checked: "已确认"
+        
       supplier:
         "no": "供应商编号"
         name: "名称"
