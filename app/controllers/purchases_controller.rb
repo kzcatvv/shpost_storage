@@ -3,6 +3,7 @@ class PurchasesController < ApplicationController
 
   user_logs_filter only: [:create, :close, :destroy], symbol: :name#, object: :user, operation: '新增用户'
   user_logs_filter only: [:check], symbol: :name, operation: '确认入库'#, object: :user, operation: '新增用户'
+  user_logs_filter only: [:onecheck], operation: '确认1入库'
   # GET /purchasees
   # GET /purchasees.json
   def index

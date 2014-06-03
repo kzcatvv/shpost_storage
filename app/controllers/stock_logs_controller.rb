@@ -2,6 +2,7 @@ class StockLogsController < ApplicationController
   # before_filter :find_current_storage
   load_and_authorize_resource
 
+user_logs_filter only: [:check], symbol: :desc#, object: :stock_log, operation: '确认2入库'
   # GET /stock_logs
   # GET /stock_logs.json
   def index
