@@ -36,8 +36,13 @@ class AreaShelfController < ApplicationController
   def create
     @shelf = Shelf.new(shelf_params)
     @shelf.shelf_code = setShelfCode(shelf_params)
+
+
+   # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
+
     @shelf.area_id = params[:area_id]
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
+
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
     # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
     # @shelf.shelf_code << "-" << change(shelf_params[:area_height])

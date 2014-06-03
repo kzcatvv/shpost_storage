@@ -1,0 +1,31 @@
+<h1>Listing orderreturns</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Order detail</th>
+      <th>Return reason</th>
+      <th>Is bad</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @orderreturns.each do |orderreturn| %>
+      <tr>
+        <td><%= orderreturn.order_detail_id %></td>
+        <td><%= orderreturn.return_reason %></td>
+        <td><%= orderreturn.is_bad %></td>
+        <td><%= link_to 'Show', orderreturn %></td>
+        <td><%= link_to 'Edit', edit_orderreturn_path(orderreturn) %></td>
+        <td><%= link_to 'Destroy', orderreturn, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Orderreturn', new_orderreturn_path %>

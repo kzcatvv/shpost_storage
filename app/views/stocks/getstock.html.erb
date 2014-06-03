@@ -1,6 +1,6 @@
 <%- model_class = Stock -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} StockFind'], :model => model_class.model_name.human.titleize %></h1>
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} (库存盘点)'], :model => model_class.model_name.human.titleize %></h1>
   <div style="float:right">   
   </div>
 
@@ -26,6 +26,36 @@
     </tr>
   </thead>
   <tbody>
+    <% if value[1] < value[2] %>
+      <tr style='Color:#ff0000'>
+        <td><%= Business.find(key[0]).name %></td>
+        <td><%= Specification.find(key[1]).name %></td>
+        <td><%= Supplier.find(key[2]).name %></td>
+        <td><%= value[0] %></td>
+        <td><%= value[1] %></td>
+      </tr>
+      <table align="center" width="80%" rules=groups>
+        <thead>
+          <tr>
+             <th><%= model_class.human_attribute_name(:shelf_id) %></th>
+             <th><%= model_class.human_attribute_name(:batch_no) %></th>
+             <th><%= model_class.human_attribute_name(:actual_amount) %></th>
+             <th><%= model_class.human_attribute_name(:virtual_amount) %></th>
+         </tr>
+       </thead>
+       <tbody>
+         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]) %>
+         <% @selectstocks.each do |stock| %>
+           <tr>
+              <td><%= Shelf.find(stock.shelf_id).shelf_code %></td>
+              <td><%= stock.batch_no %></td>
+              <td><%= stock.actual_amount %></td>
+              <td><%= stock.virtual_amount %></td>
+           </tr>
+         <% end %>
+       </tbody>
+      </table>
+    <% else %>
       <tr>
         <td><%= Business.find(key[0]).name %></td>
         <td><%= Specification.find(key[1]).name %></td>
@@ -54,6 +84,7 @@
          <% end %>
        </tbody>
       </table>
+    <% end %>
   </tbody>
 </table>
 <% end %>

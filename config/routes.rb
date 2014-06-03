@@ -1,6 +1,14 @@
 ShpostStorage::Application.routes.draw do
 
 
+  resources :orderreturns do
+    collection do
+      get 'packreturn'
+      get 'doreturn'
+      get 'findtrackingnumber'
+    end
+  end
+
   resources :contacts do
     get 'relation', on: :collection
     get 'deleterelation', on: :member
@@ -15,7 +23,7 @@ ShpostStorage::Application.routes.draw do
         get 'packout'
         get 'findorderout'
         get 'setoutstatus'
-        get 'findprintindex'
+        get 'findprintindex'      
       end
 
      resources :order_details
