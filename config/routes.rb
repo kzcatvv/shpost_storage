@@ -6,6 +6,7 @@ ShpostStorage::Application.routes.draw do
       get 'packreturn'
       get 'doreturn'
       get 'findtrackingnumber'
+      get 'returncheck'
     end
   end
 
