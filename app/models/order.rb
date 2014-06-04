@@ -38,7 +38,7 @@ class Order < ActiveRecord::Base
   end
 
   def checked_amount
-    self.stock_logs.to_a.sum{|x| x.checked? ? x.amount : 0}
+    self.stock_logs.where("operation <> 'order_return'").to_a.sum{|x| x.checked? ? x.amount : 0}
   end
 
   def all_checked?

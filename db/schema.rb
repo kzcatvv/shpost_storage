@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140603020257) do
+ActiveRecord::Schema.define(version: 20140604013441) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -139,6 +139,7 @@ ActiveRecord::Schema.define(version: 20140603020257) do
     t.string   "is_bad"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "batch_id"
   end
 
   create_table "orders", force: true do |t|
