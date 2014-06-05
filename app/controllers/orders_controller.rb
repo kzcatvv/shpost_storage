@@ -1,6 +1,7 @@
 class OrdersController < ApplicationController
   load_and_authorize_resource
 
+  user_logs_filter only: [:ordercheck], symbol: :batch_id, operation: '确认出库', object: :keyclientorder
   # GET /orderes
   # GET /orderes.json
   def index
