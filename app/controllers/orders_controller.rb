@@ -279,6 +279,9 @@ class OrdersController < ApplicationController
     sklogs=[]
     chkout=0
     @keycorder=params[:format]
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts @keycorder
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     @keyclientorder=Keyclientorder.find(params[:format])
     @orders=@keyclientorder.orders
     @orders.each do |order|
@@ -469,6 +472,7 @@ class OrdersController < ApplicationController
      @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary
      @selectorders=Order.where(id: @slorders)
      if !params[:grid].nil?
+      if !params[:grid][:f].nil?
        if !params[:grid][:f]["businesses.name".to_sym].nil?
         businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
         @selectorders=@selectorders.where(:business_id,businessid)
@@ -477,6 +481,7 @@ class OrdersController < ApplicationController
        if !params[:grid][:f][:created_at].nil?
         @selectorders=@selectorders.where(["created_at >= ? and created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
        end
+      end
      end
 
      @selectorders=@selectorders.to_ary

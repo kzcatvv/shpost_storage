@@ -2,6 +2,7 @@ class StockLogsController < ApplicationController
   # before_filter :find_current_storage
   load_and_authorize_resource
 
+user_logs_filter only: [:check], symbol: :desc#, object: :stock_log, operation: '确认2入库'
   # GET /stock_logs
   # GET /stock_logs.json
   def index
@@ -75,18 +76,25 @@ class StockLogsController < ApplicationController
         # puts Area.where(storage: current_storage).ids
         shelf_modify = Shelf.where(area_id: Area.where(storage: current_storage).ids, shelf_code: params[:shelfid]).first
         if !shelf_modify.blank?
+          puts 111111111111111111111111
           if shelf_modify.id != @stock.shelf.id.to_s
-            stock = Stock.find_stock_in_shelf_with_batch_no(@stock.specification, @stock.supplier, @stock.business, @stock.batch_no, shelf_modify)
+            puts 222222222222222222
             if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+              puts 33333333333333333333
               @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
             elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+              puts 444444444444444
               @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
             end
             @stock.save()
+            stock = Stock.find_stock_in_shelf_with_batch_no(@stock.specification, @stock.supplier, @stock.business, @stock.batch_no, shelf_modify)
             if !stock
+              puts 555555555555555555555
               if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+                puts 666666666666666666666666666
                 stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: shelf_modify.id, batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: 0 - @stock_log.amount)
               elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+                puts 77777777777777777777777
                 stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: shelf_modify.id, batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: @stock_log.amount)
               end
                # @stock_log.stock = stock
@@ -94,8 +102,10 @@ class StockLogsController < ApplicationController
               stock_log = StockLog.update(@stock_log.id, stock: stock)
             else
               if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
+                puts 88888888888888
                 stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount - @stock_log.amount)
               elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
+                puts 99999999999999999999
                 stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount + @stock_log.amount)
               end
               stock_log = StockLog.update(@stock_log.id, stock: stock)
