@@ -77,12 +77,14 @@ class OrderreturnsController < ApplicationController
 
   def doreturn
     sklogs=[]
+    time = Time.now
+    @batchid = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + (Orderreturn.select(:batch_id).distinct.count+1).to_s.rjust(5,'0')
     params[:cbids].each do |id|
       reason=params[("rereason_"+id).to_sym]
       isbad=params[("st_"+id).to_sym]
       @orderdtl=OrderDetail.find(id)
       @order=@orderdtl.order
-      @orderreturn=Orderreturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad)
+      @orderreturn=Orderreturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,batch_id:@batchid)
       stock=Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
       stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
       @orderdtl.stock_logs << stklog
@@ -91,6 +93,22 @@ class OrderreturnsController < ApplicationController
     @stock_logs = StockLog.where(id: sklogs)
 
     @stock_logs_grid = initialize_grid(@stock_logs)
+  end
+
+  def returncheck
+
+      @orderreturns=Orderreturn.where("batch_id=?",params[:format])
+      @orderreturns.each do |ot|
+        @orderdtl=OrderDetail.find(ot.order_detail_id)
+        stlogs=@orderdtl.stock_logs.where("operation='order_return'")
+        stlogs.each do |stlog|
+          stlog.order_check
+        end
+      end
+      
+
+      redirect_to :action => 'packreturn'
+
   end
 
   private
