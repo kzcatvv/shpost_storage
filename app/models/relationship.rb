@@ -5,7 +5,7 @@ class Relationship < ActiveRecord::Base
   has_and_belongs_to_many :contacts
   validates_presence_of :business_id, :specification_id, :external_code, :message => '不能为空'
 
-  def self.find_relationship(sku, supplier = nil, spec_desc = nil, business, unit)
+  def self.find_relationships(sku, supplier = nil, spec_desc = nil, business, unit)
     conditions =  where(business_id: business, external_code: sku)
     
     if !supplier.blank?

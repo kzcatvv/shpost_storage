@@ -279,6 +279,9 @@ class OrdersController < ApplicationController
     sklogs=[]
     chkout=0
     @keycorder=params[:format]
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts @keycorder
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     @keyclientorder=Keyclientorder.find(params[:format])
     @orders=@keyclientorder.orders
     @orders.each do |order|
