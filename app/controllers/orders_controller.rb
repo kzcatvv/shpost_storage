@@ -494,36 +494,6 @@ class OrdersController < ApplicationController
 
   end
 
-  def packreturn
-    @order_details=[]
-  end
-
-  def findtrackingnumber
-    @order=Order.where(tracking_number: params[:tracking_number]).first
-    @order_details=@order.order_details
-    respond_to do |format|
-          format.js 
-    end
-
-  end
-
-  def set_reason
-    respond_to do |format|
-          format.js 
-    end
-  end
-
-  def doreturn
-    params[:cbids].each do |id|
-      reason=params[("rereason_"+id).to_sym]
-      isbad=params[("st_"+id).to_sym]
-      @orderdtl=OrderDetail.find(id)
-      @order=@orderdtl.order
-      @order.update_attributes(status: "return",seller_desc: reason)
-    end
-    redirect_to :action => 'packreturn'
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
