@@ -82,17 +82,19 @@ class OrderreturnsController < ApplicationController
     params[:cbids].each do |id|
       reason=params[("rereason_"+id).to_sym]
       isbad=params[("st_"+id).to_sym]
-      @orderdtl=OrderDetail.find(id)
-      @order=@orderdtl.order
-      @orderreturn=Orderreturn.where(order_detail: @orderdtl).first
-      if @orderreturn.nil?
-        @orderreturn=Orderreturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,batch_id:@batchid,status:"waiting")
+      if isbad == "否"
+        @orderdtl=OrderDetail.find(id)
+        @order=@orderdtl.order
+        @orderreturn=Orderreturn.where(order_detail: @orderdtl).first
+        if @orderreturn.nil?
+          @orderreturn=Orderreturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,batch_id:@batchid,status:"waiting")
+        end
+        stock=Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
+        stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
+        @orderdtl.stock_logs << stklog
+        sl=StockLog.where(id: stklog)
+        sklogs += sl
       end
-      stock=Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
-      stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
-      @orderdtl.stock_logs << stklog
-      sl=StockLog.where(id: stklog)
-      sklogs += sl
     end
     @stock_logs = StockLog.where(id: sklogs)
 
