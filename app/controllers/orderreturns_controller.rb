@@ -86,12 +86,13 @@ class OrderreturnsController < ApplicationController
       @order=@orderdtl.order
       @orderreturn=Orderreturn.where(order_detail: @orderdtl).first
       if @orderreturn.nil?
-        @orderreturn=Orderreturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,batch_id:@batchid)
+        @orderreturn=Orderreturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,batch_id:@batchid,status:"waiting")
       end
       stock=Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
       stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
       @orderdtl.stock_logs << stklog
-      sklogs += stklog.to_ary
+      sl=StockLog.where(id: stklog)
+      sklogs += sl
     end
     @stock_logs = StockLog.where(id: sklogs)
 
@@ -100,13 +101,14 @@ class OrderreturnsController < ApplicationController
 
   def returncheck
 
-      @orderreturns=Orderreturn.where("batch_id=?",params[:format])
+      @orderreturns=Orderreturn.where("batch_id=? and is_bad='否'",params[:format])
       @orderreturns.each do |ot|
         @orderdtl=OrderDetail.find(ot.order_detail_id)
         stlogs=@orderdtl.stock_logs.where("operation='order_return'")
         stlogs.each do |stlog|
           stlog.order_check
         end
+        ot.return_in
       end
       
 
