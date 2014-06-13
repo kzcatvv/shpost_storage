@@ -9,6 +9,11 @@ class OrdersController < ApplicationController
                    :conditions => {:order_type => "b2c"})
   end
 
+  def order_alert
+    @orders = Order.where( [ "status = ? and created_at < ?", 'waiting', Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders_grid = initialize_grid(@orders)
+  end
+
   # GET /orderes/1
   # GET /orderes/1.json
   def show
@@ -498,6 +503,92 @@ class OrdersController < ApplicationController
      end
      #binding.pry
 
+  end
+
+  def pingan_b2c_import
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])   
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            keyclientorder=Keyclientorder.create! keyclient_name: "平安线上 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
+            
+            2.upto(instance.last_row) do |line|
+              city=nil
+              if instance.cell(line,'G').include?("市")
+                city=instance.cell(line,'G').split("市")[0]+"市"
+              else
+                city=instance.cell(line,'G').split("县")[0]+"县"
+              end
+              
+              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('.0')[0],business_trans_no: instance.cell(line,'K').to_s.split('.0')[0], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I'), keyclientorder: keyclientorder
+              
+              relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+              
+              OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('.0')[0], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
+        
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = "导入失败"
+          end
+        
+      end   
+    end
+  end
+
+  def pingan_b2b_import
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])   
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            keyclientorder=Keyclientorder.create! keyclient_name: "平安线下 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
+    
+            relationship = Relationship.find_relationships(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+            keyclientorderdetails=Keyclientorderdetail.create! specification: relationship.specification, keyclientorder: keyclientorder, amount: 1, supplier: relationship.supplier, business_id: StorageConfig.config["business"]['pajf_id']
+            
+            2.upto(instance.last_row) do |line|
+              
+              order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
+              
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = "导入失败"
+          end
+        
+      end   
+    end
+  end
+
+  def upload_pingan(file)
+     if !file.original_filename.empty?
+       direct = "#{Rails.root}/upload/pingan/"
+       filename = "#{Time.now.to_f}_#{file.original_filename}"
+
+       file_path = direct + filename
+       File.open(file_path, "wb") do |f|
+          f.write(file.read)
+       end
+       file_path
+     end
   end
 
   private

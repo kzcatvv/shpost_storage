@@ -16,7 +16,7 @@ class StandardInterface
     
     #price = context['PRICE']
 
-    relationship =  Relationship.find_relationship(sku, supplier, spec, business, unit)
+    relationship =  Relationship.find_relationships(sku, supplier, spec, business, unit)
     
 
     if relationship.nil?
@@ -128,7 +128,7 @@ class StandardInterface
         supplier = Supplier.find_supplier(supplier_no, business)
       end
       
-      relationship =  Relationship.find_relationship(sku, supplier, spec, business, unit)
+      relationship =  Relationship.find_relationships(sku, supplier, spec, business, unit)
 
       if relationship.nil?
         amount = 0

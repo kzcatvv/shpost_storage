@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20140606010934) do
     t.datetime "updated_at"
     t.string   "no"
     t.string   "secret_key"
+    t.integer  "alertday",   default: 0
   end
 
   create_table "commodities", force: true do |t|
@@ -177,6 +178,9 @@ ActiveRecord::Schema.define(version: 20140606010934) do
     t.string   "business_order_id"
     t.string   "business_trans_no"
     t.string   "county"
+    t.string   "pingan_ordertime"
+    t.string   "pingan_operate"
+    t.string   "customer_idnumber"
   end
 
   create_table "purchase_details", force: true do |t|

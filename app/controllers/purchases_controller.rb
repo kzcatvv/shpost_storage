@@ -110,12 +110,9 @@ class PurchasesController < ApplicationController
   def onecheck
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
-    @stock_log = StockLog.find(params[:stock_log])
-    respond_to do |format|
-      if @stock_log.check
-        format.html { render action: 'stock_in' }
-      end
-    end
+
+    StockLog.find(params[:stock_log]).check
+    render action: 'stock_in'
   end
 
 

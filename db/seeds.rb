@@ -58,6 +58,7 @@ supplier2 = Supplier.create(no: 'G002',name: '供应商2',address: '供应商地
 
 business1 = Business.create(id: StorageConfig.config["business"]['bst_id'],name: '号码百事通',email: 'business1@test.com',contactor: '号码百事通联系人',phone: '22334455667',address: '号码百事通地址',desc: '号码百事通备注',unit: unit1, no: '0001', secret_key: '12345')
 business2 = Business.create(id: StorageConfig.config["business"]['jh_id'],name: '交通银行',email: 'business2@test.com',contactor: '交通银行联系人',phone: '22334455668',address: '交通银行地址',desc: '交通银行备注',unit: unit1, no: '0002', secret_key: '12345')
+business3 = Business.create(id: StorageConfig.config["business"]['pajf_id'],name: '平安万里通',email: 'business3@test.com',contactor: '平安联系人',phone: '22334455669',address: '平安地址',desc: '平安备注',unit: unit1, no: '0003', secret_key: '12345')
 
 # Thirdpartcode.create business_id: 1, specification_id: 1, external_code: '000000002', supplier_id: 1
 
