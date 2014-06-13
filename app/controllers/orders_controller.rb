@@ -591,6 +591,46 @@ class OrdersController < ApplicationController
      end
   end
 
+  def pingan_b2c_outport
+  end
+
+  def pingan_b2c_xls_outport
+    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    if @keyclientorder.nil?
+       flash[:alert] = "无此批次编号"
+       redirect_to :action => 'pingan_b2c_outport'
+    else
+      @orders=@keyclientorder.orders 
+      respond_to do |format|  
+        format.xls {   
+          send_data(b2c_xls_content_for(@orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Report_Users_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
+  def pingan_b2b_outport
+  end
+
+  def pingan_b2b_xls_outport
+    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    if @keyclientorder.nil?
+       flash[:alert] = "无此批次编号"
+       redirect_to :action => 'pingan_b2b_outport'
+    else
+      @orders=@keyclientorder.orders 
+      respond_to do |format|  
+        format.xls {   
+          send_data(b2b_xls_content_for(@orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Report_Users_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
@@ -600,5 +640,45 @@ class OrdersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
       params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:province,:city,:county,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
+    end
+
+    def b2c_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{customer_name customer_address}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.customer_name
+        sheet1[count_row,1]=obj.customer_address
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
+    end
+
+    def b2b_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{customer_name customer_address}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.customer_name
+        sheet1[count_row,1]=obj.customer_address
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
     end
 end
