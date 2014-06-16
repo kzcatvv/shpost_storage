@@ -181,11 +181,12 @@ function addTr(slid,index)
         var jsonData = eval("("+data.responseText+")");
         tablereplace(index,"p","id",jsonData.id);
         tablereplace(index,"a","id",jsonData.id);
+		tablereplace(index,"a","href",jsonData.id);
         tablereplace(index,"input","id",jsonData.id);
         tablereplace(index,"select","id",jsonData.id);
         amountset(index,jsonData.id,0);
         statusset(slid,index,jsonData.id,"waiting");
-        linkset(index,jsonData.id);
+        linkset(index,jsonData.id, jsonData.pid);
       }
     }
   });
@@ -215,9 +216,10 @@ function statusset(slid,index,id,value) {
   })
 }
 
-function linkset(index,id) {
-  link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_link_'+id+'" onclick="destroy(this)">删除</a>';
-  $('table.wice-grid tr:eq('+index+') td').last().html(link_field);
+function linkset(index,id,pid) {
+  check_link_field='<a class="btn btn-xs btn-info" href="/purchases/'+pid+'/onecheck?stock_log='+id+'" id="stock_logs_checklink_'+id+'" rel="nofollow" data-method="patch">确认入库</a>';
+  delete_link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_deletelink_'+id+'" onclick="destroy(this)">删除</a>';
+  $('table.wice-grid tr:eq('+index+') td').last().html(check_link_field+' '+delete_link_field);
 }
 
 function removeTr(current)

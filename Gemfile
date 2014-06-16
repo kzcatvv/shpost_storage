@@ -57,6 +57,8 @@ gem 'pry', :group => :development
 
 gem 'spreadsheet'
 
+gem 'roo'
+
 gem 'yomu'
 
 group :test, :development do

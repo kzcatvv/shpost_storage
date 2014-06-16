@@ -1,57 +1,75 @@
 class CSBSendWithSOAP
 	require "rexml/document"
 
+	@@call_flg = false
 	# @@startrow = 1
 
 	def self.sendPointOrder()
 		for order_type in 1..2
 			puts order_type
-			# call_flg = false
-			# @@startrow = 1
-			# begin 
+			@@call_flg = false
+			begin 
 				xml_file = setSendPointOrder(order_type)
-				# puts '----------------------------'
-				# puts xml_file
-				# puts '----------------------------'
-				# puts decode_xml(xml_file)
-				# puts '----------------------------'
-	      send_hash = { "xmlFile" => xml_file}
-	      client = getClient('SendPointOrder')
-	      response = client.call("sendQueryOrder".to_sym, message: send_hash)
+				puts '------------start----------------'
+				puts xml_file
+				puts '----------------------------'
+				soap_request = setSOAPRequestXML('SendPointOrder',xml_file)
 
-	      xml_file_return = response.body[:sendQueryOrder][:sendQueryOrderReturn].to_s
-		    xml_file_trans_status = parseAndSaveSendPointOrder(xml_file_return,order_type)
+				response = csb_post(StorageConfig.config["csb_interface"]["send_point_order_url"],soap_request)
+				xml_file_return = response.body.to_s
+				puts xml_file_return
+				puts "@@call_flg=" << @@call_flg.to_s
+				xml_file_trans_status = parseAndSaveSendPointOrder(xml_file_return,order_type)
+				puts '----------------------------'
+				puts xml_file_trans_status
+				soap_request = setSOAPRequestXML('PointUpdateTransStatus',xml_file_trans_status)
+				puts StorageConfig.config["csb_interface"]["point_update_trans_status_url"]
+				puts '----------------------------'
+				puts soap_request
+				response = csb_post(StorageConfig.config["csb_interface"]["point_update_trans_status_url"],soap_request)
+				puts response.body
+				puts '-----------end-----------------'
 
-		    send_hash_trans_status = { "xmlFile" => xml_file_trans_status}
-	      client = getClient('PointUpdateTransStatus')
-	      response_trans_status = client.call("updateTransportStatus".to_sym, message: send_hash_trans_status)
-	      parsePointUpdateTransStatus(response_trans_status)
-			# end while call_flg
+			end while !@@call_flg
 		end
   end
 
   def self.updatePointOrderStatus(orders)
 	  	xml_file = setUpdatePointOrderStatus(orders)
-	  	send_hash = { "xmlFile" => xml_file}
-	    client = getClient('UpdatePointOrderStatus')
-      response = client.call("updateQueryOrderStatus".to_sym, message: send_hash)
+		puts 'xml_file:[' << xml_file << ']'
+		soap_request = setSOAPRequestXML('UpdatePointOrderStatus',xml_file)
+		puts 'soap_request:[' << soap_request << ']'
+		response = csb_post(StorageConfig.config["csb_interface"]["update_point_order_status_url"],soap_request)
 
-      xml_file_return = response.body[:updateQueryOrderStatus][:updateQueryOrderStatusReturn].to_s
+		xml_file_return = response.body.to_s
+		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+		puts xml_file_return
+		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 	    parseUpdatePointOrderStatus(xml_file_return)
   end
 
 	def self.pointOrderStatus(orders)
-		puts '------------todo:pointOrderStatus function--------------'
 		xml_file = setPointOrderStatus(orders)
-	  	send_hash = { "inputXml" => xml_file}
-	    client = getClient('PointOrderStatus')
-      response = client.call("OrderStatus".to_sym, message: send_hash)
-
-      xml_file_return = response.body[:OrderStatus][:OrderStatusReturn].to_s
-      parsePointOrderStatus(xml_file_return)
+		puts 'xml_file:[' << xml_file << ']'
+		soap_request = setSOAPRequestXML('PointOrderStatus',xml_file)
+		puts 'soap_request:[' << soap_request << ']'
+		response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],soap_request)
+		xml_file_return = response.body.to_s
+		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+		puts xml_file_return
+		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+		parsePointOrderStatus(xml_file_return)
   end
 
   private
+  def self.csb_post(uri,body)
+  	url = URI.parse(uri)
+		request = Net::HTTP::Post.new(url.path)
+		request.content_type = 'text/xml'
+		request.body = body
+		response = Net::HTTP.start(url.host, url.port) {|http| http.request(request)}
+  end
+
   def self.setPointOrderStatus(orders)
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
   	doc = REXML::Document.new       #创建XML内容 
@@ -67,58 +85,81 @@ class CSBSendWithSOAP
 		messageCode = head.add_element('MessageCode')
 		description = head.add_element('Description')
 		activeCode = head.add_element('ActiveCode')
+		
+		sender.add_text StorageConfig.config["csb_interface"]["post_name"]
+		reciver.add_text StorageConfig.config["csb_interface"]["bst_name"]
+		activeCode.add_text StorageConfig.config["csb_interface"]["active_code"]
 
 		orderDetail = scoreOrderInfo.add_element('OrderDetail')
 		# 原始订单
-		originalityOrder  = scoreOrderInfo.add_element('OriginalityOrder')
+		originalityOrder  = orderDetail.add_element('OriginalityOrder')
 		# 合并订单
-		combinationOrder = scoreOrderInfo.add_element('CombinationOrder')
-
-  	originalityOrder.add_attributes('isnull','xxxxxxxxxxxxxxxxxx')
-  	combinationOrder.add_attributes('isnull','xxxxxxxxxxxxxxxxxx')
-
+		combinationOrder = orderDetail.add_element('CombinationOrder')
+		
+		originalityOrderCount = 0
+		combinationOrderCount = 0
+		
 		orders.each do |order|
 			if order.order_details.first.business_deliver_no.blank?
+				originalityOrderCount+=1
 				orderLabel = originalityOrder.add_element('OrderLabel')
-				# 原始订单中的listid和orderID数据是原始订单号
-				orderLabel.add_attributes('listID',order.business_order_id)
 
 				order.order_details.each do |detail|
-					giftInfo  = originalityOrder.add_element('GiftInfo')
+					giftInfo  = orderLabel.add_element('GiftInfo')
 
 					relationship = Relationship.find_relationship(detail.specification_id,StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'])
-					giftInfo.add_attributes('ItemNo', relationship.external_code)
+					giftInfo.add_attribute('ItemNo', relationship.external_code)
 					# 原始订单中的listid和orderID数据是原始订单号
-					giftInfo.add_attributes('OrderId', order.business_order_id)
+					giftInfo.add_attribute('GiftLineId', order.business_order_id)
 					# 4：本人签收，5：他人代收，7：退货
-					if order.status == ORDER::STATUS[:delivered]
-						giftDetail.add_attributes('realStatus', '4')
-					elsif order.status == ORDER::STATUS[:declined]
-						giftDetail.add_attributes('realStatus', '7')
+					if order.status == Order::STATUS[:delivered]
+						orderLabel.add_attribute('OrderStatus','4')
+						giftInfo.add_attribute('RealStatus', '4')
+					elsif order.status == Order::STATUS[:declined] or order.status == Order::STATUS[:returned]
+						orderLabel.add_attribute('OrderStatus','7')
+						giftInfo.add_attribute('RealStatus', '7')
 					end
 				end
+			
+				# 原始订单中的listid和orderID数据是原始订单号
+				orderLabel.add_attribute('ListID',order.business_order_id)
 			else
-				combinationOrder  = originalityOrder.add_element('CombinationOrder')
+				combinationOrderCount+=1
+				mergerOrderLabel  = combinationOrder.add_element('MergerOrderLabel')
 				# MergerOrderLabel BigOrderId="B105"归并的大订单号
-				combinationOrder.add_attributes('BigOrderId',order.business_order_id)
+				mergerOrderLabel.add_attribute('BigOrderId',order.business_order_id)
 
 				order.order_details.each do |detail|
-					giftDetail = originalityOrder.add_element('GiftDetail')
+					giftDetail = mergerOrderLabel.add_element('GiftDetail')
 
 					relationship = Relationship.find_relationship(detail.specification_id,StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'])
-					giftDetail.add_attributes('MergerItemNo', relationship.external_code)
+					giftDetail.add_attribute('MergerItemNo', relationship.external_code)
 					# 原始订单中的listid和orderID数据是原始订单号
-					giftDetail.add_attributes('MergerListID', detail.business_deliver_no)
-					giftDetail.add_attributes('MergerOrderId', detail.business_deliver_no)
+					giftDetail.add_attribute('MergerListID', detail.business_deliver_no)
+					giftDetail.add_attribute('MergerOrderId', detail.business_deliver_no)
 					# 4：本人签收，5：他人代收，7：退货
-					if order.status == ORDER::STATUS[:delivered]
-						giftDetail.add_attributes('MergerRealStatus', '4')
-					elsif order.status == ORDER::STATUS[:declined]
-						giftDetail.add_attributes('MergerRealStatus', '7')
+					if order.status == Order::STATUS[:delivered]
+						mergerOrderLabel.add_attribute('OrderStatus','4')
+						giftDetail.add_attribute('MergerRealStatus', '4')
+					elsif order.status == Order::STATUS[:declined] or order.status == Order::STATUS[:returned]
+						mergerOrderLabel.add_attribute('OrderStatus','7')
+						giftDetail.add_attribute('MergerRealStatus', '7')
 					end
 				end
 			end
 		end
+	#	if originalityOrderCount == 0
+	#		originalityOrder.add_attribute('isnull','no')
+	#	else
+	#		originalityOrder.add_attribute('isnull','is')
+	#	end
+	#	if combinationOrderCount == 0
+	#		combinationOrder.add_attribute('isnull','no')
+	#	else
+	#		combinationOrder.add_attribute('isnull','is')
+	#	end
+		
+		xml_file << doc.to_s
   end
 
   def self.setUpdatePointOrderStatus(orders)
@@ -129,43 +170,47 @@ class CSBSendWithSOAP
 		head = scoreOrderInfo.add_element('Head')
 		sender = head.add_element('Sender')
 		reciver = head.add_element('Reciver')
-
-		queryLists = scoreOrderInfo.add_element('QueryLists')
+		sender.add_text StorageConfig.config["csb_interface"]["post_name"]
+		reciver.add_text StorageConfig.config["csb_interface"]["bst_name"]
+		
+		queryLists = scoreOrderInfo.add_element('queryLists')
 		orders.each do |order|
 			order.order_details.each do |detail|
-				queryList = queryLists.add_element('QueryList')
+				queryList = queryLists.add_element('queryList')
 				operator = queryList.add_element('Operator')
-				operationDepartment = queryList.add_element('OperationDepartment')
-				abnormalReason = queryList.add_element('AbnormalReason')
-				state = queryList.add_element('State')
-				operatorTime = queryList.add_element('OperatorTime')
-				signer = queryList.add_element('Signer')
-				operatorTel = queryList.add_element('OperatorTel')
-				orderListId = queryList.add_element('OrderListId')
-				hostNumber = queryList.add_element('HostNumber')
-				courier = queryList.add_element('Courier')
-				courierTel = queryList.add_element('CourierTel')
+				operationDepartment = queryList.add_element('operationDepartment')
+				abnormalReason = queryList.add_element('abnormalReason')
+				state = queryList.add_element('state')
+				operatorTime = queryList.add_element('operatorTime')
+				signer = queryList.add_element('signer')
+				operatorTel = queryList.add_element('operatorTel')
+				orderListId = queryList.add_element('orderListId')
+				hostNumber = queryList.add_element('hostNumber')
+				courier = queryList.add_element('courier')
+				courierTel = queryList.add_element('courierTel')
 				
-				# abnormalReason.add_text ""
-				if !order.status == 'delivering'
-					operator.add_text "仓库人员"
-					operationDepartment.add_text "仓库"
-					state.add_text ORDER::STATUS[order.status]
-					signer.add_text "仓库人员"
-					operatorTel.add_text "操作人联系电话"
-				elsif order.status == 'delivering'
+				abnormalReason.add_text ""
+			#	if !order.status == 'delivering'
 					operator.add_text "操作人"
-					operationDepartment.add_text "站点"
-					state.add_text "物流状态信息描述"
+					operationDepartment.add_text "仓库"
+					state.add_text Order::STATUS[order.status.to_sym]
 					signer.add_text "操作人"
-					operatorTel.add_text "操作人联系电话"
-				end
+					operatorTel.add_text "12345678901"
+			#	elsif order.status == 'delivering'
+			#		operator.add_text "操作人"
+			#		operationDepartment.add_text "站点"
+			#		state.add_text "物流状态信息描述"
+			#		signer.add_text "操作人"
+			#		operatorTel.add_text "操作人联系电话"
+			#	end
 				operatorTime.add_text Time.now.strftime("%Y-%m-%d %H:%m:%S")
 				if order.tracking_number
 					hostNumber.add_text order.tracking_number
+				else
+					hostNumber.add_text "000000"
 				end
-				# courier.add_text ""
-				# courierTel.add_text ""
+				courier.add_text "courier"
+				courierTel.add_text "12345678902"
 				if detail.business_deliver_no.blank?
 					orderListId.add_text order.business_order_id
 					break
@@ -176,13 +221,20 @@ class CSBSendWithSOAP
 		end
 
 		xml_file << doc.to_s
-		puts xml_file
-		xml_file.encode(:xml => :text)
   end
 
   def self.setSendPointOrder(order_type)
   	current_date = DateTime.now.strftime("%Y-%m-%d")
   	start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d")
+	#current_date = "2014-01-20"
+	#start_date = "2014-01-19"
+	#if order_type == 1
+	#	current_date = "2014-01-20"
+	#	start_date = "2014-01-19"
+	#else
+	#	current_date = "2014-02-17"
+	#	start_date = "2014-02-16"
+	#end
 
   	xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
   	doc = REXML::Document.new       #创建XML内容 
@@ -210,56 +262,87 @@ class CSBSendWithSOAP
 		maxTimeValve.add_text StorageConfig.config["csb_interface"]["max_time_valve"].to_s
 		orderType.add_text order_type.to_s
 		startRow.add_text '1'
-		# rowCount.add_text "行数统计"
+		rowCount.add_text "5"
 		# messageCode.add_text "错误信息code"
 		# description.add_text "错误信息描述"
 		activeCode.add_text StorageConfig.config["csb_interface"]["active_code"]
-		# puts current_date
-		# puts start_date
 		beginDate.add_text start_date+' '+StorageConfig.config["csb_interface"]["query_time"]
 		endDate.add_text current_date+' '+StorageConfig.config["csb_interface"]["query_time"]
 
-
-		# # for test
-		# if order_type == StorageConfig.config["csb_interface"]["order_type_1"]
-		# orderDetail = scoreOrderInfo.add_element('OrderDetail')
-		# originalityOrder = orderDetail.add_element('OriginalityOrder')
-		# orderLabel1 = originalityOrder.add_element('OrderLabel',{'listId'=>'订单号1', 'CreateDate'=>'创建时间', 'CustomerName'=>'客户姓名1', 'Address'=>'联系地址', 'Telephone'=>'联系电话', 'CustomerArea'=>'邮编', 'DeadLineDate'=>'', 'CustRemark'=>'客户备注'})
-		# giftDetail1 = orderLabel1.add_element('GiftDetail',{'itemId'=>'礼品编号1', 'giftLineId'=>'礼品单编号1', 'GiftName'=>'礼品名称1', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-		# giftDetail2 = orderLabel1.add_element('GiftDetail',{'itemId'=>'礼品编号2', 'giftLineId'=>'礼品单编号1', 'GiftName'=>'礼品名称2', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-
-		# orderLabel2 = originalityOrder.add_element('OrderLabel',{'listId'=>'订单号2', 'CreateDate'=>'创建时间', 'CustomerName'=>'客户姓名2', 'Address'=>'联系地址', 'Telephone'=>'联系电话', 'CustomerArea'=>'邮编', 'DeadLineDate'=>'', 'CustRemark'=>'客户备注'})
-		# giftDetail3 = orderLabel2.add_element('GiftDetail',{'itemId'=>'礼品编号3', 'giftLineId'=>'礼品单编号2', 'GiftName'=>'礼品名称1', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-		# giftDetail4 = orderLabel2.add_element('GiftDetail',{'itemId'=>'礼品编号4', 'giftLineId'=>'礼品单编号2', 'GiftName'=>'礼品名称2', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-		# else
-		# orderDetail = scoreOrderInfo.add_element('OrderDetail')
-		# originalityOrder = orderDetail.add_element('CombinationOrder')
-		# orderLabel1 = originalityOrder.add_element('OrderLabel',{'BigOrderId'=>'归并订单号1', 'CreateDate'=>'创建时间', 'CustomerName'=>'客户姓名1', 'Address'=>'联系地址', 'Telephone'=>'联系电话', 'CustomerArea'=>'邮编', 'DeadLineDate'=>'', 'CustRemark'=>'客户备注'})
-		# giftDetail1 = orderLabel1.add_element('GiftDetail',{'listId'=>'订单号1','itemId'=>'礼品编号1', 'giftLineId'=>'礼品单编号1', 'GiftName'=>'礼品名称1', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-		# giftDetail2 = orderLabel1.add_element('GiftDetail',{'listId'=>'订单号2','itemId'=>'礼品编号2', 'giftLineId'=>'礼品单编号1', 'GiftName'=>'礼品名称2', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-
-		# orderLabel2 = originalityOrder.add_element('OrderLabel',{'BigOrderId'=>'归并订单号2', 'CreateDate'=>'创建时间', 'CustomerName'=>'客户姓名2', 'Address'=>'联系地址', 'Telephone'=>'联系电话', 'CustomerArea'=>'邮编', 'DeadLineDate'=>'', 'CustRemark'=>'客户备注'})
-		# giftDetail3 = orderLabel2.add_element('GiftDetail',{'listId'=>'订单号3','itemId'=>'礼品编号3', 'giftLineId'=>'礼品单编号2', 'GiftName'=>'礼品名称1', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-		# giftDetail4 = orderLabel2.add_element('GiftDetail',{'listId'=>'订单号4','itemId'=>'礼品编号4', 'giftLineId'=>'礼品单编号2', 'GiftName'=>'礼品名称2', 'ChangeNumber'=>'兑换数量', 'ScoreValue'=>'礼品单价'})
-		# end
-		# # for test
-
 		xml_file << doc.to_s
-		xml_file.encode(:xml => :text)
+		# xml_file.encode(:xml => :text)
+  end
+
+  def self.setSOAPRequestXML(service_name,xml_soap)
+  	xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
+  	doc = REXML::Document.new       #创建XML内容
+
+  	envelope = doc.add_element('SOAP-ENV:Envelope')
+  	envelope.add_attribute('xmlns:SOAP-ENV',"http://schemas.xmlsoap.org/soap/envelope/")
+  	envelope.add_attribute('xmlns:SOAP-ENC',"http://schemas.xmlsoap.org/soap/encoding/")
+  	envelope.add_attribute('xmlns:xsi',"http://www.w3.org/2001/XMLSchema-instance")
+  	envelope.add_attribute('xmlns:xsd',"http://www.w3.org/2001/XMLSchema")
+  	envelope.add_attribute('xmlns:m0',"http://www.shtel.com.cn/csb/v2/")
+  	envelope.add_attribute('xmlns:m1',"http://schemas.xmlsoap.org/soap/encoding/")
+
+  	header = envelope.add_element('SOAP-ENV:Header')
+  	csb_header = header.add_element('m:CSBHeader')
+  	csb_header.add_attribute('xmlns:m',"http://www.shtel.com.cn/csb/v2/")
+
+  	serviceName = csb_header.add_element('ServiceName')
+  	serviceVer = csb_header.add_element('ServiceVer')
+  	consumer = csb_header.add_element('Consumer')
+  	requestTime = csb_header.add_element('RequestTime')
+
+  	serviceName.add_text(service_name)
+  	serviceVer.add_text('1.0')
+  	consumer.add_text('闸北邮政')
+  	requestTime.add_text(Time.now.strftime("%Y-%m-%d %H:%m:%S"))
+
+  	body = envelope.add_element('SOAP-ENV:Body')
+	soap_action = nil
+	if service_name == "SendPointOrder"
+		soap_action = body.add_element('m:sendQueryOrder')
+	elsif service_name == "PointUpdateTransStatus"
+		soap_action = body.add_element('m:updateTransportStatus')
+	elsif service_name == "UpdatePointOrderStatus"
+		soap_action = body.add_element('m:updateQueryOrderStatus')
+	elsif service_name == "PointOrderStatus"
+		soap_action = body.add_element('m:OrderStatus')
+	end
+  	soap_action.add_attribute('xmlns:m', "http://localhost:8080/services/0rderWS")
+  	soap_action.add_attribute('SOAP-ENV:encodingStyle', "http://schemas.xmlsoap.org/soap/encoding/")
+  	soap_params = soap_action.add_element('xmlFile')
+  	soap_params.add_text(xml_soap)
+
+  	xml_file << doc.to_s
   end
 
   def self.parseAndSaveSendPointOrder(xml_file,order_type)
   	orderTransStatus = Array.new
-
-  	doc = REXML::Document.new(decode_xml(xml_file)) 
-  	root = doc.root
+	doc = REXML::Document.new(xml_file)
+	xml_body = doc.root.elements['soapenv:Body'].elements['ns1:sendQueryOrderResponse'].elements['sendQueryOrderReturn'].text.to_s
+	# default encoding is utf-8 in ruby
+  	doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
+	puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+	puts doc
+  	puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+	root = doc.root
   	head = root.elements['Head']
   	orderTotal = head.elements['OrderTotal']
   	startRow = head.elements['startRow']
   	rowCount = head.elements['rowCount']
-
+	orderTotal_s = orderTotal.text
+	rowCount_s = rowCount.text
+	rowsum = 0
   	# queryCondition = root.elements['QueryCondition']
   	# beginDate = queryCondition.elements['BeginDate']
+	
+	messageCode = head.elements['MessageCode'].text
+  	description = head.elements['Description'].text
+	if messageCode != '0'
+		return description
+	end
 
   	orderDetail = root.elements['OrderDetail']
   	orders = nil
@@ -285,9 +368,12 @@ class CSBSendWithSOAP
   		custRemark = orderLabel.attributes['CustRemark']
   		
   		order_hash.store('ORDER_ID',orderId)
+		puts "ORDER_ID=" << orderId
   		order_hash.store('DATE',createDate)
   		order_hash.store('CUST_NAME',customerName)
+		puts "CUST_NAME=" << customerName
   		order_hash.store('ADDR',address)
+		puts "ADDR=" << address
   		order_hash.store('MOBILE',telephone)
   		order_hash.store('ZIP',customerArea)
   		order_hash.store('DESC',custRemark)
@@ -302,11 +388,14 @@ class CSBSendWithSOAP
   			scoreValue = giftDetail.attributes['ScoreValue']
   			if order_type == StorageConfig.config["csb_interface"]["order_type_2"]
 	  			listId = giftDetail.attributes['listId']
+				puts "DELIVER_NO=" << listId
 	  			order_detail.store('DELIVER_NO', listId)
 	  		end
 
 				order_detail.store('SKU', itemId)
-				order_detail.store('NAME', giftName)
+				puts "SKU=" << itemId
+				order_detail.store('DESC', giftName)
+				puts "DESC=" << giftName
 				order_detail.store('QTY', changeNumber)
 				order_detail.store('PRICE', scoreValue)
 
@@ -315,24 +404,32 @@ class CSBSendWithSOAP
 
   		order_hash.store('ORDER_DETAILS', order_details)
   		puts order_hash
-  		order = StandardInterface.order_enter(order_hash, Business.find(StorageConfig.config["business"]['bst_id']), Business.find(StorageConfig.config["unit"]['zb_id']))
+  		order = StandardInterface.order_enter(order_hash, Business.find(StorageConfig.config["business"]['bst_id']), Unit.find(StorageConfig.config["unit"]['zb_id']))
   		if !order.blank?
   			orderTransStatus << orderId
-	      # @@startrow += 1
+	        rowsum += 1
 	    else
 	    	next
 	      # return true
 	    end
   	}
+	puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+	puts "orderTotal=" << orderTotal_s
+	puts "rowCount=" << rowCount_s
+	puts "rowsum=" << rowsum.to_s
+	if orderTotal_s == rowCount_s && rowsum.to_s == rowCount_s
+		@@call_flg = true
+	end
+	puts "@@call_flg=" << @@call_flg.to_s
+	puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
   	setPointUpdateTransStatus(orderTransStatus, order_type)
-  	# return orderTotal.text.to_i > @@startrow - 1
 	end
 
 	def self.setPointUpdateTransStatus(order_ids, order_type)
 		xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
-  	doc = REXML::Document.new       #创建XML内容 
+		doc = REXML::Document.new       #创建XML内容 
 
-  	scoreOrderInfo = doc.add_element('ScoreOrderInfo')
+		scoreOrderInfo = doc.add_element('ScoreOrderInfo')
 		head = scoreOrderInfo.add_element('Head')
 		sender = head.add_element('Sender')
 		reciver = head.add_element('Reciver')
@@ -359,69 +456,83 @@ class CSBSendWithSOAP
 		orderDetail = scoreOrderInfo.add_element('OrderDetail')
 		order_ids.each do |id|
 			orderLabel = orderDetail.add_element('OrderLabel')
-			orderLabel.add_attributes('orderId', id)
-			orderLabel.add_attributes('isReceive', 'y')
+			orderLabel.add_attribute('orderId', id)
+			orderLabel.add_attribute('isReceive', 'y')
 		end
 
 		xml_file << doc.to_s
-		xml_file.encode(:xml => :text)
+		#xml_file.encode(:xml => :text)
 	end
 
 	def self.parseUpdatePointOrderStatus(xml_file)
-		doc = REXML::Document.new(decode_xml(xml_file)) 
-  	root = doc.root
-  	head = root.elements['Head']
-  	sender = head.elements['Sender']
-  	reciver = head.elements['Reciver']
+		doc = REXML::Document.new(xml_file)
+		xml_body = doc.root.elements['soapenv:Body'].elements['ns1:updateQueryOrderStatusResponse'].elements['updateQueryOrderStatusReturn'].text.to_s
+		# default encoding is utf-8 in ruby
+		doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
+		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		puts doc
+		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		root = doc.root
+		head = root.elements['Head']
+		sender = head.elements['Sender']
+		reciver = head.elements['Reciver']
 
-  	resultInfo = root.elements['resultInfo']
-  	sqlcount = resultInfo.elements['sqlcount']
-  	result = resultInfo.elements['result']
-  	message = resultInfo.elements['message']
+		resultInfo = root.elements['resultInfo']
+		sqlcount = resultInfo.elements['sqlcount']
+		result = resultInfo.elements['result']
+		message = resultInfo.elements['message']
 
-  	return_array = []
-  	return_array << result.text << message.text
-  	return return_array
+		return_array = []
+		puts result.text
+		puts message.text
+		return_array << result.text << message.text
+		return return_array
 	end
 
 	def self.parsePointOrderStatus(xml_file)
-		doc = REXML::Document.new(decode_xml(xml_file)) 
-  	root = doc.root
-  	head = root.elements['Head']
-  	sender = head.elements['Sender']
-  	reciver = head.elements['Reciver']
-  	total = head.elements['Total']
-  	processCode = head.elements['ProcessCode']
-  	description = head.elements['Description']
-  	activeCode = head.elements['ActiveCode']
+		doc = REXML::Document.new(xml_file)
+		xml_body = doc.root.elements['soapenv:Body'].elements['ns1:OrderStatusResponse'].elements['OrderStatusReturn'].text.to_s
+		# default encoding is utf-8 in ruby
+		doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
+		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		puts doc
+		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		root = doc.root
+		head = root.elements['Head']
+		sender = head.elements['Sender']
+		reciver = head.elements['Reciver']
+		total = head.elements['Total']
+		messageCode = head.elements['MessageCode']
+		description = head.elements['Description']
+		activeCode = head.elements['ActiveCode']
 
-  	return_array = []
-  	if processCode.text.blank?
-  		return_array << '0' << ''
-  	else
-  		return_array << processCode.text << description.text
-  	end
-  	return return_array
+		return_array = []
+		if messageCode.text.blank?
+			return_array << '0' << ''
+		else
+			return_array << messageCode.text << description.text
+		end
+		return return_array
 	end
 
 	def self.parsePointUpdateTransStatus(xml_file)
 		doc = REXML::Document.new(decode_xml(xml_file)) 
-  	root = doc.root
-  	head = root.elements['Head']
-  	sender = head.elements['Sender']
-  	reciver = head.elements['Reciver']
-  	orderTotal = head.elements['OrderTotal']
-  	messageCode = head.elements['MessageCode']
-  	description = head.elements['Description']
-  	activeCode = head.elements['ActiveCode']
+		root = doc.root
+		head = root.elements['Head']
+		sender = head.elements['Sender']
+		reciver = head.elements['Reciver']
+		orderTotal = head.elements['OrderTotal']
+		messageCode = head.elements['MessageCode']
+		description = head.elements['Description']
+		activeCode = head.elements['ActiveCode']
 
-  	return_array = []
-  	if messageCode.text.blank?
-  		return_array << '0' << ''
-  	else
-  		return_array << messageCode.text << description.text
-  	end
-  	return return_array
+		return_array = []
+		if messageCode.text.blank?
+			return_array << '0' << ''
+		else
+			return_array << messageCode.text << description.text
+		end
+		return return_array
 	end
 
 	def self.decode_xml(xml_get)
@@ -437,7 +548,7 @@ class CSBSendWithSOAP
 			'CSBHeader' => {
 				'ServiceName' => "#{serviceName}",
 				'ServiceVer' => '1.0',
-				'Consumer' => '网厅',
+				'Consumer' => '邮政',
 				'RequestTime' => Time.now.strftime("%Y-%m-%d %H:%m:%S")
 			}
 		},

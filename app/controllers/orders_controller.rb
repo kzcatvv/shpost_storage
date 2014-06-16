@@ -1,11 +1,17 @@
 class OrdersController < ApplicationController
   load_and_authorize_resource
 
+  user_logs_filter only: [:ordercheck], symbol: :batch_id, operation: '确认出库', object: :keyclientorder
   # GET /orderes
   # GET /orderes.json
   def index
     @orders_grid = initialize_grid(@orders,
                    :conditions => {:order_type => "b2c"})
+  end
+
+  def order_alert
+    @orders = Order.where( [ "status = ? and created_at < ?", 'waiting', Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders_grid = initialize_grid(@orders)
   end
 
   # GET /orderes/1
@@ -279,6 +285,9 @@ class OrdersController < ApplicationController
     sklogs=[]
     chkout=0
     @keycorder=params[:format]
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts @keycorder
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     @keyclientorder=Keyclientorder.find(params[:format])
     @orders=@keyclientorder.orders
     @orders.each do |order|
@@ -300,14 +309,14 @@ class OrdersController < ApplicationController
                        outbl = true
                        outstock.update_attribute(:virtual_amount , setamount)
                        outstock.save
-                       keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
-                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out],keyclientorderdetail: keyorderdtl)
+                       #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
                        orderdtl.stock_logs << stklog
                       else 
                        amount = amount - outstock.virtual_amount
                        outbl = false
-                       keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
-                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out],keyclientorderdetail: keyorderdtl)
+                       #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
+                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
                        orderdtl.stock_logs << stklog
                        outstock.update_attribute(:virtual_amount , 0)
                        outstock.save
@@ -496,6 +505,132 @@ class OrdersController < ApplicationController
 
   end
 
+  def pingan_b2c_import
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])   
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            keyclientorder=Keyclientorder.create! keyclient_name: "平安线上 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
+            
+            2.upto(instance.last_row) do |line|
+              city=nil
+              if instance.cell(line,'G').include?("市")
+                city=instance.cell(line,'G').split("市")[0]+"市"
+              else
+                city=instance.cell(line,'G').split("县")[0]+"县"
+              end
+              
+              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('.0')[0],business_trans_no: instance.cell(line,'K').to_s.split('.0')[0], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I'), keyclientorder: keyclientorder
+              
+              relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+              
+              OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('.0')[0], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
+        
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = "导入失败"
+          end
+        
+      end   
+    end
+  end
+
+  def pingan_b2b_import
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])   
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            keyclientorder=Keyclientorder.create! keyclient_name: "平安线下 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
+    
+            relationship = Relationship.find_relationships(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+            keyclientorderdetails=Keyclientorderdetail.create! specification: relationship.specification, keyclientorder: keyclientorder, amount: 1, supplier: relationship.supplier, business_id: StorageConfig.config["business"]['pajf_id']
+            
+            2.upto(instance.last_row) do |line|
+              
+              order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
+              
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = "导入失败"
+          end
+        
+      end   
+    end
+  end
+
+  def upload_pingan(file)
+     if !file.original_filename.empty?
+       direct = "#{Rails.root}/upload/pingan/"
+       filename = "#{Time.now.to_f}_#{file.original_filename}"
+
+       file_path = direct + filename
+       File.open(file_path, "wb") do |f|
+          f.write(file.read)
+       end
+       file_path
+     end
+  end
+
+  def pingan_b2c_outport
+  end
+
+  def pingan_b2c_xls_outport
+    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    if @keyclientorder.nil?
+       flash[:alert] = "无此批次编号"
+       redirect_to :action => 'pingan_b2c_outport'
+    else
+      @orders=@keyclientorder.orders 
+      respond_to do |format|  
+        format.xls {   
+          send_data(b2c_xls_content_for(@orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Report_Users_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
+  def pingan_b2b_outport
+  end
+
+  def pingan_b2b_xls_outport
+    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    if @keyclientorder.nil?
+       flash[:alert] = "无此批次编号"
+       redirect_to :action => 'pingan_b2b_outport'
+    else
+      @orders=@keyclientorder.orders 
+      respond_to do |format|  
+        format.xls {   
+          send_data(b2b_xls_content_for(@orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Report_Users_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
@@ -505,5 +640,70 @@ class OrdersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
       params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:province,:city,:county,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
+    end
+
+    def b2c_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{订单生成时间 产品编号 兑换品名称 兑换品数量 操作类型 收件人名称 收件人地址 联系电话 身份证后四位 订单编号 行项目编号 签收时间 配送结果 操作批次号 供应商名称 邮编 承运商 快递单号}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.pingan_ordertime
+        sheet1[count_row,1]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code
+        sheet1[count_row,2]=obj.order_details.first.name
+        sheet1[count_row,3]=obj.order_details.first.total_amount
+        sheet1[count_row,4]=obj.pingan_operate
+        sheet1[count_row,5]=obj.customer_name
+        sheet1[count_row,6]=obj.customer_address
+        sheet1[count_row,7]=obj.customer_phone
+        sheet1[count_row,8]="|"+obj.customer_idnumber
+        sheet1[count_row,9]="|"+obj.business_order_id
+        sheet1[count_row,10]="|"+obj.business_trans_no
+        sheet1[count_row,11]=""
+        sheet1[count_row,12]=""
+        sheet1[count_row,13]="|"+obj.batch_no
+        sheet1[count_row,14]=Supplier.find(obj.order_details.first.supplier_id).name
+        sheet1[count_row,15]=obj.customer_postcode
+        sheet1[count_row,16]=obj.transport_type
+        sheet1[count_row,17]="|"+obj.tracking_number
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
+    end
+
+    def b2b_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{序号 客户号 礼品 姓名 电话 地址 邮编 城市 投诉时间 客诉原因 运单号}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.business_trans_no
+        sheet1[count_row,1]=obj.customer_idnumber
+        sheet1[count_row,2]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code
+        sheet1[count_row,3]=obj.customer_name
+        sheet1[count_row,4]=obj.customer_phone
+        sheet1[count_row,5]=obj.customer_address
+        sheet1[count_row,6]=obj.customer_postcode
+        sheet1[count_row,7]=obj.city
+        sheet1[count_row,8]=""
+        sheet1[count_row,9]=""
+        sheet1[count_row,10]="|"+obj.tracking_number
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
     end
 end

@@ -76,13 +76,13 @@ class StockLogsController < ApplicationController
         shelf_modify = Shelf.where(area_id: Area.where(storage: current_storage).ids, shelf_code: params[:shelfid]).first
         if !shelf_modify.blank?
           if shelf_modify.id != @stock.shelf.id.to_s
-            stock = Stock.find_stock_in_shelf_with_batch_no(@stock.specification, @stock.supplier, @stock.business, @stock.batch_no, shelf_modify)
             if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
               @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
             elsif @stock_log.operation_type == StockLog::OPERATION_TYPE[:in]
               @stock.virtual_amount = @stock.virtual_amount - @stock_log.amount
             end
             @stock.save()
+            stock = Stock.find_stock_in_shelf_with_batch_no(@stock.specification, @stock.supplier, @stock.business, @stock.batch_no, shelf_modify)
             if !stock
               if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
                 stock = Stock.create(specification: @stock.specification, business: @stock.business, supplier: @stock.supplier, shelf_id: shelf_modify.id, batch_no: @stock.batch_no, actual_amount: 0, virtual_amount: 0 - @stock_log.amount)
@@ -188,7 +188,7 @@ class StockLogsController < ApplicationController
 
       @stock_log_new.save();
 
-      render json: {id: @stock_log_new.id}
+      render json: {id: @stock_log_new.id, pid: @stock_log_new.purchase_detail.purchase_id}
     end
   end
 

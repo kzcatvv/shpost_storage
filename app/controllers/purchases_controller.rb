@@ -1,6 +1,9 @@
 class PurchasesController < ApplicationController
   load_and_authorize_resource
 
+  user_logs_filter only: [:create, :close, :destroy], symbol: :name#, object: :user, operation: '新增用户'
+  user_logs_filter only: [:check], symbol: :no, operation: '采购单确认入库'#, object: :user, operation: '新增用户'
+  user_logs_filter only: [:onecheck], symbol: :desc, operation: '采购单明细确认入库', object: :stock_log
   # GET /purchasees
   # GET /purchasees.json
   def index
@@ -104,14 +107,12 @@ class PurchasesController < ApplicationController
     end
   end
 
-def onecheck
-  @stock_logs = @purchase.stock_logs
+  def onecheck
+    @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
-    respond_to do |format|
-      if StockLog.find(params[:stock_log]).check
-      format.html { render action: 'stock_in' }
-    end
-    end
+
+    StockLog.find(params[:stock_log]).check
+    render action: 'stock_in'
   end
 
 

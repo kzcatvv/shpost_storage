@@ -21,6 +21,9 @@ module ShpostStorage
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     config.i18n.default_locale = "zh-CN"
 
+    config.time_zone = 'Beijing'
+    config.active_record.default_timezone = :local
+
     config.generators do |g|
         g.test_framework :rspec,
                         fixtures: true,

@@ -15,6 +15,11 @@ class StockLog < ActiveRecord::Base
   #before_create :set_desc
   before_save :set_desc
 
+  def stock_out_name
+    # stock_log : order_detail = N:1
+    self.order_details.first.specification.name + "_" + self.order_details.first.order.no
+  end
+
   def set_desc
     if !stock.blank?
     self.desc = "#{OPERATION_TYPE[operation_type.to_sym]}#{stock.try(:specification).try(:commodity).try :name}-#{stock.try(:specification).try :model}共计#{self.amount}，批次：#{stock.batch_no}，商户：#{stock.try(:business).try :name}，供应商：#{stock.try(:supplier).try :name}，货架：#{stock.try(:shelf).try :shelf_code}"

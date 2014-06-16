@@ -27,8 +27,13 @@
     if @orders
       g.column name: model_class.human_attribute_name(:kcorder_name), attribute: 'batch_no', ordering: false, model: 'Keyclientorderdetail' do |stock_log|
         # if stock_log.status == 'waiting'
+        if stock_log.keyclientorderdetail
           select_tag("stock_logs[][kcdid]", options_for_select(Keyclientorderdetail.accessible_by(current_ability).where(keyclientorder: @orders.first.keyclientorder).map{|u| [u.keyclientorder.keyclient_name+"_"+(u.batch_no==nil ? '' : u.batch_no+"_")+u.specification.name,u.id]}, stock_log.keyclientorderdetail.id), id: "stock_logs_kcdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
           content_tag(:p, stock_log.keyclientorderdetail.keyclientorder.keyclient_name+"_"+(stock_log.keyclientorderdetail.batch_no==nil ? '' : stock_log.keyclientorderdetail.batch_no+"_")+stock_log.keyclientorderdetail.specification.name, {id: "stock_logs_kcdid_#{stock_log.id}", onclick: 'clickin(this);'})
+        else
+          select_tag("stock_logs[][kcdid]", options_from_collection_for_select(@stock_logs, 'id', 'stock_out_name', stock_log.id), id: "stock_logs_kcdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, stock_log.stock_out_name, {id: "stock_logs_kcdid_#{stock_log.id}", onclick: 'clickin(this);'})
+        end
         # else
         #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
         # end
@@ -79,14 +84,14 @@
     g.column do |stock_log|
       # if stock_log.status == 'waiting'
         ActiveSupport::SafeBuffer.new <<
-        (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
+        (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, id: "stock_logs_checklink_#{stock_log.id}", :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
           # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
           # (submit_tag('check!!'))  #<< ' ' <<
           # (button_tag() do
           #   content_tag(:strong, 'check')
           # end)  << ' ' <<
           # (link_to t('.delete', :default => t("helpers.links.delete")), split_stock_log_path(stock_log.id), :class => 'btn btn-xs btn-primary', id: "test_#{stock_log.id}")
-          (link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'destroy(this)', id: "stock_logs_link_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log)
+          (link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'destroy(this)', id: "stock_logs_deletelink_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log)
       end
     # end
   end
