@@ -160,9 +160,9 @@ namespace :transmitter do
       end
     end
 
-    desc "CSB Transmitter send_point_order"
-    task :send_point_order => :environment do
-      generate_params 'transmitter.csb.send_point_order'
+    desc "CSB Transmitter get_point_order"
+    task :get_point_order => :environment do
+      generate_params 'transmitter.csb.get_point_order'
 
       while 1==1 do
         @count += 1
