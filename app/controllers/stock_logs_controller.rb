@@ -136,20 +136,25 @@ class StockLogsController < ApplicationController
       end
 
       if !params[:kcdid].nil?
-        # todo
-        if params[:kcdid] != @stock_log.keyclientorderdetail.id.to_s
-          kcd = Keyclientorderdetail.find(params[:kcdid])
-          stock = Stock.find_stock_in_shelf_with_batch_no(kcd.specification, kcd.supplier, kcd.business, kcd.batch_no, @stock.shelf)
-          @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
-          @stock.save()
-          if !stock
-            stock = Stock.create(specification: pd.specification, business: pd.purchase.business, supplier: pd.supplier, shelf_id: @stock.shelf.id, batch_no: pd.batch_no, actual_amount: 0, virtual_amount: 0-@stock_log.amount)
-            stock_log = StockLog.update(@stock_log.id, stock: stock, keyclientorderdetail_id: params[:kcdid])
-          else
-            stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount - @stock_log.amount)
-            stock_log = StockLog.update(@stock_log.id, stock: stock, keyclientorderdetail_id: params[:kcdid])
-          end
-        end
+        # 电商订单
+		if @stock_log.keyclientorderdetail.nil?
+			
+		else
+		# 大客户订单
+			if params[:kcdid] != @stock_log.keyclientorderdetail.id.to_s
+			  kcd = Keyclientorderdetail.find(params[:kcdid])
+			  stock = Stock.find_stock_in_shelf_with_batch_no(kcd.specification, kcd.supplier, kcd.business, kcd.batch_no, @stock.shelf)
+			  @stock.virtual_amount = @stock.virtual_amount + @stock_log.amount
+			  @stock.save()
+			  if !stock
+				stock = Stock.create(specification: pd.specification, business: pd.purchase.business, supplier: pd.supplier, shelf_id: @stock.shelf.id, batch_no: pd.batch_no, actual_amount: 0, virtual_amount: 0-@stock_log.amount)
+				stock_log = StockLog.update(@stock_log.id, stock: stock, keyclientorderdetail_id: params[:kcdid])
+			  else
+				stock = Stock.update(stock.id, virtual_amount: stock.virtual_amount - @stock_log.amount)
+				stock_log = StockLog.update(@stock_log.id, stock: stock, keyclientorderdetail_id: params[:kcdid])
+			  end
+			end
+		end
       end
     end
     # redirect_to request.referer
