@@ -99,11 +99,11 @@ function clickin(current)
       $("input#"+current.id).focus();
     }
   // } else {
-  //   if ($("select#"+current.id).is(":hidden")){ 
-  //     $(current).hide();
-  //     $("select#"+current.id).show();
-  //     $("select#"+current.id).focus();
-  //   }
+     if ($("select#"+current.id).is(":hidden")){ 
+       $(current).hide();
+       $("select#"+current.id).show();
+       $("select#"+current.id).focus();
+     }
   // }
 }
 
@@ -111,14 +111,22 @@ function hideit(current)
 {
   param = current.id.split('_');
   $("p#"+current.id).show();
-  // if (param[2] == "amount") {
+  if (param[2] == "amount") {
     if ($(current).val() == "") {
       $(current).val(0);
     }
     $("p#"+current.id).text($(current).val());
-  // } else {
-  //   $("p#"+current.id).text($(current).find("option:selected").text());
-  // }
+  } else if (param[2] == "shelfid") {
+    if ($(current).val() == "") {
+      $(current).val("错误的货架");
+	  $(current).css("background-color","red");
+    } else {
+	  $(current).css("background-color","transparent");
+	}
+    $("p#"+current.id).text($(current).val());
+  } else {
+    $("p#"+current.id).text($(current).find("option:selected").text());
+  }
   $(current).hide();
 }
 
@@ -149,6 +157,9 @@ function destroy(current) {
 function modify(current)
 {
   param = current.id.split('_');
+  // alert(param[3]);
+  // alert(param[2]);
+  // alert($(current).val());
   $.ajax({
     type: "POST",
     url: "/stock_logs/modify",
