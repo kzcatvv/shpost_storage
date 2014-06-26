@@ -591,6 +591,46 @@ class OrdersController < ApplicationController
      end
   end
 
+  def pingan_b2c_outport
+  end
+
+  def pingan_b2c_xls_outport
+    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    if @keyclientorder.nil?
+       flash[:alert] = "无此批次编号"
+       redirect_to :action => 'pingan_b2c_outport'
+    else
+      @orders=@keyclientorder.orders 
+      respond_to do |format|  
+        format.xls {   
+          send_data(b2c_xls_content_for(@orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Report_Users_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
+  def pingan_b2b_outport
+  end
+
+  def pingan_b2b_xls_outport
+    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    if @keyclientorder.nil?
+       flash[:alert] = "无此批次编号"
+       redirect_to :action => 'pingan_b2b_outport'
+    else
+      @orders=@keyclientorder.orders 
+      respond_to do |format|  
+        format.xls {   
+          send_data(b2b_xls_content_for(@orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Report_Users_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
@@ -600,5 +640,70 @@ class OrdersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
       params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:province,:city,:county,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
+    end
+
+    def b2c_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{订单生成时间 产品编号 兑换品名称 兑换品数量 操作类型 收件人名称 收件人地址 联系电话 身份证后四位 订单编号 行项目编号 签收时间 配送结果 操作批次号 供应商名称 邮编 承运商 快递单号}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.pingan_ordertime
+        sheet1[count_row,1]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code
+        sheet1[count_row,2]=obj.order_details.first.name
+        sheet1[count_row,3]=obj.order_details.first.total_amount
+        sheet1[count_row,4]=obj.pingan_operate
+        sheet1[count_row,5]=obj.customer_name
+        sheet1[count_row,6]=obj.customer_address
+        sheet1[count_row,7]=obj.customer_phone
+        sheet1[count_row,8]="|"+obj.customer_idnumber
+        sheet1[count_row,9]="|"+obj.business_order_id
+        sheet1[count_row,10]="|"+obj.business_trans_no
+        sheet1[count_row,11]=""
+        sheet1[count_row,12]=""
+        sheet1[count_row,13]="|"+obj.batch_no
+        sheet1[count_row,14]=Supplier.find(obj.order_details.first.supplier_id).name
+        sheet1[count_row,15]=obj.customer_postcode
+        sheet1[count_row,16]=obj.transport_type
+        sheet1[count_row,17]="|"+obj.tracking_number
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
+    end
+
+    def b2b_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{序号 客户号 礼品 姓名 电话 地址 邮编 城市 投诉时间 客诉原因 运单号}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.business_trans_no
+        sheet1[count_row,1]=obj.customer_idnumber
+        sheet1[count_row,2]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code
+        sheet1[count_row,3]=obj.customer_name
+        sheet1[count_row,4]=obj.customer_phone
+        sheet1[count_row,5]=obj.customer_address
+        sheet1[count_row,6]=obj.customer_postcode
+        sheet1[count_row,7]=obj.city
+        sheet1[count_row,8]=""
+        sheet1[count_row,9]=""
+        sheet1[count_row,10]="|"+obj.tracking_number
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
     end
 end

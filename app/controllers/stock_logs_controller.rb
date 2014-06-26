@@ -188,7 +188,7 @@ class StockLogsController < ApplicationController
 
       @stock_log_new.save();
 
-      render json: {id: @stock_log_new.id}
+      render json: {id: @stock_log_new.id, pid: @stock_log_new.purchase_detail.purchase_id}
     end
   end
 

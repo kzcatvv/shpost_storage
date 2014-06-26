@@ -1,4 +1,24 @@
 namespace :transmitter do
+
+  namespace :tcbd do
+    desc "BankComm Transmitter"
+      task :order_query => :environment do
+        generate_params 'transmitter.tcsd.order_query'
+        while 1==1 do
+          @count += 1
+          begin
+            TCBDSOAP.order_query(@uri, @method)
+          rescue Exception => e
+            Rails.errors e.message
+          ensure
+            ActiveRecord::Base.connection_pool.release_connection
+            puts "#{@title} : #{@count}"
+          end
+          sleep @interval
+        end
+      end
+  end
+
   namespace :bankcomm do
     desc "BankComm Transmitter"
       task :order_update => :environment do
@@ -140,9 +160,9 @@ namespace :transmitter do
       end
     end
 
-    desc "CSB Transmitter send_point_order"
-    task :send_point_order => :environment do
-      generate_params 'transmitter.csb.send_point_order'
+    desc "CSB Transmitter get_point_order"
+    task :get_point_order => :environment do
+      generate_params 'transmitter.csb.get_point_order'
 
       while 1==1 do
         @count += 1
@@ -180,6 +200,7 @@ namespace :transmitter do
     @interval = I18n.t "#{@title}.interval"
     @interval ||= 1800
     @uri = I18n.t "#{@title}.uri"
+    @method = I18n.t "#{@title}.method"
     @count = 0
   end
 

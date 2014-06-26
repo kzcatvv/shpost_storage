@@ -651,6 +651,12 @@ zh-CN:
         pinganb2cimport:
           name: "平安线上订单导入"
           link: "/orders/pingan_b2c_import"
+        pinganb2boutport:
+          name: "平安线下订单导出"
+          link: "/orders/pingan_b2b_outport"
+        pinganb2coutport:
+          name: "平安线上订单导出"
+          link: "/orders/pingan_b2c_outport"
         findwarning:
           name: "退件入库"
           link: "/orders/packreturn"

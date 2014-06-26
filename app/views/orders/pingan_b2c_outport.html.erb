@@ -1,0 +1,17 @@
+<center>
+<br><br>
+<font face="微软雅黑" color='#006030' size=6>平安线上订单导出</font>   
+
+<br><br><br>
+  
+ 	
+<%= form_tag(pingan_b2c_xls_outport_orders_url(format: "xls")) %>
+<font face="微软雅黑" color='#D9B300' size=3>批次编号:<%= text_field_tag('keyclientorder_id')%></font>   
+<br><br><br>
+
+
+<%= submit_tag "确认导出" %>
+
+</form>
+
+</center>
