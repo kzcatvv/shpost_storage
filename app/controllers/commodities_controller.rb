@@ -4,7 +4,11 @@ class CommoditiesController < ApplicationController
   # GET /commodities
   # GET /commodities.json
   def index
-    @commodities = initialize_grid(@commodities)
+    @commodities = initialize_grid(@commodities,
+                   :order => 'commodities.id',
+                   :order_direction => 'desc'
+                  
+)
   end
 
   # GET /commodities/1

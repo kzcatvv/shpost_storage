@@ -15,7 +15,10 @@ class AreaShelfController < ApplicationController
   # GET /shelves
   # GET /shelves.json
   def index
-    @shelves_grid = initialize_grid(@shelves,:include => :area)
+    @shelves_grid = initialize_grid(@shelves,
+         :order => 'shelves.id',
+         :order_direction => 'desc',
+         :include => :area)
   end
 
   # GET /shelves/1

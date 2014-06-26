@@ -4,7 +4,9 @@ class BusinessesController < ApplicationController
   # GET /businesses
   # GET /businesses.json
   def index
-    @businesses_grid = initialize_grid(@businesses)
+    @businesses_grid = initialize_grid(@businesses,
+         :order => 'businesses.id',
+         :order_direction => 'desc')
   end
 
   # GET /businesses/1

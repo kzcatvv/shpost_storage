@@ -4,7 +4,10 @@ class UserLogsController < ApplicationController
   # GET /user_logs
   # GET /user_logs.json
   def index
-    @user_logs_grid = initialize_grid(@user_logs, include: :user)
+    @user_logs_grid = initialize_grid(@user_logs, 
+      :order => 'user_logs.id',
+      :order_direction => 'desc',
+    	include: :user)
   end
 
   # GET /user_logs/1

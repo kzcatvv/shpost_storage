@@ -4,7 +4,10 @@ class StocksController < ApplicationController
   # GET /stocks
   # GET /stocks.json
   def index
-    @stocks_grid = initialize_grid(@stocks, include: [:shelf, :specification, :business, :supplier])
+    @stocks_grid = initialize_grid(@stocks,
+      :order => 'stocks.id',
+      :order_direction => 'desc',
+      include: [:shelf, :specification, :business, :supplier])
   end
 
   # GET /stocks/1
