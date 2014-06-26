@@ -390,9 +390,9 @@ zh-CN:
         desc: "规格描述"
         sixnine_code: "69码"
         name: "规格名称"
-        long: "长(毫米)"
-        wide: "宽(毫米)"
-        high: "高(毫米)"
+        long: "长(厘米)"
+        wide: "宽(厘米)"
+        high: "高(厘米)"
         weight: "重量(克)"
         volume: "体积"
       relationship:
