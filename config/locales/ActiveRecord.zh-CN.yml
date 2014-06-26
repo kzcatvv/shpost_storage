@@ -365,15 +365,13 @@ zh-CN:
         created_at: "创建时间"
         checked_at: "确认时间"
         pd_name: "采购单明细"
-<<<<<<< HEAD
         "shelf_code": "货架编号"
         "Shelf": "货架编号"
         
-=======
+
         shelf_code: "货架编号"
         shelf: "货架编号"
         status_checked: "已确认"
->>>>>>> d435bfd205ffc7ba8f85f82e99bf0e72f174828f
       supplier:
         no: "供应商编号"
         name: "名称"
