@@ -507,7 +507,8 @@ class OrdersController < ApplicationController
 
   def pingan_b2c_import
     unless request.get?
-      if file = upload_pingan(params[:file]['file'])   
+      if file = upload_pingan(params[:file]['file'])       
+        Keyclientorder.transaction do
           begin
             instance=nil
             if file.include?('.xlsx')
@@ -520,7 +521,7 @@ class OrdersController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
             keyclientorder=Keyclientorder.create! keyclient_name: "平安线上 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
-            
+
             2.upto(instance.last_row) do |line|
               city=nil
               if instance.cell(line,'G').include?("市")
@@ -529,25 +530,27 @@ class OrdersController < ApplicationController
                 city=instance.cell(line,'G').split("县")[0]+"县"
               end
               
-              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('.0')[0],business_trans_no: instance.cell(line,'K').to_s.split('.0')[0], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I'), keyclientorder: keyclientorder
-              
               relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
               
-              OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('.0')[0], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
+              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('.0')[0],business_trans_no: instance.cell(line,'K').to_s.split('.0')[0], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I'), keyclientorder: keyclientorder
+
+              OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('.0')[0], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.upplier, order: order
         
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
             flash[:alert] = "导入失败"
+            raise ActiveRecord::Rollback
           end
-        
+        end
       end   
     end
   end
 
   def pingan_b2b_import
     unless request.get?
-      if file = upload_pingan(params[:file]['file'])   
+      if file = upload_pingan(params[:file]['file'])
+        Keyclientorder.transaction do
           begin
             instance=nil
             if file.include?('.xlsx')
@@ -559,21 +562,26 @@ class OrdersController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
-            keyclientorder=Keyclientorder.create! keyclient_name: "平安线下 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
-    
             relationship = Relationship.find_relationships(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
-            keyclientorderdetails=Keyclientorderdetail.create! specification: relationship.specification, keyclientorder: keyclientorder, amount: 1, supplier: relationship.supplier, business_id: StorageConfig.config["business"]['pajf_id']
             
-            2.upto(instance.last_row) do |line|
+            if !relationship.nil?
+              keyclientorder=Keyclientorder.create! keyclient_name: "平安线下 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
+              keyclientorderdetails=Keyclientorderdetail.create! specification: relationship.specification, keyclientorder: keyclientorder, amount: 1, supplier: relationship.supplier, business_id: StorageConfig.config["business"]['pajf_id']
               
-              order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
-              
+              2.upto(instance.last_row) do |line|
+                
+                order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
+                
+              end
+              flash[:alert] = "导入成功"
+            else
+              flash[:alert] = "商品关联缺失，导入失败"
             end
-            flash[:alert] = "导入成功"
           rescue Exception => e
             flash[:alert] = "导入失败"
+            raise ActiveRecord::Rollback
           end
-        
+        end
       end   
     end
   end
