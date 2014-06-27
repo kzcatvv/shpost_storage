@@ -6,7 +6,7 @@ class StockLogsController < ApplicationController
   # GET /stock_logs.json
   def index
     @stock_logs_grid = initialize_grid(@stock_logs, 
-      order: "stock_logs.status",
+      order: "stock_logs.id",
       order_direction: 'desc', 
       include: [:user, :stock, :shelf])
   end

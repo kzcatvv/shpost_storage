@@ -365,6 +365,10 @@ zh-CN:
         created_at: "创建时间"
         checked_at: "确认时间"
         pd_name: "采购单明细"
+        "shelf_code": "货架编号"
+        "Shelf": "货架编号"
+        
+
         shelf_code: "货架编号"
         shelf: "货架编号"
         status_checked: "已确认"
@@ -655,6 +659,7 @@ zh-CN:
           link: "/orders/pingan_b2c_outport"
         findwarning:
           name: "退件入库"
+          link: "/orders/packreturn"
           link: "/orderreturns/packreturn"
         # b2cfindprint:
         #   name: "电商订单打印"

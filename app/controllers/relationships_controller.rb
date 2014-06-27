@@ -5,7 +5,10 @@ class RelationshipsController < ApplicationController
   # GET /relationships.json
   def index
     #@relationships = Relationship.all
-    @relationships_grid = initialize_grid(@relationships,include: [:business, :specification, :supplier])
+    @relationships_grid = initialize_grid(@relationships,
+      :order => 'relationships.id',
+      :order_direction => 'desc',
+      include: [:business, :specification, :supplier])
   end
 
   # GET /relationships/1
