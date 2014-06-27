@@ -97,6 +97,54 @@ class ShelvesController < ApplicationController
     end
   end
 
+
+  def shelf_import
+    puts 000000000000
+    unless request.get?
+      puts 1111111111
+      if file = upload_shelf(params[:file]['file'])   
+        begin
+          instance=nil
+          if file.include?('.xlsx')
+            instance= Roo::Excelx.new(file)
+          elsif file.include?('.xls')
+            instance= Roo::Excel.new(file)
+          elsif file.include?('.csv')
+            instance= Roo::CSV.new(file)
+          end
+          instance.default_sheet = instance.sheets.first
+
+          2.upto(instance.last_row) do |line|
+            shelfcode = instance.cell(line,'B').to_s
+            shelfcode << change(instance.cell(line,'C').to_s)
+            shelfcode << change(instance.cell(line,'D').to_s)
+            shelfcode << change(instance.cell(line,'E').to_s)
+            shelfcode << change(instance.cell(line,'F').to_s)
+            shelfcode << change(instance.cell(line,'G').to_s)
+            area=Area.where(area_code: instance.cell(line,'B').to_s)
+            shelf = Shelf.create! area_id: area.id,area_length: instance.cell(line,'C').to_s,area_width: instance.cell(line,'D').to_s, area_height:instance.cell(line,'E').to_s, shelf_row:instance.cell(line,'F').to_s, shelf_column:instance.cell(line,'G').to_s,max_weight: instance.cell(line,'H'), max_volume: instance.cell(line,'I').to_s,desc: instance.cell(line,'J').to_s,shelf_code:shelfcode
+          end
+          flash[:alert] = "导入成功"
+        rescue Exception => e
+          flash[:alert] = "导入失败"
+        end
+      end   
+    end
+  end
+
+  def upload_shelf(file)
+    if !file.original_filename.empty?
+      direct = "#{Rails.root}/upload/shelf/"
+      filename = "#{Time.now.to_f}_#{file.original_filename}"
+      file_path = direct + filename
+      File.open(file_path, "wb") do |f|
+        f.write(file.read)
+      end
+      file_path
+    end
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_shelf
@@ -120,9 +168,6 @@ class ShelvesController < ApplicationController
 
     end
 
-
-
-
     def setShelfCode(shelf_params)
       shelf_code = @areas.find(shelf_params[:area_id]).area_code
       shelf_code << change(shelf_params[:area_length])
@@ -131,53 +176,5 @@ class ShelvesController < ApplicationController
       shelf_code << change(shelf_params[:shelf_row])
       shelf_code << change(shelf_params[:shelf_column])
     end
-
-
-    def shelf_import
-    unless request.get?
-      if file = upload_shelf(params[:file]['file'])   
-          begin
-            instance=nil
-            if file.include?('.xlsx')
-              instance= Roo::Excelx.new(file)
-            elsif file.include?('.xls')
-              instance= Roo::Excel.new(file)
-            elsif file.include?('.csv')
-              instance= Roo::CSV.new(file)
-            end
-            instance.default_sheet = instance.sheets.first
-
-            
-            2.upto(instance.last_row) do |line|
-           shelfcode = instance.cell(line,'B').to_s
-           shelfcode << instance.cell(line,'C').to_s
-           shelfcode << instance.cell(line,'D').to_s
-           shelfcode << instance.cell(line,'E').to_s
-           shelfcode << instance.cell(line,'F').to_s
-           shelfcode << instance.cell(line,'G').to_s
-              area=Area.where(area_code: instance.cell(line,'B').to_s)
-              shelf = Shelf.create! area_id: area.id,area_length: instance.cell(line,'C').to_s,area_width: instance.cell(line,'D').to_s, area_height:instance.cell(line,'E').to_s, shelf_row:instance.cell(line,'F').to_s, shelf_column:instance.cell(line,'G').to_s,max_weight: instance.cell(line,'H'), max_volume: instance.cell(line,'I').to_s,desc: instance.cell(line,'J').to_s,shelf_code:shelfcode
-           end
-            flash[:alert] = "导入成功"
-          rescue Exception => e
-            flash[:alert] = "导入失败"
-          end
-        
-      end   
-    end
-  end
-
-def upload_shelf(file)
-     if !file.original_filename.empty?
-       direct = "#{Rails.root}/upload/pingan/"
-       filename = "#{Time.now.to_f}_#{file.original_filename}"
-
-       file_path = direct + filename
-       File.open(file_path, "wb") do |f|
-          f.write(file.read)
-       end
-       file_path
-     end
-  end
 
 end

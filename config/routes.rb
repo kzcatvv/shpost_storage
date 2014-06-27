@@ -59,14 +59,11 @@ ShpostStorage::Application.routes.draw do
   end
 
   resources :shelves do
-    # get :autocomplete_shelf_shelf_code, :on => :collection
+    get :autocomplete_shelf_shelf_code, :on => :collection
     collection do 
-    get :autocomplete_shelf_shelf_code
-    get 'shelf_import'
-    post 'shelf_import' => 'shelves#shelf_import'
-  end
-
-
+      get 'shelf_import'
+      post 'shelf_import' => 'shelves#shelf_import'
+    end
   end
 
 
