@@ -588,9 +588,6 @@ zh-CN:
         shelf:
           name: "货架管理"
           link: "/shelves/"
-        shelfimport:
-          name: "货架导入"
-          link: "/shelves/shelf_import"
           # needrole:
           #   can: :read
           #   role: "shelf"

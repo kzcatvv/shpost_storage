@@ -99,34 +99,35 @@ class ShelvesController < ApplicationController
 
 
   def shelf_import
-    puts 000000000000
     unless request.get?
-      puts 1111111111
-      if file = upload_shelf(params[:file]['file'])   
-        begin
-          instance=nil
-          if file.include?('.xlsx')
-            instance= Roo::Excelx.new(file)
-          elsif file.include?('.xls')
-            instance= Roo::Excel.new(file)
-          elsif file.include?('.csv')
-            instance= Roo::CSV.new(file)
-          end
-          instance.default_sheet = instance.sheets.first
+      if file = upload_shelf(params[:file]['file'])
+        Shelf.transaction do
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
 
-          2.upto(instance.last_row) do |line|
-            shelfcode = instance.cell(line,'B').to_s
-            shelfcode << change(instance.cell(line,'C').to_s)
-            shelfcode << change(instance.cell(line,'D').to_s)
-            shelfcode << change(instance.cell(line,'E').to_s)
-            shelfcode << change(instance.cell(line,'F').to_s)
-            shelfcode << change(instance.cell(line,'G').to_s)
-            area=Area.where(area_code: instance.cell(line,'B').to_s)
-            shelf = Shelf.create! area_id: area.id,area_length: instance.cell(line,'C').to_s,area_width: instance.cell(line,'D').to_s, area_height:instance.cell(line,'E').to_s, shelf_row:instance.cell(line,'F').to_s, shelf_column:instance.cell(line,'G').to_s,max_weight: instance.cell(line,'H'), max_volume: instance.cell(line,'I').to_s,desc: instance.cell(line,'J').to_s,shelf_code:shelfcode
+            2.upto(instance.last_row) do |line|
+              shelfcode = instance.cell(line,'B').to_s
+              shelfcode << change(instance.cell(line,'C').to_s)
+              shelfcode << change(instance.cell(line,'D').to_s)
+              shelfcode << change(instance.cell(line,'E').to_s)
+              shelfcode << change(instance.cell(line,'F').to_s)
+              shelfcode << change(instance.cell(line,'G').to_s)
+              area=Area.where(area_code: instance.cell(line,'B').to_s)
+              shelf = Shelf.create! area_id: area.id,area_length: instance.cell(line,'C').to_s,area_width: instance.cell(line,'D').to_s, area_height:instance.cell(line,'E').to_s, shelf_row:instance.cell(line,'F').to_s, shelf_column:instance.cell(line,'G').to_s,max_weight: instance.cell(line,'H'), max_volume: instance.cell(line,'I').to_s,desc: instance.cell(line,'J').to_s,shelf_code:shelfcode
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = "导入失败"
+            raise ActiveRecord::Rollback
           end
-          flash[:alert] = "导入成功"
-        rescue Exception => e
-          flash[:alert] = "导入失败"
         end
       end   
     end
