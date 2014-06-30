@@ -1,4 +1,4 @@
-class ShelvesController < ApplicationController
+  class ShelvesController < ApplicationController
   # before_action :set_shelf, only: [:show, :edit, :update, :destroy]
   before_filter :find_current_storage
   load_and_authorize_resource :shelf
@@ -99,7 +99,9 @@ class ShelvesController < ApplicationController
 
 
   def shelf_import
+    puts 123456
     unless request.get?
+    puts 01234
       if file = upload_shelf(params[:file]['file'])
         Shelf.transaction do
           begin
@@ -112,16 +114,25 @@ class ShelvesController < ApplicationController
               instance= Roo::CSV.new(file)
             end
             instance.default_sheet = instance.sheets.first
-
+             puts 11111
             2.upto(instance.last_row) do |line|
+              puts 22222
               shelfcode = instance.cell(line,'B').to_s
+              puts 33333
               shelfcode << change(instance.cell(line,'C').to_s)
+              puts 44444
               shelfcode << change(instance.cell(line,'D').to_s)
+              puts 55555
+
               shelfcode << change(instance.cell(line,'E').to_s)
               shelfcode << change(instance.cell(line,'F').to_s)
               shelfcode << change(instance.cell(line,'G').to_s)
+              puts shelfcode
               area=Area.where(area_code: instance.cell(line,'B').to_s)
-              shelf = Shelf.create! area_id: area.id,area_length: instance.cell(line,'C').to_s,area_width: instance.cell(line,'D').to_s, area_height:instance.cell(line,'E').to_s, shelf_row:instance.cell(line,'F').to_s, shelf_column:instance.cell(line,'G').to_s,max_weight: instance.cell(line,'H'), max_volume: instance.cell(line,'I').to_s,desc: instance.cell(line,'J').to_s,shelf_code:shelfcode
+              puts 66666
+              puts area.id
+              shelf = Shelf.create! area_id: area.id,area_length: instance.cell(line,'C'),area_width: instance.cell(line,'D'), area_height:instance.cell(line,'E'), shelf_row:instance.cell(line,'F'), shelf_column:instance.cell(line,'G'),max_weight: instance.cell(line,'H').to_i, max_volume: instance.cell(line,'I').to_i,desc: instance.cell(line,'J'),shelf_code:shelfcode
+              puts 77777
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
