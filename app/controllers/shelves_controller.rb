@@ -101,7 +101,7 @@
   def shelf_import
     puts 123456
     unless request.get?
-    puts 01234
+    puts 1234
       if file = upload_shelf(params[:file]['file'])
         Shelf.transaction do
           begin
@@ -114,24 +114,19 @@
               instance= Roo::CSV.new(file)
             end
             instance.default_sheet = instance.sheets.first
-             puts 11111
             2.upto(instance.last_row) do |line|
-              puts 22222
+              area=Area.where(area_code: instance.cell(line,'B').to_s).first
               shelfcode = instance.cell(line,'B').to_s
-              puts 33333
-              shelfcode << change(instance.cell(line,'C').to_s)
-              puts 44444
-              shelfcode << change(instance.cell(line,'D').to_s)
-              puts 55555
-
-              shelfcode << change(instance.cell(line,'E').to_s)
-              shelfcode << change(instance.cell(line,'F').to_s)
-              shelfcode << change(instance.cell(line,'G').to_s)
+              shelfcode << change(to_string(instance.cell(line,'C').to_s))
+              shelfcode << change(to_string(instance.cell(line,'D').to_s))
+              shelfcode << change(to_string(instance.cell(line,'E').to_s))
+              shelfcode << change(to_string(instance.cell(line,'F').to_s))
+              shelfcode << change(to_string(instance.cell(line,'G').to_s))
               puts shelfcode
-              area=Area.where(area_code: instance.cell(line,'B').to_s)
-              puts 66666
+              puts instance.cell(line,'B').to_s
               puts area.id
-              shelf = Shelf.create! area_id: area.id,area_length: instance.cell(line,'C'),area_width: instance.cell(line,'D'), area_height:instance.cell(line,'E'), shelf_row:instance.cell(line,'F'), shelf_column:instance.cell(line,'G'),max_weight: instance.cell(line,'H').to_i, max_volume: instance.cell(line,'I').to_i,desc: instance.cell(line,'J'),shelf_code:shelfcode
+              binding.pry
+              shelf = Shelf.create! area_id: area.id,area_length: to_string(instance.cell(line,'C')),area_width: to_string(instance.cell(line,'D')), area_height:to_string(instance.cell(line,'E')), shelf_row:to_string(instance.cell(line,'F')), shelf_column:to_string(instance.cell(line,'G')),max_weight: instance.cell(line,'H').to_i, max_volume: instance.cell(line,'I').to_i,desc: instance.cell(line,'J'),shelf_code:shelfcode
               puts 77777
             end
             flash[:alert] = "导入成功"
@@ -178,6 +173,10 @@
       # end
       text.blank?? "" : ('-'<<text)
 
+    end
+
+    def to_string(text)
+      text.to_s.split('.0')[0]
     end
 
     def setShelfCode(shelf_params)
