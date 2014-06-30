@@ -113,8 +113,10 @@
             end
             instance.default_sheet = instance.sheets.first
             2.upto(instance.last_row) do |line|
-              area=Area.where(area_code: instance.cell(line,'B').to_s).first
-              shelfcode = instance.cell(line,'B').to_s
+              storage = Storage.where(name: instance.cell(line,'A').to_s).first
+              area=Area.where(storage: storage, area_code: instance.cell(line,'B').to_s).first
+              shelfcode = ""
+              shelfcode << instance.cell(line,'B').to_s
               shelfcode << change(to_string(instance.cell(line,'C').to_s))
               shelfcode << change(to_string(instance.cell(line,'D').to_s))
               shelfcode << change(to_string(instance.cell(line,'E').to_s))
