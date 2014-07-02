@@ -470,9 +470,11 @@ class OrdersController < ApplicationController
   end
 
   def findprintindex
+    status = ["waiting","printed"]
      @orders_grid = initialize_grid(@orders,
                    :include => [:business],
-                   :conditions => {:order_type => "b2c"})
+                   :conditions => ['order_type = ? and status in (?)',"b2c",status],
+                   :per_page => 15)
      @allcnt = {}
      @allcnt.clear
      @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary
