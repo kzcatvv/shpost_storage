@@ -147,6 +147,10 @@ ShpostStorage::Application.routes.draw do
 
   resources :commodities do
      resources :specifications
+      collection do 
+      get 'commodity_import'
+      post 'commodity_import' => 'commodities#commodity_import'
+    end
   end
 
   resources :areas do
