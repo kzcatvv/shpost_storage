@@ -107,7 +107,7 @@ class StandardInterface
 
     order = nil
     if !deliver_no.blank?
-      order = ORDERDETAIL.find_by_business_deliver_no deliver_no
+      order = OrderDetail.find_by_business_deliver_no deliver_no
     end
 
     order ||= Order.find_by_no order_no
