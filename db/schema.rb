@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140606010934) do
+ActiveRecord::Schema.define(version: 20140702032632) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -181,6 +181,7 @@ ActiveRecord::Schema.define(version: 20140606010934) do
     t.string   "pingan_ordertime"
     t.string   "pingan_operate"
     t.string   "customer_idnumber"
+    t.string   "tracking_info"
   end
 
   create_table "purchase_details", force: true do |t|
