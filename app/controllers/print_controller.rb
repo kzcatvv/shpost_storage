@@ -47,12 +47,14 @@ class PrintController < ApplicationController
 			@keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "printed")
         end
 		@transport_type=params[:transport_type]
-		start=params[:start].to_i
-	    ending=params[:end].to_i
+		regular = /([\D]*)([\d]*)/
+		start=regular.match(params[:start])
+		numberSize = start[2].size
+	    ending=regular.match(params[:end])
 		@ids=params[:id].split(",").map(&:to_i)
-		(start..ending).each_with_index do |num,i|
+		(start[2].to_i..ending[2].to_i).each_with_index do |num,i|
 			order = Order.find(@ids[i])
-			order.tracking_number=num.to_s
+			order.tracking_number=start[1] << sprintf("%0#{numberSize.to_s}d", num)
 			order.status='printed'
 			order.user_id=current_user.id
 			order.transport_type=@transport_type

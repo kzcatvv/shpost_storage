@@ -50,10 +50,31 @@ class StandardInterfaceController < ApplicationController
     order_got = StandardInterface.order_query(@context_hash, @business, @unit)
 
     if !order_got.blank?
+	  deliver_details = []
+	  tracking_infos = ""
+	  if order_got.is_a? Order
+	    tracking_infos = order_got.tracking_info
+	  else
+	    tracking_infos = order_got.order.tracking_info
+	  end
+	  tracking_infos.split(/\n/).each do |info|
+		deliver_detail = {}
+		x = info.split('#')
+		if x.size == 4
+		  deliver_detail['DATE'] = x[0]
+		  deliver_detail['LOCAL'] = x[2]
+		  # deliver_detail['NAME'] = x[]
+		  deliver_detail['DESC'] = x[1]
+		elsif x.size == 2
+		  deliver_detail['DATE'] = x[0]
+		  deliver_detail['DESC'] = x[1]
+		end
+		deliver_details << deliver_detail
+	  end
       if order_got.is_a? Order
-        render json: success_builder({'STATUS' => order_got.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_got.tracking_number})
+        render json: success_builder({'STATUS' => order_got.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_got.tracking_number, 'DELIVER_DETAIL' => deliver_details})
       else
-        render json: success_builder({'STATUS' => order_got.order.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_god.tracking_number})
+        render json: success_builder({'STATUS' => order_got.order.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_god.tracking_number, 'DELIVER_DETAIL' => deliver_details})
       end
     else
       render json: error_builder('9999')
