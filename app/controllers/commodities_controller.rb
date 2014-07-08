@@ -66,22 +66,9 @@ class CommoditiesController < ApplicationController
     end
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    # def set_commodity
-    #   @commodity = Commodity.find(params[:id])
-    # end
-
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def commodity_params
-      params[:commodity].permit!
-    end
-
-def commodity_import
-    
+  def commodity_import
     unless request.get?
       if file = upload_commodity(params[:file]['file'])
-     #   puts xxx
         Commodity.transaction do
           begin
             instance=nil
@@ -92,22 +79,21 @@ def commodity_import
             elsif file.include?('.csv')
               instance= Roo::CSV.new(file)
             end
-            puts 111111
             instance.default_sheet = instance.sheets.first
 
             2.upto(instance.last_row) do |line|
-              puts 10001
-             # all_name = ""
-             # all_name << instance.cell(line,'B').to_s
-             # all_name << instance.cell(line,'F').to_s
-             # puts  all_name
+              all_name = ""
+              all_name << instance.cell(line,'B').to_s
+              all_name << instance.cell(line,'F').to_s
               # binding.pry
-              goodtype= Goodstype.where(name:instance.cell(line,'C').to_s).first
-              puts  10002
-              commodity = Commodity.create! no:instance.cell(line,'A'),name: instance.cell(line,'B'),goodstype_id: goodtype.id,unit_id: current_user.unit.id
-              puts  10003
-             # specification=Specifications.create! commodity_id:commodity.id,name:instance.cell(line,'F'),sixnine_code:instance.cell(line,'E'),desc:instance.cell(line,'G'),sku:instance.cell(line,'D'),long:instance.cell(line,'H'),wide:instance.cell(line,'I'),high:instance.cell(line,'J'),weight:instance.cell(line,'K'),volumn:instance.cell(line,'L'),all_name:all_name
-              puts  10004
+              goodtype= Goodstype.where(name: instance.cell(line,'C').to_s).first
+
+              commodity = Commodity.create! no: to_string(instance.cell(line,'A')),name: instance.cell(line,'B'),goodstype_id: goodtype.id,unit_id: current_user.unit.id
+
+              #binding.pry
+              specification=Specification.create! commodity_id:commodity.id,name:instance.cell(line,'F'),sixnine_code: to_string(instance.cell(line,'E')),desc:instance.cell(line,'G'),sku: "",long: instance.cell(line,'H').to_f,wide: instance.cell(line,'I').to_f,high: instance.cell(line,'J').to_f,weight: instance.cell(line,'K').to_f,volume: instance.cell(line,'L').to_f,all_name: all_name
+              sku = goodtype.id.to_s + commodity.id.to_s + specification.id.to_s
+              specification.update_attribute(:sku,sku)
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
@@ -119,10 +105,23 @@ def commodity_import
     end
   end
 
- def upload_commodity(file)
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    # def set_commodity
+    #   @commodity = Commodity.find(params[:id])
+    # end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def commodity_params
+      params[:commodity].permit!
+    end
+
+
+  def upload_commodity(file)
     if !file.original_filename.empty?
       puts 99999
-      direct = "#{Rails.root}/upload/shelf/"
+      direct = "#{Rails.root}/upload/goods/"
       filename = "#{Time.now.to_f}_#{file.original_filename}"
       file_path = direct + filename
       puts file_path
@@ -133,7 +132,7 @@ def commodity_import
     end
   end
 
-
-
-
+  def to_string(text)
+    text.to_s.split('.0')[0]
+  end
 end
