@@ -7,9 +7,29 @@ namespace :transmitter do
         while 1==1 do
           @count += 1
           begin
-            TCBDSOAP.order_query(@uri, @method)
+            TcbdSoap.order_query(@uri, @method)
           rescue Exception => e
             Rails.errors e.message
+          ensure
+            ActiveRecord::Base.connection_pool.release_connection
+            puts "#{@title} : #{@count}"
+          end
+          sleep @interval
+        end
+      end
+  end
+
+  namespace :gnxb do
+    desc "BankComm Transmitter"
+      task :order_query => :environment do
+        generate_params 'transmitter.gnxb.order_query'
+        while 1==1 do
+          @count += 1
+          begin
+            GnxbSoap.order_query(@uri, @method)
+          rescue Exception => e
+            puts e
+            #Rails.errors e.message
           ensure
             ActiveRecord::Base.connection_pool.release_connection
             puts "#{@title} : #{@count}"
