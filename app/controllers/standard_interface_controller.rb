@@ -100,10 +100,10 @@ class StandardInterfaceController < ApplicationController
     
     return render json: error_builder('0002') if !@format.eql? 'JSON'
 
-    @business = Business.find_by(no: params[:business])
+    @business = Business.find_by(id: params[:business])
     return render json: error_builder('0003') if @business.nil?
 
-    @unit = Unit.find_by(no: params[:unit])
+    @unit = Unit.find_by(id: params[:unit])
     return render json: error_builder('0004') if @unit.nil?
 
     @context = params[:context]
