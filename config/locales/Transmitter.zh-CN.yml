@@ -19,5 +19,5 @@ zh-CN:
     gnxb:
       order_query:
         uri: 'http://211.156.220.124:7700/ECWS/xfire/services/MailTtService?wsdl'
-        method: 'getMails'
+        method: 'get_mails'
         interval: 1800
