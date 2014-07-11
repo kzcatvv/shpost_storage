@@ -2,28 +2,44 @@ class GnxbSoap
   require "rexml/document"
 
   def self.order_query(uri, mehod)
-    puts uri
+
     client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
       
-    yjbh = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]]}).map!{|x| x.tracking_number}.to_json
-    puts yjbh
-    yjbh = "PN00058784731"
+    yjbh = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"}).first.map!{|x| x.tracking_number}.to_json
 
+    #yjbh = "9900162517212"
+    puts yjbh
+	
     response = client.call(mehod.to_sym, message: { in0: "6", in1: "192.168.0.1", in2: yjbh })
-    #in_body = setInBody()
-    #puts in_body
-    #response = gnxb_post(uri,in_body)
-    body_s = response.body.to_s
-    puts body_s
-    doc = REXML::Document.new(body_s)
-    root = doc.root
-    head = root.elements['Mail']
-    puts head
+    json = response.body["#{mehod}_response".to_sym]["out".to_sym]
+	gnxb_info = ""
+	gnxb_status = Order::STATUS[:packed]
+	json["mail".to_sym].each do |x|
+	  action_time = convertToString(x[:action_date_time],Date)
+	  office_desc = convertToString(x[:relation_office_desc],String)
+	  office_name = convertToString(x[:office_name],String)
+	  info_out = convertToString(x[:action_info_out],String)
+	  gnxb_info << action_time << "#" << office_desc << "#" << office_name << "#" << info_out << "\n"
+	  gnxb_status = returnStatus(info_out)
+	end
+	updateOrder(yjbh,gnxb_info,gnxb_status)
   end
 
   private
   def self.test_mod?
     SalaryQueryConfig.config["test_mod"]
+  end
+  
+  def self.convertToString(input,type)
+    if input.is_a? type
+	  if type == Date
+	    return input.to_s
+	  elsif type == String
+	    return input
+	  end
+	else
+	  return ""
+	end
   end
 
   def self.gnxb_post(uri,body)
@@ -49,7 +65,7 @@ class GnxbSoap
   
   def self.returnStatus(tdxq)
 	if !tdxq.blank?
-      if tdxq.start_with? '已妥投'
+      if tdxq.start_with? '已签收'
 		return Order::STATUS[:delivered]
       end
     end

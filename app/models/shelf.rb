@@ -27,4 +27,8 @@ class Shelf < ActiveRecord::Base
   def self.get_neighbor_shelf(stocks)
     prior.first
   end
+  
+  def self.get_default_shelf
+    Shelf.where(area_id: current_storage.area_ids).first
+  end
 end
