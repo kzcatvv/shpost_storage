@@ -53,21 +53,29 @@ class PrintController < ApplicationController
 	    ending=getTrackingNumber(@transport_type, params[:end])
 		@ids=params[:id].split(",").map(&:to_i)
 		(start[1].to_i..ending[1].to_i).each_with_index do |num,i|
+			#puts "----------" << i.to_s << "---------"
+			#puts "num=" << num.to_s
 			order = Order.find(@ids[i])
 			num_s = sprintf("%0#{numberSize.to_s}d", num)
+			#puts "numberSize=" << numberSize.to_s
+			#puts "num_s=" << num_s.to_s
+			#puts "start[0]=" << start[0].to_s
+			#puts "start[1]=" << start[1].to_s
+			#puts "start[2]=" << start[2].to_s
 			case num_s.size
 			when 8
-				order.tracking_number=start[0] << num_s << checkTrackingNO(num_s).to_s << start[2]
+				order.tracking_number=start[0] + num_s + checkTrackingNO(num_s).to_s + start[2]
 			when 11
-				order.tracking_number=start[0] << num_s
+				order.tracking_number=start[0] + num_s
 			end
+			#puts "order.tracking_number=" << order.tracking_number
 			order.status='printed'
 			order.user_id=current_user.id
 			order.transport_type=@transport_type
 			if params[:flag]=='filter'
 				order.keyclientorder_id=@keycorder.id
 			end
-			puts order.tracking_number
+			#puts order.tracking_number
 			order.save
 		end
 		flash[:alert] = "正在打印"
