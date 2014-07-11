@@ -34,6 +34,7 @@ class Stock < ActiveRecord::Base
     shelf = Shelf.get_neighbor_shelf stocks_in_storage_with_batch_no
     shelf ||= Shelf.get_neighbor_shelf stocks_in_storage_without_batch_no
     shelf ||= Shelf.get_empty_shelf
+	shelf ||= Shelf.get_default_shelf
 
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
   end
