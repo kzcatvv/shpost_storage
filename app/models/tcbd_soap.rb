@@ -3,7 +3,7 @@ class TcbdSoap
   def self.order_query(uri, mehod)
     client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
       
-    yjbh = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]]}).map!{|x| x.tracking_number}.to_json
+    yjbh = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "tcsd"}).map!{|x| x.tracking_number}.to_json
 	puts yjbh
     # yjbh = "['PN00058784731', 'PN00058785531']"
 
@@ -12,7 +12,7 @@ class TcbdSoap
     json = JSON.parse body
 	yjbh = ""
 	tdxq = ""
-	td_status = ""
+	td_status = Order::STATUS[:packed]
     json["yjrzcx"].each do |x|
 	  if !yjbh.blank? and yjbh != x['yjbh']
 	    updateOrder(yjbh,tdxq,td_status)
