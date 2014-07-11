@@ -5,24 +5,30 @@ class GnxbSoap
 
     client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
       
-    yjbh = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"}).first.map!{|x| x.tracking_number}.to_json
+    yjbhs = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"}).map!{|x| x.tracking_number}
 
     #yjbh = "9900162517212"
-    puts yjbh
+    #puts yjbhs
 	
-    response = client.call(mehod.to_sym, message: { in0: "6", in1: "192.168.0.1", in2: yjbh })
-    json = response.body["#{mehod}_response".to_sym]["out".to_sym]
-	gnxb_info = ""
-	gnxb_status = Order::STATUS[:packed]
-	json["mail".to_sym].each do |x|
-	  action_time = convertToString(x[:action_date_time],Date)
-	  office_desc = convertToString(x[:relation_office_desc],String)
-	  office_name = convertToString(x[:office_name],String)
-	  info_out = convertToString(x[:action_info_out],String)
-	  gnxb_info << action_time << "#" << office_desc << "#" << office_name << "#" << info_out << "\n"
-	  gnxb_status = returnStatus(info_out)
+	yjbhs.each do |yjbh|
+	  puts "-------------" << yjbh << "-----------------"
+		response = client.call(mehod.to_sym, message: { in0: "6", in1: "192.168.0.1", in2: yjbh })
+		json = response.body["#{mehod}_response".to_sym]["out".to_sym]
+		gnxb_info = ""
+		gnxb_status = Order::STATUS[:packed]
+		if json.blank?
+		  next
+		end
+		json["mail".to_sym].each do |x|
+		  action_time = convertToString(x[:action_date_time],Date)
+		  office_desc = convertToString(x[:relation_office_desc],String)
+		  office_name = convertToString(x[:office_name],String)
+		  info_out = convertToString(x[:action_info_out],String)
+		  gnxb_info << action_time << "#" << office_desc << "#" << office_name << "#" << info_out << "\n"
+		  gnxb_status = returnStatus(info_out)
+		end
+		updateOrder(yjbh,gnxb_info,gnxb_status)
 	end
-	updateOrder(yjbh,gnxb_info,gnxb_status)
   end
 
   private
@@ -33,7 +39,7 @@ class GnxbSoap
   def self.convertToString(input,type)
     if input.is_a? type
 	  if type == Date
-	    return input.to_s
+	    return input.strftime("%Y-%m-%d %H:%M:%S")
 	  elsif type == String
 	    return input
 	  end
