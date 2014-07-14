@@ -11,7 +11,7 @@ class Shelf < ActiveRecord::Base
   validates_uniqueness_of :shelf_code, scope: :area_id, :message => "货架已存在"
  
   scope :prior, ->{ includes(:stocks).where(stocks: {id: nil}).order("priority_level ASC")}
-
+  scope :default, ->{ includes(:stocks).order("priority_level ASC")}
 
   # def self.min_abs_pl(priority_level)
   #   condition = "abs(#{priority_level} - priority_level) "
@@ -29,6 +29,6 @@ class Shelf < ActiveRecord::Base
   end
   
   def self.get_default_shelf
-    Shelf.where(area_id: current_storage.area_ids).first
+    default.first
   end
 end
