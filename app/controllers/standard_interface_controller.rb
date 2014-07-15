@@ -116,7 +116,7 @@ class StandardInterfaceController < ApplicationController
 
   def verify_sign
     @sign = params[:sign]
-    render json: error_builder('0001') if !@sign.eql? Digest::MD5.base64digest(@context + @business.secret_key)
+    render json: error_builder('0001') if !@sign.eql? Digest::MD5.hexdigest(Digest::MD5.base64digest(@context + @business.secret_key))
   end
 
    
