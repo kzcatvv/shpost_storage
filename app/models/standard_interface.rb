@@ -109,10 +109,15 @@ class StandardInterface
     if !deliver_no.blank?
       order = OrderDetail.find_by_business_deliver_no deliver_no
     end
-
-    order ||= Order.find_by_no order_no
-    order ||= Order.find_by_business_order_id order_id
-    order ||= Order.find_by_business_trans_no trans_sn
+    if !order_no.blank?
+      order = Order.find_by_no order_no
+	end
+	if !order_id.blank?
+      order = Order.find_by_business_order_id order_id
+	end
+	if !trans_sn.blank?
+      order = Order.find_by_business_trans_no trans_sn
+	end
   end
 
   def self.stock_query(context, business, unit)

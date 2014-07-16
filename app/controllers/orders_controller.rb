@@ -542,7 +542,7 @@ class OrdersController < ApplicationController
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
-            flash[:alert] = "导入失败"
+            flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
         end
@@ -720,7 +720,7 @@ class OrdersController < ApplicationController
 
     def findTransportType(specification)
       #default transport type
-      type = "tcsd"
+      type = "gnxb"
       long = specification.long
       wide = specification.wide
       high = specification.high

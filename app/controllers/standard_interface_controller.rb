@@ -57,6 +57,7 @@ class StandardInterfaceController < ApplicationController
 	  else
 	    tracking_infos = order_got.order.tracking_info
 	  end
+	  if !tracking_infos.blank?
 	  tracking_infos.split(/\n/).each do |info|
 		deliver_detail = {}
 		x = info.split('#')
@@ -70,6 +71,7 @@ class StandardInterfaceController < ApplicationController
 		  deliver_detail['DESC'] = x[1]
 		end
 		deliver_details << deliver_detail
+	  end
 	  end
       if order_got.is_a? Order
         render json: success_builder({'STATUS' => order_got.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_got.tracking_number, 'DELIVER_DETAIL' => deliver_details})
@@ -116,7 +118,7 @@ class StandardInterfaceController < ApplicationController
 
   def verify_sign
     @sign = params[:sign]
-    render json: error_builder('0001') if !@sign.eql? Digest::MD5.base64digest(@context + @business.secret_key)
+    render json: error_builder('0001') if !@sign.eql? Digest::MD5.hexdigest(Digest::MD5.base64digest(@context + @business.secret_key))
   end
 
    
