@@ -54,7 +54,9 @@ ShpostStorage::Application.routes.draw do
         get 'select_commodities'
         get 'select_specifications'
         get 'findwarningamt'
-       end
+      get 'relationship_import'
+      post 'relationship_import' => 'relationships#relationship_import'
+    end
     resources :contacts
   end
 
