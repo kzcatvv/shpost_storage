@@ -101,7 +101,55 @@ class RelationshipsController < ApplicationController
     end
   end
 
+  def relationship_import
+    unless request.get?
+      if file = upload_relationship(params[:file]['file'])       
+        Relationship.transaction do
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
 
+            2.upto(instance.last_row) do |line|
+              specification = Specification.find_by sku: instance.cell(line,'D').to_s.split('.0')[0]
+              business = Business.find_by name: instance.cell(line,'H') 
+              supplier = Supplier.find_by name: instance.cell(line,'I')
+              relationship = Relationship.find_by business_id: business.id, specification_id: specification.id
+
+              if relationship.nil?
+                Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: instance.cell(line,'J').to_s.split('.0')[0], spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
+              else
+                Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: instance.cell(line,'J').to_s.split('.0')[0], spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
+              end
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = e.message
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
+  def upload_relationship(file)
+     if !file.original_filename.empty?
+       direct = "#{Rails.root}/upload/relationship/"
+       filename = "#{Time.now.to_f}_#{file.original_filename}"
+
+       file_path = direct + filename
+       File.open(file_path, "wb") do |f|
+          f.write(file.read)
+       end
+       file_path
+     end
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

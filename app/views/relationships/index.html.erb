@@ -3,6 +3,9 @@
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
     <% if can? :new, Relationship %>
+      <%= link_to t('.import', :default => t("helpers.links.import")),
+                  relationship_import_relationships_path,
+                  :class => 'btn btn-primary' %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
                   new_relationship_path,
                   :class => 'btn btn-primary' %>

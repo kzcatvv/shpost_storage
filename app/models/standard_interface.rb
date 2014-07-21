@@ -118,6 +118,7 @@ class StandardInterface
 	if !trans_sn.blank?
       order = Order.find_by_business_trans_no trans_sn
 	end
+    return order
   end
 
   def self.stock_query(context, business, unit)
