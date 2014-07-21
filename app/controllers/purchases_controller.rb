@@ -128,11 +128,89 @@ class PurchasesController < ApplicationController
     end
   end
 
+
+ def purchase_import
+    unless request.get?
+      if file = upload_purchase(params[:file]['file'])
+        puts  000
+        Purchase.transaction do
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            2.upto(instance.last_row) do |line|
+              puts 11111
+               #binding.pry
+              purchase=Purchase.where(no: instance.cell(line,'B').to_s).first
+              puts 2222
+              supplier=Supplier.where(name:instance.cell(line,'C').to_s).first
+              puts 3333
+
+              specification=Specification.where(name:instance.cell(line,'D').to_s).first
+              puts 4444
+
+           #   purchase_detail = PurchaseDetail.create! name:instance.cell(line,'A'),purchase_id: purchase.id,supplier_id: supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'E'),amount:instance.cell(line,'F').to_i,desc:instance.cell(line,'G'),sum:instance.cell(line,'F').to_f, status:"waiting"
+              purchase_detail = PurchaseDetail.create! name:instance.cell(line,'A'),purchase_id:"8",supplier_id:supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'E'),amount:instance.cell(line,'F').to_i,desc:instance.cell(line,'G'),sum:12.3, status:"waiting"
+
+              puts 5555
+             # batch_no= purchase_detail.set_batch_no
+             # puts 
+             #  purchase_detail.update_attribute(:batch_no,batch_no)
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = "导入失败"
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_purchase
       @purchase = Purchase.find(params[:id])
     end
+
+
+  def to_string(text)
+    text.to_s.split('.0')[0]
+  end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    # def set_commodity
+    #   @commodity = Commodity.find(params[:id])
+    # end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    
+
+
+  def upload_purchase(file)
+    if !file.original_filename.empty?
+      puts 99999
+      direct = "#{Rails.root}/upload/goods/"
+      filename = "#{Time.now.to_f}_#{file.original_filename}"
+      file_path = direct + filename
+      puts file_path
+      File.open(file_path, "wb") do |f|
+        f.write(file.read)
+      end
+      file_path
+    end
+  end
+
+
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_params

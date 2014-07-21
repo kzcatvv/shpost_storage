@@ -628,6 +628,7 @@ zh-CN:
         purchase:
           name: "采购单管理"
           link: "/purchases"
+       
     business:
       name: "订单管理"
       needrole:

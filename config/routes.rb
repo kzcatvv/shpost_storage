@@ -69,6 +69,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :purchases do
     resources :purchase_details
+      collection do 
+      get  'purchase_import'
+      post 'purchase_import' => 'purchases#purchase_import'
+      end
+
     member do
       patch 'onecheck'
       patch 'stock_in'
@@ -152,6 +157,9 @@ ShpostStorage::Application.routes.draw do
       post 'commodity_import' => 'commodities#commodity_import'
     end
   end
+
+  
+
 
   resources :areas do
      resources :shelves, :controller => 'area_shelf'

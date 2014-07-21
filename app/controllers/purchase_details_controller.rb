@@ -64,6 +64,23 @@ class PurchaseDetailsController < ApplicationController
     end
   end
 
+ 
+
+ 
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    # def set_commodity
+    #   @commodity = Commodity.find(params[:id])
+    # end
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    
+
+
+  
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_purchase_detail
