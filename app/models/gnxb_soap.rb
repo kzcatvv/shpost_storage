@@ -28,6 +28,7 @@ class GnxbSoap
 		  gnxb_status = returnStatus(info_out)
 		end
 		updateOrder(yjbh,gnxb_info,gnxb_status)
+    sleep 5
 	end
   end
 
