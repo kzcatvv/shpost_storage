@@ -667,7 +667,7 @@ class OrdersController < ApplicationController
         sheet1[count_row,0]=obj.pingan_ordertime
         sheet1[count_row,1]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code
         sheet1[count_row,2]=obj.order_details.first.name
-        sheet1[count_row,3]=obj.order_details.first.total_amount
+        sheet1[count_row,3]=obj.order_details.first.amount
         sheet1[count_row,4]=obj.pingan_operate
         sheet1[count_row,5]=obj.customer_name
         sheet1[count_row,6]=obj.customer_address
@@ -677,11 +677,11 @@ class OrdersController < ApplicationController
         sheet1[count_row,10]="|"+obj.business_trans_no
         sheet1[count_row,11]=""
         sheet1[count_row,12]=""
-        sheet1[count_row,13]="|"+obj.batch_no
+        sheet1[count_row,13]="|"+obj.order_details.first.batch_no
         sheet1[count_row,14]=Supplier.find(obj.order_details.first.supplier_id).name
         sheet1[count_row,15]=obj.customer_postcode
         sheet1[count_row,16]=obj.transport_type
-        sheet1[count_row,17]="|"+obj.tracking_number
+        sheet1[count_row,17]="|"+obj.tracking_number.to_s
        count_row += 1
       end  
   
@@ -710,7 +710,7 @@ class OrdersController < ApplicationController
         sheet1[count_row,7]=obj.city
         sheet1[count_row,8]=""
         sheet1[count_row,9]=""
-        sheet1[count_row,10]="|"+obj.tracking_number
+        sheet1[count_row,10]="|"+obj.tracking_number.to_s
        count_row += 1
       end  
   
