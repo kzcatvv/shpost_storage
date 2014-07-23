@@ -15,9 +15,9 @@ zh-CN:
       order_query:
         uri: 'http://10.126.22.202/tcbd_webs/n_tcbd_webs.asmx?wsdl'
         method: 'jk_yjrzcx'
-        interval: 10
+        interval: 43200
     gnxb:
       order_query:
         uri: 'http://211.156.220.124:7700/ECWS/xfire/services/MailTtService?wsdl'
         method: 'get_mails'
-        interval: 1800
+        interval: 43200
