@@ -37,6 +37,10 @@
       order.status_name
     end
 
+   g.column name: model_class.human_attribute_name(:status), attribute: 'status', detach_with_id: :status_show_filter,custom_filter: Order::STATUS_SHOW.invert do |order| 
+      order.status_name
+    end
+
     g.column name: model_class.human_attribute_name(:buyer_desc), attribute: 'buyer_desc',detach_with_id: :buyer_desc_filter
 
     g.column name: model_class.human_attribute_name(:seller_desc), attribute: 'seller_desc', detach_with_id: :seller_desc_filter

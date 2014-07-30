@@ -163,6 +163,8 @@ zh-CN:
       contacts: 联系人管理
       roledtl: 角色明细
       shelves: 货架管理
+      import: 信息导入
+      export: 信息导出
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -317,7 +319,7 @@ zh-CN:
         role_name: "角色"
         unit_id: "所属单位"
       unit:
-        no: "编号"
+        "no": "编号"
         name: "单位名"
         desc: "单位描述"
       storage:
@@ -366,14 +368,14 @@ zh-CN:
         checked_at: "确认时间"
         pd_name: "采购单明细"
         "shelf_code": "货架编号"
-        "Shelf": "货架编号"
+        "shelf": "货架编号"
         
 
         shelf_code: "货架编号"
         shelf: "货架编号"
         status_checked: "已确认"
       supplier:
-        no: "供应商编号"
+        "no": "供应商编号"
         name: "名称"
         address: "地址"
         phone: "电话"
@@ -385,7 +387,7 @@ zh-CN:
         unit_id: "所属机构"
       commodity:
         id: "序列号"
-        no: "商品编号"
+        "no": "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
       specification:
@@ -407,7 +409,7 @@ zh-CN:
         spec_desc: "规格描述"
         warning_amt: "预警数量"
       business:
-        no: "编号"
+        "no": "编号"
         name: "名称"
         email: "电子邮件"
         contactor: "联系人"
@@ -471,7 +473,7 @@ zh-CN:
         order_id: "订单编号"
         desc: "备注"
       purchase:
-        no: "编号"
+        "no": "编号"
         name: "名称"
         unit_id: "所属机构"
         business_id: "所属商户"
