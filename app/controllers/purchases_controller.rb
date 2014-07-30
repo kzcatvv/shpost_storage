@@ -132,7 +132,6 @@ class PurchasesController < ApplicationController
  def purchase_import
     unless request.get?
       if file = upload_purchase(params[:file]['file'])
-        puts  000
         Purchase.transaction do
           begin
             instance=nil
@@ -145,28 +144,40 @@ class PurchasesController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
+            @purchase = nil
             2.upto(instance.last_row) do |line|
-              puts 11111
                #binding.pry
-              purchase=Purchase.where(no: instance.cell(line,'B').to_s).first
-              puts 2222
-              supplier=Supplier.where(name:instance.cell(line,'C').to_s).first
-              puts 3333
 
-              specification=Specification.where(name:instance.cell(line,'D').to_s).first
-              puts 4444
+              if !instance.cell(line,'A').to_s.blank?
+                unit = current_user.unit
+                status = Purchase::STATUS[:opened]
+                storage = current_storage
+                business = Business.find_by name: instance.cell(line,'B').to_s
+                time=Time.new
+                no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Purchase.count.to_s.rjust(5,'0')
+
+                purchase = Purchase.create! no: no, unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
+              end
+              supplier=Supplier.find_by name:instance.cell(line,'E').to_s
+
+              specifications=Specification.where(sixnine_code:instance.cell(line,'G').to_s)
+              specification=nil
+              if specifications.size > 1
+                specification=specifications.find_by name: instance.cell(line,'F').to_s
+              elsif specifications.size == 1
+                specification = specifications.first
+              end
 
            #   purchase_detail = PurchaseDetail.create! name:instance.cell(line,'A'),purchase_id: purchase.id,supplier_id: supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'E'),amount:instance.cell(line,'F').to_i,desc:instance.cell(line,'G'),sum:instance.cell(line,'F').to_f, status:"waiting"
-              purchase_detail = PurchaseDetail.create! name:instance.cell(line,'A'),purchase_id:"8",supplier_id:supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'E'),amount:instance.cell(line,'F').to_i,desc:instance.cell(line,'G'),sum:12.3, status:"waiting"
+              purchase_detail = PurchaseDetail.create! name:instance.cell(line,'D'),purchase_id: purchase.id,supplier_id:supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'H'),amount:instance.cell(line,'I').to_i,desc:instance.cell(line,'J'), status:"waiting"
 
-              puts 5555
              # batch_no= purchase_detail.set_batch_no
              # puts 
              #  purchase_detail.update_attribute(:batch_no,batch_no)
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
-            flash[:alert] = "导入失败"
+            flash[:alert] = e.to_s
             raise ActiveRecord::Rollback
           end
         end
