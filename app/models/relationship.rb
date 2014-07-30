@@ -24,4 +24,22 @@ class Relationship < ActiveRecord::Base
     
     conditions.includes(:specification).includes(specification: :commodity).where(commodities: { unit_id: unit}).first
   end
+
+  def self.find_relationships(sku, supplier = nil, spec_desc = nil,unit)
+
+    conditions =  where(external_code: sku)
+    
+    if !supplier.blank?
+      conditions = conditions.where(supplier: supplier)
+    end
+
+    if !spec_desc.blank?
+      conditions = conditions.where(spec_desc: spec_desc)
+    end
+
+    conditions.includes(:specification).includes(specification: :commodity).where(commodities: { unit_id: unit}).first
+  end
+
+
+
 end
