@@ -34,7 +34,9 @@ ShpostStorage::Application.routes.draw do
         post 'pingan_b2c_xls_outport'
         get 'pingan_b2b_outport'
         post 'pingan_b2b_xls_outport'
-
+        post 'exportorders'
+        get 'importorders'
+        post 'importorders' => 'orders#importorders'
       end
 
      resources :order_details

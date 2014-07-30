@@ -1,0 +1,17 @@
+<center>
+<br><br>
+<font face="微软雅黑" color='#006030' size=6>订单信息回馈导入</font>   
+
+<br><br><br>
+  
+ 	
+<%= form_tag({:action => 'importorders'}, :multipart => true) %>
+<font face="微软雅黑" color='#D9B300' size=3>上传文档模板: <%= file_field("file", "file") %></font>   
+<br><br><br>
+
+
+<%= submit_tag "确认导入", data: { disable_with: "导入中，请稍等..." } %>
+
+</form>
+
+</center>

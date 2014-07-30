@@ -523,7 +523,7 @@ class OrdersController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
           #  keyclientorder=Keyclientorder.create! keyclient_name: "平安线上 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
-
+            keyclientorder = nil
             2.upto(instance.last_row) do |line|
               city=nil
               if instance.cell(line,'G').include?("市")
@@ -531,28 +531,17 @@ class OrdersController < ApplicationController
               else
                 city=instance.cell(line,'G').split("县")[0]+"县"
               end
-              puts 1111
               relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('|')[1],nil,nil, current_user.unit.id)
 			   #     relationship1 = Relationship.find_relationships(instance.cell(line,'B').to_s.split('|')[1],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
-    
-              puts 2222
 
               transport_type = findTransportType(relationship.specification)
-              puts 3333
-           
-              if relationship.business_id== StorageConfig.config["business"]['jh_id']
-              puts 4444
-              keyclientorder=Keyclientorder.create! keyclient_name: "交行线上 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['jh_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
-              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('|')[1],business_trans_no: instance.cell(line,'K').to_s.split('|')[1], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: StorageConfig.config["business"]['jh_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I').to_s.split('|')[1], keyclientorder: keyclientorder, transport_type: transport_type
-			  
-              OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('|')[1], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
-              elsif relationship.business_id==StorageConfig.config["business"]['pajf_id']
 
-              keyclientorder=Keyclientorder.create! keyclient_name: "平安线上 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
-              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('|')[1],business_trans_no: instance.cell(line,'K').to_s.split('|')[1], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I').to_s.split('|')[1], keyclientorder: keyclientorder, transport_type: transport_type
-              OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('|')[1], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
+              if keyclientorder.nil?
+                keyclientorder=Keyclientorder.create! keyclient_name: "批量导入 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_storage.id
               end
+              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('|')[1],business_trans_no: instance.cell(line,'K').to_s.split('|')[1], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I').to_s.split('|')[1], keyclientorder: keyclientorder, transport_type: transport_type
 
+              OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('|')[1], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
@@ -656,6 +645,75 @@ class OrdersController < ApplicationController
     end
   end
 
+  def importorders()
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])       
+        Order.transaction do
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            koid = ""
+            2.upto(instance.last_row) do |line|
+              order = Order.find(instance.cell(line,'A').to_s.split('.0')[0])
+              tracking_number = instance.cell(line,'S').to_s.split('|')[1]
+              transport_type = instance.cell(line,'R').to_s
+              trackingNumber = getTrackingNumber(transport_type, tracking_number)
+              puts trackingNumber[1].class
+              case trackingNumber[1].size
+              when 8
+                order.tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
+              when 11
+                order.tracking_number=trackingNumber[0] + trackingNumber[1]
+              end
+              order.transport_type=transport_type
+              order.status='printed'
+              order.user_id=current_user.id
+              if order.keyclientorder_id.blank?
+                if koid.blank?
+                  koid = getKeycOrderID()
+                end
+                order.keyclientorder_id=koid
+              else
+                koid = order.keyclientorder_id
+              end
+              order.save
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = e.message
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
+  def exportorders()
+    puts params[:ids]
+    x = params[:ids].split(",")
+    @orders = Order.find(x)
+    if @orders.nil?
+       flash[:alert] = "无订单"
+       redirect_to :action => 'findprintindex'
+    else
+      respond_to do |format|
+        format.xls {   
+          send_data(exportorders_xls_content_for(@orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_order
@@ -679,19 +737,19 @@ class OrdersController < ApplicationController
       count_row = 1
       objs.each do |obj|  
         sheet1[count_row,0]=obj.pingan_ordertime
-        sheet1[count_row,1]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code
+        sheet1[count_row,1]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code.to_s
         sheet1[count_row,2]=obj.order_details.first.name
         sheet1[count_row,3]=obj.order_details.first.amount
         sheet1[count_row,4]=obj.pingan_operate
         sheet1[count_row,5]=obj.customer_name
         sheet1[count_row,6]=obj.customer_address
         sheet1[count_row,7]=obj.customer_phone
-        sheet1[count_row,8]="|"+obj.customer_idnumber
-        sheet1[count_row,9]="|"+obj.business_order_id
-        sheet1[count_row,10]="|"+obj.business_trans_no
+        sheet1[count_row,8]="|"+obj.customer_idnumber.to_s
+        sheet1[count_row,9]="|"+obj.business_order_id.to_s
+        sheet1[count_row,10]="|"+obj.business_trans_no.to_s
         sheet1[count_row,11]=""
         sheet1[count_row,12]=""
-        sheet1[count_row,13]="|"+obj.order_details.first.batch_no
+        sheet1[count_row,13]="|"+obj.order_details.first.batch_no.to_s
         sheet1[count_row,14]=Supplier.find(obj.order_details.first.supplier_id).name
         sheet1[count_row,15]=obj.customer_postcode
         sheet1[count_row,16]=obj.transport_type
@@ -743,5 +801,97 @@ class OrdersController < ApplicationController
         type = "ems"
       end
       return type
+    end
+
+    def exportorders_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{订单ID 订单生成时间 产品编号 兑换品名称 兑换品数量 操作类型 收件人名称 收件人地址 联系电话 身份证后四位 订单编号 行项目编号 签收时间 配送结果 操作批次号 供应商名称 邮编 承运商 快递单号}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.id
+        sheet1[count_row,1]=obj.pingan_ordertime
+        sheet1[count_row,2]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code.to_s
+        sheet1[count_row,3]=obj.order_details.first.name
+        sheet1[count_row,4]=obj.order_details.first.amount
+        sheet1[count_row,5]=obj.pingan_operate
+        sheet1[count_row,6]=obj.customer_name
+        sheet1[count_row,7]=obj.customer_address
+        sheet1[count_row,8]=obj.customer_phone
+        sheet1[count_row,9]="|"+obj.customer_idnumber.to_s
+        sheet1[count_row,10]="|"+obj.business_order_id.to_s
+        sheet1[count_row,11]="|"+obj.business_trans_no.to_s
+        sheet1[count_row,12]=""
+        sheet1[count_row,13]=""
+        sheet1[count_row,14]="|"+obj.order_details.first.batch_no.to_s
+        sheet1[count_row,15]=Supplier.find(obj.order_details.first.supplier_id).name
+        sheet1[count_row,16]=obj.customer_postcode
+        sheet1[count_row,17]=obj.transport_type
+        sheet1[count_row,18]="|"+obj.tracking_number.to_s
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
+    end
+
+    def getTrackingNumber(transport_type, tracking_number)
+      return_no = []
+      case transport_type
+      when "tcsd"
+        case tracking_number.size
+        when 13
+          return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
+        when 10
+          return_no << tracking_number[0,2] << tracking_number[2,8] << "31"
+        when 8
+          return_no << "PN" << tracking_number << "31"
+        end
+      when "gnxb"
+        case tracking_number.size
+        when 13
+          return_no << tracking_number[0,2] << tracking_number[2,11] << ""
+        end
+      when "ems"
+        case tracking_number.size
+        when 13
+          return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
+        when 10
+          return_no << tracking_number[0,2] << tracking_number[2,8] << "06"
+        when 8
+          return_no << "10" << tracking_number << "06"
+        end
+      end
+      return return_no  
+    end
+
+    def checkTrackingNO(num)
+      x = [8,6,4,2,3,5,9,7]
+      num_a = num.split("")
+      sum = 0
+      num_a.each_with_index do |s,i|
+        sum = sum + s.to_i* x[i]
+      end
+      r = sum % 11
+      case r
+      when 0
+        return "5"
+      when 1
+        return "0"
+      else
+        return (11 - r).to_s
+      end
+    end
+
+    def getKeycOrderID()
+      time = Time.new
+      batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+      keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "printed")
+      return keycorder.id
     end
 end

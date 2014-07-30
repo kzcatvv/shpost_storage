@@ -144,7 +144,40 @@ function add() {
   addTr(slid,index);
 }
 
+function exportorder(input)
+{
 
+  var url = "/orders/exportorders.xls";  
+
+  var postForm = document.createElement("form");//表单对象     
+  postForm.method="post" ;     
+  postForm.action = url;  
+  
+  
+  var idsInput = document.createElement("input") ;     
+  idsInput.setAttribute("name", "ids") ;     
+  idsInput.setAttribute("value", input);  
+  postForm.appendChild(idsInput);          
+  
+  document.body.appendChild(postForm) ;  
+  postForm.submit() ;     
+  document.body.removeChild(postForm) ;    
+
+
+  // $.ajax({
+  //   type: "POST",
+  //   url: "/orders/exportorders.xls",
+  //   data: "ids=" + input,
+  //   dataType: "json",
+  //   complete: function(data) {
+  //     if(data.success){
+  //       // alert(data.responseText)
+  //     } else {
+  //       alert("NG!!!")
+  //     }
+  //   }
+  // });
+}
 
 function destroy(current) {
   if(confirm("确定删除？")){
