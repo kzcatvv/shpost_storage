@@ -23,5 +23,5 @@ csb_interface:
     order_type_1: 1 #原始订单
     order_type_2: 2 #合并订单
     active_code: '0991' #口令验证码
-    query_time: '23:59:59' #查询订单截止时间
+    #query_time: '23:59:59' #查询订单截止时间(弃用)
     query_period: 1 #查询订单周期(天)

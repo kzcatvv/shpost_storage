@@ -6,29 +6,29 @@ class CSBSendWithSOAP
 
 	def self.sendPointOrder()
 		for order_type in 1..2
-			puts order_type
+			# puts order_type
 			@@call_flg = false
 			begin 
 				xml_file = setSendPointOrder(order_type)
-				puts '------------start----------------'
-				puts xml_file
-				puts '----------------------------'
+				# puts '------------start----------------'
+				# puts xml_file
+				# puts '----------------------------'
 				soap_request = setSOAPRequestXML('SendPointOrder',xml_file)
 
 				response = csb_post(StorageConfig.config["csb_interface"]["send_point_order_url"],soap_request)
 				xml_file_return = response.body.to_s
-				puts xml_file_return
-				puts "@@call_flg=" << @@call_flg.to_s
+				# puts xml_file_return
+				# puts "@@call_flg=" << @@call_flg.to_s
 				xml_file_trans_status = parseAndSaveSendPointOrder(xml_file_return,order_type)
-				puts '----------------------------'
-				puts xml_file_trans_status
+				# puts '----------------------------'
+				# puts xml_file_trans_status
 				soap_request = setSOAPRequestXML('PointUpdateTransStatus',xml_file_trans_status)
-				puts StorageConfig.config["csb_interface"]["point_update_trans_status_url"]
-				puts '----------------------------'
-				puts soap_request
+				# puts StorageConfig.config["csb_interface"]["point_update_trans_status_url"]
+				# puts '----------------------------'
+				# puts soap_request
 				response = csb_post(StorageConfig.config["csb_interface"]["point_update_trans_status_url"],soap_request)
-				puts response.body
-				puts '-----------end-----------------'
+				# puts response.body
+				# puts '-----------end-----------------'
 
 			end while !@@call_flg
 		end
@@ -36,28 +36,28 @@ class CSBSendWithSOAP
 
   def self.updatePointOrderStatus(orders)
 	  	xml_file = setUpdatePointOrderStatus(orders)
-		puts 'xml_file:[' << xml_file << ']'
+		# puts 'xml_file:[' << xml_file << ']'
 		soap_request = setSOAPRequestXML('UpdatePointOrderStatus',xml_file)
-		puts 'soap_request:[' << soap_request << ']'
+		# puts 'soap_request:[' << soap_request << ']'
 		response = csb_post(StorageConfig.config["csb_interface"]["update_point_order_status_url"],soap_request)
 
 		xml_file_return = response.body.to_s
-		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-		puts xml_file_return
-		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+		# puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+		# puts xml_file_return
+		# puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 	    parseUpdatePointOrderStatus(xml_file_return)
   end
 
 	def self.pointOrderStatus(orders)
 		xml_file = setPointOrderStatus(orders)
-		puts 'xml_file:[' << xml_file << ']'
+		# puts 'xml_file:[' << xml_file << ']'
 		soap_request = setSOAPRequestXML('PointOrderStatus',xml_file)
-		puts 'soap_request:[' << soap_request << ']'
+		# puts 'soap_request:[' << soap_request << ']'
 		response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],soap_request)
 		xml_file_return = response.body.to_s
-		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-		puts xml_file_return
-		puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+		# puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+		# puts xml_file_return
+		# puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
 		parsePointOrderStatus(xml_file_return)
   end
 
@@ -190,27 +190,27 @@ class CSBSendWithSOAP
 				courierTel = queryList.add_element('courierTel')
 				
 				abnormalReason.add_text ""
-			#	if !order.status == 'delivering'
+				if order.status == 'delivering' or order.status == 'delivered'
+				    operator.add_text "操作人"
+					operationDepartment.add_text "站点"
+					state.add_text Order::STATUS[order.status.to_sym]
+					signer.add_text ""
+					operatorTel.add_text ""
+				else
 					operator.add_text "操作人"
 					operationDepartment.add_text "仓库"
 					state.add_text Order::STATUS[order.status.to_sym]
-					signer.add_text "操作人"
-					operatorTel.add_text "12345678901"
-			#	elsif order.status == 'delivering'
-			#		operator.add_text "操作人"
-			#		operationDepartment.add_text "站点"
-			#		state.add_text "物流状态信息描述"
-			#		signer.add_text "操作人"
-			#		operatorTel.add_text "操作人联系电话"
-			#	end
+					signer.add_text ""
+					operatorTel.add_text ""	
+				end
 				operatorTime.add_text Time.now.strftime("%Y-%m-%d %H:%m:%S")
 				if order.tracking_number
 					hostNumber.add_text order.tracking_number
 				else
 					hostNumber.add_text "000000"
 				end
-				courier.add_text "courier"
-				courierTel.add_text "12345678902"
+				courier.add_text ""
+				courierTel.add_text ""
 				if detail.business_deliver_no.blank?
 					orderListId.add_text order.business_order_id
 					break
@@ -224,8 +224,8 @@ class CSBSendWithSOAP
   end
 
   def self.setSendPointOrder(order_type)
-  	current_date = DateTime.now.strftime("%Y-%m-%d")
-  	start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d")
+  	current_date = DateTime.now.strftime("%Y-%m-%d %H:%M:%S")
+  	start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d %H:%M:%S")
 	#current_date = "2014-01-20"
 	#start_date = "2014-01-19"
 	#if order_type == 1
@@ -266,8 +266,8 @@ class CSBSendWithSOAP
 		# messageCode.add_text "错误信息code"
 		# description.add_text "错误信息描述"
 		activeCode.add_text StorageConfig.config["csb_interface"]["active_code"]
-		beginDate.add_text start_date+' '+StorageConfig.config["csb_interface"]["query_time"]
-		endDate.add_text current_date+' '+StorageConfig.config["csb_interface"]["query_time"]
+		beginDate.add_text start_date
+		endDate.add_text current_date
 
 		xml_file << doc.to_s
 		# xml_file.encode(:xml => :text)
@@ -324,9 +324,9 @@ class CSBSendWithSOAP
 	xml_body = doc.root.elements['soapenv:Body'].elements['ns1:sendQueryOrderResponse'].elements['sendQueryOrderReturn'].text.to_s
 	# default encoding is utf-8 in ruby
   	doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
-	puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-	puts doc
-  	puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+	#puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+	#puts doc
+  	#puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 	root = doc.root
   	head = root.elements['Head']
   	orderTotal = head.elements['OrderTotal']
@@ -368,12 +368,12 @@ class CSBSendWithSOAP
   		custRemark = orderLabel.attributes['CustRemark']
   		
   		order_hash.store('ORDER_ID',orderId)
-		puts "ORDER_ID=" << orderId
+		#puts "ORDER_ID=" << orderId
   		order_hash.store('DATE',createDate)
   		order_hash.store('CUST_NAME',customerName)
-		puts "CUST_NAME=" << customerName
+		#puts "CUST_NAME=" << customerName
   		order_hash.store('ADDR',address)
-		puts "ADDR=" << address
+		#puts "ADDR=" << address
   		order_hash.store('MOBILE',telephone)
   		order_hash.store('ZIP',customerArea)
   		order_hash.store('DESC',custRemark)
@@ -388,14 +388,14 @@ class CSBSendWithSOAP
   			scoreValue = giftDetail.attributes['ScoreValue']
   			if order_type == StorageConfig.config["csb_interface"]["order_type_2"]
 	  			listId = giftDetail.attributes['listId']
-				puts "DELIVER_NO=" << listId
+				#puts "DELIVER_NO=" << listId
 	  			order_detail.store('DELIVER_NO', listId)
 	  		end
 
 				order_detail.store('SKU', itemId)
-				puts "SKU=" << itemId
+				#puts "SKU=" << itemId
 				order_detail.store('DESC', giftName)
-				puts "DESC=" << giftName
+				#puts "DESC=" << giftName
 				order_detail.store('QTY', changeNumber)
 				order_detail.store('PRICE', scoreValue)
 
@@ -403,7 +403,7 @@ class CSBSendWithSOAP
   		}
 
   		order_hash.store('ORDER_DETAILS', order_details)
-  		puts order_hash
+  		#puts order_hash
   		order = StandardInterface.order_enter(order_hash, Business.find(StorageConfig.config["business"]['bst_id']), Unit.find(StorageConfig.config["unit"]['zb_id']))
   		if !order.blank?
   			orderTransStatus << orderId
@@ -413,15 +413,15 @@ class CSBSendWithSOAP
 	      # return true
 	    end
   	}
-	puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
-	puts "orderTotal=" << orderTotal_s
-	puts "rowCount=" << rowCount_s
-	puts "rowsum=" << rowsum.to_s
+	# puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+	# puts "orderTotal=" << orderTotal_s
+	# puts "rowCount=" << rowCount_s
+	# puts "rowsum=" << rowsum.to_s
 	if orderTotal_s == rowCount_s && rowsum.to_s == rowCount_s
 		@@call_flg = true
 	end
-	puts "@@call_flg=" << @@call_flg.to_s
-	puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+	# puts "@@call_flg=" << @@call_flg.to_s
+	# puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
   	setPointUpdateTransStatus(orderTransStatus, order_type)
 	end
 
@@ -450,7 +450,7 @@ class CSBSendWithSOAP
 		# startRow.add_text '1'
 		# rowCount.add_text "行数统计"
 		# messageCode.add_text "错误信息code"
-		description.add_text "配送商接收到订单返回信息"
+		description.add_text "订单返回信息"
 		activeCode.add_text StorageConfig.config["csb_interface"]["active_code"]
 
 		orderDetail = scoreOrderInfo.add_element('OrderDetail')
@@ -469,9 +469,9 @@ class CSBSendWithSOAP
 		xml_body = doc.root.elements['soapenv:Body'].elements['ns1:updateQueryOrderStatusResponse'].elements['updateQueryOrderStatusReturn'].text.to_s
 		# default encoding is utf-8 in ruby
 		doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
-		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-		puts doc
-		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		# puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		# puts doc
+		# puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 		root = doc.root
 		head = root.elements['Head']
 		sender = head.elements['Sender']
@@ -483,8 +483,8 @@ class CSBSendWithSOAP
 		message = resultInfo.elements['message']
 
 		return_array = []
-		puts result.text
-		puts message.text
+		# puts result.text
+		# puts message.text
 		return_array << result.text << message.text
 		return return_array
 	end
@@ -494,9 +494,9 @@ class CSBSendWithSOAP
 		xml_body = doc.root.elements['soapenv:Body'].elements['ns1:OrderStatusResponse'].elements['OrderStatusReturn'].text.to_s
 		# default encoding is utf-8 in ruby
 		doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
-		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-		puts doc
-		puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		# puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+		# puts doc
+		# puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 		root = doc.root
 		head = root.elements['Head']
 		sender = head.elements['Sender']

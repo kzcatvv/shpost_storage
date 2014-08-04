@@ -10,7 +10,7 @@ zh-CN:
       order_status:
         interval: 1800
       send_point_order:
-        interval: 1800
+        interval: 43200
     tcsd:
       order_query:
         uri: 'http://10.126.22.202/tcbd_webs/n_tcbd_webs.asmx?wsdl'
