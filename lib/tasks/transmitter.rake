@@ -9,7 +9,8 @@ namespace :transmitter do
           begin
             TcbdSoap.order_query(@uri, @method)
           rescue Exception => e
-            Rails.errors e.message
+            puts e
+            #Rails.errors e.message
           ensure
             ActiveRecord::Base.connection_pool.release_connection
             puts "#{@title} : #{@count}"
