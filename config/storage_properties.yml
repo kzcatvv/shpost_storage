@@ -13,10 +13,10 @@ csb_interface:
     update_point_order_status_url: 'http://222.68.185.224:10088/UpdatePointOrderStatus/V1_0'
     point_update_trans_status_url: 'http://222.68.185.224:10088/PointUpdateTransStatus/V1_0'
     # for production
-    #send_point_order_url: 'http://222.68.185.224:10089/SendPointOrder/V1_0'
-    #point_order_status_url: 'http://222.68.185.224:10089/PointOrderStatus/V1_0'
-    #update_point_order_status_url: 'http://222.68.185.224:10089/UpdatePointOrderStatus/V1_0'
-    #point_update_trans_status_url: 'http://222.68.185.224:10089/PointUpdateTransStatus/V1_0'
+    #send_point_order_url: 'http://172.16.203.100:3000/SendPointOrder/V1_0'
+    #point_order_status_url: 'http://172.16.203.100:3000/PointOrderStatus/V1_0'
+    #update_point_order_status_url: 'http://172.16.203.100:3000/UpdatePointOrderStatus/V1_0'
+    #point_update_trans_status_url: 'http://172.16.203.100:3000/PointUpdateTransStatus/V1_0'
     post_name: '闸北邮政' #XX配送商
     bst_name: '积分平台' #积分平台
     max_time_valve: 10 #每次发送的最大条数

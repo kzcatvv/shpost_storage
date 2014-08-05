@@ -18,6 +18,9 @@ zh-CN:
         interval: 43200
     gnxb:
       order_query:
+        #for test
         uri: 'http://211.156.220.124:7700/ECWS/xfire/services/MailTtService?wsdl'
+        #fot production
+        #uri: 'http://172.16.203.100:3000/ECWS/xfire/services/MailTtService?wsdl'
         method: 'get_mails'
         interval: 43200
