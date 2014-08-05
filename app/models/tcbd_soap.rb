@@ -4,28 +4,29 @@ class TcbdSoap
     client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
       
     yjbh = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "tcsd"}).map!{|x| x.tracking_number}.to_json
-	puts yjbh
+    puts yjbh
     # yjbh = "['PN00058784731', 'PN00058785531']"
-
-    response = client.call(mehod.to_sym, message: { yjbh: yjbh })
-    body = response.body["#{mehod}_response".to_sym]["#{mehod}_result".to_sym].to_s
-    json = JSON.parse body
-	yjbh = ""
-	tdxq = ""
-	td_status = Order::STATUS[:packed]
-    json["yjrzcx"].each do |x|
-	  if !yjbh.blank? and yjbh != x['yjbh']
-	    updateOrder(yjbh,tdxq,td_status)
-		yjbh = x['yjbh']
-		tdxq = ""
-		td_status = ""
-	  elsif yjbh.blank?
-		yjbh = x['yjbh']
-	  end
-	  tdxq << x['czsj'] << "#" << x['bgms'] << "\n"
-	  td_status = returnStatus(x['tdxq'])
+    if !yjbh.blank?
+      response = client.call(mehod.to_sym, message: { yjbh: yjbh })
+      body = response.body["#{mehod}_response".to_sym]["#{mehod}_result".to_sym].to_s
+      json = JSON.parse body
+      yjbh = ""
+      tdxq = ""
+      td_status = Order::STATUS[:packed]
+      json["yjrzcx"].each do |x|
+        if !yjbh.blank? and yjbh != x['yjbh']
+          updateOrder(yjbh,tdxq,td_status)
+          yjbh = x['yjbh']
+          tdxq = ""
+          td_status = ""
+        elsif yjbh.blank?
+          yjbh = x['yjbh']
+        end
+        tdxq << x['czsj'] << "#" << x['bgms'] << "\n"
+        td_status = returnStatus(x['tdxq'])
+      end
+      updateOrder(yjbh,tdxq,td_status)
     end
-	updateOrder(yjbh,tdxq,td_status)
   end
 
   private
