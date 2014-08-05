@@ -72,7 +72,7 @@ namespace :transmitter do
               end
             end
           rescue Exception => e
-            # puts e.message
+            puts e.message
             plaintext["goodsInfoS"].each do |g|
                 order=Order.find_by(business_trans_no: g["transSn"]).id
                 notice=DeliverNotice.where( :order_id => order, :send_type => g["deliverState"] )
@@ -80,7 +80,7 @@ namespace :transmitter do
                 notice.send_times=notice.send_times+1
                 notice.save
               end
-            Rails.errors e.message
+            #Rails.errors e.message
           ensure
             ActiveRecord::Base.connection_pool.release_connection
             puts "#{@title} : #{@count}"
@@ -171,7 +171,7 @@ namespace :transmitter do
             notice.send_times=notice.send_times+1
             notice.save
           end
-          Rails.errors e.message
+          #Rails.errors e.message
         ensure
           ActiveRecord::Base.connection_pool.release_connection
           puts "#{@title} : #{@count}"
