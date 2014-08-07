@@ -165,6 +165,8 @@ zh-CN:
       shelves: 货架管理
       import: 信息导入
       export: 信息导出
+      relationship_import: 商品对应关系导入
+      specification_export: 商品规格导出
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
