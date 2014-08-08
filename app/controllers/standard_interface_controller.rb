@@ -50,33 +50,33 @@ class StandardInterfaceController < ApplicationController
     order_got = StandardInterface.order_query(@context_hash, @business, @unit)
 
     if !order_got.blank?
-	  deliver_details = []
-	  tracking_infos = ""
-	  if order_got.is_a? Order
-	    tracking_infos = order_got.tracking_info
-	  else
-	    tracking_infos = order_got.order.tracking_info
-	  end
-	  if !tracking_infos.blank?
-	  tracking_infos.split(/\n/).each do |info|
-		deliver_detail = {}
-		x = info.split('#')
-		if x.size == 4
-		  deliver_detail['DATE'] = x[0]
-		  deliver_detail['LOCAL'] = x[2]
-		  # deliver_detail['NAME'] = x[]
-		  deliver_detail['DESC'] = x[1]
-		elsif x.size == 2
-		  deliver_detail['DATE'] = x[0]
-		  deliver_detail['DESC'] = x[1]
-		end
-		deliver_details << deliver_detail
-	  end
-	  end
+      deliver_details = []
+      tracking_infos = ""
+      if order_got.is_a? Order
+        tracking_infos = order_got.tracking_info
+      else
+        tracking_infos = order_got.order.tracking_info
+      end
+      if !tracking_infos.blank?
+        tracking_infos.split(/\n/).each do |info|
+          deliver_detail = {}
+          x = info.split('#')
+          if x.size == 4
+            deliver_detail['DATE'] = x[0]
+            deliver_detail['LOCAL'] = x[2]
+            # deliver_detail['NAME'] = x[]
+            deliver_detail['DESC'] = x[1]
+          elsif x.size == 2
+            deliver_detail['DATE'] = x[0]
+            deliver_detail['DESC'] = x[1]
+          end
+          deliver_details << deliver_detail
+        end
+      end
       if order_got.is_a? Order
         render json: success_builder({'STATUS' => order_got.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_got.tracking_number, 'DELIVER_DETAIL' => deliver_details})
       else
-        render json: success_builder({'STATUS' => order_got.order.status, 'EXPS' => order_got.transport_type, 'EXPS_NO' => order_god.tracking_number, 'DELIVER_DETAIL' => deliver_details})
+        render json: success_builder({'STATUS' => order_got.order.status, 'EXPS' => order_got.order.transport_type, 'EXPS_NO' => order_got.order.tracking_number, 'DELIVER_DETAIL' => deliver_details})
       end
     else
       render json: error_builder('9999')
@@ -94,6 +94,93 @@ class StandardInterfaceController < ApplicationController
     else
       render json: error_builder('9999')
     end
+  end
+
+  def orders_query
+    type = nil
+    order_nos = @context_hash['ORDER_NO']
+    deliver_nos = @context_hash['DELIVER_NO']
+    order_ids = @context_hash['ORDER_ID']
+    trans_sns= @context_hash['TRANS_SN']
+    ids = []
+    order_details = []
+    if !order_nos.blank?
+      type = "ORDER_NO"
+      ids = order_nos.split(',')
+    elsif !deliver_nos.blank?
+      type = "DELIVER_NO"
+      ids = deliver_nos.split(',')
+    elsif !order_ids.blank?
+      type = "ORDER_ID"
+      ids = order_ids.split(',')
+    elsif !trans_sns.blank?
+      type = "TRANS_SN"
+      ids = trans_sns.split(',')
+    end
+
+    #orders_got = StandardInterface.orders_query(@context_hash, @business, @unit)
+    
+    ids.each do |id|
+      order_detail = {}
+      context_string = "{\"" + type + "\":\"" + id.to_s + "\"}"
+      context = ActiveSupport::JSON.decode(context_string)
+      order_got = StandardInterface.order_query(context, @business, @unit)
+
+      deliver_details = []
+      if !order_got.blank?
+        tracking_infos = ""
+        if order_got.is_a? Order
+          tracking_infos = order_got.tracking_info
+        else
+          tracking_infos = order_got.order.tracking_info
+        end
+        if !tracking_infos.blank?
+          tracking_infos.split(/\n/).each do |info|
+            deliver_detail = {}
+            x = info.split('#')
+            if x.size == 4
+              deliver_detail['DATE'] = x[0]
+              deliver_detail['LOCAL'] = x[2]
+              # deliver_detail['NAME'] = x[]
+              deliver_detail['DESC'] = x[1]
+            elsif x.size == 2
+              deliver_detail['DATE'] = x[0]
+              deliver_detail['DESC'] = x[1]
+            end
+            deliver_details << deliver_detail
+          end
+        end
+        if order_got.is_a? Order
+          order_detail['FLAG'] = "success"
+          order_detail['ORDER_ID'] = id
+          order_detail['STATUS'] = order_got.status
+          order_detail['EXPS'] = order_got.transport_type
+          order_detail['EXPS_NO'] = order_got.tracking_number
+          order_detail['DESC'] = ""
+          order_detail['DELIVER_DETAIL'] = deliver_details
+          order_details << order_detail
+        else
+          order_detail['FLAG'] = "success"
+          order_detail['ORDER_ID'] = id
+          order_detail['STATUS'] = order_got.order.status
+          order_detail['EXPS'] = order_got.order.transport_type
+          order_detail['EXPS_NO'] = order_got.order.tracking_number
+          order_detail['DESC'] = ""
+          order_detail['DELIVER_DETAIL'] = deliver_details
+          order_details << order_detail
+        end
+      else
+        order_detail['FLAG'] = "failure"
+        order_detail['ORDER_ID'] = id
+        order_detail['STATUS'] = ""
+        order_detail['EXPS'] = ""
+        order_detail['EXPS_NO'] = ""
+        order_detail['DESC'] = "订单号不存在"
+        order_detail['DELIVER_DETAIL'] = deliver_details
+        order_details << order_detail
+      end
+    end
+    render json: {'ORDER_DETAIL' => order_details}
   end
 
   private

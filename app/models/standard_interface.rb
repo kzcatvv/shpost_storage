@@ -111,15 +111,37 @@ class StandardInterface
     end
     if !order_no.blank?
       order = Order.find_by_no order_no
-	end
-	if !order_id.blank?
+    end
+    if !order_id.blank?
       order = Order.find_by_business_order_id order_id
-	end
-	if !trans_sn.blank?
+    end
+    if !trans_sn.blank?
       order = Order.find_by_business_trans_no trans_sn
-	end
+    end
     return order
   end
+
+  # def self.orders_query(context, business, unit)
+  #   order_no = context['ORDER_NO']
+  #   deliver_no = context['DELIVER_NO']
+  #   order_id = context['ORDER_ID']
+  #   trans_sn = context['TRANS_SN']
+
+  #   orders = nil
+  #   if !deliver_no.blank?
+  #     orders = OrderDetail.where business_deliver_no: deliver_no.split(',')
+  #   end
+  #   if !order_no.blank?
+  #     orders = Order.where no: order_no.split(',')
+  #   end
+  #   if !order_id.blank?
+  #     orders = Order.where business_order_id: order_id.split(',')
+  #   end
+  #   if !trans_sn.blank?
+  #     orders = Order.where business_trans_no: trans_sn.split(',')
+  #   end
+  #   return orders
+  # end
 
   def self.stock_query(context, business, unit)
     query_array = context['QUERY_ARRAY']
