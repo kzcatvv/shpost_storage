@@ -33,9 +33,6 @@
 
     g.column name: model_class.human_attribute_name(:transport_price), attribute: 'transport_price',detach_with_id: :transport_price_filter
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status', detach_with_id: :status_filter,custom_filter: Order::STATUS.invert do |order| 
-      order.status_name
-    end
 
    g.column name: model_class.human_attribute_name(:status), attribute: 'status', detach_with_id: :status_show_filter,custom_filter: Order::STATUS_SHOW.invert do |order| 
       order.status_name
