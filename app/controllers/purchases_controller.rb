@@ -144,7 +144,7 @@ class PurchasesController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
-            @purchase = nil
+            purchase = nil
             2.upto(instance.last_row) do |line|
                #binding.pry
 
