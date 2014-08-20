@@ -78,11 +78,13 @@ class Ability
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
     else
-        can :update, User, id: user.id
-        can :manage, Area
-        can :manage, Shelf
+        can :manage, :all
+        #can :update, User, id: user.id
+        cannot :read, User
+        cannot :read, Area
+        cannot :read, Commodity
+        cannot :read, Business
         
-        can :read, :all
         can :change, Storage do |s|
             user.storages.include? s
         end
