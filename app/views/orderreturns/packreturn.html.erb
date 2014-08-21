@@ -12,6 +12,9 @@
    <%= text_field_tag("reasondtl") %>
    <input type="button" id="setreason" value="设置">
 </div>
+<div>
+  <%=link_to t('退件信息导出'), "/orderreturns/exportorderreturns.xls", target: '_blank',:class => 'btn btn-primary' %>
+</div>
 <%= form_tag("/orderreturns/doreturn/", :method => "get") do %>
 <div style="float:right">
     <%= submit_tag("退件入库", :class=>"btn btn-primary") %>  

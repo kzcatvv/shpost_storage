@@ -7,6 +7,8 @@ ShpostStorage::Application.routes.draw do
       get 'doreturn'
       get 'findtrackingnumber'
       get 'returncheck'
+      post 'exportorderreturns' => 'orderreturns#exportorderreturns'
+      get 'exportorderreturns'
     end
   end
 

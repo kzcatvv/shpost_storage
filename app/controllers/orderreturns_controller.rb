@@ -90,6 +90,7 @@ class OrderreturnsController < ApplicationController
           @orderreturn=Orderreturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,batch_id:@batchid,status:"waiting")
         end
         stock=Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
+        stock.update(virtual_amount: @orderdtl.amount+stock.virtual_amount)
         stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
         @orderdtl.stock_logs << stklog
         sl=StockLog.where(id: stklog)
@@ -118,6 +119,22 @@ class OrderreturnsController < ApplicationController
 
   end
 
+  def exportorderreturns()
+    @orderreturns = Orderreturn.all
+    if @orderreturns.nil?
+       flash[:alert] = "无退件信息"
+       redirect_to :action => 'packreturn'
+    else
+      respond_to do |format|
+        format.xls {   
+          send_data(exportorderreturns_xls_content_for(@orderreturns),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "OrderReturns_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_orderreturn
@@ -127,5 +144,30 @@ class OrderreturnsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def orderreturn_params
       params.require(:orderreturn).permit(:order_detail_id, :return_reason, :is_bad)
+    end
+
+    def exportorderreturns_xls_content_for(objs)  
+      xls_report = StringIO.new
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "OrderReturns"  
+
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+
+      sheet1.row(0).concat %w{退件ID 退件时间 退件理由 是否破损 退件面单号 批次号 状态}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.id
+        sheet1[count_row,1]=obj.created_at
+        sheet1[count_row,2]=obj.return_reason
+        sheet1[count_row,3]=obj.is_bad
+        sheet1[count_row,4]=obj.order_detail.order.tracking_number
+        sheet1[count_row,5]=obj.batch_id
+        sheet1[count_row,6]=obj.status
+        count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
     end
 end
