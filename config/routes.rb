@@ -119,6 +119,10 @@ ShpostStorage::Application.routes.draw do
 
   resources :suppliers do
     resources :contacts
+    collection do 
+      get 'supplier_import'
+      post 'supplier_import' => 'suppliers#supplier_import'
+    end
   end
 
   resources :user_logs, only: [:index, :show]

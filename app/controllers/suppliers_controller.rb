@@ -64,6 +64,50 @@ class SuppliersController < ApplicationController
     end
   end
 
+  def supplier_import
+    unless request.get?
+      if file = upload_supplier(params[:file]['file'])       
+        Supplier.transaction do
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            2.upto(instance.last_row) do |line|
+              supplier_no = instance.cell(line,'A').to_s.split('.0')[0]
+              supplier_name = instance.cell(line,'B').to_s
+              supplier_addr = instance.cell(line,'C').to_s
+              supplier_tel = instance.cell(line,'D').to_s.split('.0')[0]
+
+              supplier = Supplier.create(no: supplier_no, name: supplier_name, address: supplier_addr, phone: supplier_tel, unit_id: current_storage.unit_id)
+
+              contact_i = 1
+              while !instance.cell(line, contact_i*4 + 1).to_s.blank? do
+                contact_name = instance.cell(line, contact_i*4 + 1).to_s
+                contact_email = instance.cell(line, contact_i*4 + 2).to_s
+                contact_phone = instance.cell(line, contact_i*4 + 3).to_s.split('.0')[0]
+                contact_desc = instance.cell(line, contact_i*4 + 4).to_s
+
+                contact = Contact.create(name: contact_name, email: contact_email, phone: contact_phone, desc: contact_desc, supplier_id: supplier.id)
+                contact_i = contact_i + 1
+              end
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = e.message
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_supplier
@@ -73,5 +117,18 @@ class SuppliersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def supplier_params
       params[:supplier].permit!
+    end
+
+    def upload_supplier(file)
+      if !file.original_filename.empty?
+        direct = "#{Rails.root}/upload/supplier/"
+        filename = "#{Time.now.to_f}_#{file.original_filename}"
+
+        file_path = direct + filename
+        File.open(file_path, "wb") do |f|
+           f.write(file.read)
+        end
+        file_path
+      end
     end
 end
