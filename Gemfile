@@ -57,8 +57,6 @@ gem 'pry', :group => :development
 
 gem 'spreadsheet'
 
-gem 'roo'
-
 gem 'yomu'
 
 group :test, :development do
@@ -103,3 +101,6 @@ gem 'jquery_datepicker'
 # gem 'ruby-oci8'
 
 # gem "activerecord-oracle_enhanced-adapter"
+
+# gem 'resque-scheduler'
+gem 'whenever'
