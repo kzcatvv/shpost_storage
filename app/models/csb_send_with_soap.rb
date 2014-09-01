@@ -4,6 +4,24 @@ class CSBSendWithSOAP
   @@call_flg = false
   # @@startrow = 1
 
+  def self.redealWithSavedOrders()
+    direct = "#{Rails.root}/upload/orders/"
+    Dir.entries(direct).each { |file_name|
+      file_path = direct + file_name
+      if File.file?(file_path)
+        ary = FileInterface.read_order_file(file_path)
+        context = JSON.parse(ary[0].split(/\n/)[0])
+        business = Business.find ary[1].split(/\n/)[0]
+        unit = Unit.find ary[2].split(/\n/)[0]
+        order = StandardInterface.order_enter(context,business,unit)
+        # if order.class is Order, means this order was saved into Order table. otherwise was saved into file
+        if order.class == Order
+          File.delete(file_path)
+        end
+      end
+    }
+  end
+
   def self.sendPointOrder()
     # @count += 1
     begin
@@ -49,26 +67,25 @@ class CSBSendWithSOAP
     # @count += 1
     orders = BcmInterface.csb_notice_array_all()
     begin
-      if orders.size == 0
-        next
-      end
-      return_array = CSBSendWithSOAP.updatePointOrderStatus(orders)
-      # puts return_array
-      if return_array[0]=="0"
-        # puts 0
-        orders.each do |order|
-          notice = DeliverNotice.where(order_id: order.id).last
-          notice.status="success"
-          notice.send_times=notice.send_times+1
-          notice.save
-        end
-      else
-        # puts 1
-        orders.each do |order|
-          notice = DeliverNotice.where(order_id: order.id).last
-          notice.status=return_array[0]+':'+return_array[1]
-          notice.send_times=notice.send_times+1
-          notice.save
+      if orders.size > 0
+        return_array = CSBSendWithSOAP.updatePointOrderStatus(orders)
+        # puts return_array
+        if return_array[0]=="0"
+          # puts 0
+          orders.each do |order|
+            notice = DeliverNotice.where(order_id: order.id).last
+            notice.status="success"
+            notice.send_times=notice.send_times+1
+            notice.save
+          end
+        else
+          # puts 1
+          orders.each do |order|
+            notice = DeliverNotice.where(order_id: order.id).last
+            notice.status=return_array[0]+':'+return_array[1]
+            notice.send_times=notice.send_times+1
+            notice.save
+          end
         end
       end
     rescue Exception => e
@@ -388,16 +405,16 @@ class CSBSendWithSOAP
     requestTime.add_text(Time.now.strftime("%Y-%m-%d %H:%m:%S"))
 
     body = envelope.add_element('SOAP-ENV:Body')
-  soap_action = nil
-  if service_name == "SendPointOrder"
-    soap_action = body.add_element('m:sendQueryOrder')
-  elsif service_name == "PointUpdateTransStatus"
-    soap_action = body.add_element('m:updateTransportStatus')
-  elsif service_name == "UpdatePointOrderStatus"
-    soap_action = body.add_element('m:updateQueryOrderStatus')
-  elsif service_name == "PointOrderStatus"
-    soap_action = body.add_element('m:OrderStatus')
-  end
+    soap_action = nil
+    if service_name == "SendPointOrder"
+      soap_action = body.add_element('m:sendQueryOrder')
+    elsif service_name == "PointUpdateTransStatus"
+      soap_action = body.add_element('m:updateTransportStatus')
+    elsif service_name == "UpdatePointOrderStatus"
+      soap_action = body.add_element('m:updateQueryOrderStatus')
+    elsif service_name == "PointOrderStatus"
+      soap_action = body.add_element('m:OrderStatus')
+    end
     soap_action.add_attribute('xmlns:m', "http://localhost:8080/services/0rderWS")
     soap_action.add_attribute('SOAP-ENV:encodingStyle', "http://schemas.xmlsoap.org/soap/encoding/")
     soap_params = soap_action.add_element('xmlFile')
@@ -408,29 +425,29 @@ class CSBSendWithSOAP
 
   def self.parseAndSaveSendPointOrder(xml_file,order_type)
     orderTransStatus = Array.new
-  doc = REXML::Document.new(xml_file)
-  xml_body = doc.root.elements['soapenv:Body'].elements['ns1:sendQueryOrderResponse'].elements['sendQueryOrderReturn'].text.to_s
-  # default encoding is utf-8 in ruby
+    doc = REXML::Document.new(xml_file)
+    xml_body = doc.root.elements['soapenv:Body'].elements['ns1:sendQueryOrderResponse'].elements['sendQueryOrderReturn'].text.to_s
+    # default encoding is utf-8 in ruby
     doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
-  #puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-  #puts doc
     #puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-  root = doc.root
+    #puts doc
+    #puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    root = doc.root
     head = root.elements['Head']
     orderTotal = head.elements['OrderTotal']
     startRow = head.elements['startRow']
     rowCount = head.elements['rowCount']
-  orderTotal_s = orderTotal.text
-  rowCount_s = rowCount.text
-  rowsum = 0
+    orderTotal_s = orderTotal.text
+    rowCount_s = rowCount.text
+    rowsum = 0
     # queryCondition = root.elements['QueryCondition']
     # beginDate = queryCondition.elements['BeginDate']
   
-  messageCode = head.elements['MessageCode'].text
+    messageCode = head.elements['MessageCode'].text
     description = head.elements['Description'].text
-  if messageCode != '0'
-    return description
-  end
+    if messageCode != '0'
+      return description
+    end
 
     orderDetail = root.elements['OrderDetail']
     orders = nil
@@ -456,12 +473,12 @@ class CSBSendWithSOAP
       custRemark = orderLabel.attributes['CustRemark']
       
       order_hash.store('ORDER_ID',orderId)
-    #puts "ORDER_ID=" << orderId
+      #puts "ORDER_ID=" << orderId
       order_hash.store('DATE',createDate)
       order_hash.store('CUST_NAME',customerName)
-    #puts "CUST_NAME=" << customerName
+      #puts "CUST_NAME=" << customerName
       order_hash.store('ADDR',address)
-    #puts "ADDR=" << address
+      #puts "ADDR=" << address
       order_hash.store('MOBILE',telephone)
       order_hash.store('ZIP',customerArea)
       order_hash.store('DESC',custRemark)
@@ -501,15 +518,15 @@ class CSBSendWithSOAP
         # return true
       end
     }
-  # puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
-  # puts "orderTotal=" << orderTotal_s
-  # puts "rowCount=" << rowCount_s
-  # puts "rowsum=" << rowsum.to_s
-  if orderTotal_s == rowCount_s && rowsum.to_s == rowCount_s
-    @@call_flg = true
-  end
-  # puts "@@call_flg=" << @@call_flg.to_s
-  # puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+    # puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+    # puts "orderTotal=" << orderTotal_s
+    # puts "rowCount=" << rowCount_s
+    # puts "rowsum=" << rowsum.to_s
+    if orderTotal_s == rowCount_s && rowsum.to_s == rowCount_s
+      @@call_flg = true
+    end
+    # puts "@@call_flg=" << @@call_flg.to_s
+    # puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
     setPointUpdateTransStatus(orderTransStatus, order_type)
   end
 
@@ -643,5 +660,14 @@ class CSBSendWithSOAP
     env_namespace: 'SOAP-ENV'.to_sym,
     namespace_identifier: :m,
     namespaces: {'xmlns:m0'=>'http://www.shtel.com.cn/csb/v2/'})
+  end
+
+  def self.read_order_file(file_path)
+    file = File.open(file_path,"r")
+    ary = file.readlines
+  end
+
+  def self.delete_file(file_path)
+    File.delete(file_path)
   end
 end

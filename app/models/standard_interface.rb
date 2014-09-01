@@ -27,6 +27,7 @@ class StandardInterface
   end
 
   def self.order_enter(context, business, unit)
+    Order.transaction do
     order_id = context['ORDER_ID']
     trans_sn = context['TRANS_SN']
     date = context['DATE']
@@ -91,11 +92,15 @@ class StandardInterface
 
       relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
     
-      next if relationship.nil?
+      if relationship.nil?
+        order = FileInterface.save_order(context, business.id, unit.id)
+        raise ActiveRecord::Rollback
+        break
+      end
 
       OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc
     end 
-
+    end
     return order 
   end
 
@@ -195,4 +200,5 @@ class StandardInterface
       end
     end
   end
+
 end
