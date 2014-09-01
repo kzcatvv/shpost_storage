@@ -4,8 +4,8 @@ namespace :transmitter do
     desc "BankComm Transmitter"
       task :order_query => :environment do
         generate_params 'transmitter.tcsd.order_query'
-        while 1==1 do
-          @count += 1
+        # while 1==1 do
+          # @count += 1
           begin
             TcbdSoap.order_query(@uri, @method)
           rescue Exception => e
@@ -15,7 +15,7 @@ namespace :transmitter do
             ActiveRecord::Base.connection_pool.release_connection
             puts "#{@title} : #{@count}"
           end
-          sleep @interval
+          # sleep @interval
         end
       end
   end
@@ -24,8 +24,8 @@ namespace :transmitter do
     desc "BankComm Transmitter"
       task :order_query => :environment do
         generate_params 'transmitter.gnxb.order_query'
-        while 1==1 do
-          @count += 1
+        # while 1==1 do
+          # @count += 1
           begin
             GnxbSoap.order_query(@uri, @method)
           rescue Exception => e
@@ -35,7 +35,7 @@ namespace :transmitter do
             ActiveRecord::Base.connection_pool.release_connection
             puts "#{@title} : #{@count}"
           end
-          sleep @interval
+          # sleep @interval
         end
       end
   end
@@ -183,6 +183,11 @@ namespace :transmitter do
       #   end
       #   sleep @interval
       # end
+    end
+
+  desc "CSB Transmitter test"
+    task :test => :environment do
+      puts "test====="
     end
 
     desc "CSB Transmitter get_point_order"

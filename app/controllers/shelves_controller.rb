@@ -1,4 +1,4 @@
-  class ShelvesController < ApplicationController
+class ShelvesController < ApplicationController
   # before_action :set_shelf, only: [:show, :edit, :update, :destroy]
   before_filter :find_current_storage
   load_and_authorize_resource :shelf

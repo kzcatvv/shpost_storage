@@ -47,23 +47,6 @@ class BcmInterface
 		return array
 	end
 	
-	def self.csb_notice_array_all()
-		orders_return = []
-		status_keys = @@status_hash.keys
-		#puts status_keys
-		status_keys.each do |key|
-		#	puts "*************"
-		#	puts key
-			orders = BcmInterface.notice_array(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],key)
-		#	puts orders.size
-			orders.each do |order|
-				orders_return << order
-			end
-		end
-		#puts orders_return.size
-		orders_return
-	end
-	
 	def self.notice_array_over(business,unit,status)
 		array=[]
 		dn1=Order.where( business_id: business, unit_id: unit, status: status ).includes(:deliver_notices).where(["deliver_notices.send_type=? and deliver_notices.status!=?",@@status_hash[status],"over"])
@@ -88,20 +71,4 @@ class BcmInterface
 		return array
 	end
 	
-	def self.csb_notice_array()
-		orders_return = []
-		status_keys = ["delivered","declined","returned"]
-		#puts status_keys
-		status_keys.each do |key|
-		#	puts "*************"
-		#	puts key
-			orders = BcmInterface.notice_array_over(StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'],key)
-		#	puts orders.size
-			orders.each do |order|
-				orders_return << order
-			end
-		end
-		#puts orders_return.size
-		orders_return
-	end
 end
