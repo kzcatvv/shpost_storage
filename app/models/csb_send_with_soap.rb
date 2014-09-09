@@ -68,7 +68,7 @@ class CSBSendWithSOAP
     orders = BcmInterface.csb_notice_array_all()
     begin
       if orders.size > 0
-        return_array = CSBSendWithSOAP.updatePointOrderStatus(orders)
+        return_array = CSBSendWithSOAP.callUpdatePointOrderStatus(orders)
         # puts return_array
         if return_array[0]=="0"
           # puts 0
@@ -103,7 +103,7 @@ class CSBSendWithSOAP
     end
   end
 
-  def self.updatePointOrderStatus(orders)
+  def self.callUpdatePointOrderStatus(orders)
     xml_file = setUpdatePointOrderStatus(orders)
     # puts 'xml_file:[' << xml_file << ']'
     soap_request = setSOAPRequestXML('UpdatePointOrderStatus',xml_file)
@@ -121,7 +121,7 @@ class CSBSendWithSOAP
     # @count += 1
     orders = BcmInterface.csb_notice_array()
     begin
-      return_array = CSBSendWithSOAP.pointOrderStatus(orders)
+      return_array = CSBSendWithSOAP.callPointOrderStatus(orders)
       if return_array[0]=="0"
         orders.each do |order|
           # todo: order:deliver_notice=1:N
@@ -153,7 +153,7 @@ class CSBSendWithSOAP
     end
   end
 
-  def self.pointOrderStatus(orders)
+  def self.callPointOrderStatus(orders)
     xml_file = setPointOrderStatus(orders)
     # puts 'xml_file:[' << xml_file << ']'
     soap_request = setSOAPRequestXML('PointOrderStatus',xml_file)
@@ -333,13 +333,13 @@ class CSBSendWithSOAP
     start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d %H:%M:%S")
   #current_date = "2014-01-20"
   #start_date = "2014-01-19"
-  #if order_type == 1
-  #  current_date = "2014-01-20"
-  #  start_date = "2014-01-19"
-  #else
-  #  current_date = "2014-02-17"
-  #  start_date = "2014-02-16"
-  #end
+  # if order_type == 1
+  #   current_date = "2014-08-02 00:00:00"
+  #   start_date = "2014-08-01 00:00:00"
+  # else
+  #   current_date = "2014-08-02 00:00:00"
+  #   start_date = "2014-08-01 00:00:00"
+  # end
 
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
     doc = REXML::Document.new       #创建XML内容 
@@ -473,10 +473,10 @@ class CSBSendWithSOAP
       custRemark = orderLabel.attributes['CustRemark']
       
       order_hash.store('ORDER_ID',orderId)
-      #puts "ORDER_ID=" << orderId
+      # puts "ORDER_ID=" << orderId
       order_hash.store('DATE',createDate)
       order_hash.store('CUST_NAME',customerName)
-      #puts "CUST_NAME=" << customerName
+      # puts "CUST_NAME=" << customerName
       order_hash.store('ADDR',address)
       #puts "ADDR=" << address
       order_hash.store('MOBILE',telephone)
@@ -498,7 +498,7 @@ class CSBSendWithSOAP
         end
 
         order_detail.store('SKU', itemId)
-        #puts "SKU=" << itemId
+        # puts "SKU=" << itemId
         order_detail.store('DESC', giftName)
         #puts "DESC=" << giftName
         order_detail.store('QTY', changeNumber)
@@ -508,8 +508,8 @@ class CSBSendWithSOAP
       }
 
       order_hash.store('ORDER_DETAILS', order_details)
-      #puts order_hash
-      order = StandardInterface.order_enter(order_hash, Business.find(StorageConfig.config["business"]['bst_id']), Unit.find(StorageConfig.config["unit"]['zb_id']))
+      # puts order_hash
+      order = StandardInterface.order_enter(order_hash, Business.find_by(no: StorageConfig.config["business"]['bst_id']), Unit.find_by(no: StorageConfig.config["unit"]['zb_id']))
       if !order.blank?
         orderTransStatus << orderId
           rowsum += 1

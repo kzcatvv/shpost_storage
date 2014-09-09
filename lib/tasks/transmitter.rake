@@ -16,7 +16,7 @@ namespace :transmitter do
             puts "#{@title} : #{@count}"
           end
           # sleep @interval
-        # end
+        #end
       end
   end
 
@@ -36,7 +36,7 @@ namespace :transmitter do
             puts "#{@title} : #{@count}"
           end
           # sleep @interval
-        # end
+        #end
       end
   end
 
@@ -211,6 +211,12 @@ namespace :transmitter do
       #   sleep @interval
       # end
     end
+
+    desc "Transmitter redeal with orders"
+    task :redeal_with_orders => :environment do
+      CSBSendWithSOAP.redealWithSavedOrders()
+    end
+
   end
 
   private

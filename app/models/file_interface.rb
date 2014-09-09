@@ -6,6 +6,8 @@ class FileInterface
       file_content = order_context.to_json << "\n" << business_id.to_s << "\n" << unit_id.to_s
       write_file(direct + file_name,file_content)
       return file_name
+    else
+      return order_context['ORDER_ID']
     end
   end
 

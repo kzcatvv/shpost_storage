@@ -27,6 +27,7 @@ class StandardInterface
   end
 
   def self.order_enter(context, business, unit)
+    order = nil
     Order.transaction do
     order_id = context['ORDER_ID']
     trans_sn = context['TRANS_SN']
