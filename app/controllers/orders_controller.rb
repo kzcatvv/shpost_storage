@@ -90,7 +90,7 @@ class OrdersController < ApplicationController
    if @orders.empty?
 
     @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
-    find_has_stock(@orders)
+    find_has_stock(@orders, true)
     
    else
     @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_id').first
@@ -100,13 +100,13 @@ class OrdersController < ApplicationController
 
   end
 
-  def find_has_stock(orders)
+  def find_has_stock(orders,createKeyCilentOrderFlg)
     allcnt = {}
     findorders = []
     ordercnt = 0
     orders.each do |o|
      hasstockchk = true
-     if ordercnt < 25
+     #if ordercnt < 25
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
         allamount = Stock.total_stock_in_storage(d.specification, d.supplier, o.business, current_storage)
@@ -139,9 +139,10 @@ class OrdersController < ApplicationController
           allcnt[product][1]=allcnt[product][1]-dtl.amount
         end
       end
-     end
+     #end
     end
     
+    if createKeyCilentOrderFlg
     if ordercnt > 0
       time = Time.new
       batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
@@ -154,6 +155,7 @@ class OrdersController < ApplicationController
           Keyclientorderdetail.create(keyclientorder: @keycorder,business_id: k[0],specification_id: k[1],supplier_id: k[2],amount: v[1])
          end
       end
+    end
     end
 
     orders=Order.where(id: findorders)
@@ -523,7 +525,7 @@ class OrdersController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
           #  keyclientorder=Keyclientorder.create! keyclient_name: "平安线上 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_storage.id
-            keyclientorder = nil
+            # keyclientorder = nil
             2.upto(instance.last_row) do |line|
               city=nil
               if instance.cell(line,'G').include?("市")
@@ -531,15 +533,16 @@ class OrdersController < ApplicationController
               else
                 city=instance.cell(line,'G').split("县")[0]+"县"
               end
-              relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('|')[1],nil,nil, current_user.unit.id)
+              relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('|')[1],nil,nil,nil, current_user.unit.id)
 			   #     relationship1 = Relationship.find_relationships(instance.cell(line,'B').to_s.split('|')[1],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
 
               transport_type = findTransportType(relationship.specification)
 
-              if keyclientorder.nil?
-                keyclientorder=Keyclientorder.create! keyclient_name: "批量导入 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_storage.id
-              end
-              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('|')[1],business_trans_no: instance.cell(line,'K').to_s.split('|')[1], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I').to_s.split('|')[1], keyclientorder: keyclientorder, transport_type: transport_type
+              # if keyclientorder.nil?
+              #   keyclientorder=Keyclientorder.create! keyclient_name: "批量导入 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_storage.id
+              # end
+              # order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('|')[1],business_trans_no: instance.cell(line,'K').to_s.split('|')[1], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I').to_s.split('|')[1], keyclientorder: keyclientorder, transport_type: transport_type
+              order = Order.create! business_order_id: instance.cell(line,'J').to_s.split('|')[1],business_trans_no: instance.cell(line,'K').to_s.split('|')[1], order_type: 'b2c', customer_name: instance.cell(line,'F'), customer_phone: instance.cell(line,'H').to_s.split('.0')[0], city: city, customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'P').to_s.split('.0')[0], total_amount: instance.cell(line,'D'), business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', pingan_ordertime: instance.cell(line,'A'), pingan_operate: instance.cell(line,'E'), customer_idnumber: instance.cell(line,'I').to_s.split('|')[1], transport_type: transport_type
 
               OrderDetail.create! name: instance.cell(line,'C'),batch_no: instance.cell(line,'N').to_s.split('|')[1], specification: relationship.specification, amount: instance.cell(line,'D'), supplier: relationship.supplier, order: order
             end
@@ -660,7 +663,7 @@ class OrdersController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
-            koid = ""
+            #koid = ""
             2.upto(instance.last_row) do |line|
               order = Order.find(instance.cell(line,'A').to_s.split('.0')[0])
               tracking_number = instance.cell(line,'S').to_s.split('|')[1]
@@ -676,14 +679,14 @@ class OrdersController < ApplicationController
               order.transport_type=transport_type
               order.status='printed'
               order.user_id=current_user.id
-              if order.keyclientorder_id.blank?
+              # if order.keyclientorder_id.blank?
                 if koid.blank?
                   koid = getKeycOrderID()
                 end
                 order.keyclientorder_id=koid
-              else
-                koid = order.keyclientorder_id
-              end
+              # else
+                # koid = order.keyclientorder_id
+              # end
               order.save
             end
             flash[:alert] = "导入成功"
@@ -697,16 +700,19 @@ class OrdersController < ApplicationController
   end
 
   def exportorders()
-    puts params[:ids]
-    x = params[:ids].split(",")
-    @orders = Order.find(x)
+    # puts params[:ids]
+    # x = params[:ids].split(",")
+    # @orders = Order.find(x)
+
+    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
+    
     if @orders.nil?
        flash[:alert] = "无订单"
        redirect_to :action => 'findprintindex'
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(@orders),  
+          send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
                 :type => "text/excel;charset=utf-8; header=present",  
                 :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
         }  
