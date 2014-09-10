@@ -13,7 +13,7 @@ namespace :transmitter do
             #Rails.errors e.message
           ensure
             ActiveRecord::Base.connection_pool.release_connection
-            puts "#{@title} : #{@count}"
+            # puts "#{@title} : #{@count}"
           end
           # sleep @interval
         #end
@@ -33,7 +33,7 @@ namespace :transmitter do
             #Rails.errors e.message
           ensure
             ActiveRecord::Base.connection_pool.release_connection
-            puts "#{@title} : #{@count}"
+            # puts "#{@title} : #{@count}"
           end
           # sleep @interval
         #end
@@ -185,7 +185,7 @@ namespace :transmitter do
       # end
     end
 
-  desc "CSB Transmitter test"
+    desc "CSB Transmitter test"
     task :test => :environment do
       puts "test====="
     end
