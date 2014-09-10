@@ -9,7 +9,7 @@
 env :PATH, ENV['PATH']
 env :GEM_PATH, ENV['GEM_PATH']
 
-set :output, "./log/cron_log.log"
+set :output, "log/cron_log.log"
 
 
 #
@@ -23,7 +23,7 @@ set :output, "./log/cron_log.log"
 #   runner "AnotherModel.prune_old_records"
 # end
 
-every :day, :at => '00:10am' do
+every :day, :at => '11:07am' do
 # every '* * * * *' do
   rake "transmitter:csb:get_point_order"
 end
@@ -40,7 +40,7 @@ every 1.hours do
   rake "transmitter:gnxb:order_query"
 end
 
-every 1.hours do
+every 1.minutes do
   rake "transmitter:tcbd:order_query"
 end
 # Learn more: http://github.com/javan/whenever
