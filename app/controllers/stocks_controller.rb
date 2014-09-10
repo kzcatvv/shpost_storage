@@ -78,7 +78,8 @@ class StocksController < ApplicationController
   end
 
   def getstock
-   if !params[:ex_code].empty?
+    @stocks=[]
+    if !params[:ex_code].empty?
       @relationship=Relationship.where("external_code=?",params[:ex_code]).first
       if @relationship.nil?
         @stocks=[]
@@ -86,14 +87,17 @@ class StocksController < ApplicationController
         @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
       end
 
-   elsif !params[:sixnine_code].empty?
-    @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).first
-    if @specification.nil?
-        @stocks=[]
+    elsif !params[:sixnine_code].empty?
+      @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).first
+      if @specification.nil?
+          @stocks=[]
+      else
+          @stocks=Stock.where(specification_id: @specification)
+      end
     else
-        @stocks=Stock.where(specification_id: @specification)
+      flash[:alert] = "输入69码或商品编码"
+      redirect_to :action => 'findstock'
     end
-   end
     @allcnt={}
     @stocks.each do |s|
         product = [s.business_id,s.specification_id,s.supplier_id]
