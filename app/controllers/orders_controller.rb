@@ -663,7 +663,7 @@ class OrdersController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
-            #koid = ""
+            koid = ""
             2.upto(instance.last_row) do |line|
               order = Order.find(instance.cell(line,'A').to_s.split('.0')[0])
               tracking_number = instance.cell(line,'S').to_s.split('|')[1]
