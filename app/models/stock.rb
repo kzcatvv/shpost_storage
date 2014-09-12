@@ -85,6 +85,16 @@ class Stock < ActiveRecord::Base
     true
   end
 
+  def get_available_amount()
+    return_amount = 0
+    if self.actual_amount <= self.virtual_amount
+      return_amount = self.actual_amount
+    else
+      return_amount = self.virtual_amount
+    end
+    return_amount
+  end
+
   protected
   def self.sum_virtual_amount
     sum(:virtual_amount)

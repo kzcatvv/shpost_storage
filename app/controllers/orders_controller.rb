@@ -173,7 +173,7 @@ class OrdersController < ApplicationController
 
    if !params[:keyclientorder_id].nil?
        sklogs=[]
-       chkout=0
+       # chkout=0
        has_out=0
        @keycorder=params[:keyclientorder_id]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
@@ -284,69 +284,131 @@ class OrdersController < ApplicationController
         sklogs=StockLog.where(id: keyorder.stock_logs)
 
    else
+    allcnt = {}
     sklogs=[]
     chkout=0
     @keycorder=params[:format]
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    puts @keycorder
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     @keyclientorder=Keyclientorder.find(params[:format])
     @orders=@keyclientorder.orders
     @orders.each do |order|
 
-     if check_out_stocks(order)
-      order.order_details.each do |orderdtl|
-          if orderdtl.amount > 0
-            outstocks = Stock.find_stocks_in_storage(orderdtl.specification, orderdtl.supplier, order.business, current_storage).to_ary
-            outbl = false
-            amount = orderdtl.amount
-
-              if orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
-                amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
-                 outstocks.each do |outstock|
-                   if outstock.virtual_amount > 0
-                    if !outbl
-                      if outstock.virtual_amount - amount >= 0
-                       setamount = outstock.virtual_amount - amount
-                       outbl = true
-                       outstock.update_attribute(:virtual_amount , setamount)
-                       outstock.save
-                       #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
-                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                       orderdtl.stock_logs << stklog
-                      else 
-                       amount = amount - outstock.virtual_amount
-                       outbl = false
-                       #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
-                       stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
-                       orderdtl.stock_logs << stklog
-                       outstock.update_attribute(:virtual_amount , 0)
-                       outstock.save
-                      end
-                    end
-                   end
-                 end
-              end
-
+      if check_out_stocks(order)
+        order.order_details.each do |orderdtl|
+          product = [order.business,orderdtl.specification,orderdtl.supplier]
+          if allcnt.has_key?(product)
+              allcnt[product][0]=allcnt[product][0]+orderdtl.amount
+              allcnt[product][1]<<orderdtl
+          else
+              allcnt[product]=[orderdtl.amount, [orderdtl]]
           end
-          sklogs += orderdtl.stock_logs
-      end
+        end
         order.update_attribute(:is_shortage,"no")
-     else
-       chkout += 1
-       order.update_attribute(:is_shortage,"yes")
-     end
+        order.set_picking
+      else
+        order.update_attribute(:is_shortage,"yes")
+      end
     end
+    # puts allcnt
 
-   end
-    #@orders.update_all(status: "unchecked",user_id: nil)
+    allcnt.each do |x|
+      product = x[0]
+      amount = x[1][0]
+      orderdetails = x[1][1]
+      # puts "-------product info--------"
+      # puts product
+      # puts "-------amount info--------"
+      # puts amount
+      if orderdetails.first.stock_logs.blank?
+        outstocks = Stock.find_stocks_in_storage(product[1], product[2], product[0], current_storage).to_ary
+        # puts "-------outstocks size--------"
+        # puts outstocks.size
+        outstocks.each do |outstock|
+          # puts "-------------outstock----------------"
+          # puts "-----------outstock info-------------"
+          # puts outstock.id
+          available_amount = outstock.get_available_amount
+          # puts "----------available amount-----------"
+          # puts available_amount
+          if available_amount == 0
+            next
+          elsif available_amount >= amount
+            outstock.update_attribute(:virtual_amount , outstock.virtual_amount - amount)
+            outstock.save
+            stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            orderdetails.each do |x|
+              x.stock_logs << stocklog
+            end
+            sklogs << stocklog
+            break
+          else
+            amount = amount - available_amount
+            outstock.update_attribute(:virtual_amount , outstock.virtual_amount - available_amount)
+            outstock.save
+            stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: available_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            orderdetails.each do |x|
+              x.stock_logs << stocklog
+            end
+            sklogs << stocklog
+          end
+        end
+      else
+        sklogs += orderdetails.first.stock_logs
+      end
+    end
+    # puts sklogs
+    # puts "-----------------------end------------------------"
+
+   #        if orderdtl.amount > 0
+   #          outstocks = Stock.find_stocks_in_storage(orderdtl.specification, orderdtl.supplier, order.business, current_storage).to_ary
+   #          outbl = false
+   #          amount = orderdtl.amount
+
+   #            if orderdtl.amount - orderdtl.stock_logs.sum(:amount) > 0
+   #              amount = orderdtl.amount - orderdtl.stock_logs.sum(:amount) 
+   #               outstocks.each do |outstock|
+   #                 if outstock.virtual_amount > 0
+   #                  if !outbl
+   #                    if outstock.virtual_amount - amount >= 0
+   #                     setamount = outstock.virtual_amount - amount
+   #                     outbl = true
+   #                     outstock.update_attribute(:virtual_amount , setamount)
+   #                     outstock.save
+   #                     #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
+   #                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+   #                     orderdtl.stock_logs << stklog
+   #                    else 
+   #                     amount = amount - outstock.virtual_amount
+   #                     outbl = false
+   #                     #keyorderdtl=@keyclientorder.keyclientorderdetails.where(business_id: order.business_id,specification_id: orderdtl.specification_id,supplier_id: orderdtl.supplier_id).first
+   #                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+   #                     orderdtl.stock_logs << stklog
+   #                     outstock.update_attribute(:virtual_amount , 0)
+   #                     outstock.save
+   #                    end
+   #                  end
+   #                 end
+   #               end
+   #            end
+
+   #        end
+   #        sklogs += orderdtl.stock_logs
+   #    end
+   #      order.update_attribute(:is_shortage,"no")
+   #   else
+   #     chkout += 1
+   #     order.update_attribute(:is_shortage,"yes")
+   #   end
+   #  end
+
+   # end
+   #  #@orders.update_all(status: "unchecked",user_id: nil)
     @stock_logs = StockLog.where(id: sklogs)
     #binding.pry
     @stock_logs_grid = initialize_grid(@stock_logs)
-    if chkout > 0
-     flash.now[:notice] = "注意有"+chkout.to_s+"件订单缺货"
+   #  if chkout > 0
+   #   flash.now[:notice] = "注意有"+chkout.to_s+"件订单缺货"
     end
-    #binding.pry
+   #  #binding.pry
   end
 
   def check_out_stocks(order)
@@ -472,7 +534,7 @@ class OrdersController < ApplicationController
   end
 
   def findprintindex
-    status = ["waiting","printed"]
+    status = ["waiting","printed","picking"]
      @orders_grid = initialize_grid(@orders,
                    :include => [:business],
                    :conditions => ['order_type = ? and status in (?)',"b2c",status],
@@ -535,9 +597,7 @@ class OrdersController < ApplicationController
               end
               relationship = Relationship.find_relationships(instance.cell(line,'B').to_s.split('|')[1],nil,nil,nil, current_user.unit.id)
 			   #     relationship1 = Relationship.find_relationships(instance.cell(line,'B').to_s.split('|')[1],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
-
               transport_type = findTransportType(relationship.specification)
-
               # if keyclientorder.nil?
               #   keyclientorder=Keyclientorder.create! keyclient_name: "批量导入 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: relationship.business_id, unit_id: current_user.unit.id, storage_id: current_storage.id
               # end
@@ -669,7 +729,7 @@ class OrdersController < ApplicationController
               tracking_number = instance.cell(line,'S').to_s.split('|')[1]
               transport_type = instance.cell(line,'R').to_s
               trackingNumber = getTrackingNumber(transport_type, tracking_number)
-              puts trackingNumber[1].class
+              # puts trackingNumber[1].class
               case trackingNumber[1].size
               when 8
                 order.tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
@@ -803,7 +863,7 @@ class OrdersController < ApplicationController
       wide = specification.wide
       high = specification.high
       weight = specification.weight
-      if long > 60 || wide > 60 || high > 60 || long + wide + high > 100 || weight > 3000
+      if !long.nil? && !wide.nil? && !high.nil? && !weight.nil? && (long > 60 || wide > 60 || high > 60 || long + wide + high > 100 || weight > 3000)
         type = "ems"
       end
       return type

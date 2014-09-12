@@ -48,11 +48,15 @@ class Order < ActiveRecord::Base
   end
 
   def stock_out
-    if self.all_checked?
+    # if self.all_checked?
       self.update(status: STATUS[:checked])
-    else
-      false
-    end
+    # else
+    #   false
+    # end
+  end
+
+  def set_picking
+    self.update(status: STATUS[:picking])
   end
 
   protected
