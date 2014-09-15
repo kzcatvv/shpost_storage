@@ -178,7 +178,11 @@ class OrdersController < ApplicationController
        @keycorder=params[:keyclientorder_id]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
-       
+       @stock_logs = StockLog.where(keyclientorderdetail_id: keyorder.keyclientorderdetails)
+       if !@stock_logs.blank?
+        @stock_logs_grid = initialize_grid(@stock_logs)
+        return @stock_logs_grid
+       end
 
        if key_check_out_stocks(keyorder)
           keyordercnt = keyorder.orders.count
@@ -281,7 +285,16 @@ class OrdersController < ApplicationController
 
         end
        end
-        sklogs=StockLog.where(id: keyorder.stock_logs)
+       # sklogs=StockLog.where(id: keyorder.stock_logs)
+       # details = keyorder.keyclientorderdetails
+       # ids = []
+       # details.each do |detail|
+       #   ids << detail.id
+       # end
+       @stock_logs = StockLog.where(keyclientorderdetail_id: keyorder.keyclientorderdetails)
+       puts @stock_logs.size
+      #binding.pry
+      @stock_logs_grid = initialize_grid(@stock_logs)
 
    else
     allcnt = {}
@@ -481,13 +494,21 @@ class OrdersController < ApplicationController
 
       @keyclientorder=Keyclientorder.find(params[:format])
       @orders=@keyclientorder.orders
+      # b2c
       @orders.each do |order|
         order.stock_logs.each do |stlog|
           stlog.order_check
         end
         order.stock_out
       end
-      
+      #b2b
+      if !@keyclientorder.keyclientorderdetails.blank?
+        stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
+        stock_logs.each do |stlog|
+          stlog.order_check
+        end
+      end
+
      if @keyclientorder.keyclient_name == "auto"
         redirect_to :action => 'findprint'
      else
