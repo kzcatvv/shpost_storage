@@ -31,6 +31,8 @@ ShpostStorage::Application.routes.draw do
         get 'pingan_b2b_import'
         post 'pingan_b2b_import' => 'orders#pingan_b2b_import'
         get 'pingan_b2c_import'
+        post 'orders_b2b_import' => 'orders#orders_b2b_import'
+        get 'orders_b2b_import'
         post 'pingan_b2c_import' => 'orders#pingan_b2c_import'
         get 'pingan_b2c_outport'
         post 'pingan_b2c_xls_outport'

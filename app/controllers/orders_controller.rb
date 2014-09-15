@@ -178,7 +178,11 @@ class OrdersController < ApplicationController
        @keycorder=params[:keyclientorder_id]
        keyorder=Keyclientorder.find(params[:keyclientorder_id])
        @orders = keyorder.orders
-       
+       @stock_logs = StockLog.where(keyclientorderdetail_id: keyorder.keyclientorderdetails)
+       if !@stock_logs.blank?
+        @stock_logs_grid = initialize_grid(@stock_logs)
+        return @stock_logs_grid
+       end
 
        if key_check_out_stocks(keyorder)
           keyordercnt = keyorder.orders.count
@@ -281,7 +285,16 @@ class OrdersController < ApplicationController
 
         end
        end
-        sklogs=StockLog.where(id: keyorder.stock_logs)
+       # sklogs=StockLog.where(id: keyorder.stock_logs)
+       # details = keyorder.keyclientorderdetails
+       # ids = []
+       # details.each do |detail|
+       #   ids << detail.id
+       # end
+       @stock_logs = StockLog.where(keyclientorderdetail_id: keyorder.keyclientorderdetails)
+       puts @stock_logs.size
+      #binding.pry
+      @stock_logs_grid = initialize_grid(@stock_logs)
 
    else
     allcnt = {}
@@ -481,13 +494,21 @@ class OrdersController < ApplicationController
 
       @keyclientorder=Keyclientorder.find(params[:format])
       @orders=@keyclientorder.orders
+      # b2c
       @orders.each do |order|
         order.stock_logs.each do |stlog|
           stlog.order_check
         end
         order.stock_out
       end
-      
+      #b2b
+      if !@keyclientorder.keyclientorderdetails.blank?
+        stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
+        stock_logs.each do |stlog|
+          stlog.order_check
+        end
+      end
+
      if @keyclientorder.keyclient_name == "auto"
         redirect_to :action => 'findprint'
      else
@@ -647,6 +668,54 @@ class OrdersController < ApplicationController
               flash[:alert] = "商品关联缺失，导入失败"
             end
           rescue Exception => e
+            flash[:alert] = "导入失败"
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
+  def orders_b2b_import
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])
+        Keyclientorder.transaction do
+          business_no = params[:business_select]
+          supplier_no = params[:supplier_select]
+          business = Business.find_by no: business_no
+          supplier = Supplier.find_by no: supplier_no
+          puts "*************" + business_no + "************"
+          puts "*************" + supplier_no + "************"
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            specification = Specification.find_by sku: instance.cell(2,'A')
+            # relationship = Relationship.find_relationships(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+            
+            if !specification.nil?
+              keyclientorder=Keyclientorder.create! keyclient_name: "标准线下 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: business.id, unit_id: current_user.unit.id, storage_id: current_storage.id
+              keyclientorderdetails = Keyclientorderdetail.create! specification: specification, keyclientorder: keyclientorder, amount: instance.cell(2,'B').to_s.split('.0')[0], supplier: supplier, business_id: business.id
+              
+              2.upto(instance.last_row) do |line|
+                puts "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                order = Order.create! order_type: 'b2b', customer_name: instance.cell(line,'C'), customer_phone: instance.cell(line,'D').to_s.split('.0')[0], city: instance.cell(line,'G'), customer_address: instance.cell(line,'E'), customer_postcode: instance.cell(line,'F').to_s.split('.0')[0], total_amount: instance.cell(line,'B').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder
+                # order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
+                
+              end
+              flash[:alert] = "导入成功"
+            else
+              flash[:alert] = "商品缺失，导入失败"
+            end
+          rescue Exception => e
+            puts e
             flash[:alert] = "导入失败"
             raise ActiveRecord::Rollback
           end
