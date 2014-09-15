@@ -142,18 +142,20 @@ ShpostStorage::Application.routes.draw do
   end
 
   resources :users do
-     resources :roles, only: [:index, :new, :create, :show, :destroy]
+     resources :roles, :controller => 'user_roles'
   end
+
+  # resources :roles
 
   #resources :storages do
   #   resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
   #end
 
-  resources :roles,controller: 'unit_roles', only: [:index, :new, :create, :show, :destroy] do
-    collection do
-        get 'findroledtl'
-    end
-  end
+  # resources :roles,controller: 'unit_roles', only: [:index, :new, :create, :show, :destroy] do
+  #   collection do
+  #       get 'findroledtl'
+  #   end
+  # end
 
  resources :storages, controller: 'unit_storage', only: [:index, :new, :create, :show, :destroy,:edit,:update] do
      resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]

@@ -36,7 +36,7 @@ every :day, :at => '05:10pm' do
   rake "transmitter:csb:update_order_status"
 end
 
-every :day, :at => '13:07am' do
+every :day, :at => '01:07pm' do
 # every '* * * * *' do
   rake "transmitter:csb:redeal_with_orders"
 end
