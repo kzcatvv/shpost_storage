@@ -36,11 +36,16 @@ every :day, :at => '05:10pm' do
   rake "transmitter:csb:update_order_status"
 end
 
-every 1.hours do
+every :day, :at => '13:07am' do
+# every '* * * * *' do
+  rake "transmitter:csb:redeal_with_orders"
+end
+
+every 12.hours do
   rake "transmitter:gnxb:order_query"
 end
 
-every 1.minutes do
+every 12.hours do
   rake "transmitter:tcbd:order_query"
 end
 # Learn more: http://github.com/javan/whenever
