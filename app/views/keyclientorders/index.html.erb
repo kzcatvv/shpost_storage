@@ -3,6 +3,7 @@
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
     <% if can? :new, Keyclientorder %>
+      <%=link_to t('线下订单导入'), "/orders/orders_b2b_import", target: '_blank',:class => 'btn btn-primary' %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
                   new_keyclientorder_path,
                   :class => 'btn btn-primary' %>
