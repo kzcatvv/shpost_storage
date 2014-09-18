@@ -232,7 +232,7 @@ class CSBSendWithSOAP
         combinationOrderCount+=1
         mergerOrderLabel  = combinationOrder.add_element('MergerOrderLabel')
         # MergerOrderLabel BigOrderId="B105"归并的大订单号
-        mergerOrderLabel.add_attribute('BigOrderId',order.business_order_id)
+        mergerOrderLabel.add_attribute('BigOrderId',order.business_trans_no)
 
         order.order_details.each do |detail|
           giftDetail = mergerOrderLabel.add_element('GiftDetail')
@@ -329,8 +329,8 @@ class CSBSendWithSOAP
   end
 
   def self.setSendPointOrder(order_type)
-    current_date = DateTime.now.strftime("%Y-%m-%d %H:%M:%S")
-    start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d %H:%M:%S")
+    current_date = DateTime.now.strftime("%Y-%m-%d %H:%M:%S") + " " + StorageConfig.config["csb_interface"]["query_time"]
+    start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
   #current_date = "2014-01-20"
   #start_date = "2014-01-19"
   # if order_type == 1

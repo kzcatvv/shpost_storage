@@ -69,9 +69,49 @@ class StandardInterface
       return order
     end
 
-    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
-
     order_details = context['ORDER_DETAILS']
+
+    if business.no == StorageConfig.config["business"]['bst_id'].to_s
+    # one detail one order if business is haobai
+      order_details_size = order_details.size
+      order_details.each do |x|
+        sku = x['SKU']
+        next if sku.blank?
+        qyt = x['QTY']
+        next if qyt.blank?
+        supplier_no = x['SUPPLIER']
+        deliver_no = x['DELIVER_NO']
+        spec = x['SPEC']
+        desc = x['DESC']
+        name = x['NAME']
+        if name.blank?
+          name = desc
+        end
+        price = x['PRICE']
+        amt = x['AMT']
+        if order_details_size == 1
+          order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
+        else
+          order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
+        end
+        supplier = nil
+        if !supplier_no.blank?
+          supplier = Supplier.find_supplier(supplier_no, business)
+        end
+
+        relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
+      
+        if relationship.nil?
+          order = FileInterface.save_order(context, business.id, unit.id)
+          raise ActiveRecord::Rollback
+          break
+        end
+
+        OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc, name: name
+
+      end
+    else
+    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
 
     order_details.each do |x|
       sku = x['SKU']
@@ -83,6 +123,9 @@ class StandardInterface
       spec = x['SPEC']
       desc = x['DESC']
       name = x['NAME']
+      if name.blank?
+        name = desc
+      end
       price = x['PRICE']
       amt = x['AMT']
 
@@ -99,7 +142,8 @@ class StandardInterface
         break
       end
 
-      OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc
+      OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc, name: name
+    end
     end 
     end
     return order 
