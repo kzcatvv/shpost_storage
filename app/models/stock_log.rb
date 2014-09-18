@@ -5,6 +5,7 @@ class StockLog < ActiveRecord::Base
   belongs_to :keyclientorderdetail
   has_one :shelf, through: :stock
   has_and_belongs_to_many :order_details
+  has_many :orders, through: :order_details
 
   OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return'}
   STATUS = {waiting: 'waiting', checked: 'checked'}
@@ -27,6 +28,10 @@ class StockLog < ActiveRecord::Base
     end
   end
 
+  def self.order_without_return
+    where(operation: [OPERATION[:b2c_stock_out], OPERATION[:b2b_stock_out]])
+  end
+
   def check
     if self.waiting?
       if self.operation_type.eql? OPERATION_TYPE[:in]
@@ -46,33 +51,42 @@ class StockLog < ActiveRecord::Base
         if self.belongs_to_purchase?
           self.purchase_detail.stock_in
         end
+
+        if self.belongs_to_order?
+          self.orders.each{|order| order.checked }
+        end
       end
     end
   end
 
-  def order_check
-    #binding.pry
-    if self.waiting?
-      if self.operation_type.eql? OPERATION_TYPE[:in]
-        self.stock.check_in_amount self.amount
-      elsif self.operation_type.eql? OPERATION_TYPE[:out]
-        self.stock.check_out_amount self.amount
-      elsif self.operation_type.eql? OPERATION_TYPE[:reset]
-        self.stock.check_reset_amount self.amount
-      end
-      self.status = STATUS[:checked]
-      self.checked_at = Time.now
+  # def order_check
+  #   #binding.pry
+  #   if self.waiting?
+  #     if self.operation_type.eql? OPERATION_TYPE[:in]
+  #       self.stock.check_in_amount self.amount
+  #     elsif self.operation_type.eql? OPERATION_TYPE[:out]
+  #       self.stock.check_out_amount self.amount
+  #     elsif self.operation_type.eql? OPERATION_TYPE[:reset]
+  #       self.stock.check_reset_amount self.amount
+  #     end
+  #     self.status = STATUS[:checked]
+  #     self.checked_at = Time.now
 
-      StockLog.transaction do
-        self.save
-        self.stock.save
-      end
-    end
-  end
+  #     StockLog.transaction do
+  #       self.save
+  #       self.stock.save
+  #     end
+  #   end
+  # end
 
   def belongs_to_purchase?
     ! self.purchase_detail.blank?
   end
+
+  def belongs_to_order?
+    ! self.order_details.blank?
+  end
+
   def checked?
     self.status.eql? STATUS[:checked]
   end

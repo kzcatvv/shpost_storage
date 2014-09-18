@@ -497,7 +497,7 @@ class OrdersController < ApplicationController
       # b2c
       @orders.each do |order|
         order.stock_logs.each do |stlog|
-          stlog.order_check
+          stlog.check
         end
         order.stock_out
       end
@@ -505,7 +505,7 @@ class OrdersController < ApplicationController
       if !@keyclientorder.keyclientorderdetails.blank?
         stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
         stock_logs.each do |stlog|
-          stlog.order_check
+          stlog.check
         end
       end
 

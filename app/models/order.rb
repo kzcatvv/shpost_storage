@@ -43,8 +43,23 @@ class Order < ActiveRecord::Base
     self.stock_logs.where("operation <> 'order_return'").to_a.sum{|x| x.checked? ? x.amount : 0}
   end
 
+  # def all_checked?
+  #   self.order_details.sum(:amount).eql? self.checked_amount
+  # end
+
+  def checked
+    if all_checked?
+      self.update(status: STATUS[:checked])
+    end
+  end
+
   def all_checked?
-    self.order_details.sum(:amount).eql? self.checked_amount
+    self.order_details.each do |x|
+      if ! x.all_checked?
+        return false
+      end
+    end
+    return true
   end
 
   def stock_out

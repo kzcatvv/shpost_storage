@@ -6,4 +6,12 @@ class OrderDetail < ActiveRecord::Base
 
 	# validates_presence_of :name, :message => '不能为空'
 
+
+  def all_checked?
+    self.amount.eql? self.checked_amount
+  end
+
+  def checked_amount
+    self.stock_logs.order_without_return.to_a.sum{|x| x.checked? ? x.amount : 0}
+  end
 end

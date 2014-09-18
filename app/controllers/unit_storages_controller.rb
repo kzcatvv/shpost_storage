@@ -1,5 +1,6 @@
-class UnitStorageController < ApplicationController
- load_and_authorize_resource :storage
+class UnitStoragesController < ApplicationController
+  load_and_authorize_resource :unit
+  load_and_authorize_resource :storage, through: :unit, parent: false
 
   def index
   	#binding.pry

@@ -565,37 +565,12 @@ zh-CN:
           needrole:
             can: :read
             role: :User
-        role_admin:
-          name: "角色管理"
-          link: "/roles/"
-          needrole:
-            can: :read
-            role: :User
-    storagemanage:
-      name: "仓内管理"
-      needrole:
-        can: :read
-        role: :Area
-      submenu:
-        storage:
-          name: "仓库管理"
-          link: "/storages/"
-          needrole:
-           can: :read
-           role: :User
-        area:
-          name: "区域管理"
-          link: "/areas/"
-          # needrole:
-          #   can: :read
-          #   role: "area"
-        shelf:
-          name: "货架管理"
-          link: "/shelves/"
-       
-          # needrole:
-          #   can: :read
-          #   role: "shelf"
+        # role_admin:
+        #   name: "角色管理"
+        #   link: "/roles/"
+        #   needrole:
+        #     can: :read
+        #     role: :User
     goodstypes:
       name: "商品管理"
       needrole:
@@ -623,6 +598,30 @@ zh-CN:
         supplier:
           name: "供应商管理"
           link: "/suppliers"
+    storagemanage:
+      name: "仓内管理"
+      needrole:
+        can: :read
+        role: :Area
+      submenu:
+        # storage:
+        #   name: "仓库管理"
+        #   link: "/storages/"
+        #   needrole:
+        #    can: :read
+        #    role: :Storage
+        area:
+          name: "区域管理"
+          link: "/areas/"
+          # needrole:
+          #   can: :read
+          #   role: "area"
+        shelf:
+          name: "货架管理"
+          link: "/shelves/"
+          # needrole:
+          #   can: :read
+          #   role: "shelf"
     suppliers:
       name: "采购管理"
       needrole:
@@ -632,7 +631,6 @@ zh-CN:
         purchase:
           name: "采购单管理"
           link: "/purchases"
-       
     business:
       name: "订单管理"
       needrole:
@@ -696,7 +694,7 @@ zh-CN:
           link: "/stocks/findstock"
         findwarning:
           name: "库存预警查询"
-          link: "/relationships/findwarningamt"
+          link: "/stocks/warning_stocks_index"
     logs:
       name: "日志查询"
       submenu:

@@ -95,6 +95,10 @@ class Stock < ActiveRecord::Base
     return_amount
   end
 
+  def self.warning_stocks(storage)
+    select('specification_id as spec_id, business_id as b_id, supplier_id as s_id, sum(virtual_amount) as virtual_amount').in_storage(storage).group(:specification_id, :business_id, :supplier_id).having('sum(virtual_amount) < (?)', Relationship.select(:warning_amt).where('specification_id = spec_id and business_id = b_id and supplier_id = s_id'))
+  end
+
   protected
   def self.sum_virtual_amount
     sum(:virtual_amount)
@@ -117,14 +121,14 @@ class Stock < ActiveRecord::Base
   end
 
   def self.in_unit(unit)
-    includes(:unit).where('units.id' => unit)
+    joins(:unit).where('units.id' => unit)
   end
 
   def self.in_storage(storage)
-    includes(:storage).where('storages.id' => storage)
+    joins(:storage).where('storages.id' => storage)
   end
 
   def self.in_shelf(shelf)
-    includes(:shelf).where('shelves.id' => shelf)
+    joins(:shelf).where('shelves.id' => shelf)
   end
 end
