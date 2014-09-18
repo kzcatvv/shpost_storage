@@ -1,8 +1,8 @@
 class StoragesController < ApplicationController
   #before_action :set_storage, only: [:show, :edit, :update, :destroy]
   #before_action :find_unit, only: [:index, :show, :new, :edit, :create, :update, :destroy]
-load_and_authorize_resource :unit
-load_and_authorize_resource :storage, through: :unit, parent: false
+  load_and_authorize_resource :storage 
+  skip_authorize_resource :storage, :only => :change
   #skip_load_resource :storage, :only => :create
 
   # GET /units/1/storages/1/change

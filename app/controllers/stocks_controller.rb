@@ -77,6 +77,14 @@ class StocksController < ApplicationController
 
   end
 
+  def warning_stocks_index
+    @stocks = Stock.warning_stocks(current_storage)
+    @relationships = []
+    @stocks.each do |x|
+      @relationships << Relationship.find_by(business_id: x.b_id, specification_id: x.spec_id, supplier_id: x.s_id)
+    end
+  end
+
   def getstock
     @stocks=[]
     if !params[:ex_code].empty?

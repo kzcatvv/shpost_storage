@@ -59,7 +59,6 @@ ShpostStorage::Application.routes.draw do
     collection do
         get 'select_commodities'
         get 'select_specifications'
-        get 'findwarningamt'
       get 'relationship_import'
       post 'relationship_import' => 'relationships#relationship_import'
       get 'specification_export'
@@ -94,8 +93,9 @@ ShpostStorage::Application.routes.draw do
 
   resources :stocks do
     collection do
-       get 'findstock'
-       get 'getstock'
+      get 'warning_stocks_index'
+      get 'findstock'
+      get 'getstock'
     end
   end
 
@@ -136,11 +136,7 @@ ShpostStorage::Application.routes.draw do
   
   resources :units do
     resources :users, :controller => 'unit_users'
-    resources :storages do
-      member do
-        get 'change'
-      end
-    end
+    resources :storages, :controller => 'unit_storages'
   end
 
   resources :users do
@@ -159,10 +155,13 @@ ShpostStorage::Application.routes.draw do
   #   end
   # end
 
- resources :storages, controller: 'unit_storage', only: [:index, :new, :create, :show, :destroy,:edit,:update] do
-     resources :roles, :controller => 'storage_roles', only: [:index, :new, :create, :show, :destroy]
-  collection do
-        get 'findroledtl'
+ resources :storages do
+    resources :roles, :controller => 'storage_roles'
+    collection do
+      get 'findroledtl'
+    end
+    member do
+      get 'change'
     end
    end
 

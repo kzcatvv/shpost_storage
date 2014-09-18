@@ -15,7 +15,6 @@ class Ability
         can :update, User, id: user.id
         #can :manage, User
     elsif user.unitadmin?
-
         #can :manage, :all
         can :manage, Business, unit_id: user.unit_id
         can :manage, Supplier, unit_id: user.unit_id
@@ -32,65 +31,118 @@ class Ability
         
         can :storage, Unit, id: user.unit_id
 
-        if ! storage.nil?
-
-        can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
-
-        can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
-        can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
-        can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
-        cannot :close, Purchase do |purchase|
-            (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
-        end
-        can :manage, Keyclientorder, storage_id: storage.id
-        can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
-        can :manage, Order, storage_id: storage.id
-        can :manage, OrderDetail, order: {storage_id: storage.id}
-
-        can :read, Unit, id: user.unit_id
-        can :manage, Storage, unit_id: user.unit_id
-        can :manage, Contact
-
-        can :manage, Role, storage_id: storage.id
-
-        can :manage, Area, storage_id: storage.id
-        can :manage, Shelf, area: {storage_id: storage.id}
-        can :manage, Stock
-        can :new, Shelf
-        can [:read, :getstock, :findstock], Stock, shelf: {area: {storage_id: storage.id}}
-        can :new, Stock, shelf: {area: {storage_id: storage.id}}
-        can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
-        can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}, status: StockLog::STATUS[:waiting]
-        can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
-        can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
-        can :check, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
-        can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
-
-        can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
-        end
-
         can :read, UserLog, user: {unit_id: user.unit_id}
 
         can :manage, User, unit_id: user.unit_id
-        can :role, User
+        can :role, User, unit_id: user.unit_id
         can :manage, Role
         cannot :role, User, role: 'superadmin'
-        cannot :role, User, role: 'unitadmin'
+        # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
+    elsif user.user?
+        can :update, User, id: user.id
+        can :read, UserLog, user: {id: user.id}
+
+        can :read, Unit, id: user.unit_id
+
+        can :read, Business, unit_id: user.unit_id
+        can :read, Supplier, unit_id: user.unit_id
+        can :read, Contact, supplier: {unit_id: user.unit_id}
+        can :read, Goodstype, unit_id: user.unit_id
+        can :read, Commodity, unit_id: user.unit_id
+        can :read, Specification, commodity: {unit_id: user.unit_id}
+        
+        can :read, Relationship, specification: {commodity: {unit_id: user.unit_id}}
     else
-        can :manage, :all
+        cannot :manage, :all
         #can :update, User, id: user.id
         cannot :read, User
         cannot :read, Area
         cannot :read, Commodity
         cannot :read, Business
-        
-        can :change, Storage do |s|
-            user.storages.include? s
-        end
     end
 
+    if user.admin?(storage)
+        can :change, Storage, id: storage.id
+
+        can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
+
+        can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
+
+        can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
+
+        can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
+
+        cannot :close, Purchase do |purchase|
+            (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
+        end
+
+        can :manage, Keyclientorder, storage_id: storage.id
+        can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
+
+        can :manage, Order, storage_id: storage.id
+        can :manage, OrderDetail, order: {storage_id: storage.id}
+
+        # can :manage, Role, storage_id: storage.id
+
+        can :manage, Area, storage_id: storage.id
+
+        can :new, Shelf
+        can :manage, Shelf, area: {storage_id: storage.id}
+
+        can :new, Stock
+        can :manage, Stock, shelf: {area: {storage_id: storage.id} }
+
+        
+        # can [:read, :getstock, :findstock], Stock, shelf: {area: {storage_id: storage.id}}
+
+        # can :new, Stock, shelf: {area: {storage_id: storage.id}}
+        can :manage, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        # can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}, status: StockLog::STATUS[:waiting]
+        # can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        # can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        # can :check, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        # can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+
+        can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
+    end
+
+    if user.purchase?(storage)
+        can :change, Storage, id: storage.id
+
+        can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
+
+        can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
+
+        can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
+
+        can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
+
+        cannot :close, Purchase do |purchase|
+            (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
+        end
+
+        can :new, Stock
+        can :manage, Stock, shelf: {area: {storage_id: storage.id} }
+
+        can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+    end
+
+    if user.sorter?(storage)
+        can :change, Storage, id: storage.id
+
+        can :manage, Keyclientorder, storage_id: storage.id
+        can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
+
+        can :manage, Order, storage_id: storage.id
+        can :manage, OrderDetail, order: {storage_id: storage.id}
+
+        can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
+
+        can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+    end
+    # if user.admin?(storage)
     
 
     # Define abilities for the passed in user here. For example:

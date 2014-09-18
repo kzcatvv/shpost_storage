@@ -99,7 +99,7 @@
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                   <% current_user.storages.each do |s| %>
                     <li>
-                      <%= link_to s.name, "/units/#{s.unit.id}/storages/#{s.id}/change", method: :get %>
+                      <%= link_to s.name, "/storages/#{s.id}/change", method: :get %>
                     </li>
                   <% end %>
                 </ul>

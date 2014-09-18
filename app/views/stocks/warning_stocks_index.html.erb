@@ -1,4 +1,4 @@
-<%- model_class = Relationship -%>
+<%- model_class = Stock -%>
 <div class="page-header">
   <h1>预警库存查询</h1>
 </div>
@@ -12,12 +12,12 @@
     </tr>
   </thead>
   <tbody>
-    <% @allcnt.each do |key,value| %>
+    <% @stocks.each_with_index do |x, i| %>
         <tr>
-          <td><%= Business.find(key[0]).name %></td>
-          <td><%= Specification.find(key[1]).name %></td>
-          <td><%= Supplier.find(key[2]).name %></td>
-          <td><%= value[0] %>/<%= value[1] %></td>
+          <td><%= @relationships[i].business.name %></td>
+          <td><%= @relationships[i].specification.name %></td>
+          <td><%= @relationships[i].supplier.name %></td>
+          <td><%= x.virtual_amount %>/<%= @relationships[i].warning_amt %></td>
         </tr>
     <% end %>
   </tbody>

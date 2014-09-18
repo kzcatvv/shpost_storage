@@ -27,6 +27,22 @@ class User < ActiveRecord::Base
     (role.eql? 'unitadmin') ? true : false
   end
 
+  def user?
+    (role.eql? 'user') ? true : false
+  end
+
+  def admin?(storage)
+    !roles.where(storage_id: storage, role: 'admin').empty?
+  end
+
+  def purchase?(storage)
+    !roles.where(storage_id: storage, role: 'purchase').empty?
+  end
+
+  def sorter?(storage)
+    !roles.where(storage_id: storage, role: 'sorter').empty?
+  end
+
   def email_required?
     false
   end

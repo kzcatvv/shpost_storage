@@ -89,24 +89,6 @@ class RelationshipsController < ApplicationController
       end
   end
 
-  def findwarningamt
-    @relationships=Relationship.includes(:specification).includes(specification: :commodity).where(commodities: { unit_id: current_storage.unit_id})
-    @allcnt = {}
-    @relationships.each do |r|
-      product = [r.business_id,r.specification_id,r.supplier_id]
-      allamount = Stock.total_stock_in_storage(r.specification, r.supplier, r.business, current_storage)
-      if r.warning_amt.blank?
-        if allamount == 0
-          @allcnt[product]=[allamount,r.warning_amt]
-        end
-      else
-        if allamount < r.warning_amt || allamount == 0
-          @allcnt[product]=[allamount,r.warning_amt]
-        end
-      end
-    end
-  end
-
   def relationship_import
     unless request.get?
       if file = upload_relationship(params[:file]['file'])       
