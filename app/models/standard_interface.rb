@@ -52,6 +52,8 @@ class StandardInterface
     send_zip = context['SEND_ZIP']
     send_mobile = context['SEND_MOBILE']
 
+    order_details = context['ORDER_DETAILS']
+
     if province.blank?
       province = parse_province addr
     end
@@ -64,12 +66,17 @@ class StandardInterface
       county = parse_county addr
     end
     # business_order_id重复check
-    order = Order.where(business_order_id: order_id, business: business, unit: unit)
+    if order_details.size == 1
+      order = Order.where(business_order_id: order_id, business: business, unit: unit)
+    else
+      order = Order.where(business_order_id: deliver_no, business: business, unit: unit)
+    end
+
     if !order.blank?
       return order
     end
 
-    order_details = context['ORDER_DETAILS']
+    
 
     if business.no == StorageConfig.config["business"]['bst_id'].to_s
     # one detail one order if business is haobai

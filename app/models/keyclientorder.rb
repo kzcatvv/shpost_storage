@@ -1,6 +1,6 @@
 class Keyclientorder < ActiveRecord::Base
   has_many :keyclientorderdetails, dependent: :destroy
-  has_many :orders, dependent: :destroy
+  has_many :orders
   has_many :order_details, through: :orders
   has_many :stock_logs, through: :order_details
   belongs_to :unit

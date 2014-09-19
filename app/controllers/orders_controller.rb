@@ -89,7 +89,7 @@ class OrdersController < ApplicationController
    @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
    if @orders.empty?
 
-    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
+    @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id")
     find_has_stock(@orders, true)
     
    else
@@ -345,6 +345,7 @@ class OrdersController < ApplicationController
           if available_amount == 0
             next
           elsif available_amount >= amount
+            # binding.pry
             outstock.update_attribute(:virtual_amount , outstock.virtual_amount - amount)
             outstock.save
             stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
