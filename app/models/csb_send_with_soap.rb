@@ -30,14 +30,14 @@ class CSBSendWithSOAP
         @@call_flg = false
         begin 
           xml_file = setSendPointOrder(order_type)
-          # puts '------------start----------------'
-          # puts xml_file
-          # puts '----------------------------'
+          puts '------------start----------------'
+          puts xml_file
+          puts '----------------------------'
           soap_request = setSOAPRequestXML('SendPointOrder',xml_file)
 
           response = csb_post(StorageConfig.config["csb_interface"]["send_point_order_url"],soap_request)
           xml_file_return = response.body.to_s
-          # puts xml_file_return
+          puts xml_file_return
           # puts "@@call_flg=" << @@call_flg.to_s
           xml_file_trans_status = parseAndSaveSendPointOrder(xml_file_return,order_type)
           # puts '----------------------------'
@@ -48,7 +48,7 @@ class CSBSendWithSOAP
           # puts soap_request
           response = csb_post(StorageConfig.config["csb_interface"]["point_update_trans_status_url"],soap_request)
           # puts response.body
-          # puts '-----------end-----------------'
+          puts '--------------end-----------------'
 
         end while !@@call_flg
       end
@@ -296,7 +296,7 @@ class CSBSendWithSOAP
         
         abnormalReason.add_text ""
         if order.status == 'delivering' or order.status == 'delivered'
-            operator.add_text "操作人"
+          operator.add_text "操作人"
           operationDepartment.add_text "站点"
           state.add_text Order::STATUS[order.status.to_sym]
           signer.add_text ""
@@ -309,19 +309,15 @@ class CSBSendWithSOAP
           operatorTel.add_text ""  
         end
         operatorTime.add_text Time.now.strftime("%Y-%m-%d %H:%m:%S")
-        if order.tracking_number
-          hostNumber.add_text order.tracking_number
+        if order.business_trans_no.blank?
+          orderListId.add_text order.business_order_id
+          hostNumber.add_text order.business_order_id
         else
-          hostNumber.add_text "000000"
+          orderListId.add_text order.business_order_id
+          hostNumber.add_text order.business_trans_no
         end
         courier.add_text ""
         courierTel.add_text ""
-        if detail.business_deliver_no.blank?
-          orderListId.add_text order.business_order_id
-          break
-        else
-          orderListId.add_text detail.business_deliver_no
-        end
       end
     end
 
@@ -607,15 +603,15 @@ class CSBSendWithSOAP
     sender = head.elements['Sender']
     reciver = head.elements['Reciver']
     total = head.elements['Total']
-    messageCode = head.elements['MessageCode']
+    processCode = head.elements['ProcessCode']
     description = head.elements['Description']
     activeCode = head.elements['ActiveCode']
 
     return_array = []
-    if messageCode.text.blank?
+    if processCode.text.blank?
       return_array << '0' << ''
     else
-      return_array << messageCode.text << description.text
+      return_array << processCode.text << description.text
     end
     return return_array
   end
