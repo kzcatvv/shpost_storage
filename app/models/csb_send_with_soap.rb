@@ -325,7 +325,7 @@ class CSBSendWithSOAP
   end
 
   def self.setSendPointOrder(order_type)
-    current_date = DateTime.now.strftime("%Y-%m-%d %H:%M:%S") + " " + StorageConfig.config["csb_interface"]["query_time"]
+    current_date = DateTime.now.strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
     start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
   #current_date = "2014-01-20"
   #start_date = "2014-01-19"
