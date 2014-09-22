@@ -292,7 +292,7 @@ class OrdersController < ApplicationController
        #   ids << detail.id
        # end
        @stock_logs = StockLog.where(keyclientorderdetail_id: keyorder.keyclientorderdetails)
-       puts @stock_logs.size
+       # puts @stock_logs.size
       #binding.pry
       @stock_logs_grid = initialize_grid(@stock_logs)
 
@@ -345,7 +345,6 @@ class OrdersController < ApplicationController
           if available_amount == 0
             next
           elsif available_amount >= amount
-            # binding.pry
             outstock.update_attribute(:virtual_amount , outstock.virtual_amount - amount)
             outstock.save
             stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
@@ -797,6 +796,9 @@ class OrdersController < ApplicationController
             2.upto(instance.last_row) do |line|
               order = Order.find(instance.cell(line,'A').to_s.split('.0')[0])
               tracking_number = instance.cell(line,'S').to_s.split('|')[1]
+              if tracking_number.blank?
+                next
+              end
               transport_type = instance.cell(line,'R').to_s
               trackingNumber = getTrackingNumber(transport_type, tracking_number)
               # puts trackingNumber[1].class

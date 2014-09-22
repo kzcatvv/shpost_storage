@@ -7,6 +7,7 @@ class TcbdSoap
     puts yjbh
     # yjbh = "['PN00058784731', 'PN00058785531']"
     if !yjbh.blank?
+      puts "yjbh=" + yjbh.to_s
       response = client.call(mehod.to_sym, message: { yjbh: yjbh })
       body = response.body["#{mehod}_response".to_sym]["#{mehod}_result".to_sym].to_s
       json = JSON.parse body
