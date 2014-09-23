@@ -66,11 +66,7 @@ class StandardInterface
       county = parse_county addr
     end
     # business_order_id重复check
-    if order_details.size == 1
-      order = Order.where(business_order_id: order_id, business: business, unit: unit)
-    else
-      order = Order.where(business_order_id: deliver_no, business: business, unit: unit)
-    end
+    order = Order.where(business_order_id: order_id, business: business, unit: unit)
 
     if !order.blank?
       return order
@@ -99,6 +95,12 @@ class StandardInterface
         if order_details_size == 1
           order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
         else
+          t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
+
+          if !t.blank?
+            return t
+          end
+
           order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
         end
         supplier = nil

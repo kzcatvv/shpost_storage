@@ -122,22 +122,22 @@ class CSBSendWithSOAP
     orders = BcmInterface.csb_notice_array()
     begin
       return_array = CSBSendWithSOAP.callPointOrderStatus(orders)
-      if return_array[0]=="0"
-        orders.each do |order|
-          # todo: order:deliver_notice=1:N
-          notice = DeliverNotice.where(order_id: order.id).last
-          notice.status="over"
-          notice.send_times=notice.send_times+1
-          notice.save
-        end
-      else
-        orders.each do |order|
-          notice = DeliverNotice.where(order_id: order.id).last
-          notice.status=return_array[0]+':'+return_array[1]
-          notice.send_times=notice.send_times+1
-          notice.save
-        end
-      end
+      # if return_array[0]=="0"
+      #   orders.each do |order|
+      #     # todo: order:deliver_notice=1:N
+      #     notice = DeliverNotice.where(order_id: order.id).last
+      #     notice.status="over"
+      #     notice.send_times=notice.send_times+1
+      #     notice.save
+      #   end
+      # else
+      #   orders.each do |order|
+      #     notice = DeliverNotice.where(order_id: order.id).last
+      #     notice.status=return_array[0]+':'+return_array[1]
+      #     notice.send_times=notice.send_times+1
+      #     notice.save
+      #   end
+      # end
     rescue Exception => e
       puts "error:#{$!} at:#{$@}"
       orders.each do |order|
@@ -603,17 +603,42 @@ class CSBSendWithSOAP
     sender = head.elements['Sender']
     reciver = head.elements['Reciver']
     total = head.elements['Total']
-    processCode = head.elements['ProcessCode']
+    messageCode = head.elements['MessageCode']
     description = head.elements['Description']
     activeCode = head.elements['ActiveCode']
 
-    return_array = []
-    if processCode.text.blank?
-      return_array << '0' << ''
-    else
-      return_array << processCode.text << description.text
+    # todo
+    orderDetails = root.elements['OrderDetail']
+    orderDetails.each_element('OrderLabel') do |orderLabel|
+      bigOrderId = orderLabel.attributes['bigOrderId']
+      description = orderLabel.attributes['description']
+      orderId = orderLabel.attributes['orderId']
+      pointsUserable = orderLabel.attributes['pointsUserable']
+      processResult = orderLabel.attributes['processResult']
+
+      order = Order.find_by business_order_id: orderId
+      if processResult == '0'
+        # OK
+        notice = DeliverNotice.where(order_id: order.id).last
+        notice.status="over"
+        notice.send_times=notice.send_times+1
+        notice.save
+      elsif 
+        # NG
+        notice = DeliverNotice.where(order_id: order.id).last
+        notice.status=processResult+':'+description
+        notice.send_times=notice.send_times+1
+        notice.save
+      end
     end
-    return return_array
+
+    # return_array = []
+    # if messageCode.text.blank?
+    #   return_array << '0' << ''
+    # else
+    #   return_array << messageCode.text << description.text
+    # end
+    # return return_array
   end
 
   def self.parsePointUpdateTransStatus(xml_file)
