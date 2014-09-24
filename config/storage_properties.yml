@@ -6,6 +6,8 @@ business:
     padkh_id: 10004 #平安银行大客户
 unit:
     zb_id: 10000 #闸北区局
+tcsd:
+    length: 10 #单次查询最大个数
 csb_interface:
     # for test
     send_point_order_url: 'http://222.68.185.224:10088/SendPointOrder/V1_0'
