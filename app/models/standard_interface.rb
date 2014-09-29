@@ -93,7 +93,7 @@ class StandardInterface
         price = x['PRICE']
         amt = x['AMT']
         if order_details_size == 1
-          order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
+          order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date
         else
           t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
 
@@ -101,7 +101,7 @@ class StandardInterface
             return t
           end
 
-          order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
+          order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date
         end
         supplier = nil
         if !supplier_no.blank?
@@ -120,7 +120,7 @@ class StandardInterface
 
       end
     else
-    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym]
+    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date
 
     order_details.each do |x|
       sku = x['SKU']

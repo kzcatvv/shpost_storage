@@ -328,8 +328,8 @@ class CSBSendWithSOAP
   def self.setSendPointOrder(order_type)
     current_date = DateTime.now.strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
     start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
-  # current_date = "2014-08-23 00:00:00"
-  # start_date = "2014-08-22 00:00:00"
+  #current_date = "2014-01-20"
+  #start_date = "2014-01-19"
   # if order_type == 1
   #   current_date = "2014-08-02 00:00:00"
   #   start_date = "2014-08-01 00:00:00"
@@ -426,9 +426,9 @@ class CSBSendWithSOAP
     xml_body = doc.root.elements['soapenv:Body'].elements['ns1:sendQueryOrderResponse'].elements['sendQueryOrderReturn'].text.to_s
     # default encoding is utf-8 in ruby
     doc = REXML::Document.new(xml_body.gsub('encoding="gb2312"','encoding="utf-8"')) 
-    # puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-    # puts doc
-    # puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    #puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    #puts doc
+    #puts 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     root = doc.root
     head = root.elements['Head']
     orderTotal = head.elements['OrderTotal']
@@ -483,13 +483,14 @@ class CSBSendWithSOAP
       order_details = Array.new
 
       # if gift detail is miss, skip this order and start the next one
-      giftDetails = orderLabel.get_elements('GiftDetail')
+      giftDetails = orderLabel.elements['GiftDetail'] 
       if giftDetails.blank?
         rowsum += 1
         @@startrow += 1
         next
       end
-      giftDetails.each do |giftDetail|
+
+      giftDetails.each do { |giftDetail|
         order_detail = {}
         itemId = giftDetail.attributes['itemId']
         giftLineId = giftDetail.attributes['giftLineId']
@@ -498,7 +499,7 @@ class CSBSendWithSOAP
         scoreValue = giftDetail.attributes['ScoreValue']
         if order_type == StorageConfig.config["csb_interface"]["order_type_2"]
           listId = giftDetail.attributes['listId']
-          # puts "DELIVER_NO=" << listId
+        #puts "DELIVER_NO=" << listId
           order_detail.store('DELIVER_NO', listId)
         end
 
@@ -510,7 +511,7 @@ class CSBSendWithSOAP
         order_detail.store('PRICE', scoreValue)
 
         order_details << order_detail
-      end
+      }
 
       order_hash.store('ORDER_DETAILS', order_details)
       # puts order_hash
@@ -527,7 +528,7 @@ class CSBSendWithSOAP
     # puts "orderTotal=" << orderTotal_s
     # puts "rowCount=" << rowCount_s
     # puts "rowsum=" << rowsum.to_s
-    if (orderTotal_s == rowCount_s && rowsum.to_s == rowCount_s) || rowCount_s == '0'
+    if orderTotal_s == rowCount_s && rowsum.to_s == rowCount_s
       @@call_flg = true
     end
     # puts "@@call_flg=" << @@call_flg.to_s
