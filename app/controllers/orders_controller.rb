@@ -834,7 +834,8 @@ class OrdersController < ApplicationController
   def exportorders()
     puts params[:ids]
     x = params[:ids].split(",")
-    @orders = Order.find(x)
+    @orders = Order.where(id: x, status: "waiting")
+    # @orders = Order.find(x)
 
     #@orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id").distinct
     
