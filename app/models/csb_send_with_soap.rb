@@ -299,13 +299,13 @@ class CSBSendWithSOAP
         if order.status == 'delivering' or order.status == 'delivered'
           operator.add_text "操作人"
           operationDepartment.add_text "站点"
-          state.add_text Order::STATUS[order.status.to_sym]
+          state.add_text Order::STATUS_SHOW[order.status.to_sym]
           signer.add_text ""
           operatorTel.add_text ""
         else
           operator.add_text "操作人"
           operationDepartment.add_text "仓库"
-          state.add_text Order::STATUS[order.status.to_sym]
+          state.add_text Order::STATUS_SHOW[order.status.to_sym]
           signer.add_text ""
           operatorTel.add_text ""  
         end
