@@ -13,9 +13,9 @@ class Order < ActiveRecord::Base
 
   TYPE = { b2b: 'b2b', b2c: 'b2c' }
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
-  STATUS = { waiting: 'waiting', printed: 'printed', checked: 'checked', picking: 'picking', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
+  STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
 
-  STATUS_SHOW = { waiting: '待处理', printed: '已打印', checked: '已审核', picking: '正在拣货', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
+  STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
 
   TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS'}
 
@@ -64,17 +64,36 @@ class Order < ActiveRecord::Base
 
   def stock_out
     # if self.all_checked?
+    if can_update_status(STATUS[:checked])
       self.update(status: STATUS[:checked])
+    end
     # else
     #   false
     # end
   end
 
   def set_picking
-    self.update(status: STATUS[:picking])
+    if can_update_status(STATUS[:picking])
+      self.update(status: STATUS[:picking])
+    end
   end
 
   protected
+
+  def can_update_status(status)
+    x = compare_status(self.status, status)
+    if x.blank?
+      return false
+    elsif x > 0
+      return false
+    elsif x == 0
+      return true
+    elsif x < 0
+      return true
+    end
+    # default
+    return false
+  end
 
   def set_no
     if self.no.blank?
@@ -85,5 +104,23 @@ class Order < ActiveRecord::Base
   # def paytypename
   #   Order::PAY_TYPE[pay_type.to_sym]
   # end
+
+  def compare_status(first, second)
+    # if equle return 0, first > second return 1, first < second return -1
+    if first == second
+      return 0
+    end
+    STATUS.each do |key, value|
+      if first == value && second != value
+        return -1
+      elsif first != value && second == value
+        return 1
+      else
+        next
+      end
+    end
+    # status invalid
+    return nil
+  end
 
 end

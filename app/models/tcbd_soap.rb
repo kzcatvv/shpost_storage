@@ -4,16 +4,22 @@ class TcbdSoap
     client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
       
     yjbhs = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "tcsd"}).map!{|x| x.tracking_number}
-    puts yjbhs
+    puts "yjbhs=" + yjbhs.to_s
     # yjbhs = ['PN00058784731', 'PN00058785531']
     if !yjbhs.blank?
       index = 0
-      lenth = StorageConfig.config["tcsd"]['length']
+      length = StorageConfig.config["tcsd"]['length']
       while index < yjbhs.size do
-        yjbh_t = yjbhs[index, lenth]
-        puts "yjbh_t=" + yjbh_t.to_s
+        yjbh_t = yjbhs[index, length]
+        #puts "yjbh_t=" + yjbh_t.to_s
         response = client.call(mehod.to_sym, message: { yjbh: yjbh_t.to_s })
+        #puts response
+        #puts "================================="
         body = response.body["#{mehod}_response".to_sym]["#{mehod}_result".to_sym].to_s
+        if body.start_with? '!'
+          index = index + length
+          next
+        end
         json = JSON.parse body
         yjbh = ""
         tdxq = ""

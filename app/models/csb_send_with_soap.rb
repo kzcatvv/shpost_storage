@@ -156,14 +156,14 @@ class CSBSendWithSOAP
 
   def self.callPointOrderStatus(orders)
     xml_file = setPointOrderStatus(orders)
-    # puts 'xml_file:[' << xml_file << ']'
+    puts 'xml_file:[' << xml_file << ']'
     soap_request = setSOAPRequestXML('PointOrderStatus',xml_file)
     # puts 'soap_request:[' << soap_request << ']'
     response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],soap_request)
     xml_file_return = response.body.to_s
-    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    # puts xml_file_return
-    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts xml_file_return
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     parsePointOrderStatus(xml_file_return)
   end
 
@@ -213,7 +213,7 @@ class CSBSendWithSOAP
         order.order_details.each do |detail|
           giftInfo  = orderLabel.add_element('GiftInfo')
 
-          relationship = Relationship.find_relationship(detail.specification_id,StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'])
+          relationship = Relationship.find_relationship(detail.specification_id,Business.find_by(no: StorageConfig.config["business"]['bst_id']).id, Unit.find_by(no: StorageConfig.config["unit"]['zb_id']).id)
           giftInfo.add_attribute('ItemNo', relationship.external_code)
           # 原始订单中的listid和orderID数据是原始订单号
           giftInfo.add_attribute('GiftLineId', order.business_order_id)
@@ -238,7 +238,7 @@ class CSBSendWithSOAP
         order.order_details.each do |detail|
           giftDetail = mergerOrderLabel.add_element('GiftDetail')
 
-          relationship = Relationship.find_relationship(detail.specification_id,StorageConfig.config["business"]['bst_id'], StorageConfig.config["unit"]['zb_id'])
+          relationship = Relationship.find_relationship(detail.specification_id,Business.find_by(no: StorageConfig.config["business"]['bst_id']).id, Unit.find_by(no: StorageConfig.config["unit"]['zb_id']).id)
           giftDetail.add_attribute('MergerItemNo', relationship.external_code)
           # 原始订单中的listid和orderID数据是原始订单号
           giftDetail.add_attribute('MergerListID', detail.business_deliver_no)
