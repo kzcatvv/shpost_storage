@@ -16,7 +16,7 @@ zh-CN:
         #for test
         uri: 'http://10.126.22.202/tcbd_webs/n_tcbd_webs.asmx?wsdl'
         #for produciton
-        uri: 'http://10.126.25.25:800/tcbd_webs/n_tcbd_webs.asmx?wsdl'
+        # uri: 'http://10.126.25.25:800/tcbd_webs/n_tcbd_webs.asmx?wsdl'
         method: 'jk_yjrzcx'
         interval: 43200
     gnxb:

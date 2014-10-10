@@ -34,7 +34,7 @@ class TcbdSoap
             yjbh = x['yjbh']
           end
           tdxq << x['czsj'] << "#" << x['bgms'] << "\n"
-          td_status = returnStatus(x['tdxq'])
+          td_status = returnStatus(x['tdxq'],x['qrxq'])
         end
         updateOrder(yjbh,tdxq,td_status)
         index = index + length
@@ -54,10 +54,15 @@ class TcbdSoap
     end
   end
   
-  def self.returnStatus(tdxq)
+  def self.returnStatus(tdxq,qrxq)
     if !tdxq.blank?
       if tdxq.start_with? '已妥投'
         return Order::STATUS[:delivered]
+      end
+    end
+    if !qrxq.blank?
+      if qrxq.start_with? '确认退件'
+        return Order::STATUS[:returned]
       end
     end
     return Order::STATUS[:delivering]
