@@ -21,6 +21,7 @@ csb_interface:
     #point_update_trans_status_url: 'http://172.16.203.100:3000/PointUpdateTransStatus/V1_0'
     post_name: '闸北邮政' #XX配送商
     bst_name: '积分平台' #积分平台
+    return_count: 10 #每次返回订单配送状态的最大条数
     max_time_valve: 10 #每次发送的最大条数
     row_count: 10 #行数统计
     order_type_1: 1 #原始订单

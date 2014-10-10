@@ -67,46 +67,54 @@ class CSBSendWithSOAP
   def self.updatePointOrderStatus()
     # @count += 1
     orders = BcmInterface.csb_notice_array_all()
-    begin
-      if orders.size > 0
-        return_array = CSBSendWithSOAP.callUpdatePointOrderStatus(orders)
-        # puts return_array
-        if return_array[0]=="0"
-          # puts 0
-          orders.each do |order|
+    start = 0
+    if orders.size > 0
+      while start < orders.size do
+        deal_orders = orders[start,StorageConfig.config["csb_interface"]["return_count"]]
+        # puts "deal_orders.size=" + deal_orders.size.to_s
+        # puts deal_orders
+        begin
+          # puts "start=" + start.to_s
+          return_array = CSBSendWithSOAP.callUpdatePointOrderStatus(deal_orders)
+          # puts return_array
+          if return_array[0]=="0"
+            # puts 0
+            deal_orders.each do |order|
+              notice = DeliverNotice.where(order_id: order.id).last
+              notice.status="success"
+              notice.send_times=notice.send_times+1
+              notice.save
+            end
+          else
+            # puts 1
+            deal_orders.each do |order|
+              notice = DeliverNotice.where(order_id: order.id).last
+              notice.status=return_array[0]+':'+return_array[1]
+              notice.send_times=notice.send_times+1
+              notice.save
+            end
+          end
+        rescue Exception => e
+          puts "error:#{$!} at:#{$@}"
+          deal_orders.each do |order|
             notice = DeliverNotice.where(order_id: order.id).last
-            notice.status="success"
+            notice.status="HTTP Exception"
             notice.send_times=notice.send_times+1
             notice.save
           end
-        else
-          # puts 1
-          orders.each do |order|
-            notice = DeliverNotice.where(order_id: order.id).last
-            notice.status=return_array[0]+':'+return_array[1]
-            notice.send_times=notice.send_times+1
-            notice.save
-          end
+          #Rails.errors e.message
+        ensure
+          ActiveRecord::Base.connection_pool.release_connection
+          # puts "#{@title} : #{@count}"
         end
+        start += StorageConfig.config["csb_interface"]["return_count"]
       end
-    rescue Exception => e
-      puts "error:#{$!} at:#{$@}"
-      orders.each do |order|
-        notice = DeliverNotice.where(order_id: order.id).last
-        notice.status="HTTP Exception"
-        notice.send_times=notice.send_times+1
-        notice.save
-      end
-      #Rails.errors e.message
-    ensure
-      ActiveRecord::Base.connection_pool.release_connection
-      # puts "#{@title} : #{@count}"
     end
   end
 
   def self.callUpdatePointOrderStatus(orders)
     xml_file = setUpdatePointOrderStatus(orders)
-    # puts 'xml_file:[' << xml_file << ']'
+    puts 'xml_file:[' << xml_file << ']'
     soap_request = setSOAPRequestXML('UpdatePointOrderStatus',xml_file)
     # puts 'soap_request:[' << soap_request << ']'
     response = csb_post(StorageConfig.config["csb_interface"]["update_point_order_status_url"],soap_request)
@@ -121,8 +129,29 @@ class CSBSendWithSOAP
   def self.pointOrderStatus()
     # @count += 1
     orders = BcmInterface.csb_notice_array()
-    begin
-      return_array = CSBSendWithSOAP.callPointOrderStatus(orders)
+    start = 0
+      while start < orders.size do
+        # puts "start=" + start.to_s
+        deal_orders = orders[start,StorageConfig.config["csb_interface"]["return_count"]]
+        # puts "deal_orders.size=" + deal_orders.size.to_s
+        # puts deal_orders
+        begin
+          return_array = CSBSendWithSOAP.callPointOrderStatus(deal_orders)
+        rescue Exception => e
+          puts "error:#{$!} at:#{$@}"
+          orders.each do |order|
+            notice = DeliverNotice.where(order_id: order.id).last
+            notice.status="HTTP Exception"
+            notice.send_times=notice.send_times+1
+            notice.save
+          end
+          #Rails.errors e.message
+        ensure
+          ActiveRecord::Base.connection_pool.release_connection
+          # puts "#{@title} : #{@count}"
+        end
+        start += StorageConfig.config["csb_interface"]["return_count"]
+      end
       # if return_array[0]=="0"
       #   orders.each do |order|
       #     # todo: order:deliver_notice=1:N
@@ -139,19 +168,6 @@ class CSBSendWithSOAP
       #     notice.save
       #   end
       # end
-    rescue Exception => e
-      puts "error:#{$!} at:#{$@}"
-      orders.each do |order|
-        notice = DeliverNotice.where(order_id: order.id).last
-        notice.status="HTTP Exception"
-        notice.send_times=notice.send_times+1
-        notice.save
-      end
-      #Rails.errors e.message
-    ensure
-      ActiveRecord::Base.connection_pool.release_connection
-      # puts "#{@title} : #{@count}"
-    end
   end
 
   def self.callPointOrderStatus(orders)
@@ -161,9 +177,9 @@ class CSBSendWithSOAP
     # puts 'soap_request:[' << soap_request << ']'
     response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],soap_request)
     xml_file_return = response.body.to_s
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    puts xml_file_return
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    # puts xml_file_return
+    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     parsePointOrderStatus(xml_file_return)
   end
 
