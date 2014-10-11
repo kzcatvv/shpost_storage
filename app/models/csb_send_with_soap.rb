@@ -139,7 +139,7 @@ class CSBSendWithSOAP
           return_array = CSBSendWithSOAP.callPointOrderStatus(deal_orders)
         rescue Exception => e
           puts "error:#{$!} at:#{$@}"
-          orders.each do |order|
+          deal_orders.each do |order|
             notice = DeliverNotice.where(order_id: order.id).last
             notice.status="HTTP Exception"
             notice.send_times=notice.send_times+1
