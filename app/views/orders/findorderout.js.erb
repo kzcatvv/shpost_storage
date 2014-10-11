@@ -1,17 +1,15 @@
 var oid = <%= @curr_order %>;
 var id = <%= @curr_dtl %>;
 
-if (oid == 0)
-{
-    if (id == 0)
-    {
+if (oid == 0){
+    if (id == 0){
+      $('#_tracking_number').val("")
       $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
       var myWindow = window.open("","myWindow","width=200,height=100,left=500,top=200");
       myWindow.document.write("<p>无符合条件的面单号或商品</p>");
       setTimeout(function(){myWindow.close()},3000);  
-    }
-    else
-    {
+    }else{
+      $('#_tracking_number').val("<%= @_tracking_number%>")
 	    var tdraid = "#realam_"+<%= @curr_dtl %>;
       var tddbid = "#dbam_"+<%= @curr_dtl %>;
       var trid = "#tr_"+<%= @curr_dtl %>;
@@ -44,10 +42,9 @@ if (oid == 0)
         }
       }
     }
-
 }
-else
-{
+else{
+  $('#_tracking_number').val("<%= @tracking_number%>")
 	$('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms",:object => @curr_order)) %> ");
 
 }

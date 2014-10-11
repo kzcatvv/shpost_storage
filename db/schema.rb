@@ -97,8 +97,6 @@ ActiveRecord::Schema.define(version: 20141008073453) do
     t.integer  "business_id"
   end
 
-  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
-
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -183,7 +181,7 @@ ActiveRecord::Schema.define(version: 20141008073453) do
     t.string   "pingan_ordertime"
     t.string   "pingan_operate"
     t.string   "customer_idnumber"
-    t.string   "tracking_info",     limit: 1000
+    t.string   "tracking_info",     limit: 2000
   end
 
   create_table "purchase_details", force: true do |t|

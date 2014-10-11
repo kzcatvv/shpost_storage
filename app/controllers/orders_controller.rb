@@ -523,26 +523,30 @@ class OrdersController < ApplicationController
   end
 
   def findorderout
-      @order=Order.where(tracking_number: params[:tracking_number],status: "checked").first
-      if @order.nil?
-        @order_details=[]
-        @curr_order=0
+      @_tracking_number = params[:_tracking_number]
+      @tracking_number = params[:tracking_number]
 
-        @order=Order.find(params[:orderid])
+      if !@_tracking_number.blank?
+        @order_details = []
+        @curr_order = 0
+
+        order = Order.find(params[:orderid])
       # @order_details=@order.order_details
       # @curr_order=@order.id
-        curr_dtls=@order.order_details.includes(:specification).where("specifications.sixnine_code = ?",params[:tracking_number]).distinct.first
+        curr_dtls = order.order_details.includes(:specification).where("specifications.sixnine_code = ?",params[:tracking_number]).distinct.first
         if curr_dtls.nil?
-           @curr_dtl=0
+           @curr_dtl = 0
         else
-           @curr_dtl=curr_dtls.id
+           @curr_dtl = curr_dtls.id
         end 
       else
-        @curr_order=@order.id
-        @order_details=@order.order_details
-        @curr_dtl=0
-        @dtl_cnt=@order.order_details.count
-        @act_cnt=0
+        order = Order.where(tracking_number: @tracking_number, status: "checked").first
+
+        @curr_order = order.id
+        @order_details = order.order_details
+        @curr_dtl = 0
+        @dtl_cnt = order.order_details.count
+        @act_cnt = 0
       end
       respond_to do |format|
           format.js 

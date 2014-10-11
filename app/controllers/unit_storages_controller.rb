@@ -4,24 +4,24 @@ class UnitStoragesController < ApplicationController
 
   def index
   	#binding.pry
-    @storages = Storage.includes(:unit).where("storages.unit_id=?",current_user.unit_id)
+    # @storages = Storage.includes(:unit).where("storages.unit_id=?",current_user.unit_id)
     @storages_grid = initialize_grid(@storages)
   end
 
   # GET /storages/1
   # GET /storages/1.json
   def show
-  	@storage=Storage.find(params[:id])
+  	# @storage=Storage.find(params[:id])
   end
 
   # GET /storages/new
   def new
-    @storage = Storage.new
+    # @storage = Storage.new
   end
 
   # GET /storages/1/edit
   def edit
-      @storage=Storage.find(params[:id])
+      # @storage=Storage.find(params[:id])
 
   end
 
@@ -29,11 +29,12 @@ class UnitStoragesController < ApplicationController
   # POST /storages.json
   def create
 
-    @storage = Storage.new(storage_params)
-    @storage.unit_id=current_user.unit_id
+    # @storage = Storage.new(storage_params)
+    # @storage.unit_id = u
+
     respond_to do |format|
       if @storage.save
-        format.html { redirect_to storage_path(@storage), notice: 'Role was successfully created.' }
+        format.html { redirect_to unit_storage_path(@unit,@storage), notice: 'Role was successfully created.' }
         format.json { render action: 'show', status: :created, location: @storage }
       else
         format.html { render action: 'new' }
@@ -45,10 +46,10 @@ class UnitStoragesController < ApplicationController
   # PATCH/PUT /storages/1
   # PATCH/PUT /storages/1.json
   def update
-     @storage=Storage.find(params[:id])
+     # @storage=Storage.find(params[:id])
      respond_to do |format|
       if @storage.update(storage_params)
-        format.html { redirect_to @storage, notice: 'storage was successfully updated.' }
+        format.html { redirect_to unit_storage_path(@unit,@storage), notice: 'storage was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -60,10 +61,10 @@ class UnitStoragesController < ApplicationController
   # DELETE /storages/1
   # DELETE /storages/1.json
   def destroy
-  	@storage=Storage.find(params[:id])
+  	# @storage=Storage.find(params[:id])
     @storage.destroy
     respond_to do |format|
-      format.html { redirect_to storages_path }
+      format.html { redirect_to unit_storages_path(@unit) }
       format.json { head :no_content }
     end
   end
