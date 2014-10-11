@@ -120,9 +120,9 @@ class CSBSendWithSOAP
     response = csb_post(StorageConfig.config["csb_interface"]["update_point_order_status_url"],soap_request)
 
     xml_file_return = response.body.to_s
-    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    # puts xml_file_return
-    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts xml_file_return
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     parseUpdatePointOrderStatus(xml_file_return)
   end
 
@@ -177,9 +177,9 @@ class CSBSendWithSOAP
     # puts 'soap_request:[' << soap_request << ']'
     response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],soap_request)
     xml_file_return = response.body.to_s
-    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    # puts xml_file_return
-    # puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    puts xml_file_return
+    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     parsePointOrderStatus(xml_file_return)
   end
 
