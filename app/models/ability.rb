@@ -78,6 +78,12 @@ class Ability
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
 
+        can :manage, InterfaceInfo
+
+        cannot :resend, InterfaceInfo do |interface_info|
+            (interface_info.status == "success")
+        end
+
         can :manage, Keyclientorder, storage_id: storage.id
         can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
 

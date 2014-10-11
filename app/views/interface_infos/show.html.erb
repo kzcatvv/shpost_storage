@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Method name:</strong>
+  <%= @interface_info.method_name %>
+</p>
+
+<p>
+  <strong>Class name:</strong>
+  <%= @interface_info.class_name %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @interface_info.status %>
+</p>
+
+<p>
+  <strong>Operate time:</strong>
+  <%= @interface_info.operate_time %>
+</p>
+
+<p>
+  <strong>Url:</strong>
+  <%= @interface_info.url %>
+</p>
+
+<p>
+  <strong>Url method:</strong>
+  <%= @interface_info.url_method %>
+</p>
+
+<p>
+  <strong>Url content:</strong>
+  <%= @interface_info.url_content %>
+</p>
+
+<p>
+  <strong>Type:</strong>
+  <%= @interface_info.type %>
+</p>
+
+<%= link_to 'Edit', edit_interface_info_path(@interface_info) %> |
+<%= link_to 'Back', interface_infos_path %>

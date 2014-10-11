@@ -1,35 +1,44 @@
 class GnxbSoap
   require "rexml/document"
 
-  def self.order_query(uri, mehod)
+  def order_query(uri, mehod)
+    @interface_status = '0'
+    begin
+      client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
+        
+      yjbhs = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"}).map!{|x| x.tracking_number}
 
-    client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
-      
-    yjbhs = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"}).map!{|x| x.tracking_number}
+      #yjbh = "9900162517212"
+      #puts yjbhs
 
-    #yjbh = "9900162517212"
-    #puts yjbhs
-	
-	yjbhs.each do |yjbh|
-	  puts "-------------" << yjbh << "-----------------"
-		response = client.call(mehod.to_sym, message: { in0: "6", in1: "192.168.0.1", in2: yjbh })
-		json = response.body["#{mehod}_response".to_sym]["out".to_sym]
-		gnxb_info = ""
-		gnxb_status = Order::STATUS[:packed]
-		if json.blank?
-		  next
-		end
-		json["mail".to_sym].each do |x|
-		  action_time = convertToString(x[:action_date_time],Date)
-		  office_desc = convertToString(x[:relation_office_desc],String)
-		  office_name = convertToString(x[:office_name],String)
-		  info_out = convertToString(x[:action_info_out],String)
-		  gnxb_info << action_time << "#" << office_desc << "#" << office_name << "#" << info_out << "\n"
-		  gnxb_status = returnStatus(info_out)
-		end
-		updateOrder(yjbh,gnxb_info,gnxb_status)
-    sleep 5
-	end
+      yjbhs.each do |yjbh|
+        puts "-------------" << yjbh << "-----------------"
+        response = client.call(mehod.to_sym, message: { in0: "6", in1: "192.168.0.1", in2: yjbh })
+        json = response.body["#{mehod}_response".to_sym]["out".to_sym]
+        gnxb_info = ""
+        gnxb_status = Order::STATUS[:packed]
+        if json.blank?
+          next
+        end
+        json["mail".to_sym].each do |x|
+          action_time = convertToString(x[:action_date_time],Date)
+          office_desc = convertToString(x[:relation_office_desc],String)
+          office_name = convertToString(x[:office_name],String)
+          info_out = convertToString(x[:action_info_out],String)
+          gnxb_info << action_time << "#" << office_desc << "#" << office_name << "#" << info_out << "\n"
+          gnxb_status = returnStatus(info_out)
+        end
+        updateOrder(yjbh,gnxb_info,gnxb_status)
+        sleep 5
+      end
+    rescue Exception => e
+      puts e
+      @interface_status = '1'
+      #Rails.errors e.message
+    ensure
+      ActiveRecord::Base.connection_pool.release_connection
+      # puts "#{@title} : #{@count}"
+    end
   end
 
   private
@@ -37,16 +46,16 @@ class GnxbSoap
     SalaryQueryConfig.config["test_mod"]
   end
   
-  def self.convertToString(input,type)
+  def convertToString(input,type)
     if input.is_a? type
-	  if type == Date
-	    return input.strftime("%Y-%m-%d %H:%M:%S")
-	  elsif type == String
-	    return input
-	  end
-	else
-	  return ""
-	end
+      if type == Date
+        return input.strftime("%Y-%m-%d %H:%M:%S")
+      elsif type == String
+        return input
+      end
+    else
+      return ""
+    end
   end
 
   def self.gnxb_post(uri,body)
@@ -70,12 +79,12 @@ class GnxbSoap
     xml_file << doc.to_s
   end
   
-  def self.returnStatus(tdxq)
-	if !tdxq.blank?
+  def returnStatus(tdxq)
+    if !tdxq.blank?
       if tdxq.start_with? '已签收'
-		return Order::STATUS[:delivered]
+        return Order::STATUS[:delivered]
       end
     end
-	return Order::STATUS[:delivering]
+    return Order::STATUS[:delivering]
   end
 end

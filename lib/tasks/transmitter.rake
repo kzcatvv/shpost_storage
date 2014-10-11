@@ -6,15 +6,17 @@ namespace :transmitter do
         generate_params 'transmitter.tcsd.order_query'
         # while 1==1 do
           # @count += 1
-          begin
-            TcbdSoap.order_query(@uri, @method)
-          rescue Exception => e
-            puts e
-            #Rails.errors e.message
-          ensure
-            ActiveRecord::Base.connection_pool.release_connection
-            # puts "#{@title} : #{@count}"
-          end
+          # begin
+            # TcbdSoap.order_query(@uri, @method)
+            InterfaceInfo.send_info(TcbdSoap,"order_query",[@uri,@method],"auto",nil)
+
+          # rescue Exception => e
+          #   puts e
+          #   #Rails.errors e.message
+          # ensure
+          #   ActiveRecord::Base.connection_pool.release_connection
+          #   # puts "#{@title} : #{@count}"
+          # end
           # sleep @interval
         #end
       end
@@ -27,7 +29,8 @@ namespace :transmitter do
         # while 1==1 do
           # @count += 1
           begin
-            GnxbSoap.order_query(@uri, @method)
+            # GnxbSoap.order_query(@uri, @method)
+            InterfaceInfo.send_info(GnxbSoap,"order_query",[@uri,@method],"auto",nil)
           rescue Exception => e
             puts e
             #Rails.errors e.message
@@ -96,8 +99,8 @@ namespace :transmitter do
     task :update_order_status => :environment do
       generate_params 'transmitter.csb.update_order_status'
 
-      CSBSendWithSOAP.updatePointOrderStatus()
-
+      # CSBSendWithSOAP.updatePointOrderStatus('auto')
+      InterfaceInfo.send_info(CSBSendWithSOAP,"updatePointOrderStatus",nil,"auto",nil)
       # while 1==1 do
       #   @count += 1
       #   orders = BcmInterface.csb_notice_array_all()
@@ -145,7 +148,8 @@ namespace :transmitter do
     task :order_status => :environment do
       generate_params 'transmitter.csb.order_status'
 
-      CSBSendWithSOAP.pointOrderStatus()
+      # CSBSendWithSOAP.pointOrderStatus('auto')
+      InterfaceInfo.send_info(CSBSendWithSOAP,"pointOrderStatus",nil,"auto",nil)
 
       # while 1==1 do
       #   @count += 1
@@ -194,7 +198,20 @@ namespace :transmitter do
     task :get_point_order => :environment do
       generate_params 'transmitter.csb.get_point_order'
 
-      CSBSendWithSOAP.sendPointOrder()
+      endDate = DateTime.now.strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
+      startDate = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
+      # endDate = "2014-08-23 00:00:00"
+      # startDate = "2014-08-22 00:00:00"
+      # if order_type == 1
+      #   endDate = "2014-08-02 00:00:00"
+      #   startDate = "2014-08-01 00:00:00"
+      # else
+      #   endDate = "2014-08-02 00:00:00"
+      #   startDate = "2014-08-01 00:00:00"
+      # end
+
+      # CSBSendWithSOAP.sendPointOrder('auto')
+      InterfaceInfo.send_info(CSBSendWithSOAP,"sendPointOrder",[startDate,endDate],"auto",nil)
       
       # while 1==1 do
       #   @count += 1
@@ -214,7 +231,9 @@ namespace :transmitter do
 
     desc "Transmitter redeal with orders"
     task :redeal_with_orders => :environment do
-      CSBSendWithSOAP.redealWithSavedOrders()
+      # CSBSendWithSOAP.redealWithSavedOrders()
+      InterfaceInfo.send_info(CSBSendWithSOAP,"redealWithSavedOrders",nil,"auto",nil)
+
     end
 
   end

@@ -308,6 +308,9 @@ zh-CN:
       contact:
         one: 联系人管理
         other: 联系人管理
+      interface_info:
+        one: 接口信息
+        other: 接口信息
     attributes:
       user:
         email: "电子邮件"
@@ -546,6 +549,16 @@ zh-CN:
         filename: "文档"
         rename: "文件名"
         created_at: "上传时间"
+      interface_info:
+        class_name: "类名"
+        method_name: "方法名"
+        operate_times: "操作次数"
+        operate_type: "操作类型"
+        status: "状态"
+        status_success: "成功"
+        status_failed: "失败"
+        first_time: "首次调用时间"
+        last_time: "末次调用时间"
   menu:
     permission:
       name: "权限管理"
@@ -701,6 +714,9 @@ zh-CN:
         user_log:
           name: "日志查询"
           link: "/user_logs"
+        interface_log:
+          name: "接口信息"
+          link: "/interface_infos"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 
