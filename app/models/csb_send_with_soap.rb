@@ -80,7 +80,8 @@ class CSBSendWithSOAP
           if return_array[0]=="0"
             # puts 0
             deal_orders.each do |order|
-              notice = DeliverNotice.where(order_id: order.id).last
+              # notice = DeliverNotice.where(order_id: order.id).last
+              notice = DeliverNotice.find_by(order_id: order.id, send_type: BcmInterface::STATUS_HASH[order.status])
               notice.status="success"
               notice.send_times=notice.send_times+1
               notice.save
@@ -88,7 +89,8 @@ class CSBSendWithSOAP
           else
             # puts 1
             deal_orders.each do |order|
-              notice = DeliverNotice.where(order_id: order.id).last
+              # notice = DeliverNotice.where(order_id: order.id).last
+              notice = DeliverNotice.find_by(order_id: order.id, send_type: BcmInterface::STATUS_HASH[order.status])
               notice.status=return_array[0]+':'+return_array[1]
               notice.send_times=notice.send_times+1
               notice.save
@@ -97,7 +99,8 @@ class CSBSendWithSOAP
         rescue Exception => e
           puts "error:#{$!} at:#{$@}"
           deal_orders.each do |order|
-            notice = DeliverNotice.where(order_id: order.id).last
+            # notice = DeliverNotice.where(order_id: order.id).last
+            notice = DeliverNotice.find_by(order_id: order.id, send_type: BcmInterface::STATUS_HASH[order.status])
             notice.status="HTTP Exception"
             notice.send_times=notice.send_times+1
             notice.save
@@ -140,8 +143,9 @@ class CSBSendWithSOAP
         rescue Exception => e
           puts "error:#{$!} at:#{$@}"
           deal_orders.each do |order|
-            notice = DeliverNotice.where(order_id: order.id).last
-            notice.status="HTTP Exception"
+            # notice = DeliverNotice.where(order_id: order.id).last
+            notice = DeliverNotice.find_by(order_id: order.id, send_type: BcmInterface::STATUS_HASH[order.status])
+            # notice.status="HTTP Exception"
             notice.send_times=notice.send_times+1
             notice.save
           end
@@ -642,15 +646,21 @@ class CSBSendWithSOAP
       processResult = orderLabel.attributes['processResult']
 
       order = Order.find_by business_order_id: orderId
+      notice = DeliverNotice.find_by(order_id: order.id, send_type: BcmInterface::STATUS_HASH[order.status])
       if processResult == '0'
         # OK
-        notice = DeliverNotice.where(order_id: order.id).last
+        # notice = DeliverNotice.where(order_id: order.id).last
         notice.status="over"
         notice.send_times=notice.send_times+1
         notice.save
-      elsif 
+      elsif description.start_with? '失败:此订单已经处理过'
+        # notice = DeliverNotice.where(order_id: order.id).last
+        notice.status="over"
+        notice.send_times=notice.send_times+1
+        notice.save
+      else
         # NG
-        notice = DeliverNotice.where(order_id: order.id).last
+        # notice = DeliverNotice.where(order_id: order.id).last
         notice.status=processResult+':'+description
         notice.send_times=notice.send_times+1
         notice.save
