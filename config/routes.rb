@@ -1,6 +1,12 @@
 ShpostStorage::Application.routes.draw do
 
 
+  resources :interface_infos do
+    member do
+      get 'resend'
+    end
+  end
+
   resources :orderreturns do
     collection do
       get 'packreturn'

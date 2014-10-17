@@ -1,0 +1,35 @@
+<%- model_class = InterfaceInfo -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
+
+<%= grid(@interface_infos_grid) do |g|
+    g.column name: model_class.human_attribute_name(:class_name), attribute: 'class_name' do |interface_info| 
+      InterfaceInfo::CLASS_NAME[interface_info.class_name.to_sym]
+    end
+
+    g.column name: model_class.human_attribute_name(:method_name), attribute: 'method_name' do |interface_info| 
+      InterfaceInfo::METHOD_NAME[interface_info.method_name.to_sym]
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: InterfaceInfo::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |interface_info| 
+      InterfaceInfo::STATUS[interface_info.status.to_sym]
+      # interface_info.status
+
+    end
+
+    g.column name: model_class.human_attribute_name(:operate_times), attribute: 'operate_times'
+    g.column name: model_class.human_attribute_name(:operate_type), attribute: 'operate_type'  do |interface_info| 
+      InterfaceInfo::OPERATE_TYPE[interface_info.operate_type.to_sym]
+    end
+    g.column name: model_class.human_attribute_name(:first_time), attribute: 'first_time'
+    g.column name: model_class.human_attribute_name(:last_time), attribute: 'last_time'
+
+
+    g.column do |interface_info|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.resend_interface_info', :default => t("helpers.links.resend_interface_info")), resend_interface_info_path(interface_info), method: :get, :class => 'btn btn-xs btn-primary' if can? :resend, interface_info)
+      end
+  end 
+%>
+

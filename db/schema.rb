@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141008073453) do
+ActiveRecord::Schema.define(version: 20141016062754) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -83,6 +83,24 @@ ActiveRecord::Schema.define(version: 20141008073453) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+  end
+
+  create_table "interface_infos", force: true do |t|
+    t.string   "method_name"
+    t.string   "class_name"
+    t.string   "status"
+    t.string   "url"
+    t.string   "url_method"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "first_time"
+    t.string   "last_time"
+    t.text     "url_request"
+    t.text     "url_response"
+    t.string   "operate_type"
+    t.string   "operate_user"
+    t.integer  "operate_times"
+    t.string   "params",        limit: 1000
   end
 
   create_table "keyclientorderdetails", force: true do |t|

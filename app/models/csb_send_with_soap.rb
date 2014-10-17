@@ -4,43 +4,52 @@ class CSBSendWithSOAP
   @@call_flg = false
   @@startrow = 1
 
-  def self.redealWithSavedOrders()
-    direct = "#{Rails.root}/upload/orders/"
-    Dir.entries(direct).each { |file_name|
-      file_path = direct + file_name
-      if File.file?(file_path)
-        ary = FileInterface.read_order_file(file_path)
-        context = JSON.parse(ary[0].split(/\n/)[0])
-        business = Business.find ary[1].split(/\n/)[0]
-        unit = Unit.find ary[2].split(/\n/)[0]
-        order = StandardInterface.order_enter(context,business,unit)
-        # if order.class is Order, means this order was saved into Order table. otherwise was saved into file
-        if order.class == Order
-          File.delete(file_path)
+  def redealWithSavedOrders()
+    # default status : '0' (success)
+    @interface_status = '0'
+    begin
+      direct = "#{Rails.root}/upload/orders/"
+      Dir.entries(direct).each { |file_name|
+        file_path = direct + file_name
+        if File.file?(file_path)
+          ary = FileInterface.read_order_file(file_path)
+          context = JSON.parse(ary[0].split(/\n/)[0])
+          business = Business.find ary[1].split(/\n/)[0]
+          unit = Unit.find ary[2].split(/\n/)[0]
+          order = StandardInterface.order_enter(context,business,unit)
+          # if order.class is Order, means this order was saved into Order table. otherwise was saved into file
+          if order.class == Order
+            File.delete(file_path)
+          end
         end
-      end
-    }
+      }
+    rescue Exception => e
+      puts e.message
+      @interface_status = '1'
+    ensure
+    end
   end
 
-  def self.sendPointOrder()
-    # @count += 1
+  def sendPointOrder(startDate,endDate)
+    # default status : '0' (success)
+    @interface_status = '0'
     begin
       for order_type in 1..2
         # puts order_type
         @@call_flg = false
         @@startrow = 1
         begin 
-          xml_file = setSendPointOrder(order_type)
+          xml_file = setSendPointOrder(order_type,startDate,endDate)
           puts '------------start----------------'
           puts xml_file
           puts '----------------------------'
-          soap_request = setSOAPRequestXML('SendPointOrder',xml_file)
+          @soap_request = setSOAPRequestXML('SendPointOrder',xml_file)
 
-          response = csb_post(StorageConfig.config["csb_interface"]["send_point_order_url"],soap_request)
-          xml_file_return = response.body.to_s
-          puts xml_file_return
+          response = csb_post(StorageConfig.config["csb_interface"]["send_point_order_url"],@soap_request)
+          @xml_file_return = response.body.to_s
+          puts @xml_file_return
           # puts "@@call_flg=" << @@call_flg.to_s
-          xml_file_trans_status = parseAndSaveSendPointOrder(xml_file_return,order_type)
+          xml_file_trans_status = parseAndSaveSendPointOrder(@xml_file_return,order_type)
           # puts '----------------------------'
           # puts xml_file_trans_status
           soap_request = setSOAPRequestXML('PointUpdateTransStatus',xml_file_trans_status)
@@ -57,15 +66,17 @@ class CSBSendWithSOAP
     rescue Exception => e
       #Rails.errors e.message
       puts e.message
+      @interface_status = '1'
     ensure
       ActiveRecord::Base.connection_pool.release_connection
       # puts "#{@title} : #{@count}"
     end
-    
   end
 
-  def self.updatePointOrderStatus()
+  def updatePointOrderStatus()
     # @count += 1
+    # default status : '0' (success)
+    @interface_status = '0'
     orders = BcmInterface.csb_notice_array_all()
     start = 0
     if orders.size > 0
@@ -75,7 +86,7 @@ class CSBSendWithSOAP
         # puts deal_orders
         begin
           # puts "start=" + start.to_s
-          return_array = CSBSendWithSOAP.callUpdatePointOrderStatus(deal_orders)
+          return_array = callUpdatePointOrderStatus(deal_orders)
           # puts return_array
           if return_array[0]=="0"
             # puts 0
@@ -106,6 +117,7 @@ class CSBSendWithSOAP
             notice.save
           end
           #Rails.errors e.message
+          @interface_status = '1'
         ensure
           ActiveRecord::Base.connection_pool.release_connection
           # puts "#{@title} : #{@count}"
@@ -115,22 +127,24 @@ class CSBSendWithSOAP
     end
   end
 
-  def self.callUpdatePointOrderStatus(orders)
+  def callUpdatePointOrderStatus(orders)
     xml_file = setUpdatePointOrderStatus(orders)
     puts 'xml_file:[' << xml_file << ']'
-    soap_request = setSOAPRequestXML('UpdatePointOrderStatus',xml_file)
-    # puts 'soap_request:[' << soap_request << ']'
-    response = csb_post(StorageConfig.config["csb_interface"]["update_point_order_status_url"],soap_request)
+    @soap_request = setSOAPRequestXML('UpdatePointOrderStatus',xml_file)
+    # puts 'soap_request:[' << @soap_request << ']'
+    response = csb_post(StorageConfig.config["csb_interface"]["update_point_order_status_url"],@soap_request)
 
-    xml_file_return = response.body.to_s
+    @xml_file_return = response.body.to_s
     puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    puts xml_file_return
+    puts @xml_file_return
     puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    parseUpdatePointOrderStatus(xml_file_return)
+    parseUpdatePointOrderStatus(@xml_file_return)
   end
 
-  def self.pointOrderStatus()
+  def pointOrderStatus()
     # @count += 1
+    # default status : '0' (success)
+    @interface_status = '0'
     orders = BcmInterface.csb_notice_array()
     start = 0
       while start < orders.size do
@@ -139,7 +153,7 @@ class CSBSendWithSOAP
         # puts "deal_orders.size=" + deal_orders.size.to_s
         # puts deal_orders
         begin
-          return_array = CSBSendWithSOAP.callPointOrderStatus(deal_orders)
+          return_array = callPointOrderStatus(deal_orders)
         rescue Exception => e
           puts "error:#{$!} at:#{$@}"
           deal_orders.each do |order|
@@ -150,6 +164,7 @@ class CSBSendWithSOAP
             notice.save
           end
           #Rails.errors e.message
+          @interface_status = '1'
         ensure
           ActiveRecord::Base.connection_pool.release_connection
           # puts "#{@title} : #{@count}"
@@ -174,21 +189,21 @@ class CSBSendWithSOAP
       # end
   end
 
-  def self.callPointOrderStatus(orders)
+  def callPointOrderStatus(orders)
     xml_file = setPointOrderStatus(orders)
     puts 'xml_file:[' << xml_file << ']'
-    soap_request = setSOAPRequestXML('PointOrderStatus',xml_file)
-    # puts 'soap_request:[' << soap_request << ']'
-    response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],soap_request)
-    xml_file_return = response.body.to_s
+    @soap_request = setSOAPRequestXML('PointOrderStatus',xml_file)
+    # puts 'soap_request:[' << @soap_request << ']'
+    response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],@soap_request)
+    @xml_file_return = response.body.to_s
     puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    puts xml_file_return
+    puts @xml_file_return
     puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    parsePointOrderStatus(xml_file_return)
+    parsePointOrderStatus(@xml_file_return)
   end
 
   private
-  def self.csb_post(uri,body)
+  def csb_post(uri,body)
     url = URI.parse(uri)
     request = Net::HTTP::Post.new(url.path)
     request.content_type = 'text/xml'
@@ -196,7 +211,7 @@ class CSBSendWithSOAP
     response = Net::HTTP.start(url.host, url.port) {|http| http.request(request)}
   end
 
-  def self.setPointOrderStatus(orders)
+  def setPointOrderStatus(orders)
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
     doc = REXML::Document.new       #创建XML内容 
 
@@ -288,7 +303,7 @@ class CSBSendWithSOAP
     xml_file << doc.to_s
   end
 
-  def self.setUpdatePointOrderStatus(orders)
+  def setUpdatePointOrderStatus(orders)
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
     doc = REXML::Document.new       #创建XML内容 
 
@@ -345,19 +360,7 @@ class CSBSendWithSOAP
     xml_file << doc.to_s
   end
 
-  def self.setSendPointOrder(order_type)
-    current_date = DateTime.now.strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
-    start_date = (DateTime.now - StorageConfig.config["csb_interface"]["query_period"]).strftime("%Y-%m-%d") + " " + StorageConfig.config["csb_interface"]["query_time"]
-  # current_date = "2014-08-23 00:00:00"
-  # start_date = "2014-08-22 00:00:00"
-  # if order_type == 1
-  #   current_date = "2014-08-02 00:00:00"
-  #   start_date = "2014-08-01 00:00:00"
-  # else
-  #   current_date = "2014-08-02 00:00:00"
-  #   start_date = "2014-08-01 00:00:00"
-  # end
-
+  def setSendPointOrder(order_type,start_Date,end_Date)
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
     doc = REXML::Document.new       #创建XML内容 
 
@@ -388,14 +391,14 @@ class CSBSendWithSOAP
     # messageCode.add_text "错误信息code"
     # description.add_text "错误信息描述"
     activeCode.add_text StorageConfig.config["csb_interface"]["active_code"]
-    beginDate.add_text start_date
-    endDate.add_text current_date
+    beginDate.add_text start_Date
+    endDate.add_text end_Date
 
     xml_file << doc.to_s
     # xml_file.encode(:xml => :text)
   end
 
-  def self.setSOAPRequestXML(service_name,xml_soap)
+  def setSOAPRequestXML(service_name,xml_soap)
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
     doc = REXML::Document.new       #创建XML内容
 
@@ -440,7 +443,7 @@ class CSBSendWithSOAP
     xml_file << doc.to_s
   end
 
-  def self.parseAndSaveSendPointOrder(xml_file,order_type)
+  def parseAndSaveSendPointOrder(xml_file,order_type)
     orderTransStatus = Array.new
     doc = REXML::Document.new(xml_file)
     xml_body = doc.root.elements['soapenv:Body'].elements['ns1:sendQueryOrderResponse'].elements['sendQueryOrderReturn'].text.to_s
@@ -555,7 +558,7 @@ class CSBSendWithSOAP
     setPointUpdateTransStatus(orderTransStatus, order_type)
   end
 
-  def self.setPointUpdateTransStatus(order_ids, order_type)
+  def setPointUpdateTransStatus(order_ids, order_type)
     xml_file = '<?xml version="1.0" encoding="utf-8" ?>';
     doc = REXML::Document.new       #创建XML内容 
 
@@ -594,7 +597,7 @@ class CSBSendWithSOAP
     #xml_file.encode(:xml => :text)
   end
 
-  def self.parseUpdatePointOrderStatus(xml_file)
+  def parseUpdatePointOrderStatus(xml_file)
     doc = REXML::Document.new(xml_file)
     xml_body = doc.root.elements['soapenv:Body'].elements['ns1:updateQueryOrderStatusResponse'].elements['updateQueryOrderStatusReturn'].text.to_s
     # default encoding is utf-8 in ruby
@@ -619,7 +622,7 @@ class CSBSendWithSOAP
     return return_array
   end
 
-  def self.parsePointOrderStatus(xml_file)
+  def parsePointOrderStatus(xml_file)
     doc = REXML::Document.new(xml_file)
     xml_body = doc.root.elements['soapenv:Body'].elements['ns1:OrderStatusResponse'].elements['OrderStatusReturn'].text.to_s
     # default encoding is utf-8 in ruby
@@ -676,8 +679,8 @@ class CSBSendWithSOAP
     # return return_array
   end
 
-  def self.parsePointUpdateTransStatus(xml_file)
-    doc = REXML::Document.new(decode_xml(xml_file)) 
+  def parsePointUpdateTransStatus(xml_file)
+    doc = REXML::Document.new(CSBSendWithSOAP.decode_xml(xml_file)) 
     root = doc.root
     head = root.elements['Head']
     sender = head.elements['Sender']
