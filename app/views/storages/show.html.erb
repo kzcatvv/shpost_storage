@@ -13,11 +13,11 @@
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
-              unit_storages_path(@unit), :class => 'btn btn-default'  %>
+              storage_path, :class => 'btn btn-default'  %>
 <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_unit_storage_path(@unit,@storage), :class => 'btn btn-default' %>
+              edit_storage_path(@storage), :class => 'btn btn-default' %>
 <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-              unit_storage_path(@unit,@storage),
+              storage_path(@storage),
               :method => 'delete',
               :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
               :class => 'btn btn-danger' %>

@@ -6,26 +6,10 @@
 
 </div>
 <div>
-   <%= label_tag 'name', '面单号或69码:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls", onkeypress: "EnterPress(event)"  %><%= content_tag(:p, "注意:请先扫面单号再扫69码") %>
+   <%= label_tag 'name', '扫描面单号或69码:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls"%><%= content_tag(:p, "注意:请先扫面单号再扫69码") %>
+   <%= %>
 </div>
+面单号: <%= text_field_tag '_tracking_number', nil, class: "controls", readonly: true%>
 <div id="outorders">
-    <%= render :partial => 'orders/packout_forms' %>
+  <%= render :partial => 'orders/packout_forms' %>
 </div>
-<script language="javascript" type="text/javascript"> 
-
-function EnterPress(e){ //传入 event   
-    var e = e || window.event;   
-    if(e.keyCode == 13){   
-      $.ajax({
-            type : 'GET',
-            url : '/orders/findorderout/',
-            data: { tracking_number: $('#tracking_number').val(),
-                    orderid: $('#orderid').val()},
-            dataType : 'script'
-            });
-      $('#tracking_number').val("");
-      return false;   
-    }   
-}
-
-</script>
