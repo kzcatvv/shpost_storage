@@ -24,7 +24,7 @@ class CSBSendWithSOAP
         end
       }
     rescue Exception => e
-      puts e.message
+      Rails.logger.error e.message
       @interface_status = '1'
     ensure
     end
@@ -40,14 +40,14 @@ class CSBSendWithSOAP
         @@startrow = 1
         begin 
           xml_file = setSendPointOrder(order_type,startDate,endDate)
-          puts '------------start----------------'
-          puts xml_file
-          puts '----------------------------'
+          Rails.logger.info '------------start----------------'
+          Rails.logger.info xml_file
+          Rails.logger.info '----------------------------'
           @soap_request = setSOAPRequestXML('SendPointOrder',xml_file)
 
           response = csb_post(StorageConfig.config["csb_interface"]["send_point_order_url"],@soap_request)
           @xml_file_return = response.body.to_s
-          puts @xml_file_return
+          Rails.logger.info @xml_file_return
           # puts "@@call_flg=" << @@call_flg.to_s
           xml_file_trans_status = parseAndSaveSendPointOrder(@xml_file_return,order_type)
           # puts '----------------------------'
@@ -58,14 +58,14 @@ class CSBSendWithSOAP
           # puts soap_request
           response = csb_post(StorageConfig.config["csb_interface"]["point_update_trans_status_url"],soap_request)
           # puts response.body
-          puts '--------------end-----------------'
+          Rails.logger.info '--------------end-----------------'
 
         end while !@@call_flg
       end
       # return_array = CSBSendWithSOAP.sendPointOrder()
     rescue Exception => e
       #Rails.errors e.message
-      puts e.message
+      Rails.logger.error e.message
       @interface_status = '1'
     ensure
       ActiveRecord::Base.connection_pool.release_connection
@@ -108,7 +108,7 @@ class CSBSendWithSOAP
             end
           end
         rescue Exception => e
-          puts "error:#{$!} at:#{$@}"
+          Rails.logger.error "error:#{$!} at:#{$@}"
           deal_orders.each do |order|
             # notice = DeliverNotice.where(order_id: order.id).last
             notice = DeliverNotice.find_by(order_id: order.id, send_type: BcmInterface::STATUS_HASH[order.status])
@@ -129,15 +129,15 @@ class CSBSendWithSOAP
 
   def callUpdatePointOrderStatus(orders)
     xml_file = setUpdatePointOrderStatus(orders)
-    puts 'xml_file:[' << xml_file << ']'
+    Rails.logger.info 'xml_file:[' << xml_file << ']'
     @soap_request = setSOAPRequestXML('UpdatePointOrderStatus',xml_file)
     # puts 'soap_request:[' << @soap_request << ']'
     response = csb_post(StorageConfig.config["csb_interface"]["update_point_order_status_url"],@soap_request)
 
     @xml_file_return = response.body.to_s
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    puts @xml_file_return
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    Rails.logger.info "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    Rails.logger.info @xml_file_return
+    Rails.logger.info "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     parseUpdatePointOrderStatus(@xml_file_return)
   end
 
@@ -155,7 +155,7 @@ class CSBSendWithSOAP
         begin
           return_array = callPointOrderStatus(deal_orders)
         rescue Exception => e
-          puts "error:#{$!} at:#{$@}"
+          Rails.logger.error "error:#{$!} at:#{$@}"
           deal_orders.each do |order|
             # notice = DeliverNotice.where(order_id: order.id).last
             notice = DeliverNotice.find_by(order_id: order.id, send_type: BcmInterface::STATUS_HASH[order.status])
@@ -191,14 +191,14 @@ class CSBSendWithSOAP
 
   def callPointOrderStatus(orders)
     xml_file = setPointOrderStatus(orders)
-    puts 'xml_file:[' << xml_file << ']'
+    Rails.logger.info 'xml_file:[' << xml_file << ']'
     @soap_request = setSOAPRequestXML('PointOrderStatus',xml_file)
     # puts 'soap_request:[' << @soap_request << ']'
     response = csb_post(StorageConfig.config["csb_interface"]["point_order_status_url"],@soap_request)
     @xml_file_return = response.body.to_s
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-    puts @xml_file_return
-    puts "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    Rails.logger.info "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    Rails.logger.info @xml_file_return
+    Rails.logger.info "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
     parsePointOrderStatus(@xml_file_return)
   end
 

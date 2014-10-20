@@ -6,6 +6,10 @@ class InterfaceInfo < ActiveRecord::Base
   OPERATE_TYPE = {auto: '自动', manual: '手动'}
 
   def self.save_info(class_name,method_name,status='1',url=nil,url_method=nil,url_request=nil,url_response=nil,type,params,info_id)
+    Rails.logger.info "class_name:" + class_name
+    Rails.logger.info "method_name:" + method_name
+    Rails.logger.info "status:" + status
+    Rails.logger.info "operate_type:" + type
     if info_id.blank?
       info = InterfaceInfo.new
       info.first_time = DateTime.now.strftime("%Y-%m-%d %H:%M:%S")
@@ -37,17 +41,25 @@ class InterfaceInfo < ActiveRecord::Base
   def self.send_info(cls,method_name,params,type,info_id=nil)
     x = cls.new
     x.instance_eval do
+      Rails.logger.info "************send class_name:" +cls.name+ ", method_name:"+method_name+" start*********************"
       self.send(method_name.to_sym,*params)
+      Rails.logger.info "************send end*********************"
+      Rails.logger.info "************save interface info class_name:" +cls.name+ ", method_name:"+method_name+" start*********************"
       InterfaceInfo.save_info(cls.name,method_name,@interface_status,nil,nil,@soap_request,@xml_file_return,type,params,info_id)
+      Rails.logger.info "***********save interface info end*********************"
     end
   end
 
   def self.resend(id)
+    Rails.logger.info "resend id:" + id.to_s
     x = InterfaceInfo.find id
     if !x.blank?
+      Rails.logger.info "find the interface info!"
       if x.params.blank?
+        Rails.logger.info "this interface no params"
         send_info(x.class_name.constantize,x.method_name,nil,'manual',id)
       else
+        Rails.logger.info "this interface has params"
         send_info(x.class_name.constantize,x.method_name,JSON.parse(x.params),'manual',id)
       end
     end
