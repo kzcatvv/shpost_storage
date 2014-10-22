@@ -1,0 +1,54 @@
+<%- model_class = ManualStockDetail -%>
+<div class="page-header">
+  <h1><%=@manual_stock.name%>-<%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :index, ManualStockDetail %>
+      <%= link_to t('.back', :default => t("helpers.links.back")),
+                 manual_stocks_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+    <% if can? :new, ManualStockDetail %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                 new_manual_stock_manual_stock_detail_path(@manual_stock),
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+
+
+
+<%= grid(@manual_stock_details_grid) do |g|
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:manual_stock_id), attribute: 'no',
+    model: 'ManualStock' do |manual_stock_detail|
+        manual_stock_detail.manual_stock.try :no
+    end
+
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name',
+     model: 'Supplier' do |manual_stock_detail|
+        manual_stock_detail.supplier.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name',
+        model: 'Specification' do |manual_stock_detail|
+        manual_stock_detail.specification.try :all_name
+    end
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount', filter: false
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: ManualStockDetail::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |manual_stock_detail| 
+      manual_stock_detail.status_name
+
+    end
+
+    g.column do |purchase_detail|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")), edit_manual_stock_manual_stock_detail_path(@manual_stock,manual_stock_detail), :class => 'btn btn-xs btn-primary' if can? :update, manual_stock_detail) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), manual_stock_manual_stock_detail_path(@manual_stock,manual_stock_detail), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, manual_stock_detail)
+      end
+  end 
+%>

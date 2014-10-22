@@ -1,0 +1,27 @@
+<%= form_for @manual_stock, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :business_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:business_id, Business.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_area :desc, :class => 'text_field' %>
+    </div>
+  </div>
+
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <% if can? :index, ManualStock %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+              manual_stocks_path, :class => 'btn btn-default' %>
+  <% end %>
+<% end %>

@@ -1,5 +1,20 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :manual_stocks do
+    resources :manual_stock_details
+    
+    collection do 
+      get  'manual_stock_import'
+      post 'manual_stock_import' => 'manual_stocks#manual_stock_import'
+    end
+
+    member do
+      patch 'onecheck'
+      get 'stock_out'
+      patch 'check'
+      patch 'close'
+    end
+  end
 
   resources :interface_infos do
     member do

@@ -78,6 +78,18 @@ class Ability
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
 
+        can :manage, ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:opened]
+
+        can :manage, ManualStockDetail, manual_stock: {storage_id: storage.id, status: ManualStock::STATUS[:opened]}
+
+        can :read, ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:closed]
+
+        can :read, ManualStockDetail, manual_stock: {storage_id: storage.id, status: ManualStock::STATUS[:closed]}
+
+        cannot :close, ManualStock do |manual_stock|
+            (manual_stock.storage_id == storage.id) && (manual_stock.status == ManualStock::STATUS[:opened]) && !manual_stock.can_close?
+        end
+
         can :manage, InterfaceInfo
 
         cannot :resend, InterfaceInfo do |interface_info|
