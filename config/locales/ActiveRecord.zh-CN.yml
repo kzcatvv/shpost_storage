@@ -292,8 +292,8 @@ zh-CN:
         one: 采购单明细管理
         other: 采购单明细管理
       manual_stock:
-        one: 批量出库管理
-        other: 批量出库管理
+        one: 出库单
+        other: 出库单
       manual_stock_detail:
         one: 批量出库明细管理
         other: 批量出库明细管理
@@ -664,7 +664,7 @@ zh-CN:
           #   can: :read
           #   role: "shelf"
     suppliers:
-      name: "采购管理"
+      name: "出入库管理"
       needrole:
         can: :read
         role: :Purchase
@@ -672,12 +672,6 @@ zh-CN:
         purchase:
           name: "采购单管理"
           link: "/purchases"
-    manual_stock:
-      name: "批量出库"
-      needrole:
-        can: :read
-        role: :ManualStock
-      submenu:
         manual_stock:
           name: "批量出库管理"
           link: "/manual_stocks"
