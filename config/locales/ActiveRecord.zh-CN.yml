@@ -154,10 +154,14 @@ zh-CN:
       pddetails: 商品明细管理
       custorders: 客户明细管理
       purchase_details: 采购明细
+      manual_stock_details: 批量出库明细管理
       order_details: 订单明细管理
       stock_in_purchase: 入库单
       check_purchase: 确认入库
       close_purchase: 关闭
+      stock_out_manual_stock: 批量出库单
+      check_manual_stock: 确认批量出库
+      close_manual_stock: 关闭
       stockout: 生成出库单
       ordercheck: 出库单确认
       contacts: 联系人管理
@@ -289,6 +293,12 @@ zh-CN:
       purchase_detail:
         one: 采购单明细管理
         other: 采购单明细管理
+      manual_stock:
+        one: 批量出库管理
+        other: 批量出库管理
+      manual_stock_detail:
+        one: 批量出库明细管理
+        other: 批量出库明细管理
       order:
         one: 订单管理
         other: 订单管理
@@ -500,6 +510,25 @@ zh-CN:
         status: "状态"
         status_waiting: "处理中"
         status_stock_in: "完成入库"
+      manual_stock:
+        "no": "编号"
+        name: "名称"
+        unit_id: "所属机构"
+        business_id: "所属商户"
+        desc: "备注"
+        status: "状态"
+        status_opened: "开放"
+        status_closed: "已关闭"
+      manual_stock_detail:
+        name: "名称"
+        manual_stock_id: "批量出库单"
+        supplier_id: "供应商"
+        specification_id: "规格"
+        amount: "数量"
+        desc: "备注"
+        status: "状态"
+        status_waiting: "处理中"
+        status_stock_out: "完成出库"
       area:
         name: "区域名称"
         current_storage: "当前仓库"
@@ -640,6 +669,15 @@ zh-CN:
         purchase:
           name: "采购单管理"
           link: "/purchases"
+    manual_stock:
+      name: "批量出库"
+      needrole:
+        can: :read
+        role: :ManualStock
+      submenu:
+        manual_stock:
+          name: "批量出库管理"
+          link: "/manual_stocks"
     business:
       name: "订单管理"
       needrole:

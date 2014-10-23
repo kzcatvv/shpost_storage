@@ -2,7 +2,7 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 ready = ->
-  $("#scan").keyup(scaned)
+  $("#scan").keydown(scaned)
   
 
 $(document).ready(ready)
@@ -17,3 +17,4 @@ scaned = (e) ->
       r = $("#realam_" + scan.id)
       r.val(eval(r.val()) + 1)
     $('#scan').val("")
+    return false

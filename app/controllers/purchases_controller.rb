@@ -185,6 +185,20 @@ class PurchasesController < ApplicationController
     end
   end
 
+  def scan
+    @scan = @purchase
+    @scans = @purchase.purchase_details
+    # render  'scans/scans'
+    render 'scans/scans'
+  end
+
+  def scan_check
+    @purchase.purchase_details.each do |scan|
+        scan.amount = params["realam_#{scan.id}".to_sym]
+        scan.save
+    end
+    redirect_to action: :index
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -197,7 +211,6 @@ class PurchasesController < ApplicationController
     text.to_s.split('.0')[0]
   end
 
-  private
     # Use callbacks to share common setup or constraints between actions.
     # def set_commodity
     #   @commodity = Commodity.find(params[:id])

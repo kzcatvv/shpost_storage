@@ -1,0 +1,2 @@
+module ManualStocksHelper
+end

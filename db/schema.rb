@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141016062754) do
+ActiveRecord::Schema.define(version: 20141021053120) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -129,6 +129,30 @@ ActiveRecord::Schema.define(version: 20141016062754) do
     t.integer  "business_id"
     t.integer  "user_id"
     t.string   "status"
+  end
+
+  create_table "manual_stock_details", force: true do |t|
+    t.string   "name"
+    t.string   "desc"
+    t.string   "status"
+    t.integer  "amount"
+    t.integer  "manual_stock_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "manual_stocks", force: true do |t|
+    t.string   "no"
+    t.string   "name"
+    t.string   "desc"
+    t.string   "status"
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.integer  "storage_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "order_details", force: true do |t|
