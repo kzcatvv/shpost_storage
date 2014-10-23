@@ -94,6 +94,8 @@ ShpostStorage::Application.routes.draw do
       get 'stock_in'
       patch 'check'
       patch 'close'
+      get "scan" => "scan#scan"
+      post "scan_check" => "scan#check"
     end
   end
 
@@ -178,9 +180,6 @@ ShpostStorage::Application.routes.draw do
       post 'commodity_import' => 'commodities#commodity_import'
     end
   end
-
-  
-
 
   resources :areas do
      resources :shelves, :controller => 'area_shelf'
