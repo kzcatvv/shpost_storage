@@ -14,6 +14,90 @@ class Stock < ActiveRecord::Base
   scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, virtual_amount DESC")}
   scope :available, -> { where("1 = 1")}
 
+  def self.get_product_hash(order,detail,product_hash)
+    product = [order.business,detail.specification,detail.supplier]
+    if product_hash.has_key?(product)
+        product_hash[product][0]=product_hash[product][0]+detail.amount
+        product_hash[product][1]<<detail
+    else
+        product_hash[product]=[detail.amount, [detail]]
+    end
+    return product_hash
+  end
+
+  def self.check_out_stocks(order,details,current_storage)
+    orderchk = true 
+    details.each do |odl|
+      hasout=odl.stock_logs.sum(:amount)
+      if odl.amount - hasout > 0
+       outstocks = Stock.find_stocks_in_storage(odl.specification, odl.supplier, order.business, current_storage).to_ary
+       chkout = false
+       amount = odl.amount - hasout
+       outstocks.each do |stock|
+        if !chkout
+         if stock.virtual_amount - amount >= 0
+            chkout = true
+         else 
+            amount = amount - stock.virtual_amount
+            chkout = false
+         end
+        end
+       end
+       orderchk= orderchk && chkout
+      end 
+    end
+    return orderchk
+  end
+
+  def self.stock_out(product_hash,current_storage,current_user)
+    sklogs = []
+    product_hash.each do |x|
+      product = x[0]
+      amount = x[1][0]
+      details = x[1][1]
+      # Rails.logger.info "-------product info--------"
+      # Rails.logger.info product
+      # Rails.logger.info "-------amount info--------"
+      # Rails.logger.info amount
+      if details.first.stock_logs.blank?
+        outstocks = Stock.find_stocks_in_storage(product[1], product[2], product[0], current_storage).to_ary
+        # Rails.logger.info "-------outstocks size--------"
+        # Rails.logger.info outstocks.size
+        outstocks.each do |outstock|
+          # Rails.logger.info "-------------outstock----------------"
+          # Rails.logger.info "-----------outstock info-------------"
+          # Rails.logger.info outstock.id
+          available_amount = outstock.get_available_amount
+          # Rails.logger.info "----------available amount-----------"
+          # Rails.logger.info available_amount
+          if available_amount == 0
+            next
+          elsif available_amount >= amount
+            outstock.update_attribute(:virtual_amount , outstock.virtual_amount - amount)
+            outstock.save
+            stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            details.each do |x|
+              x.stock_logs << stocklog
+            end
+            sklogs << stocklog
+            break
+          else
+            amount = amount - available_amount
+            outstock.update_attribute(:virtual_amount , outstock.virtual_amount - available_amount)
+            outstock.save
+            stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: available_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            details.each do |x|
+              x.stock_logs << stocklog
+            end
+            sklogs << stocklog
+          end
+        end
+      else
+        sklogs += details.first.stock_logs
+      end
+    end
+    return sklogs
+  end
 
   def self.get_available_stock(specification, supplier, business, batch_no, storage)
     stocks_in_storage_with_batch_no = in_storage(storage).find_stock(specification, supplier, business).with_batch_no(batch_no).available.prior

@@ -68,7 +68,34 @@ class ManualStocksController < ApplicationController
   end
 
   def stock_out
-    # todo: define the stock out logic
+    product_hash = {}
+    sklogs=[]
+
+    manual_stock=ManualStock.find(params[:id])
+
+      if Stock.check_out_stocks(manual_stock, manual_stock.manual_stock_details, current_storage)
+        manual_stock.manual_stock_details.each do |detail|
+          product_hash = Stock.get_product_hash(manual_stock,detail,product_hash)
+          # product = [order.business,orderdtl.specification,orderdtl.supplier]
+          # if allcnt.has_key?(product)
+          #     allcnt[product][0]=allcnt[product][0]+orderdtl.amount
+          #     allcnt[product][1]<<orderdtl
+          # else
+          #     allcnt[product]=[orderdtl.amount, [orderdtl]]
+          # end
+        end
+      else
+        order.update_attribute(:is_shortage,"yes")
+      end
+
+    # puts allcnt
+
+    sklogs = Stock.stock_out(product_hash, current_storage, current_user)
+
+    @stock_logs = StockLog.where(id: sklogs)
+    #binding.pry
+    @stock_logs_grid = initialize_grid(@stock_logs)
+
   end
 
   def check
