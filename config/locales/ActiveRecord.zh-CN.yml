@@ -153,7 +153,7 @@ zh-CN:
       specifications: 商品规格管理
       pddetails: 商品明细管理
       custorders: 客户明细管理
-      purchase_details: 采购单明细管理
+      purchase_details: 采购明细
       manual_stock_details: 批量出库明细管理
       order_details: 订单明细管理
       stock_in_purchase: 入库单
@@ -169,6 +169,8 @@ zh-CN:
       shelves: 货架管理
       import: 信息导入
       export: 信息导出
+      scan_check: "确认"
+      scan_confirm: "是否确认扫描数量?"
       relationship_import: 商品对应关系导入
       specification_export: 商品规格导出
     titles:
@@ -367,7 +369,6 @@ zh-CN:
         desc: 备注
         status: "状态"
         status_checked: "已确认"
-
       stock_log:
         user_id: "用户"
         username: "操作用户"
@@ -384,8 +385,6 @@ zh-CN:
         pd_name: "采购单明细"
         "shelf_code": "货架编号"
         "shelf": "货架编号"
-        
-
         shelf_code: "货架编号"
         shelf: "货架编号"
         status_checked: "已确认"
@@ -548,7 +547,6 @@ zh-CN:
         max_volume: "最大体积"
         shelf_code: "货架编号"
         desc: "货架描述"
-
       keyclientorder:
         keyclient_name: 大客户名称
         keyclient_addr: 大客户地址
@@ -559,7 +557,6 @@ zh-CN:
         unit_id: 单位
         storage_id: 仓库
         business_id: 所属商户
-
       keyclientorderdetail:
         keyclientorder_id: 订单批次编号
         specification_id: 商品规格

@@ -183,6 +183,20 @@ class ManualStocksController < ApplicationController
     end
   end
 
+  def scan
+    @scan = @manual_stock
+    @scans = @manual_stock.manual_stock_details
+    # render  'scans/scans'
+    render 'scans/scans'
+  end
+
+  def scan_check
+    @manual_stock.manual_stock_details.each do |scan|
+        scan.amount = params["realam_#{scan.id}".to_sym]
+        scan.save
+    end
+    redirect_to action: :index
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

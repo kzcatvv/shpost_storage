@@ -1,0 +1,47 @@
+<%= form_tag(action: "scan_check" ) do %>
+
+<div>
+  <%= label_tag 'name', '请逐件扫描商品69码:', class: 'control-group' %>
+  <%= text_field_tag 'scan', nil, class: "controls"%>
+  <%= button_tag(t('helpers.links.scan_check', :default => '确认'), :class => 'btn btn-xs btn-primary', :data => { :confirm => t('helpers.links.scan_confirm', :default => '是否确认扫描数量?') }) %>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>名称</th>
+      <th>69码</th>
+      <th>合计数量</th>
+      <th>扫描数量</th>
+    </tr>
+  </thead>
+  <tbody>
+    <script type="text/javascript">
+      scans = new Map();
+    </script>
+    <% 
+      if ! @scans.blank?
+      @scans.each do |scan| 
+
+    %>
+    <script type="text/javascript">
+    scan_<%= scan.id %> = {
+      id: <%= scan.id %>,
+      sexnine: <%= scan.specification.sixnine_code %>,
+      amount: <%= scan.amount %>
+    };
+    scans.set("<%= scan.specification.sixnine_code %>", scan_<%= scan.id %>)
+    </script>
+    <%= 
+      content_tag(:tr, content_tag(:td, scan.specification.full_title )+
+      content_tag(:td, scan.specification.sixnine_code )+
+      content_tag(:td, text_field_tag("dbam_#{scan.id}", scan.amount, disabled: true) )+
+      content_tag(:td, text_field_tag("realam_#{scan.id}", "0", readonly: true) ) )
+    %>
+        
+    <% 
+      end 
+    end
+    %>
+  </tbody>
+</table>
+<% end %>

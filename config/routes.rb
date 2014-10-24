@@ -1,8 +1,6 @@
 ShpostStorage::Application.routes.draw do
 
   resources :manual_stocks do
-    resources :manual_stock_details
-    
     collection do 
       get  'manual_stock_import'
       post 'manual_stock_import' => 'manual_stocks#manual_stock_import'
@@ -13,7 +11,10 @@ ShpostStorage::Application.routes.draw do
       get 'stock_out'
       patch 'check'
       patch 'close'
+      get 'scan'
+      post 'scan_check'
     end
+    resources :manual_stock_details
   end
 
   resources :interface_infos do
@@ -109,6 +110,8 @@ ShpostStorage::Application.routes.draw do
       get 'stock_in'
       patch 'check'
       patch 'close'
+      get "scan"
+      post "scan_check"
     end
   end
 
@@ -194,12 +197,12 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
-  
-
-
   resources :areas do
      resources :shelves, :controller => 'area_shelf'
   end
+
+  # get 'scans' => 'scans#scans'
+  # post 'scans_check' => 'scans#scans_check'
 
   #stabdar_interface
   match "/shpost_storage/standard_interface/commodity_enter" => "standard_interface#commodity_enter", via: [:get, :post]
