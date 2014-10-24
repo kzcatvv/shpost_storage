@@ -6,9 +6,9 @@
   <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} Stock Out'], :model => model_class.model_name.human.titleize %></h1>
   <div style="float:right">   
       <a href="javascript:stockout_preview()" class='btn btn-primary' >打印出库单</a>
-      <%= link_to t('.ordercheck', :default => t("helpers.links.ordercheck")),
-                  check_manual_stocks_url(),
-                  method: :push
+      <%= link_to t('.check', :default => t("helpers.links.check_manual_stock")),
+                  check_manual_stock_url(),
+                  method: :patch,
                   :class => 'btn btn-primary' %>
   </div>
 

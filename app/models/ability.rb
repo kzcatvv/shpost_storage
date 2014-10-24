@@ -78,6 +78,10 @@ class Ability
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
 
+        cannot :destroy, PurchaseDetail do |purchase_detail|
+            (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in1])
+        end
+
         can :manage, ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:opened]
 
         can :manage, ManualStockDetail, manual_stock: {storage_id: storage.id, status: ManualStock::STATUS[:opened]}
