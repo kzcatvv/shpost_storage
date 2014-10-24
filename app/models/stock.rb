@@ -101,25 +101,21 @@ class Stock < ActiveRecord::Base
 
   def self.get_available_stock(specification, supplier, business, batch_no, storage)
     stocks_in_storage_with_batch_no = in_storage(storage).find_stock(specification, supplier, business).with_batch_no(batch_no).available.prior
-
     stocks_in_storage_with_batch_no.each do |stock|
       return stock if stock.is_available?
     end
 
     stocks_in_storage_without_batch_no = in_storage(storage).find_stock(specification, supplier, business).without_batch_no(batch_no).available.prior
-
     stocks_in_storage_without_batch_no.each do |stock|
       if stock.is_available?
         available_stock = Stock.create(specification: specification, business: business, supplier: supplier, shelf: stock.shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
         return available_stock
       end
     end
-
-    shelf = Shelf.accessible_by(current_ability).get_neighbor_shelf stocks_in_storage_with_batch_no
-    shelf ||= Shelf.accessible_by(current_ability).get_neighbor_shelf stocks_in_storage_without_batch_no
-    shelf ||= Shelf.accessible_by(current_ability).get_empty_shelf
-	shelf ||= Shelf.accessible_by(current_ability).get_default_shelf
-
+    shelf = Shelf.get_neighbor_shelf stocks_in_storage_with_batch_no
+    shelf ||= Shelf.get_neighbor_shelf stocks_in_storage_without_batch_no
+    shelf ||= Shelf.get_empty_shelf storage
+    shelf ||= Shelf.get_default_shelf storage
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
   end
 

@@ -84,8 +84,6 @@ class ManualStocksController < ApplicationController
           #     allcnt[product]=[orderdtl.amount, [orderdtl]]
           # end
         end
-      else
-        order.update_attribute(:is_shortage,"yes")
       end
 
     # puts allcnt

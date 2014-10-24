@@ -78,8 +78,12 @@ class Ability
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
 
+        cannot :update, PurchaseDetail do |purchase_detail|
+            (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in])
+        end
+
         cannot :destroy, PurchaseDetail do |purchase_detail|
-            (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in1])
+            (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in])
         end
 
         can :manage, ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:opened]
@@ -92,6 +96,14 @@ class Ability
 
         cannot :close, ManualStock do |manual_stock|
             (manual_stock.storage_id == storage.id) && (manual_stock.status == ManualStock::STATUS[:opened]) && !manual_stock.can_close?
+        end
+
+        cannot :update, ManualStockDetail do |manual_stock_detail|
+            (manual_stock_detail.manual_stock.storage_id == storage.id) && (manual_stock_detail.status == ManualStockDetail::STATUS[:stock_out])
+        end
+
+        cannot :destroy, ManualStockDetail do |manual_stock_detail|
+            (manual_stock_detail.manual_stock.storage_id == storage.id) && (manual_stock_detail.status == ManualStockDetail::STATUS[:stock_out])
         end
 
         can :manage, InterfaceInfo
@@ -126,6 +138,7 @@ class Ability
         # can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         # can :check, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         # can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        cannot :destroy, StockLog, status: "checked"
 
         can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
     end

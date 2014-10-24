@@ -56,6 +56,10 @@ class StockLog < ActiveRecord::Base
         if self.belongs_to_order?
           self.orders.each{|order| order.checked }
         end
+
+        if self.belongs_to_manual_stock?
+          ManualStockDetail.find(self.manual_stock_detail_id).stock_out
+        end
       end
     end
   end
@@ -86,6 +90,10 @@ class StockLog < ActiveRecord::Base
 
   def belongs_to_order?
     ! self.order_details.blank?
+  end
+
+  def belongs_to_manual_stock?
+    ! self.manual_stock_detail_id.blank?
   end
 
   def checked?
