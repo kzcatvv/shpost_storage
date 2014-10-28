@@ -19,6 +19,7 @@ class Sequence < ActiveRecord::Base
         if obj.respond_to? :sku
           obj.sku = obj.barcode
         end
+        return true
       end
     end
   end
@@ -29,6 +30,7 @@ class Sequence < ActiveRecord::Base
         if obj.batch_no.blank?
           obj.batch_no = Sequence.generate_batch(obj.unit, obj.class, ((obj.respond_to? :no) ? obj.no : Sequence.generate_sequence(obj.unit, obj.class)))
         end
+        return true
       end
     end
   end
