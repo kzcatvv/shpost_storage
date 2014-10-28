@@ -10,7 +10,7 @@ class OrdersController < ApplicationController
   end
 
   def order_alert
-    @orders = Order.where( [ "status = ? and created_at < ?", 'waiting', Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders = Order.where( [ "status = ? and storage_id = ?and created_at < ?", 'waiting',session[:current_storage].id, Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
     @orders_grid = initialize_grid(@orders)
   end
 
@@ -435,6 +435,7 @@ class OrdersController < ApplicationController
     end
    #  #binding.pry
       rescue Exception => e
+        Rails.logger.error e.backtrace
         flash[:alert] = e.message
         redirect_to :action => 'findprintindex'
         raise ActiveRecord::Rollback
@@ -593,11 +594,11 @@ class OrdersController < ApplicationController
     unless request.get?
       if file = upload_pingan(params[:file]['file'])
         Keyclientorder.transaction do
-          business_no = params[:business_select]
+          business_id = params[:business_select]
           # supplier_no = params[:supplier_select]
-          business = Business.find_by no: business_no
+          business = Business.find business_id
           # supplier = Supplier.find_by no: supplier_no
-          Rails.logger.info "*************business_no:" + business_no + "************"
+          Rails.logger.info "*************business_id:" + business_id + "************"
           # puts "*************" + supplier_no + "************"
           begin
             instance=nil
@@ -668,6 +669,7 @@ class OrdersController < ApplicationController
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
+            Rails.logger.error e.backtrace
             flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
@@ -713,6 +715,7 @@ class OrdersController < ApplicationController
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
+            Rails.logger.error e.backtrace
             flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
@@ -752,7 +755,8 @@ class OrdersController < ApplicationController
               flash[:alert] = "商品关联缺失，导入失败"
             end
           rescue Exception => e
-            flash[:alert] = "导入失败"
+            Rails.logger.error e.backtrace
+            flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
         end
@@ -764,12 +768,12 @@ class OrdersController < ApplicationController
     unless request.get?
       if file = upload_pingan(params[:file]['file'])
         Keyclientorder.transaction do
-          business_no = params[:business_select]
-          supplier_no = params[:supplier_select]
-          business = Business.find_by no: business_no
-          supplier = Supplier.find_by no: supplier_no
-          Rails.logger.info "*************" + business_no + "************"
-          Rails.logger.info "*************" + supplier_no + "************"
+          business_id = params[:business_select]
+          supplier_id = params[:supplier_select]
+          business = Business.find business_id
+          supplier = Supplier.find supplier_id
+          Rails.logger.info "*************" + business_id + "************"
+          Rails.logger.info "*************" + supplier_id + "************"
           begin
             instance=nil
             if file.include?('.xlsx')
@@ -798,7 +802,8 @@ class OrdersController < ApplicationController
               flash[:alert] = "商品缺失，导入失败"
             end
           rescue Exception => e
-            flash[:alert] = e.to_s
+            Rails.logger.error e.backtrace
+            flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
         end
@@ -917,6 +922,7 @@ class OrdersController < ApplicationController
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
+            Rails.logger.error e.backtrace
             flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end

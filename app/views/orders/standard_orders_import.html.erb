@@ -7,7 +7,7 @@
 <%= form_tag({:action => 'standard_orders_import'}, :multipart => true) %>
 
 <div>
-   <strong>商户: </strong><%= select_tag :business_select, options_for_select(Business.accessible_by(current_ability).map{|u| [u.name, u.no]}) %>&nbsp;
+   <strong>商户: </strong><%= select_tag :business_select, options_for_select(Business.accessible_by(current_ability).map{|u| [u.name, u.id]}) %>&nbsp;
 </div>
 
 <br/>

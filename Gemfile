@@ -24,7 +24,7 @@ gem 'therubyracer', platforms: :ruby
 #gem 'execjs'
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails'
+gem 'jquery-rails','3.1'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
@@ -49,9 +49,9 @@ gem 'devise-i18n-views'
 #gem 'cancan', git: 'https://github.com/francocatena/cancan'
 gem 'cancancan'
 
-gem 'wice_grid'
+gem 'wice_grid', '3.4.3'
 
-gem 'jquery-ui-rails'
+gem 'jquery-ui-rails','4.2.1'
 
 gem 'pry', :group => :development
 

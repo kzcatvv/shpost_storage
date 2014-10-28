@@ -1,6 +1,6 @@
 <%- model_class = Order -%>
 <%= define_grid(@orders_grid, hide_submit_button: true, hide_reset_button: true) do |g|
-    g.column name: model_class.human_attribute_name(:no), attribute: 'no',filter_type: :range, detach_with_id: :no_filter
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no', detach_with_id: :no_filter
 
     g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name', detach_with_id: :customer_name_filter
 
@@ -49,9 +49,7 @@
       order.unit.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', detach_with_id: :keyclientorder_id_filter,model: 'Keyclientorder' do |order|
-      order.keyclientorder.try :batch_no
-    end
+    g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number', filter_type: :range, detach_with_id: :tracking_number_filter
 
     g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage', detach_with_id: :is_shortage_filter,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
       order.shortage_type_name
