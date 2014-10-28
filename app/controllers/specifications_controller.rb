@@ -2,6 +2,7 @@ class SpecificationsController < ApplicationController
   #before_action :set_specification, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource :commodity
   load_and_authorize_resource :specification, through: :commodity, parent: false
+
   # GET /specifications
   # GET /specifications.json
   def index

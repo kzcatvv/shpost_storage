@@ -1,6 +1,7 @@
 class RelationshipsController < ApplicationController
   #before_action :set_relationship, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource
+
   # GET /relationships
   # GET /relationships.json
   def index
@@ -24,7 +25,7 @@ class RelationshipsController < ApplicationController
   # GET /relationships/1/edit
   def edit
     #binding.pry
-    set_product_select(@relationship)
+    set_autocom_update(@relationship)
   end
 
   # POST /relationships
@@ -105,10 +106,10 @@ class RelationshipsController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
             2.upto(instance.last_row) do |line|
-              specification = Specification.find_by sku: instance.cell(line,'D').to_s.split('.0')[0]
-              business = Business.find_by name: instance.cell(line,'H') 
-              supplier = Supplier.find_by name: instance.cell(line,'I')
-              relationship = Relationship.find_by business_id: business.id, specification_id: specification.id
+              specification = Specification.accessible_by(current_ability).find_by sku: instance.cell(line,'D').to_s.split('.0')[0]
+              business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'H') 
+              supplier = Supplier.accessible_by(current_ability).find_by name: instance.cell(line,'I')
+              relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id
 
               if relationship.nil?
                 Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: instance.cell(line,'J').to_s.split('.0')[0], spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
@@ -127,7 +128,7 @@ class RelationshipsController < ApplicationController
   end
 
   def specification_export
-    @specifications=Specification.all
+    @specifications=Specification.accessible_by(current_ability).all
     if @specifications.nil?
        flash[:alert] = "无商品规格数据"
        redirect_to :action => 'index'

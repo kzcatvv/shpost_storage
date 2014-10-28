@@ -20,7 +20,7 @@ class OrderDetailsController < ApplicationController
 
   # GET /order_detailes/1/edit
   def edit
-    set_product_select(@order_detail)
+    set_autocom_update(@order_detail)
   end
 
   # POST /order_detailes

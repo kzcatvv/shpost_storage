@@ -1,6 +1,6 @@
 module ApplicationHelper
 
-	def product_select(obj_id)
+	  def product_select(obj_id)
        
        concat  select("goodstype","id", Goodstype.accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择") )
        concat hidden_field_tag('ajax_object_id', obj_id)
@@ -19,4 +19,12 @@ module ApplicationHelper
        	 concat select(obj_id.to_sym,"specification_id", Specification.accessible_by(current_ability).map{|u| [u.name,u.id]},{:prompt => "请选择"})
       end
     end
+
+
+    def product_select_autocom(obj_id)
+       
+       concat text_field_tag('specification_name',@spname, 'data-autocomplete' => "/specification_autocom/autocomplete_specification_name?objid=#{obj_id}" )
+       hidden_field(obj_id.to_sym,"specification_id");
+    end
+
 end

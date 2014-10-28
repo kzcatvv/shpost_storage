@@ -35,6 +35,7 @@ class Shelf < ActiveRecord::Base
   end
   
   def self.get_default_shelf(storage)
-    default.first
+    Shelf.includes(:area).where(area_id: storage.areas).order("priority_level ASC").first
+    # default.first
   end
 end
