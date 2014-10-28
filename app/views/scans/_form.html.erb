@@ -1,9 +1,9 @@
-<%= form_tag(action: "scan_check" ) do %>
+<%= form_tag(action: "scan_check") do %>
 
 <div>
   <%= label_tag 'name', '请逐件扫描商品69码:', class: 'control-group' %>
   <%= text_field_tag 'scan', nil, class: "controls"%>
-  <%= button_tag(t('helpers.links.scan_check', :default => '确认'), :type => 'button', :class => 'btn btn-xs btn-primary', onclick: => { :confirm => t('helpers.links.scan_confirm', :default => '是否确认扫描数量?') }) %>
+  <%= button_tag(t('helpers.links.scan_check', :default => '确认'), :type => 'button', :class => 'btn btn-xs btn-primary', :onclick =>  "if (confirm('#{t('helpers.links.scan_confirm', :default => '是否确认扫描数量?')}')){ submit();}") %>
 </div>
 <table class="table table-striped">
   <thead>
