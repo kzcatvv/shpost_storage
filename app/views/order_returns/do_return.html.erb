@@ -1,0 +1,14 @@
+<%- model_class = OrderReturn -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_in', '%{model} 退件入库'], :model => model_class.model_name.human.titleize %></h1>
+  <div style="float:right">   
+      <%= link_to t('.return_check', :default => t("helpers.links.return_check")),
+                  return_check_order_returns_url(@batchid),
+                  :class => 'btn btn-primary' %>
+  </div>
+</div>
+<%= render :partial => 'order_returns/some_forms' %>
+
+<script language="javascript" type="text/javascript"> 
+
+</script>

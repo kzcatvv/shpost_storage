@@ -1,0 +1,29 @@
+<%= form_for(@order_return) do |f| %>
+  <% if @order_return.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@order_return.errors.count, "error") %> prohibited this order_return from being saved:</h2>
+
+      <ul>
+      <% @order_return.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :order_detail_id %><br>
+    <%= f.number_field :order_detail_id %>
+  </div>
+  <div class="field">
+    <%= f.label :return_reason %><br>
+    <%= f.text_field :return_reason %>
+  </div>
+  <div class="field">
+    <%= f.label :is_bad %><br>
+    <%= f.text_field :is_bad %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
