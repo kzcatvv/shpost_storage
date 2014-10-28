@@ -39,9 +39,12 @@ class Ability
         can :read, UserLog, user: {unit_id: user.unit_id}
 
         can :manage, User, unit_id: user.unit_id
-        can :role, User, unit_id: user.unit_id
+        
         can :manage, Role
         cannot :role, User, role: 'superadmin'
+        can :role, :unitadmin
+        can :role, :user
+        
         # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
