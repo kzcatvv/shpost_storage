@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  
+
   resources :manual_stocks do
     collection do 
       get  'manual_stock_import'
@@ -23,14 +25,14 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
-  resources :orderreturns do
+  resources :order_returns do
     collection do
-      get 'packreturn'
-      get 'doreturn'
-      get 'findtrackingnumber'
-      get 'returncheck'
-      post 'exportorderreturns' => 'orderreturns#exportorderreturns'
-      get 'exportorderreturns'
+      get 'pack_return'
+      get 'do_return'
+      get 'find_tracking_number'
+      get 'return_check'
+      post 'export_order_returns' => 'order_returns#export_order_returns'
+      get 'export_order_returns'
     end
   end
 
@@ -161,6 +163,7 @@ ShpostStorage::Application.routes.draw do
   resources :units do
     resources :users, :controller => 'unit_users'
     resources :storages, :controller => 'unit_storages'
+    resources :sequences, :controller => 'unit_sequences'
   end
 
   resources :users do

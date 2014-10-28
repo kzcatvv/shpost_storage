@@ -54,8 +54,8 @@
       order.unit.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_id', detach_with_id: :keyclientorder_id_filter,model: 'Keyclientorder' do |order|
-      order.keyclientorder.try :batch_id
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', detach_with_id: :keyclientorder_id_filter,model: 'Keyclientorder' do |order|
+      order.keyclientorder.try :batch_no
     end
 
     g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage', detach_with_id: :is_shortage_filter,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 

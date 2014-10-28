@@ -66,8 +66,8 @@
       order.unit.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_id', model: 'Keyclientorder' do |order|
-      order.keyclientorder.try :batch_id
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', model: 'Keyclientorder' do |order|
+      order.keyclientorder.try :batch_no
     end
 
     g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage',custom_filter: Order::SHORTAGE_TYPE.invert do |order| 

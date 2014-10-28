@@ -7,9 +7,9 @@ class Order < ActiveRecord::Base
   has_many :stock_logs, through: :order_details
   has_many :deliver_notices
 
-  before_validation :set_no
+  # before_validation :set_no
 
-  validates_presence_of :no, :message => '不能为空'
+  # validates_presence_of :no, :message => '不能为空'
 
   TYPE = { b2b: 'b2b', b2c: 'b2c' }
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
@@ -95,12 +95,12 @@ class Order < ActiveRecord::Base
     return false
   end
 
-  def set_no
-    if self.no.blank?
-      time = Time.now
-      self.no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + Order.count.to_s.rjust(5,'0')
-    end
-  end
+  # def set_no
+  #   if self.no.blank?
+  #     time = Time.now
+  #     self.no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + Order.count.to_s.rjust(5,'0')
+  #   end
+  # end
   # def paytypename
   #   Order::PAY_TYPE[pay_type.to_sym]
   # end

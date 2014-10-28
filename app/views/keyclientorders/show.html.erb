@@ -14,8 +14,8 @@
   <dd><%= @keyclientorder.phone %></dd>
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @keyclientorder.desc %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:batch_id) %>:</strong></dt>
-  <dd><%= @keyclientorder.batch_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:batch_no) %>:</strong></dt>
+  <dd><%= @keyclientorder.batch_no %></dd>
   <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
   <dd><%= Unit.find(@keyclientorder.unit_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>

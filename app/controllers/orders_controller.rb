@@ -1,7 +1,7 @@
 class OrdersController < ApplicationController
   load_and_authorize_resource
 
-  user_logs_filter only: [:ordercheck], symbol: :batch_id, operation: '确认出库', object: :keyclientorder
+  user_logs_filter only: [:ordercheck], symbol: :batch_no, operation: '确认出库', object: :keyclientorder
   # GET /orderes
   # GET /orderes.json
   def index
@@ -93,7 +93,7 @@ class OrdersController < ApplicationController
     find_has_stock(@orders, true)
     
    else
-    @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_id').first
+    @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_no').first
     @orders=@keycorder.orders
     #find_has_stock(@orders)
    end
@@ -145,8 +145,8 @@ class OrdersController < ApplicationController
     if createKeyCilentOrderFlg
     if ordercnt > 0
       time = Time.new
-      batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-      @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "waiting")
+      # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+      @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,user: current_user,status: "waiting")
       orders=Order.where(id: findorders)
       orders.update_all(keyclientorder_id: @keycorder)
 
@@ -725,7 +725,7 @@ class OrdersController < ApplicationController
   end
 
   def pingan_b2c_xls_outport
-    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    @keyclientorder=Keyclientorder.where(batch_no: params[:keyclientorder_id]).first
     if @keyclientorder.nil?
        flash[:alert] = "无此批次编号"
        redirect_to :action => 'pingan_b2c_outport'
@@ -745,7 +745,7 @@ class OrdersController < ApplicationController
   end
 
   def pingan_b2b_xls_outport
-    @keyclientorder=Keyclientorder.where(batch_id: params[:keyclientorder_id]).first
+    @keyclientorder=Keyclientorder.where(batch_no: params[:keyclientorder_id]).first
     if @keyclientorder.nil?
        flash[:alert] = "无此批次编号"
        redirect_to :action => 'pingan_b2b_outport'
@@ -1013,8 +1013,8 @@ class OrdersController < ApplicationController
 
     def getKeycOrderID()
       time = Time.new
-      batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-      keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "printed")
+      batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+      keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_no: batch_no,user: current_user,status: "printed")
       return keycorder.id
     end
 end

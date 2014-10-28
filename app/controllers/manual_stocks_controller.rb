@@ -30,7 +30,7 @@ class ManualStocksController < ApplicationController
     @manual_stock.unit = current_user.unit
     @manual_stock.status = ManualStock::STATUS[:opened]
     @manual_stock.storage = current_storage
-    @manual_stock.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+ManualStock.count.to_s.rjust(5,'0')
+    # @manual_stock.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+ManualStock.count.to_s.rjust(5,'0')
 
     respond_to do |format|
       if @manual_stock.save
@@ -157,9 +157,9 @@ class ManualStocksController < ApplicationController
                 storage = current_storage
                 business = Business.find_by name: instance.cell(line,'B').to_s
                 time=Time.new
-                no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Purchase.count.to_s.rjust(5,'0')
+                # no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Purchase.count.to_s.rjust(5,'0')
 
-                manual_stock = ManualStock.create! no: no, unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
+                manual_stock = ManualStock.create!  unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
               end
               supplier=Supplier.find_by name:instance.cell(line,'E').to_s
 

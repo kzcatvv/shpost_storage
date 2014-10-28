@@ -18,81 +18,81 @@ require 'spec_helper'
 # Message expectations are only used when there is no simpler way to specify
 # that an instance is receiving a specific message.
 
-describe OrderreturnsController do
+describe OrderReturnsController do
 
   # This should return the minimal set of attributes required to create a valid
-  # Orderreturn. As you add validations to Orderreturn, be sure to
+  # OrderReturn. As you add validations to OrderReturn, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) { { "order_detail_id" => "1" } }
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
-  # OrderreturnsController. Be sure to keep this updated too.
+  # OrderReturnsController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
   describe "GET index" do
-    it "assigns all orderreturns as @orderreturns" do
-      orderreturn = Orderreturn.create! valid_attributes
+    it "assigns all order_returns as @order_returns" do
+      order_return = OrderReturn.create! valid_attributes
       get :index, {}, valid_session
-      expect(assigns(:orderreturns)).to eq([orderreturn])
+      expect(assigns(:order_returns)).to eq([order_return])
     end
   end
 
   describe "GET show" do
-    it "assigns the requested orderreturn as @orderreturn" do
-      orderreturn = Orderreturn.create! valid_attributes
-      get :show, {:id => orderreturn.to_param}, valid_session
-      expect(assigns(:orderreturn)).to eq(orderreturn)
+    it "assigns the requested order_return as @order_return" do
+      order_return = OrderReturn.create! valid_attributes
+      get :show, {:id => order_return.to_param}, valid_session
+      expect(assigns(:order_return)).to eq(order_return)
     end
   end
 
   describe "GET new" do
-    it "assigns a new orderreturn as @orderreturn" do
+    it "assigns a new order_return as @order_return" do
       get :new, {}, valid_session
-      expect(assigns(:orderreturn)).to be_a_new(Orderreturn)
+      expect(assigns(:order_return)).to be_a_new(OrderReturn)
     end
   end
 
   describe "GET edit" do
-    it "assigns the requested orderreturn as @orderreturn" do
-      orderreturn = Orderreturn.create! valid_attributes
-      get :edit, {:id => orderreturn.to_param}, valid_session
-      expect(assigns(:orderreturn)).to eq(orderreturn)
+    it "assigns the requested order_return as @order_return" do
+      order_return = OrderReturn.create! valid_attributes
+      get :edit, {:id => order_return.to_param}, valid_session
+      expect(assigns(:order_return)).to eq(order_return)
     end
   end
 
   describe "POST create" do
     describe "with valid params" do
-      it "creates a new Orderreturn" do
+      it "creates a new OrderReturn" do
         expect {
-          post :create, {:orderreturn => valid_attributes}, valid_session
-        }.to change(Orderreturn, :count).by(1)
+          post :create, {:order_return => valid_attributes}, valid_session
+        }.to change(OrderReturn, :count).by(1)
       end
 
-      it "assigns a newly created orderreturn as @orderreturn" do
-        post :create, {:orderreturn => valid_attributes}, valid_session
-        expect(assigns(:orderreturn)).to be_a(Orderreturn)
-        expect(assigns(:orderreturn)).to be_persisted
+      it "assigns a newly created order_return as @order_return" do
+        post :create, {:order_return => valid_attributes}, valid_session
+        expect(assigns(:order_return)).to be_a(OrderReturn)
+        expect(assigns(:order_return)).to be_persisted
       end
 
-      it "redirects to the created orderreturn" do
-        post :create, {:orderreturn => valid_attributes}, valid_session
-        expect(response).to redirect_to(Orderreturn.last)
+      it "redirects to the created order_return" do
+        post :create, {:order_return => valid_attributes}, valid_session
+        expect(response).to redirect_to(OrderReturn.last)
       end
     end
 
     describe "with invalid params" do
-      it "assigns a newly created but unsaved orderreturn as @orderreturn" do
+      it "assigns a newly created but unsaved order_return as @order_return" do
         # Trigger the behavior that occurs when invalid params are submitted
-        allow_any_instance_of(Orderreturn).to receive(:save).and_return(false)
-        post :create, {:orderreturn => { "order_detail_id" => "invalid value" }}, valid_session
-        expect(assigns(:orderreturn)).to be_a_new(Orderreturn)
+        allow_any_instance_of(OrderReturn).to receive(:save).and_return(false)
+        post :create, {:order_return => { "order_detail_id" => "invalid value" }}, valid_session
+        expect(assigns(:order_return)).to be_a_new(OrderReturn)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
-        allow_any_instance_of(Orderreturn).to receive(:save).and_return(false)
-        post :create, {:orderreturn => { "order_detail_id" => "invalid value" }}, valid_session
+        allow_any_instance_of(OrderReturn).to receive(:save).and_return(false)
+        post :create, {:order_return => { "order_detail_id" => "invalid value" }}, valid_session
         expect(response).to render_template("new")
       end
     end
@@ -100,60 +100,60 @@ describe OrderreturnsController do
 
   describe "PUT update" do
     describe "with valid params" do
-      it "updates the requested orderreturn" do
-        orderreturn = Orderreturn.create! valid_attributes
-        # Assuming there are no other orderreturns in the database, this
-        # specifies that the Orderreturn created on the previous line
+      it "updates the requested order_return" do
+        order_return = OrderReturn.create! valid_attributes
+        # Assuming there are no other order_returns in the database, this
+        # specifies that the OrderReturn created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        expect_any_instance_of(Orderreturn).to receive(:update).with({ "order_detail_id" => "1" })
-        put :update, {:id => orderreturn.to_param, :orderreturn => { "order_detail_id" => "1" }}, valid_session
+        expect_any_instance_of(OrderReturn).to receive(:update).with({ "order_detail_id" => "1" })
+        put :update, {:id => order_return.to_param, :order_return => { "order_detail_id" => "1" }}, valid_session
       end
 
-      it "assigns the requested orderreturn as @orderreturn" do
-        orderreturn = Orderreturn.create! valid_attributes
-        put :update, {:id => orderreturn.to_param, :orderreturn => valid_attributes}, valid_session
-        expect(assigns(:orderreturn)).to eq(orderreturn)
+      it "assigns the requested order_return as @order_return" do
+        order_return = OrderReturn.create! valid_attributes
+        put :update, {:id => order_return.to_param, :order_return => valid_attributes}, valid_session
+        expect(assigns(:order_return)).to eq(order_return)
       end
 
-      it "redirects to the orderreturn" do
-        orderreturn = Orderreturn.create! valid_attributes
-        put :update, {:id => orderreturn.to_param, :orderreturn => valid_attributes}, valid_session
-        expect(response).to redirect_to(orderreturn)
+      it "redirects to the order_return" do
+        order_return = OrderReturn.create! valid_attributes
+        put :update, {:id => order_return.to_param, :order_return => valid_attributes}, valid_session
+        expect(response).to redirect_to(order_return)
       end
     end
 
     describe "with invalid params" do
-      it "assigns the orderreturn as @orderreturn" do
-        orderreturn = Orderreturn.create! valid_attributes
+      it "assigns the order_return as @order_return" do
+        order_return = OrderReturn.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        allow_any_instance_of(Orderreturn).to receive(:save).and_return(false)
-        put :update, {:id => orderreturn.to_param, :orderreturn => { "order_detail_id" => "invalid value" }}, valid_session
-        expect(assigns(:orderreturn)).to eq(orderreturn)
+        allow_any_instance_of(OrderReturn).to receive(:save).and_return(false)
+        put :update, {:id => order_return.to_param, :order_return => { "order_detail_id" => "invalid value" }}, valid_session
+        expect(assigns(:order_return)).to eq(order_return)
       end
 
       it "re-renders the 'edit' template" do
-        orderreturn = Orderreturn.create! valid_attributes
+        order_return = OrderReturn.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
-        allow_any_instance_of(Orderreturn).to receive(:save).and_return(false)
-        put :update, {:id => orderreturn.to_param, :orderreturn => { "order_detail_id" => "invalid value" }}, valid_session
+        allow_any_instance_of(OrderReturn).to receive(:save).and_return(false)
+        put :update, {:id => order_return.to_param, :order_return => { "order_detail_id" => "invalid value" }}, valid_session
         expect(response).to render_template("edit")
       end
     end
   end
 
   describe "DELETE destroy" do
-    it "destroys the requested orderreturn" do
-      orderreturn = Orderreturn.create! valid_attributes
+    it "destroys the requested order_return" do
+      order_return = OrderReturn.create! valid_attributes
       expect {
-        delete :destroy, {:id => orderreturn.to_param}, valid_session
-      }.to change(Orderreturn, :count).by(-1)
+        delete :destroy, {:id => order_return.to_param}, valid_session
+      }.to change(OrderReturn, :count).by(-1)
     end
 
-    it "redirects to the orderreturns list" do
-      orderreturn = Orderreturn.create! valid_attributes
-      delete :destroy, {:id => orderreturn.to_param}, valid_session
-      expect(response).to redirect_to(orderreturns_url)
+    it "redirects to the order_returns list" do
+      order_return = OrderReturn.create! valid_attributes
+      delete :destroy, {:id => order_return.to_param}, valid_session
+      expect(response).to redirect_to(order_returns_url)
     end
   end
 

@@ -1,6 +1,9 @@
 class Shelf < ActiveRecord::Base
 	belongs_to :area
+  has_one :storage, through: :area
+  has_one :unit, through: :storage
   has_many :stocks
+
 
 	validates_presence_of :shelf_code, :area_id, :message => '不能为空字符'
 
