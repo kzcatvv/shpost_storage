@@ -78,7 +78,7 @@ class OrderReturnsController < ApplicationController
   def do_return
     sklogs=[]
     time = Time.now
-    @batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + (OrderReturn.select(:batch_no).distinct.count+1).to_s.rjust(5,'0')
+    # @batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + (OrderReturn.select(:batch_no).distinct.count+1).to_s.rjust(5,'0')
     params[:cbids].each do |id|
       reason=params[("rereason_"+id).to_sym]
       isbad=params[("st_"+id).to_sym]
@@ -87,7 +87,7 @@ class OrderReturnsController < ApplicationController
         @order=@orderdtl.order
         @order_return=OrderReturn.where(order_detail: @orderdtl).first
         if @order_return.nil?
-          @order_return=OrderReturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,batch_no:@batch_no,status:"waiting")
+          @order_return=OrderReturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,status:"waiting")
         end
         stock=Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
         stock.update(virtual_amount: @orderdtl.amount+stock.virtual_amount)
