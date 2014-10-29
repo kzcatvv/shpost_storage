@@ -12,6 +12,7 @@
   <div style="float:right">
     <%= form_tag(exportorders_orders_url(format: "xls")) %>
     <%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
+    <%=link_to t('订单导入'), "/orders/standard_orders_import", target: '_blank',:class => 'btn btn-primary' %>
     <%= submit_tag "订单导出",:class => 'btn btn-primary' %>
     <%=link_to t('面单信息回馈'), "/orders/importorders", target: '_blank',:class => 'btn btn-primary' %>
     </form>
@@ -60,7 +61,7 @@
       <tr>
         <td><%= Business.find(key[0]).name %></td>
         <td><%= Specification.find(key[1]).name %></td>
-        <td><%= Supplier.find(key[2]).name %></td>
+        <td><%= key[2].blank?? "":Supplier.find(key[2]).name %></td>
         <td><%= value[0] %></td>
       </tr>
     <% end %>

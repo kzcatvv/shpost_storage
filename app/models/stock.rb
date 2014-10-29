@@ -75,7 +75,13 @@ class Stock < ActiveRecord::Base
           elsif available_amount >= amount
             outstock.update_attribute(:virtual_amount , outstock.virtual_amount - amount)
             outstock.save
-            stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            # 20141029 merge the same stocklog
+            stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
+            if stocklog.blank?
+              stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            else
+              stocklog.update_attribute(:amount, stocklog.amount + amount)
+            end
             details.each do |x|
               x.stock_logs << stocklog
             end
@@ -85,7 +91,13 @@ class Stock < ActiveRecord::Base
             amount = amount - available_amount
             outstock.update_attribute(:virtual_amount , outstock.virtual_amount - available_amount)
             outstock.save
-            stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: available_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            # 20141029 merge the same stocklog
+            stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
+            if stocklog.blank?
+              stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: available_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+            else
+              stocklog.update_attribute(:amount, stocklog.amount + available_amount)
+            end
             details.each do |x|
               x.stock_logs << stocklog
             end
@@ -139,6 +151,20 @@ class Stock < ActiveRecord::Base
     in_storage(storage).find_stock(specification, supplier, business).sum_virtual_amount
   end
 
+  def find_same_stocklog(keyclientorder)
+    stocklogs = self.stock_logs.where(status: "waiting")
+    stocklogs.each do |stocklog|
+      detail = stocklog.order_details.first
+      if detail.blank?
+        # skip the stocklog of purchase or manual_stock 
+        next
+      elsif detail.order.keyclientorder.id == keyclientorder.id
+        return stocklog
+      end
+    end
+    return nil
+  end
+
   def stock_in_amount(amount)
     stock_in_amount = available_amount(amount)
     self.virtual_amount += stock_in_amount
@@ -185,11 +211,16 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stock(specification, supplier, business)
+    Rails.logger.info "------------"+specification.id.to_s+"---------------"
+    Rails.logger.info "------------"+business.id.to_s+"---------------"
     conditions = where(specification: specification, business: business)
 
     if ! supplier.nil?
+      Rails.logger.info "------------------"+supplier.id.to_s+"--------------------"
       conditions.where(supplier: supplier)
     end
+
+    return conditions
   end
 
   def self.with_batch_no(batch_no)

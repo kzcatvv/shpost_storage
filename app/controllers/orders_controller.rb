@@ -105,11 +105,16 @@ class OrdersController < ApplicationController
     findorders = []
     ordercnt = 0
     orders.each do |o|
-     hasstockchk = true
-     #if ordercnt < 25
+      hasstockchk = true
+      #if ordercnt < 25
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
+        Rails.logger.info "business:" + o.business_id.to_s
+        Rails.logger.info "specification:" + d.specification_id.to_s
+        Rails.logger.info "supplier:" + d.supplier_id.to_s
+        Rails.logger.info "storage:" + current_storage.id.to_s
         allamount = Stock.total_stock_in_storage(d.specification, d.supplier, o.business, current_storage)
+        Rails.logger.info "allamount:" + allamount.to_s
         if allcnt.has_key?(product)
           if allcnt[product][0]-allcnt[product][1]-d.amount >= 0
             allcnt[product][1]=allcnt[product][1]+d.amount
@@ -139,6 +144,7 @@ class OrdersController < ApplicationController
           allcnt[product][1]=allcnt[product][1]-dtl.amount
         end
       end
+      Rails.logger.info "all product info: " + allcnt.to_s
      #end
     end
     
@@ -170,7 +176,8 @@ class OrdersController < ApplicationController
   end
 
   def stockout
-
+    Stock.transaction do
+      begin
    if !params[:keyclientorder_id].nil?
        sklogs=[]
        # chkout=0
@@ -427,6 +434,12 @@ class OrdersController < ApplicationController
    #   flash.now[:notice] = "注意有"+chkout.to_s+"件订单缺货"
     end
    #  #binding.pry
+      rescue Exception => e
+        flash[:alert] = e.message
+        redirect_to :action => 'findprintindex'
+        raise ActiveRecord::Rollback
+      end
+    end
   end
 
   def key_check_out_stocks(keyorder)
@@ -576,6 +589,93 @@ class OrdersController < ApplicationController
 
   end
 
+  def standard_orders_import
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])
+        Keyclientorder.transaction do
+          business_no = params[:business_select]
+          # supplier_no = params[:supplier_select]
+          business = Business.find_by no: business_no
+          # supplier = Supplier.find_by no: supplier_no
+          Rails.logger.info "*************business_no:" + business_no + "************"
+          # puts "*************" + supplier_no + "************"
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+
+            keyclientorder=Keyclientorder.create! keyclient_name: "标准导入订单 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: business.id, unit_id: current_user.unit.id, storage_id: current_storage.id
+            2.upto(instance.last_row) do |line|
+              sku_ids = instance.cell(line,'A')
+              if sku_ids.blank?
+                raise "导入文件第" + line.to_s + "行数据, 缺少sku，导入失败"
+              end
+              sku_ids = sku_ids.split(',')
+              Rails.logger.info sku_ids
+              amounts = instance.cell(line,'B')
+              if amounts.blank?
+                raise "导入文件第" + line.to_s + "行数据, 缺少数量，导入失败"
+              end
+              amounts = amounts.split(',')
+              Rails.logger.info amounts
+              supplier_names = instance.cell(line,'H')
+              if !supplier_names.blank?
+                supplier_names = supplier_names.split(',')
+              else
+                supplier_names = []
+              end
+              Rails.logger.info supplier_names
+              specifications = Specification.where sku: sku_ids
+              suppliers = Supplier.where name: supplier_names
+
+              # relationship = Relationship.find_relationships(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
+              
+              if specifications.size != sku_ids.size
+                # flash[:alert] = "导入文件第" + line.to_s + "行数据, 商品缺失，导入失败"
+                raise "导入文件第" + line.to_s + "行数据, 商品缺失，导入失败"
+              elsif sku_ids.size != amounts.size
+                # flash[:alert] = "导入文件第" + line.to_s + "行数据, sku与数量个数不符，导入失败"
+                raise "导入文件第" + line.to_s + "行数据, sku与数量个数不符，导入失败"
+              else
+                # keyclientorderdetails = Keyclientorderdetail.create! specification: specification, keyclientorder: keyclientorder, amount: instance.cell(2,'B').to_s.split('.0')[0], supplier: supplier, business_id: business.id
+                supplier_name_size = 0
+                supplier_names.each do |name|
+                  if !name.blank?
+                    supplier_name_size = +1
+                  end
+                end
+                Rails.logger.info suppliers.size
+                Rails.logger.info supplier_name_size
+                if suppliers.size != supplier_name_size
+                  # flash[:alert] = "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
+                  raise "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
+                end
+                order = Order.create! order_type: 'b2c', customer_name: instance.cell(line,'C'), customer_phone: instance.cell(line,'D').to_s.split('.0')[0], city: instance.cell(line,'G'), customer_address: instance.cell(line,'E'), customer_postcode: instance.cell(line,'F').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder
+                # order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
+                0.upto(sku_ids.size - 1) do |x|
+                  specification = specifications.find_by sku: sku_ids[x]
+                  name = supplier_names[x].blank?? "":supplier_names[x]
+                  supplier = suppliers.find_by name: name
+                  OrderDetail.create! name: specification.name,batch_no: nil, specification: specification, amount: amounts[x], supplier: supplier, order: order
+                end
+              end
+            end
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            flash[:alert] = e.message
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
   def pingan_b2c_import
     unless request.get?
       if file = upload_pingan(params[:file]['file'])       
@@ -668,8 +768,8 @@ class OrdersController < ApplicationController
           supplier_no = params[:supplier_select]
           business = Business.find_by no: business_no
           supplier = Supplier.find_by no: supplier_no
-          puts "*************" + business_no + "************"
-          puts "*************" + supplier_no + "************"
+          Rails.logger.info "*************" + business_no + "************"
+          Rails.logger.info "*************" + supplier_no + "************"
           begin
             instance=nil
             if file.include?('.xlsx')
@@ -689,7 +789,6 @@ class OrdersController < ApplicationController
               keyclientorderdetails = Keyclientorderdetail.create! specification: specification, keyclientorder: keyclientorder, amount: instance.cell(2,'B').to_s.split('.0')[0], supplier: supplier, business_id: business.id
               
               2.upto(instance.last_row) do |line|
-                puts "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 order = Order.create! order_type: 'b2b', customer_name: instance.cell(line,'C'), customer_phone: instance.cell(line,'D').to_s.split('.0')[0], city: instance.cell(line,'G'), customer_address: instance.cell(line,'E'), customer_postcode: instance.cell(line,'F').to_s.split('.0')[0], total_amount: instance.cell(line,'B').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder
                 # order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
                 
@@ -699,8 +798,7 @@ class OrdersController < ApplicationController
               flash[:alert] = "商品缺失，导入失败"
             end
           rescue Exception => e
-            puts e
-            flash[:alert] = "导入失败"
+            flash[:alert] = e.to_s
             raise ActiveRecord::Rollback
           end
         end
@@ -711,6 +809,19 @@ class OrdersController < ApplicationController
   def upload_pingan(file)
      if !file.original_filename.empty?
        direct = "#{Rails.root}/upload/pingan/"
+       filename = "#{Time.now.to_f}_#{file.original_filename}"
+
+       file_path = direct + filename
+       File.open(file_path, "wb") do |f|
+          f.write(file.read)
+       end
+       file_path
+     end
+  end
+
+  def upload_orders_import(file)
+     if !file.original_filename.empty?
+       direct = "#{Rails.root}/upload/orders_import/"
        filename = "#{Time.now.to_f}_#{file.original_filename}"
 
        file_path = direct + filename
@@ -784,8 +895,7 @@ class OrdersController < ApplicationController
                 next
               end
               transport_type = instance.cell(line,'R').to_s
-              trackingNumber = getTrackingNumber(transport_type, tracking_number)
-              # puts trackingNumber[1].class
+              trackingNumber = getTrackingNumber(transport_type, tracking_number, line)
               case trackingNumber[1].size
               when 8
                 order.tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
@@ -816,7 +926,6 @@ class OrdersController < ApplicationController
   end
 
   def exportorders()
-    puts params[:ids]
     x = params[:ids].split(",")
     @orders = Order.where(id: x, status: "waiting")
     # @orders = Order.find(x)
@@ -936,12 +1045,32 @@ class OrdersController < ApplicationController
   
       sheet1.row(0).concat %w{订单ID 订单生成时间 产品编号 兑换品名称 兑换品数量 操作类型 收件人名称 收件人地址 联系电话 身份证后四位 订单编号 行项目编号 签收时间 配送结果 操作批次号 供应商名称 邮编 承运商 快递单号}  
       count_row = 1
-      objs.each do |obj|  
+      objs.each do |obj|
+        column2 = "|"  # 产品编号
+        column3 = ""  # 兑换品名称
+        column4 = ""  # 兑换品数量
+        column14 = "|" # 操作批次号
+        column15 = "" # 供应商名称
+        i = 0
+        obj.order_details.each do |detail|
+          if detail.supplier.blank?
+            column2 += add_text(i,"")
+            column15 += add_text(i,"")
+          else
+            column2 += add_text(i,Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,detail.supplier_id,detail.specification_id).first.external_code.to_s)
+            column15 += add_text(i,Supplier.find(detail.supplier_id).name)
+          end
+          column3 += add_text(i,detail.name)
+          column4 += add_text(i,detail.amount.to_s)
+          column14 += add_text(i,detail.batch_no.to_s)
+          i += 1
+        end  
         sheet1[count_row,0]=obj.id
         sheet1[count_row,1]=obj.pingan_ordertime
-        sheet1[count_row,2]="|"+Relationship.where("business_id=? and supplier_id=? and specification_id=?",obj.business_id,obj.order_details.first.supplier_id,obj.order_details.first.specification_id).first.external_code.to_s
-        sheet1[count_row,3]=obj.order_details.first.name
-        sheet1[count_row,4]=obj.order_details.first.amount
+
+        sheet1[count_row,2]=column2
+        sheet1[count_row,3]=column3
+        sheet1[count_row,4]=column4
         sheet1[count_row,5]=obj.pingan_operate
         sheet1[count_row,6]=obj.customer_name
         sheet1[count_row,7]=obj.customer_address
@@ -951,8 +1080,8 @@ class OrdersController < ApplicationController
         sheet1[count_row,11]="|"+obj.business_trans_no.to_s
         sheet1[count_row,12]=""
         sheet1[count_row,13]=""
-        sheet1[count_row,14]="|"+obj.order_details.first.batch_no.to_s
-        sheet1[count_row,15]=Supplier.find(obj.order_details.first.supplier_id).name
+        sheet1[count_row,14]=column14
+        sheet1[count_row,15]=column15
         sheet1[count_row,16]=obj.customer_postcode
         sheet1[count_row,17]=obj.transport_type
         sheet1[count_row,18]="|"+obj.tracking_number.to_s
@@ -963,7 +1092,7 @@ class OrdersController < ApplicationController
       xls_report.string  
     end
 
-    def getTrackingNumber(transport_type, tracking_number)
+    def getTrackingNumber(transport_type, tracking_number, line=nil)
       return_no = []
       case transport_type
       when "tcsd"
@@ -974,11 +1103,15 @@ class OrdersController < ApplicationController
           return_no << tracking_number[0,2] << tracking_number[2,8] << "31"
         when 8
           return_no << "PN" << tracking_number << "31"
+        else
+          raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "同城速递邮件编号格式错误,导入失败"
         end
       when "gnxb"
         case tracking_number.size
         when 13
           return_no << tracking_number[0,2] << tracking_number[2,11] << ""
+        else
+          raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "国内小包邮件编号格式错误,导入失败"
         end
       when "ems"
         case tracking_number.size
@@ -988,7 +1121,11 @@ class OrdersController < ApplicationController
           return_no << tracking_number[0,2] << tracking_number[2,8] << "06"
         when 8
           return_no << "10" << tracking_number << "06"
+        else
+          raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "ems邮件编号格式错误,导入失败"
         end
+      else
+        raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "错误的承运商,导入失败"
       end
       return return_no  
     end
@@ -1016,5 +1153,9 @@ class OrdersController < ApplicationController
       batch_id = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
       keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_id: batch_id,user: current_user,status: "printed")
       return keycorder.id
+    end
+
+    def add_text(index,content)
+      index == 0? content:(","+content)
     end
 end
