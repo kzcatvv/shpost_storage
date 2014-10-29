@@ -10,6 +10,7 @@ class Ability
         can :manage, Storage
         can :role, :unitadmin
         can :role, :user
+        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
         # cannot :role, :superadmin
         cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
         can :update, User, id: user.id
@@ -23,6 +24,8 @@ class Ability
         can :manage, Commodity, unit_id: user.unit_id
         can :manage, Specification, commodity: {unit_id: user.unit_id}
         can :new, Relationship
+
+        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
         
         can :manage, Relationship, specification: {commodity: {unit_id: user.unit_id}}
 
@@ -52,6 +55,8 @@ class Ability
         can :read, Goodstype, unit_id: user.unit_id
         can :read, Commodity, unit_id: user.unit_id
         can :read, Specification, commodity: {unit_id: user.unit_id}
+
+        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
         
         can :read, Relationship, specification: {commodity: {unit_id: user.unit_id}}
     else
@@ -141,6 +146,8 @@ class Ability
         cannot :destroy, StockLog, status: "checked"
 
         can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
+
+        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end
 
     if user.purchase?(storage)
@@ -162,6 +169,8 @@ class Ability
         can :manage, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+
+        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end
 
     if user.sorter?(storage)
@@ -176,6 +185,8 @@ class Ability
         can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+
+        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end
     # if user.admin?(storage)
     
