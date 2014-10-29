@@ -21,7 +21,7 @@ class ManualStockDetailsController < ApplicationController
 
   # GET /manual_stock_details/1/edit
   def edit
-    set_product_select(@manual_stock_detail)
+    set_autocom_update(@manual_stock_detail)
   end
 
   # POST /manual_stock_details

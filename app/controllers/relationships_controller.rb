@@ -1,6 +1,7 @@
 class RelationshipsController < ApplicationController
   #before_action :set_relationship, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource
+
   # GET /relationships
   # GET /relationships.json
   def index
@@ -24,7 +25,7 @@ class RelationshipsController < ApplicationController
   # GET /relationships/1/edit
   def edit
     #binding.pry
-    set_product_select(@relationship)
+    set_autocom_update(@relationship)
   end
 
   # POST /relationships

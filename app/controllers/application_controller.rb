@@ -64,6 +64,10 @@ class ApplicationController < ActionController::Base
       @commodity=Commodity.find(commodityid)
       @goodstype=Goodstype.find(goodstypeid)
   end
+
+  def set_autocom_update(objid)
+      @spname=Specification.find(objid.specification_id).all_name
+  end
      
   private
   def access_denied exception
