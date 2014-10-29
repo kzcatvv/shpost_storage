@@ -86,13 +86,16 @@ class CommoditiesController < ApplicationController
               all_name << instance.cell(line,'B').to_s
               all_name << instance.cell(line,'F').to_s
               # binding.pry
-              goodtype= Goodstype.where(name: instance.cell(line,'C').to_s).first
-              commodity = Commodity.find_by no: to_string(instance.cell(line,'A'))
+              goodtype= Goodstype.accessible_by(current_ability).where(name: instance.cell(line,'C').to_s).first
+              if goodtype.blank?
+                raise "导入文件第" + line.to_s + "行数据, 商品类型不存在，导入失败"
+              end
+              commodity = Commodity.accessible_by(current_ability).find_by no: to_string(instance.cell(line,'A'))
               if commodity.blank?
                 commodity = Commodity.create! no: to_string(instance.cell(line,'A')),name: instance.cell(line,'B'),goodstype_id: goodtype.id,unit_id: current_user.unit.id
               end
               #binding.pry
-              specification = Specification.find_by commodity_id:commodity.id,name:instance.cell(line,'F')
+              specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:instance.cell(line,'F')
               if specification.blank?
                 specification=Specification.create! commodity_id:commodity.id,name:instance.cell(line,'F'),sixnine_code: to_string(instance.cell(line,'E')),desc:instance.cell(line,'G'),sku: "",long: instance.cell(line,'H').to_f,wide: instance.cell(line,'I').to_f,high: instance.cell(line,'J').to_f,weight: instance.cell(line,'K').to_f,volume: instance.cell(line,'L').to_f,all_name: all_name
                 sku = goodtype.id.to_s + commodity.id.to_s + specification.id.to_s
