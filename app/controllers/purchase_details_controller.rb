@@ -21,7 +21,7 @@ class PurchaseDetailsController < ApplicationController
 
   # GET /purchase_detailes/1/edit
   def edit
-    set_product_select(@purchase_detail)
+    set_autocom_update(@purchase_detail)
   end
 
   # POST /purchase_detailes

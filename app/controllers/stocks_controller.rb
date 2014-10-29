@@ -88,7 +88,7 @@ class StocksController < ApplicationController
   def getstock
     @stocks=[]
     if !params[:ex_code].empty?
-      @relationship=Relationship.where("external_code=?",params[:ex_code]).first
+      @relationship=Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
       if @relationship.nil?
         @stocks=[]
       else
@@ -96,7 +96,7 @@ class StocksController < ApplicationController
       end
 
     elsif !params[:sixnine_code].empty?
-      @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).first
+      @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).accessible_by(current_ability).first
       if @specification.nil?
           @stocks=[]
       else
@@ -110,6 +110,9 @@ class StocksController < ApplicationController
     @stocks.each do |s|
         product = [s.business_id,s.specification_id,s.supplier_id]
         warning_amount=Relationship.where("business_id=? and specification_id=? and supplier_id=?",s.business_id,s.specification_id,s.supplier_id).first.warning_amt
+        if warning_amount.nil?
+          warning_amount="hasnot"
+        end
 
         if @allcnt.has_key?(product)
             @allcnt[product][0]=@allcnt[product][0]+s.actual_amount

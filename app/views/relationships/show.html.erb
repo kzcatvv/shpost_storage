@@ -11,7 +11,7 @@
   <dt><strong><%= model_class.human_attribute_name(:specification_id) %>:</strong></dt>
   <dd><%= Specification.find(@relationship.specification_id).all_name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:external_code) %>:</strong></dt>
-  <dd><%= @relationship.spec_desc %></dd>
+  <dd><%= @relationship.external_code %></dd>
   <dt><strong><%= model_class.human_attribute_name(:spec_desc) %>:</strong></dt>
   <dd><%= @relationship.spec_desc %></dd>
   <dt><strong><%= model_class.human_attribute_name(:warning_amt) %>:</strong></dt>

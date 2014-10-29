@@ -84,6 +84,12 @@ function ajaxspecifications() {
  
     return false; 
   })
+
+  $('#specification_name').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    var spid = "#"+data.item.obj+"_specification_id";
+    $(spid).val(data.item.id);
+  });
 };
 
 function clickin(current)
@@ -279,3 +285,5 @@ function removeTr(current)
     }
   });
 }
+
+

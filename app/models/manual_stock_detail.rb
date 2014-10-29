@@ -40,10 +40,10 @@ class ManualStockDetail < ActiveRecord::Base
     self.stock_logs.to_a.sum{|x| x.checked? ? x.amount : 0}
   end
 
-  def set_batch_no
-    if self.batch_no.blank?
-      time = Time.now
-      self.batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + PurchaseDetail.count.to_s.rjust(5,'0')
-    end
-  end
+  # def set_batch_no
+  #   if self.batch_no.blank?
+  #     time = Time.now
+  #     self.batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + PurchaseDetail.count.to_s.rjust(5,'0')
+  #   end
+  # end
 end

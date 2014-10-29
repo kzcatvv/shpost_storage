@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Order detail:</strong>
+  <%= @order_return.order_detail_id %>
+</p>
+
+<p>
+  <strong>Return reason:</strong>
+  <%= @order_return.return_reason %>
+</p>
+
+<p>
+  <strong>Is bad:</strong>
+  <%= @order_return.is_bad %>
+</p>
+
+<%= link_to 'Edit', edit_order_return_path(@order_return) %> |
+<%= link_to 'Back', order_returns_path %>

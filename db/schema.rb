@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141022063413) do
+ActiveRecord::Schema.define(version: 20141027230129) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.string   "no"
     t.string   "secret_key"
     t.integer  "alertday",   default: 0
+    t.string   "barcode"
   end
 
   create_table "commodities", force: true do |t|
@@ -123,12 +124,14 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "batch_id"
+    t.string   "batch_no"
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "business_id"
     t.integer  "user_id"
     t.string   "status"
+    t.string   "barcode"
+    t.string   "no"
   end
 
   create_table "manual_stock_details", force: true do |t|
@@ -153,6 +156,7 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.integer  "storage_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "barcode"
   end
 
   create_table "order_details", force: true do |t|
@@ -176,14 +180,16 @@ ActiveRecord::Schema.define(version: 20141022063413) do
 
   add_index "order_details_stock_logs", ["order_detail_id", "stock_log_id"], name: "od_sl_by_id", unique: true
 
-  create_table "orderreturns", force: true do |t|
+  create_table "order_returns", force: true do |t|
     t.integer  "order_detail_id"
     t.string   "return_reason"
     t.string   "is_bad"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "batch_id"
+    t.string   "batch_no"
     t.string   "status"
+    t.string   "barcode"
+    t.string   "no"
   end
 
   create_table "orders", force: true do |t|
@@ -224,6 +230,8 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.string   "pingan_operate"
     t.string   "customer_idnumber"
     t.string   "tracking_info",     limit: 2000
+    t.string   "barcode"
+    t.string   "batch_no"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -253,6 +261,7 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.datetime "updated_at"
     t.string   "name",        default: "", null: false
     t.integer  "storage_id"
+    t.string   "barcode"
   end
 
   create_table "relationships", force: true do |t|
@@ -276,6 +285,14 @@ ActiveRecord::Schema.define(version: 20141022063413) do
 
   add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
 
+  create_table "sequences", force: true do |t|
+    t.string   "entity"
+    t.integer  "unit_id"
+    t.integer  "count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "shelves", force: true do |t|
     t.integer  "area_id"
     t.string   "shelf_code"
@@ -290,6 +307,8 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.string   "area_length",    default: ""
     t.string   "area_width",     default: ""
     t.string   "area_height",    default: ""
+    t.string   "barcode"
+    t.string   "no"
   end
 
   create_table "specifications", force: true do |t|
@@ -306,6 +325,8 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.float    "weight"
     t.float    "volume"
     t.string   "all_name"
+    t.string   "barcode"
+    t.string   "no"
   end
 
   create_table "standard_interfaces", force: true do |t|
@@ -359,6 +380,7 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "barcode"
   end
 
   create_table "units", force: true do |t|
@@ -367,6 +389,7 @@ ActiveRecord::Schema.define(version: 20141022063413) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "no"
+    t.string   "short_name"
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true

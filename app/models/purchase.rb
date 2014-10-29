@@ -6,7 +6,7 @@ class Purchase < ActiveRecord::Base
   has_many :stock_logs, through: :purchase_details
 	has_many :stocks, through: :stock_logs  
 
-	validates_presence_of :no, :name, message: '不能为空'
+	# validates_presence_of :no, :name, message: '不能为空'
 
 
 

@@ -58,7 +58,7 @@
   <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
   <dd><%= Storage.find(@order.storage_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:keyclientorder_id) %>:</strong></dt>
-  <dd><%= Keyclientorder.find(@order.keyclientorder_id).batch_id %></dd>
+  <dd><%= Keyclientorder.find(@order.keyclientorder_id).batch_no %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

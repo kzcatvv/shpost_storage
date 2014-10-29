@@ -2,6 +2,7 @@ class SpecificationsController < ApplicationController
   #before_action :set_specification, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource :commodity
   load_and_authorize_resource :specification, through: :commodity, parent: false
+
   # GET /specifications
   # GET /specifications.json
   def index
@@ -32,7 +33,7 @@ class SpecificationsController < ApplicationController
 
     respond_to do |format|
       if @specification.save
-        @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s) 
+        # @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s) 
         format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: 'Specification was successfully created.' }
         format.json { render action: 'show', status: :created, location: @specification }
       else
@@ -48,7 +49,7 @@ class SpecificationsController < ApplicationController
     @specification.all_name=Commodity.find(@specification.commodity_id).name+@specification.name
     respond_to do |format|
       if @specification.update(specification_params)
-        @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s)
+        # @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s)
         format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: 'Specification was successfully updated.' }
         format.json { head :no_content }
       else

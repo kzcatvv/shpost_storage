@@ -323,6 +323,9 @@ zh-CN:
       interface_info:
         one: 接口信息
         other: 接口信息
+      sequence:
+        one: 编号序列
+        other: 编号序列
     attributes:
       user:
         email: "电子邮件"
@@ -553,7 +556,7 @@ zh-CN:
         contact_person: 联系人
         phone: 联系电话
         desc: 备注
-        batch_id: 订单批次编号
+        batch_no: 订单批次编号
         unit_id: 单位
         storage_id: 仓库
         business_id: 所属商户
@@ -584,6 +587,9 @@ zh-CN:
         status_failed: "失败"
         first_time: "首次调用时间"
         last_time: "末次调用时间"
+      squence:
+        class: "编号类型"
+        count: "目前计数"
   menu:
     permission:
       name: "权限管理"
@@ -704,8 +710,8 @@ zh-CN:
           link: "/orders/pingan_b2c_outport"
         findwarning:
           name: "退件入库"
-          link: "/orders/packreturn"
-          link: "/orderreturns/packreturn"
+          link: "/orders/pack_return"
+          link: "/order_returns/pack_return"
         # b2cfindprint:
         #   name: "电商订单打印"
         #   link: "/orders/findprint"

@@ -1,8 +1,8 @@
 class Supplier < ActiveRecord::Base
 	belongs_to :unit
 	has_many :contacts, dependent: :destroy
-	validates_presence_of :no, :name, :message => '不能为空'
-	validates_uniqueness_of :no, :message => '该编号已存在'
+	# validates_presence_of :no, :name, :message => '不能为空'
+	# validates_uniqueness_of :no, :message => '该编号已存在'
 
   def self.find_supplier(supplier_no, business)
     find_by(no: business.no + '_' + supplier_no)
