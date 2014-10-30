@@ -594,11 +594,11 @@ class OrdersController < ApplicationController
     unless request.get?
       if file = upload_pingan(params[:file]['file'])
         Keyclientorder.transaction do
-          business_no = params[:business_select]
+          business_id = params[:business_select]
           # supplier_no = params[:supplier_select]
-          business = Business.find_by no: business_no
+          business = Business.find business_id
           # supplier = Supplier.find_by no: supplier_no
-          Rails.logger.info "*************business_no:" + business_no + "************"
+          Rails.logger.info "*************business_id:" + business_id + "************"
           # puts "*************" + supplier_no + "************"
           begin
             instance=nil
