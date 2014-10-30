@@ -17,8 +17,6 @@
 
     g.column name: model_class.human_attribute_name(:id), attribute: 'id', filter_type: :range
 
-    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
-
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
     g.column name: model_class.human_attribute_name(:goodstype_id), attribute: 'goodstype_id',custom_filter: Goodstype.accessible_by(current_ability).collect {|g| [g.name,g.id]} do |commodity|

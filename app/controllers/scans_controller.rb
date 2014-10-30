@@ -5,7 +5,6 @@ class ScansController < ApplicationController
   # before_action :scan_filter
 
   def scans
-    binding.pry
     # binding.pry
     # @scans = Array.new
     # if ! @purchase.blank?

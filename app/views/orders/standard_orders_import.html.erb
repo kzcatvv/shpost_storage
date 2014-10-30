@@ -1,0 +1,22 @@
+<center>
+<br><br>
+<font face="微软雅黑" color='#006030' size=6>标准订单导入</font>   
+
+<br><br><br>
+
+<%= form_tag({:action => 'standard_orders_import'}, :multipart => true) %>
+
+<div>
+   <strong>商户: </strong><%= select_tag :business_select, options_for_select(Business.accessible_by(current_ability).map{|u| [u.name, u.no]}) %>&nbsp;
+</div>
+
+<br/>
+
+<font face="微软雅黑" color='#D9B300' size=3>上传文档模板: <%= file_field("file", "file") %></font>   
+<br><br><br>
+
+
+<%= submit_tag "确认导入", data: { disable_with: "导入中，请稍等..." } %>
+
+</form>
+</center>

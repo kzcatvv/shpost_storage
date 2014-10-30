@@ -33,7 +33,6 @@ class PurchasesController < ApplicationController
     @purchase.unit = current_user.unit
     @purchase.status = Purchase::STATUS[:opened]
     @purchase.storage = current_storage
-    @purchase.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Purchase.count.to_s.rjust(5,'0')
 
 
     respond_to do |format|
@@ -152,15 +151,14 @@ class PurchasesController < ApplicationController
                 unit = current_user.unit
                 status = Purchase::STATUS[:opened]
                 storage = current_storage
-                business = Business.find_by name: instance.cell(line,'B').to_s
+                business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'B').to_s
                 time=Time.new
-                no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Purchase.count.to_s.rjust(5,'0')
 
-                purchase = Purchase.create! no: no, unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
+                purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
               end
-              supplier=Supplier.find_by name:instance.cell(line,'E').to_s
+              supplier=Supplier.accessible_by(current_ability).find_by name:instance.cell(line,'E').to_s
 
-              specifications=Specification.where(sixnine_code:instance.cell(line,'G').to_s)
+              specifications=Specification.accessible_by(current_ability).where(sixnine_code:instance.cell(line,'G').to_s)
               specification=nil
               if specifications.size > 1
                 specification=specifications.find_by name: instance.cell(line,'F').to_s

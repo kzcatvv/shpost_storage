@@ -14,6 +14,7 @@ class Ability
         # cannot :role, :superadmin
         cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
         can :update, User, id: user.id
+        can :manage, Sequence
         #can :manage, User
     elsif user.unitadmin?
         #can :manage, :all
@@ -30,6 +31,7 @@ class Ability
         can :manage, Relationship, specification: {commodity: {unit_id: user.unit_id}}
 
         can [:read, :update], Unit, id: user.unit_id
+        can :manage, Sequence, id: user.unit_id
         can :manage, Storage, unit_id: user.unit_id
         
         can :storage, Unit, id: user.unit_id
@@ -37,9 +39,12 @@ class Ability
         can :read, UserLog, user: {unit_id: user.unit_id}
 
         can :manage, User, unit_id: user.unit_id
-        can :role, User, unit_id: user.unit_id
+        
         can :manage, Role
         cannot :role, User, role: 'superadmin'
+        can :role, :unitadmin
+        can :role, :user
+        
         # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
@@ -49,6 +54,7 @@ class Ability
         can :read, UserLog, user: {id: user.id}
 
         can :read, Unit, id: user.unit_id
+        
 
         can :read, Business, unit_id: user.unit_id
         can :read, Supplier, unit_id: user.unit_id
@@ -146,7 +152,7 @@ class Ability
         # can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         cannot :destroy, StockLog, status: "checked"
 
-        can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
+        can :manage, OrderReturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end
@@ -183,7 +189,7 @@ class Ability
         can :manage, Order, storage_id: storage.id
         can :manage, OrderDetail, order: {storage_id: storage.id}
 
-        can :manage, Orderreturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
+        can :manage, OrderReturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
 

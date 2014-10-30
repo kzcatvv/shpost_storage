@@ -113,8 +113,8 @@ class ShelvesController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
             2.upto(instance.last_row) do |line|
-              storage = Storage.where(name: instance.cell(line,'A').to_s).first
-              area=Area.where(storage: storage, area_code: instance.cell(line,'B').to_s).first
+              storage = Storage.accessible_by(current_ability).where(name: instance.cell(line,'A').to_s).first
+              area=Area.accessible_by(current_ability).where(storage: storage, area_code: instance.cell(line,'B').to_s).first
               shelfcode = ""
               shelfcode << instance.cell(line,'B').to_s
               shelfcode << change(to_string(instance.cell(line,'C').to_s))

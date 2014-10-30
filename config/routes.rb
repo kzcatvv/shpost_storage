@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  
+
   resources :manual_stocks do
     collection do 
       get  'manual_stock_import'
@@ -23,14 +25,14 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
-  resources :orderreturns do
+  resources :order_returns do
     collection do
-      get 'packreturn'
-      get 'doreturn'
-      get 'findtrackingnumber'
-      get 'returncheck'
-      post 'exportorderreturns' => 'orderreturns#exportorderreturns'
-      get 'exportorderreturns'
+      get 'pack_return'
+      get 'do_return'
+      get 'find_tracking_number'
+      get 'return_check'
+      post 'export_order_returns' => 'order_returns#export_order_returns'
+      get 'export_order_returns'
     end
   end
 
@@ -53,9 +55,11 @@ ShpostStorage::Application.routes.draw do
         get 'pingan_b2b_import'
         post 'pingan_b2b_import' => 'orders#pingan_b2b_import'
         get 'pingan_b2c_import'
-        post 'orders_b2b_import' => 'orders#orders_b2b_import'
-        get 'orders_b2b_import'
         post 'pingan_b2c_import' => 'orders#pingan_b2c_import'
+        get 'orders_b2b_import'
+        post 'orders_b2b_import' => 'orders#orders_b2b_import'
+        get 'standard_orders_import'
+        post 'standard_orders_import' => 'orders#standard_orders_import'
         get 'pingan_b2c_outport'
         post 'pingan_b2c_xls_outport'
         get 'pingan_b2b_outport'
@@ -161,6 +165,7 @@ ShpostStorage::Application.routes.draw do
   resources :units do
     resources :users, :controller => 'unit_users'
     resources :storages, :controller => 'unit_storages'
+    resources :sequences, :controller => 'unit_sequences'
   end
 
   resources :users do
