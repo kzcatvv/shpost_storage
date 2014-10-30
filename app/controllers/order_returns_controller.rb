@@ -67,7 +67,7 @@ class OrderReturnsController < ApplicationController
   end
 
   def find_tracking_number
-    @order = Order.where(tracking_number: params[:tracking_number]).first
+    @order = Order.where(tracking_number: params[:tracking_number]).accessible_by(current_ability).first
     @order_details = @order.order_details
     respond_to do |format|
           format.js 
