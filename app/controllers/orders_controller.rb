@@ -768,12 +768,12 @@ class OrdersController < ApplicationController
     unless request.get?
       if file = upload_pingan(params[:file]['file'])
         Keyclientorder.transaction do
-          business_no = params[:business_select]
-          supplier_no = params[:supplier_select]
-          business = Business.find_by no: business_no
-          supplier = Supplier.find_by no: supplier_no
-          Rails.logger.info "*************" + business_no + "************"
-          Rails.logger.info "*************" + supplier_no + "************"
+          business_id = params[:business_select]
+          supplier_id = params[:supplier_select]
+          business = Business.find business_id
+          supplier = Supplier.find supplier_id
+          Rails.logger.info "*************" + business_id + "************"
+          Rails.logger.info "*************" + supplier_id + "************"
           begin
             instance=nil
             if file.include?('.xlsx')
