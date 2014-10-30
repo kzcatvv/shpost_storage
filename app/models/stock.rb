@@ -55,21 +55,21 @@ class Stock < ActiveRecord::Base
       product = x[0]
       amount = x[1][0]
       details = x[1][1]
-      # Rails.logger.info "-------product info--------"
-      # Rails.logger.info product
-      # Rails.logger.info "-------amount info--------"
-      # Rails.logger.info amount
+      Rails.logger.info "-------product info--------"
+      Rails.logger.info product
+      Rails.logger.info "-------amount info--------"
+      Rails.logger.info amount
       if details.first.stock_logs.blank?
         outstocks = Stock.find_stocks_in_storage(product[1], product[2], product[0], current_storage).to_ary
-        # Rails.logger.info "-------outstocks size--------"
-        # Rails.logger.info outstocks.size
+        Rails.logger.info "-------outstocks size--------"
+        Rails.logger.info outstocks.size
         outstocks.each do |outstock|
-          # Rails.logger.info "-------------outstock----------------"
-          # Rails.logger.info "-----------outstock info-------------"
-          # Rails.logger.info outstock.id
+          Rails.logger.info "-------------outstock----------------"
+          Rails.logger.info "-----------outstock info-------------"
+          Rails.logger.info outstock.id
           available_amount = outstock.get_available_amount
-          # Rails.logger.info "----------available amount-----------"
-          # Rails.logger.info available_amount
+          Rails.logger.info "----------available amount-----------"
+          Rails.logger.info available_amount
           if available_amount == 0
             next
           elsif available_amount >= amount
