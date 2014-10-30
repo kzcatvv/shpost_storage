@@ -4,7 +4,7 @@ class ManualStock < ActiveRecord::Base
   belongs_to :storage
   has_many :manual_stock_details, dependent: :destroy
   has_many :stock_logs, through: :manual_stock_details
-  has_many :stocks, through: :stock_logs  
+  has_many :stocks, through: :manual_stock_details  
 
   # validates_presence_of :no, :name, message: '不能为空'
 

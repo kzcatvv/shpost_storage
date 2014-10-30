@@ -5,8 +5,8 @@ class Stock < ActiveRecord::Base
   belongs_to :supplier
   # belongs_to :storage
   has_one :area, through: :shelf
-  has_one :storage, through: :area
-  has_one :unit, through: :storage
+  has_one :storage, through: :shelf
+  has_one :unit, through: :shelf
   has_many :stock_logs
 
   validates_presence_of :specification_id, :actual_amount, :virtual_amount

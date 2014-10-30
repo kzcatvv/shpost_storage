@@ -1,7 +1,7 @@
 class Shelf < ActiveRecord::Base
 	belongs_to :area
   has_one :storage, through: :area
-  has_one :unit, through: :storage
+  has_one :unit, through: :area
   has_many :stocks
 
 
