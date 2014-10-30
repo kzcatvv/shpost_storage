@@ -197,6 +197,12 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
+  resources :specification_autocom do
+     collection do
+        get 'autocomplete_specification_name'
+     end
+  end
+
   resources :areas do
      resources :shelves, :controller => 'area_shelf'
   end
