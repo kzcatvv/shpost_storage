@@ -48,6 +48,7 @@ class Ability
         # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
+        
     elsif user.user?
         can :update, User, id: user.id
         can :read, UserLog, user: {id: user.id}
