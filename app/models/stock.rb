@@ -217,8 +217,9 @@ class Stock < ActiveRecord::Base
 
     if ! supplier.nil?
       Rails.logger.info "------------------"+supplier.id.to_s+"--------------------"
-      conditions.where(supplier: supplier)
+      conditions = conditions.where(supplier: supplier)
     end
+    return conditions
   end
 
   def self.with_batch_no(batch_no)
