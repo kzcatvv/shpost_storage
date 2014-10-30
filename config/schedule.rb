@@ -23,7 +23,7 @@ set :output, "log/cron_log.log"
 #   runner "AnotherModel.prune_old_records"
 # end
 
-every :day, :at => '00:20am' do
+every :day, :at => '08:00am' do
 # every '* * * * *' do
   rake "transmitter:csb:get_point_order"
 end
@@ -32,11 +32,11 @@ every :day, :at => '05:10pm' do
   rake "transmitter:csb:order_status"
 end
 
-every :day, :at => '05:10pm' do
+every :day, :at => '05:20pm' do
   rake "transmitter:csb:update_order_status"
 end
 
-every 1.hours do
+every :day, :at => '08:30am' do
 # every '* * * * *' do
   rake "transmitter:csb:redeal_with_orders"
 end
