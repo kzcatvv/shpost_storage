@@ -435,6 +435,7 @@ class OrdersController < ApplicationController
     end
    #  #binding.pry
       rescue Exception => e
+        Rails.logger.error e.backtrace
         flash[:alert] = e.message
         redirect_to :action => 'findprintindex'
         raise ActiveRecord::Rollback
@@ -668,6 +669,7 @@ class OrdersController < ApplicationController
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
+            Rails.logger.error e.backtrace
             flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
@@ -713,6 +715,7 @@ class OrdersController < ApplicationController
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
+            Rails.logger.error e.backtrace
             flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
@@ -752,7 +755,8 @@ class OrdersController < ApplicationController
               flash[:alert] = "商品关联缺失，导入失败"
             end
           rescue Exception => e
-            flash[:alert] = "导入失败"
+            Rails.logger.error e.backtrace
+            flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
         end
@@ -798,7 +802,8 @@ class OrdersController < ApplicationController
               flash[:alert] = "商品缺失，导入失败"
             end
           rescue Exception => e
-            flash[:alert] = e.to_s
+            Rails.logger.error e.backtrace
+            flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
         end
@@ -917,6 +922,7 @@ class OrdersController < ApplicationController
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
+            Rails.logger.error e.backtrace
             flash[:alert] = e.message
             raise ActiveRecord::Rollback
           end
