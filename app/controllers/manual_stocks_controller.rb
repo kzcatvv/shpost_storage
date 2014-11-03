@@ -71,20 +71,23 @@ class ManualStocksController < ApplicationController
     product_hash = {}
     sklogs=[]
 
+    Stock.transaction do
+      begin
+
     manual_stock=ManualStock.find(params[:id])
 
-      if Stock.check_out_stocks(manual_stock, manual_stock.manual_stock_details, current_storage)
-        manual_stock.manual_stock_details.each do |detail|
-          product_hash = Stock.get_product_hash(manual_stock,detail,product_hash)
-          # product = [order.business,orderdtl.specification,orderdtl.supplier]
-          # if allcnt.has_key?(product)
-          #     allcnt[product][0]=allcnt[product][0]+orderdtl.amount
-          #     allcnt[product][1]<<orderdtl
-          # else
-          #     allcnt[product]=[orderdtl.amount, [orderdtl]]
-          # end
-        end
+    if Stock.check_out_stocks(manual_stock, manual_stock.manual_stock_details, current_storage)
+      manual_stock.manual_stock_details.each do |detail|
+        product_hash = Stock.get_product_hash(manual_stock,detail,product_hash)
+        # product = [order.business,orderdtl.specification,orderdtl.supplier]
+        # if allcnt.has_key?(product)
+        #     allcnt[product][0]=allcnt[product][0]+orderdtl.amount
+        #     allcnt[product][1]<<orderdtl
+        # else
+        #     allcnt[product]=[orderdtl.amount, [orderdtl]]
+        # end
       end
+    end
 
     # puts allcnt
 
@@ -94,6 +97,13 @@ class ManualStocksController < ApplicationController
     #binding.pry
     @stock_logs_grid = initialize_grid(@stock_logs)
 
+      rescue Exception => e
+        Rails.logger.error e.backtrace
+        flash[:alert] = e.message
+        redirect_to :action => 'findprintindex'
+        raise ActiveRecord::Rollback
+      end
+    end
   end
 
   def check

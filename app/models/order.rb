@@ -78,6 +78,12 @@ class Order < ActiveRecord::Base
     end
   end
 
+  def set_status(status)
+    if can_update_status(status)
+      self.update(status: status)
+    end
+  end
+
   protected
 
   def can_update_status(status)

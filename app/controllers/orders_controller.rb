@@ -908,7 +908,8 @@ class OrdersController < ApplicationController
                 order.tracking_number=trackingNumber[0] + trackingNumber[1]
               end
               order.transport_type=transport_type
-              order.status='printed'
+              # order.status='printed'
+              order.set_status('printed')
               order.user_id=current_user.id
               # if order.keyclientorder_id.blank?
                 if koid.blank?
