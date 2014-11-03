@@ -619,13 +619,13 @@ class OrdersController < ApplicationController
               end
               sku_ids = sku_ids.split(',')
               Rails.logger.info sku_ids
-              amounts = instance.cell(line,'B')
+              amounts = instance.cell(line,'C')
               if amounts.blank?
                 raise "导入文件第" + line.to_s + "行数据, 缺少数量，导入失败"
               end
               amounts = amounts.split(',')
               Rails.logger.info amounts
-              supplier_names = instance.cell(line,'H')
+              supplier_names = instance.cell(line,'I')
               if !supplier_names.blank?
                 supplier_names = supplier_names.split(',')
               else
@@ -657,7 +657,8 @@ class OrdersController < ApplicationController
                   # flash[:alert] = "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
                   raise "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
                 end
-                order = Order.create! order_type: 'b2c', customer_name: instance.cell(line,'C'), customer_phone: instance.cell(line,'D').to_s.split('.0')[0], city: instance.cell(line,'G'), customer_address: instance.cell(line,'E'), customer_postcode: instance.cell(line,'F').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder
+                buyer_desc = instance.cell(line,'J')
+                order = Order.create! order_type: 'b2c', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder, buyer_desc: buyer_desc
                 # order = Order.create! business_trans_no: instance.cell(line,'A').to_s.split('.0')[0], order_type: 'b2b', customer_name: instance.cell(line,'D'), customer_phone: instance.cell(line,'E').to_s.split('.0')[0], city: instance.cell(line,'H'), customer_address: instance.cell(line,'F'), customer_postcode: instance.cell(line,'G').to_s.split('.0')[0], total_amount: 1, business_id: StorageConfig.config["business"]['pajf_id'], unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', customer_idnumber: instance.cell(line,'B').to_s.split('.0')[0], keyclientorder: keyclientorder
                 0.upto(sku_ids.size - 1) do |x|
                   specification = specifications.find_by sku: sku_ids[x]
@@ -893,8 +894,15 @@ class OrdersController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
             koid = ""
+            flash_message = "导入成功!!\<br/\>"
             2.upto(instance.last_row) do |line|
               order = Order.find(instance.cell(line,'A').to_s.split('.0')[0])
+              if order.blank?
+                raise "导入文件第" + line.to_s + "行数据, 订单不存在，导入失败"
+              elsif !order.can_import()
+                flash_message << "导入文件第" + line.to_s + "行数据, 订单已处理，无法导入\<br/\>"
+                next
+              end
               tracking_number = instance.cell(line,'S').to_s.split('|')[1]
               if tracking_number.blank?
                 next
@@ -921,7 +929,7 @@ class OrdersController < ApplicationController
               # end
               order.save
             end
-            flash[:alert] = "导入成功"
+            flash[:notice] = flash_message
           rescue Exception => e
             Rails.logger.error e.backtrace
             flash[:alert] = e.message

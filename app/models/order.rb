@@ -84,6 +84,24 @@ class Order < ActiveRecord::Base
     end
   end
 
+  def can_import()
+    order = Order.find self
+    if order.blank?
+      return true
+    else
+      x = compare_status(order.status,"printed")
+      if x.blank?
+        return false
+      elsif x == 0
+        return true
+      elsif x > 0
+        return false
+      elsif x < 0
+        return true
+      end
+    end
+  end
+
   protected
 
   def can_update_status(status)
