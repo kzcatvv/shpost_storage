@@ -76,7 +76,11 @@ class Stock < ActiveRecord::Base
             outstock.update_attribute(:virtual_amount , outstock.virtual_amount - amount)
             outstock.save
             # 20141029 merge the same stocklog
-            stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
+            if details.first.is_a? ManualStockDetail
+              stocklog = nil
+            else
+              stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
+            end
             if stocklog.blank?
               stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
             else
@@ -92,7 +96,11 @@ class Stock < ActiveRecord::Base
             outstock.update_attribute(:virtual_amount , outstock.virtual_amount - available_amount)
             outstock.save
             # 20141029 merge the same stocklog
-            stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
+            if details.first.is_a? ManualStockDetail
+              stocklog = nil
+            else
+              stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
+            end
             if stocklog.blank?
               stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: available_amount, operation_type: StockLog::OPERATION_TYPE[:out])
             else
