@@ -504,7 +504,7 @@ class OrdersController < ApplicationController
       end
 
      if @keyclientorder.keyclient_name == "auto"
-        redirect_to :action => 'findprint'
+        redirect_to :action => 'findprintindex'
      else
         redirect_to "/keyclientorders"
      end
@@ -596,7 +596,7 @@ class OrdersController < ApplicationController
         Keyclientorder.transaction do
           business_id = params[:business_select]
           # supplier_no = params[:supplier_select]
-          business = Business.find business_id
+          business = Business.accessible_by(current_ability).find business_id
           # supplier = Supplier.find_by no: supplier_no
           Rails.logger.info "*************business_id:" + business_id + "************"
           # puts "*************" + supplier_no + "************"
@@ -632,8 +632,8 @@ class OrdersController < ApplicationController
                 supplier_names = []
               end
               Rails.logger.info supplier_names
-              specifications = Specification.where sku: sku_ids
-              suppliers = Supplier.where name: supplier_names
+              specifications = Specification.accessible_by(current_ability).where sku: sku_ids
+              suppliers = Supplier.accessible_by(current_ability).where name: supplier_names
 
               # relationship = Relationship.find_relationships(instance.cell(2,'C').to_s.split('.0')[0],nil,nil, StorageConfig.config["business"]['pajf_id'], current_user.unit.id)
               
