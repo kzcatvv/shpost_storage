@@ -6,8 +6,10 @@ class Unit < ActiveRecord::Base
   has_many :commodities, dependent: :destroy
   has_many :sequences, dependent: :destroy
 
-  validates_presence_of :name, :message => '不能为空字符'
+  validates_presence_of [:name, :short_name], :message => '不能为空'
   validates_uniqueness_of :name, :message => '该单位已存在'
+
+  validates_uniqueness_of :short_name, :message => '该缩写已存在'
 
   def default_storage
     storage = storages.where(default_storage: true).first
