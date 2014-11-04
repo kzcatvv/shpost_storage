@@ -2,12 +2,12 @@
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-    <% if can? :new, Keyclientorder %>
+   <!--  <% if can? :new, Keyclientorder %>
       <%=link_to t('线下订单导入'), "/orders/orders_b2b_import", target: '_blank',:class => 'btn btn-primary' %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
                   new_keyclientorder_path,
                   :class => 'btn btn-primary' %>
-    <% end %>
+    <% end %> -->
   </div>
 </div>
 
@@ -39,12 +39,12 @@
 
     g.column do |keyclientorder|
       ActiveSupport::SafeBuffer.new << 
-        (link_to t('.edit', :default => t("helpers.links.edit")), edit_keyclientorder_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :update, keyclientorder) << ' ' <<
-        (link_to t('.destroy', :default => t("helpers.links.destroy")), keyclientorder_path(keyclientorder), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, keyclientorder)<< ' ' <<
-        (link_to t('.pddetails', :default => t("helpers.links.pddetails")), keyclientorder_keyclientorderdetails_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :details, keyclientorder)<< ' ' <<
-        (link_to t('.custorders', :default => t("helpers.links.custorders")), keyclientorder_orders_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :custorders, keyclientorder)<< ' ' <<
-        (link_to t('打印面单'), "/print/keytracking?id=#{keyclientorder.id}", target: '_blank',:class => 'btn btn-xs btn-info')<< ' ' <<
-        (link_to t('生成出库单'), "/orders/stockout?keyclientorder_id=#{keyclientorder.id}", :class => 'btn btn-xs btn-info')
+        # (link_to t('.edit', :default => t("helpers.links.edit")), edit_keyclientorder_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :update, keyclientorder) << ' ' <<
+        # (link_to t('.destroy', :default => t("helpers.links.destroy")), keyclientorder_path(keyclientorder), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, keyclientorder)<< ' ' <<
+        # (link_to t('.pddetails', :default => t("helpers.links.pddetails")), keyclientorder_keyclientorderdetails_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :details, keyclientorder)<< ' ' <<
+        (link_to t('.custorders', :default => t("helpers.links.custorders")), keyclientorder_orders_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :custorders, keyclientorder)
+        # (link_to t('打印面单'), "/print/keytracking?id=#{keyclientorder.id}", target: '_blank',:class => 'btn btn-xs btn-info')<< ' ' <<
+        # (link_to t('生成出库单'), "/orders/stockout?keyclientorder_id=#{keyclientorder.id}", :class => 'btn btn-xs btn-info')
     end
   end 
 %>

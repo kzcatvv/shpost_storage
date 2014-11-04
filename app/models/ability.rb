@@ -16,6 +16,13 @@ class Ability
         can :update, User, id: user.id
         can :manage, Sequence
         #can :manage, User
+
+        can :manage, InterfaceInfo
+
+        cannot :resend, InterfaceInfo do |interface_info|
+            (interface_info.status == "success")
+        end
+
     elsif user.unitadmin?
         #can :manage, :all
         can :manage, Business, unit_id: user.unit_id
@@ -49,6 +56,13 @@ class Ability
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
         
+        can :manage, InterfaceInfo
+
+        cannot :resend, InterfaceInfo do |interface_info|
+            (interface_info.status == "success")
+        end
+
+
     elsif user.user?
         can :update, User, id: user.id
         can :read, UserLog, user: {id: user.id}
@@ -66,6 +80,9 @@ class Ability
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
         
         can :read, Relationship, specification: {commodity: {unit_id: user.unit_id}}
+
+        cannot :manage, InterfaceInfo
+
     else
         cannot :manage, :all
         #can :update, User, id: user.id
@@ -73,6 +90,9 @@ class Ability
         cannot :read, Area
         cannot :read, Commodity
         cannot :read, Business
+
+        cannot :manage, InterfaceInfo
+
     end
 
     if user.admin?(storage)
@@ -116,12 +136,6 @@ class Ability
 
         cannot :destroy, ManualStockDetail do |manual_stock_detail|
             (manual_stock_detail.manual_stock.storage_id == storage.id) && (manual_stock_detail.status == ManualStockDetail::STATUS[:stock_out])
-        end
-
-        can :manage, InterfaceInfo
-
-        cannot :resend, InterfaceInfo do |interface_info|
-            (interface_info.status == "success")
         end
 
         can :manage, Keyclientorder, storage_id: storage.id

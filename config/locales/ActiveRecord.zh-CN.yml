@@ -312,11 +312,11 @@ zh-CN:
         one: 货架管理
         other: 货架管理
       keyclientorder:
-        one: 大客户订单管理
-        other: 大客户订单管理
+        one: 订单波次管理
+        other: 订单波次管理
       keyclientorderdetail:
-        one: 大客户订单明细管理
-        other: 大客户订单明细管理
+        one: 订单波次明细管理
+        other: 订单波次明细管理
       contact:
         one: 联系人管理
         other: 联系人管理
@@ -686,13 +686,13 @@ zh-CN:
         role: :Order
       submenu:
         b2cfindprintindex:
-          name: "电商订单作业"
+          name: "订单作业"
           link: "/orders/findprintindex"
         b2corder:
-          name: "电商订单查询"
+          name: "订单查询"
           link: "/orders"
         keyclientorder:
-          name: "大批次订单查询"
+          name: "订单波次查询"
           link: "/keyclientorders"
         orderalert:
           name: "预警订单"
@@ -752,6 +752,9 @@ zh-CN:
         interface_log:
           name: "接口信息"
           link: "/interface_infos"
+          needrole:
+            can: :read
+            role: :InterfaceInfo
     # filetemp:
     #   name: "模板管理"
     #   needrole: 
