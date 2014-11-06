@@ -28,7 +28,7 @@
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_supplier_contact_path(@supplier,contact), :class => 'btn btn-xs btn-primary' if can? :update, contact) << ' ' <<
-        (link_to t('.destroy', :default => t("helpers.links.destroy")), supplier_contact_path(@supplier,contact), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, contact)
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), supplier_contact_path(@supplier,contact), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, contact)
     end
   end
 %>

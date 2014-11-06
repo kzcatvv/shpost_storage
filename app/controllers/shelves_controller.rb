@@ -55,7 +55,7 @@ class ShelvesController < ApplicationController
 
     respond_to do |format|
       if @shelf.save
-        format.html { redirect_to @shelf, notice: 'Shelf was successfully created.' }
+        format.html { redirect_to @shelf, notice: I18n.t('controller.create_success_notice', model: '货架')}
         format.json { render action: 'show', status: :created, location: @shelf }
       else
         format.html { render action: 'new' }
@@ -78,7 +78,7 @@ class ShelvesController < ApplicationController
     
     respond_to do |format|
       if @shelf.update(shelf_params)
-        format.html { redirect_to @shelf, notice: 'Shelf was successfully updated.' }
+        format.html { redirect_to @shelf, notice: I18n.t('controller.update_success_notice', model: '货架') }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

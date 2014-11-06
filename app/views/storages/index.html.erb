@@ -23,7 +23,7 @@
     g.column do |storage|
       ActiveSupport::SafeBuffer.new << 
        (link_to t('.edit', :default => t("helpers.links.edit")), edit_storage_path(storage), :class => 'btn btn-xs btn-primary' if can? :update, storage) << ' ' <<
-        (link_to t('.destroy', :default => t("helpers.links.destroy")), storage_path(storage), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, storage)<< ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), storage_path(storage), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, storage)<< ' ' <<
         (link_to t('.roles', :default => t("helpers.links.roles")), storage_roles_path(storage), :class => 'btn btn-xs btn-primary' if can? :roles, storage)
     end
   end 

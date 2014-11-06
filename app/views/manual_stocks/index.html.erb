@@ -33,7 +33,7 @@
       (link_to t('.stock_out_manual_stock', :default => t("helpers.links.stock_out_manual_stock")), stock_out_manual_stock_path(manual_stock), method: :get, :class => 'btn btn-xs btn-primary' if can? :stock_out, manual_stock) << ' ' <<
       (link_to t('.check_manual_stock', :default => t("helpers.links.check_manual_stock")), check_manual_stock_path(manual_stock), method: :patch, :class => 'btn btn-xs btn-primary' if can? :check, manual_stock) << ' ' <<
       (link_to t('.scan', :default => '逐件扫描'), scan_manual_stock_path(manual_stock), :method => :get, :class => 'btn btn-xs btn-primary' if can? :update, manual_stock) << ' ' <<
-      (link_to t('.destroy', :default => t("helpers.links.destroy")), manual_stock_path(manual_stock), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, manual_stock)
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), manual_stock_path(manual_stock), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, manual_stock)
     end
   end 
 %>

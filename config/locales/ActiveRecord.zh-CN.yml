@@ -551,6 +551,7 @@ zh-CN:
         max_volume: "最大体积"
         shelf_code: "货架编号"
         desc: "货架描述"
+        barcode: "条形码"
       keyclientorder:
         keyclient_name: 大客户名称
         keyclient_addr: 大客户地址
