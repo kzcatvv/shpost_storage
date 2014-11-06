@@ -47,6 +47,7 @@ class InterfaceInfo < ActiveRecord::Base
       Rails.logger.info "************save interface info class_name:" +cls.name+ ", method_name:"+method_name+" start*********************"
       InterfaceInfo.save_info(cls.name,method_name,@interface_status,nil,nil,@soap_request,@xml_file_return,type,params,info_id)
       Rails.logger.info "***********save interface info end*********************"
+      return @interface_status
     end
   end
 

@@ -1,5 +1,5 @@
 class InterfaceInfosController < ApplicationController
-
+  load_and_authorize_resource
   before_action :set_interface_info, only: [:show, :edit, :update, :destroy]
 
   # GET /interface_infos
@@ -65,13 +65,14 @@ class InterfaceInfosController < ApplicationController
 
   def resend
     respond_to do |format|
-      if InterfaceInfo.resend(params[:id])
-        # @interface_infos = InterfaceInfo.all
-        # @interface_infos_grid = initialize_grid(@interface_infos)
+      if InterfaceInfo.resend(params[:id]).eql? "success"
+        
         format.html { redirect_to action: 'index' }
         format.json { head :no_content }
       else
-        format.html { render action: 'index' }
+        # @interface_infos = InterfaceInfo.all
+        # @interface_infos_grid = initialize_grid(@interface_infos)
+        format.html { redirect_to action: 'index' }
         format.json { head :no_content }
       end
     end

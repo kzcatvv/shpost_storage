@@ -1,8 +1,8 @@
 class CSBSendWithSOAP
   require "rexml/document"
 
-  @@call_flg = false
-  @@startrow = 1
+  @call_flg = false
+  @startrow = 1
 
   def redealWithSavedOrders()
     # default status : '0' (success)
@@ -36,8 +36,8 @@ class CSBSendWithSOAP
     begin
       for order_type in 1..2
         # puts order_type
-        @@call_flg = false
-        @@startrow = 1
+        @call_flg = false
+        @startrow = 1
         begin 
           xml_file = setSendPointOrder(order_type,startDate,endDate)
           Rails.logger.info '------------start----------------'
@@ -48,7 +48,7 @@ class CSBSendWithSOAP
           response = csb_post(StorageConfig.config["csb_interface"]["send_point_order_url"],@soap_request)
           @xml_file_return = response.body.to_s
           Rails.logger.info @xml_file_return
-          # puts "@@call_flg=" << @@call_flg.to_s
+          # puts "@call_flg=" << @call_flg.to_s
           xml_file_trans_status = parseAndSaveSendPointOrder(@xml_file_return,order_type)
           # puts '----------------------------'
           # puts xml_file_trans_status
@@ -60,7 +60,7 @@ class CSBSendWithSOAP
           # puts response.body
           Rails.logger.info '--------------end-----------------'
 
-        end while !@@call_flg
+        end while !@call_flg
       end
       # return_array = CSBSendWithSOAP.sendPointOrder()
     rescue Exception => e
@@ -386,7 +386,7 @@ class CSBSendWithSOAP
     # orderTotal.add_text "7"
     maxTimeValve.add_text StorageConfig.config["csb_interface"]["max_time_valve"].to_s
     orderType.add_text order_type.to_s
-    startRow.add_text @@startrow.to_s
+    startRow.add_text @startrow.to_s
     rowCount.add_text StorageConfig.config["csb_interface"]["row_count"].to_s
     # messageCode.add_text "错误信息code"
     # description.add_text "错误信息描述"
@@ -509,7 +509,7 @@ class CSBSendWithSOAP
       giftDetails = orderLabel.get_elements('GiftDetail')
       if giftDetails.blank?
         rowsum += 1
-        @@startrow += 1
+        @startrow += 1
         next
       end
       giftDetails.each do |giftDetail|
@@ -551,9 +551,9 @@ class CSBSendWithSOAP
     # puts "rowCount=" << rowCount_s
     # puts "rowsum=" << rowsum.to_s
     if (orderTotal_s == rowCount_s && rowsum.to_s == rowCount_s) || rowCount_s == '0'
-      @@call_flg = true
+      @call_flg = true
     end
-    # puts "@@call_flg=" << @@call_flg.to_s
+    # puts "@call_flg=" << @call_flg.to_s
     # puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
     setPointUpdateTransStatus(orderTransStatus, order_type)
   end
