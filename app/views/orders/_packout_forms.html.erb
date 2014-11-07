@@ -15,6 +15,7 @@
     </tr>
   </thead>
   <tbody>
+   <% if !@order_details.nil? %>
     <% @order_details.each do |orderdtl| %>
       <%= content_tag(:tr,content_tag(:td, orderdtl.name )+
         content_tag(:td, Specification.find(orderdtl.specification_id).name )+
@@ -23,5 +24,6 @@
         content_tag(:td, text_field_tag("realam_#{orderdtl.id}", "0", disabled: true) ),id: "tr_#{orderdtl.id}" ) %>
 
     <% end %>
+  <% end %>
   </tbody>
 </table>

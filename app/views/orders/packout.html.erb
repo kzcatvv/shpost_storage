@@ -5,6 +5,7 @@
   </div>
 
 </div>
+<form>
 <div>
    <%= label_tag 'name', '扫描面单号或69码:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls"%><%= content_tag(:p, "注意:请先扫面单号再扫69码") %>
    <%= %>
@@ -12,4 +13,20 @@
 面单号: <%= text_field_tag '_tracking_number', nil, class: "controls", readonly: true%>
 <div id="outorders">
   <%= render :partial => 'orders/packout_forms' %>
+</div>
+</form>
+
+<div>
+<form>
+  <%= render partial: 'goutdtl'%>
+
+  <div>状态:</div>
+  <div><%= grid_filter(@orders_grid, :status_show_filter)%></div>
+
+  <td><button class="wg-external-submit-button" data-grid-name="grid">递交</button></td>
+  <td><button class="wg-external-reset-button" data-grid-name="grid">重置</button></td>
+
+  <%= render_grid(@orders_grid)%>
+
+</form>
 </div>
