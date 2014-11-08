@@ -20,9 +20,10 @@
     </div>
   </div>
   <div class="control-group">
-    <%= f.label :qg_period, :class => 'control-label' %>
+    <%= f.label :expiration_date, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :qg_period, :class => 'text_field' %>
+
+      <%= f.date_select  :expiration_date %>
     </div>
   </div>
   <div class="control-group">

@@ -11,6 +11,7 @@ class Stock < ActiveRecord::Base
 
   validates_presence_of :specification_id, :actual_amount, :virtual_amount
 
+  scope :expiration_date_first, ->{order(:expiration_date )}
   scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, virtual_amount DESC")}
   scope :available, -> { where("1 = 1")}
 
@@ -132,10 +133,12 @@ class Stock < ActiveRecord::Base
         return available_stock
       end
     end
+    # find shelf empty in prior
     shelf = Shelf.get_neighbor_shelf stocks_in_storage_with_batch_no
     shelf ||= Shelf.get_neighbor_shelf stocks_in_storage_without_batch_no
     shelf ||= Shelf.get_empty_shelf storage
     shelf ||= Shelf.get_default_shelf storage
+
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
   end
 
@@ -148,7 +151,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stocks_in_storage(specification, supplier, business, storage)
-    in_storage(storage).find_stock(specification, supplier, business).available
+    in_storage(storage).find_stock(specification, supplier, business).expiration_date_first.available.prior
   end
 
   def self.total_stock_in_unit(specification, supplier, business, unit)

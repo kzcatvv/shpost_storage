@@ -28,12 +28,10 @@ class PurchasesController < ApplicationController
   # POST /purchasees
   # POST /purchasees.json
   def create
-   # @purchase = Purchase.new(purchase_params)
-    time=Time.new
+   # @purchase = Purchatimese.new(purchase_params)
     @purchase.unit = current_user.unit
     @purchase.status = Purchase::STATUS[:opened]
     @purchase.storage = current_storage
-
 
     respond_to do |format|
       if @purchase.save
@@ -79,6 +77,7 @@ class PurchasesController < ApplicationController
           stock = Stock.get_available_stock(x.specification, x.supplier, @purchase.business, x.batch_no, current_storage)
           
           stock_in_amount = stock.stock_in_amount(x.waiting_amount)
+          stock.expiration_date = x.expiration_date
           #x.amount -= stock_in_amount
 
           stock.save
@@ -152,7 +151,6 @@ class PurchasesController < ApplicationController
                 status = Purchase::STATUS[:opened]
                 storage = current_storage
                 business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'B').to_s
-                time=Time.new
 
                 purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
               end
@@ -167,7 +165,7 @@ class PurchasesController < ApplicationController
               end
 
            #   purchase_detail = PurchaseDetail.create! name:instance.cell(line,'A'),purchase_id: purchase.id,supplier_id: supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'E'),amount:instance.cell(line,'F').to_i,desc:instance.cell(line,'G'),sum:instance.cell(line,'F').to_f, status:"waiting"
-              purchase_detail = PurchaseDetail.create! name:instance.cell(line,'D'),purchase_id: purchase.id,supplier_id:supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'H'),amount:instance.cell(line,'I').to_i,desc:instance.cell(line,'J'), status:"waiting"
+            purchase_detail = PurchaseDetail.create! name:instance.cell(line,'D'),purchase_id: purchase.id,supplier_id:supplier.id,specification_id: specification.id,expiration_date:instance.cell(line,'H'),amount:instance.cell(line,'I').to_i,desc:instance.cell(line,'J'), status:"waiting"
 
              # batch_no= purchase_detail.set_batch_no
              # puts 
