@@ -8,7 +8,7 @@ class AreaShelfController < ApplicationController
     term = params[:term]
     # brand_id = params[:brand_id]
     # country = params[:country]
-    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where('shelf_code LIKE ?', "%#{term}%").order(:shelf_code).all
+    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where(" shelf_code LIKE ? and is_bad='no' ", "%#{term}%").order(:shelf_code).all
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
 
