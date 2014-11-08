@@ -15,6 +15,10 @@ class Order < ActiveRecord::Base
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
   STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
 
+  PACKAGING_STATUS = [Order::STATUS[:waiting] , Order::STATUS[:printed], STATUS[:picking], STATUS[:checked]]
+
+  PACKAGED_STATUS = [Order::STATUS[:packed] , Order::STATUS[:delivering], STATUS[:delivered], STATUS[:declined], STATUS[:returned]]
+
   STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
 
   TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS'}

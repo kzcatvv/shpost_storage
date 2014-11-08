@@ -9,7 +9,7 @@ class Area < ActiveRecord::Base
 	BAD_TYPE = { yes: '是', no: '否' }
 
 	def bad_type_name
-    	is_bad.blank? ? "" : Area::BAD_TYPE["#{is_bad}".to_sym]
+      is_bad.blank? ? "" : Area::BAD_TYPE["#{is_bad}".to_sym]
     end
 
   
