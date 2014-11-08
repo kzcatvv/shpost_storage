@@ -8,14 +8,26 @@ class StockLog < ActiveRecord::Base
   has_and_belongs_to_many :order_details
   has_many :orders, through: :order_details
 
-  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return', bad_stock_in: 'bad_stock_in', move_to_bad: 'move_to_bad'}
-  STATUS = {waiting: 'waiting', checked: 'checked'}
+
+  #OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return'}
+  OPERATION = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '电商出库', b2b_stock_out: '大客户出库', order_return: '退货'}
+  #STATUS = {waiting: 'waiting', checked: 'checked'}
+  STATUS = {waiting: '处理中', checked: '已确认'}
+
   OPERATION_TYPE = {in: 'in', out: 'out', reset: 'reset'}
 
   validates_presence_of :operation, :amount
 
   #before_create :set_desc
   before_save :set_desc
+
+  def status_name
+    status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
+  end
+
+  def operation_name
+    operation.blank? ? "" : self.class.human_attribute_name("operation_#{operation}")
+  end
 
   def stock_out_name
     # stock_log : order_detail = N:1
@@ -103,4 +115,6 @@ class StockLog < ActiveRecord::Base
   def waiting?
     self.status.eql? STATUS[:waiting]
   end
+
+  
 end

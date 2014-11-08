@@ -30,7 +30,7 @@ class BusinessesController < ApplicationController
 
     respond_to do |format|
       if @business.save
-        format.html { redirect_to @business, notice: 'Business was successfully created.' }
+        format.html { redirect_to @business, notice: I18n.t('controller.create_success_notice', model: '商户') }
         format.json { render action: 'show', status: :created, location: @business }
       else
         format.html { render action: 'new' }
@@ -44,7 +44,7 @@ class BusinessesController < ApplicationController
   def update
     respond_to do |format|
       if @business.update(business_params)
-        format.html { redirect_to @business, notice: 'Business was successfully updated.' }
+        format.html { redirect_to @business, notice: I18n.t('controller.update_success_notice', model: '商户')}
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

@@ -34,7 +34,7 @@ class ManualStocksController < ApplicationController
 
     respond_to do |format|
       if @manual_stock.save
-        format.html { redirect_to @manual_stock, notice: 'Manual stock was successfully created.' }
+        format.html { redirect_to @manual_stock, notice: I18n.t('controller.create_success_notice', model: '出库单') }
         format.json { render action: 'show', status: :created, location: @manual_stock }
       else
         format.html { render action: 'new' }
@@ -48,7 +48,7 @@ class ManualStocksController < ApplicationController
   def update
     respond_to do |format|
       if @manual_stock.update(manual_stock_params)
-        format.html { redirect_to @manual_stock, notice: 'Manual stock was successfully updated.' }
+        format.html { redirect_to @manual_stock, notice: I18n.t('controller.update_success_notice', model: '出库单')  }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

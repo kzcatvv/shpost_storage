@@ -29,7 +29,7 @@ class GoodstypesController < ApplicationController
 
     respond_to do |format|
       if @goodstype.save
-        format.html { redirect_to @goodstype, notice: 'Goodstype was successfully created.' }
+        format.html { redirect_to @goodstype, notice: I18n.t('controller.create_success_notice', model: '商品类型') }
         format.json { render action: 'show', status: :created, location: @goodstype }
       else
         format.html { render action: 'new' }
@@ -43,7 +43,7 @@ class GoodstypesController < ApplicationController
   def update
     respond_to do |format|
       if @goodstype.update(goodstype_params)
-        format.html { redirect_to @goodstype, notice: 'Goodstype was successfully updated.' }
+        format.html { redirect_to @goodstype, notice: I18n.t('controller.update_success_notice', model: '商品类型')}
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

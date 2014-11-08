@@ -27,7 +27,7 @@ class UserRolesController < ApplicationController
   def create
     respond_to do |format|
       if @role.save
-        format.html { redirect_to user_roles_path(@user), notice: 'Role was successfully created.' }
+        format.html { redirect_to user_roles_path(@user), notice: I18n.t('controller.create_success_notice', model: '角色') }
         format.json { render action: 'show', status: :created, location: @role }
       else
         format.html { render action: 'new' }

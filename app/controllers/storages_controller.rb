@@ -46,7 +46,7 @@ class StoragesController < ApplicationController
 
     respond_to do |format|
       if @storage.save
-        format.html { redirect_to unit_storage_path(@unit,@storage), notice: 'Storage was successfully created.' }
+        format.html { redirect_to unit_storage_path(@unit,@storage), notice: I18n.t('controller.create_success_notice', model: '仓库') }
         format.json { render action: 'show', status: :created, location: @storage }
       else
         format.html { render action: 'new' }
@@ -60,7 +60,7 @@ class StoragesController < ApplicationController
   def update
     respond_to do |format|
       if @storage.update(storage_params)
-        format.html { redirect_to unit_storage_path(@unit,@storage), notice: 'Storage was successfully updated.' }
+        format.html { redirect_to unit_storage_path(@unit,@storage), notice: I18n.t('controller.update_success_notice', model: '仓库') }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

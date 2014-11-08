@@ -31,7 +31,7 @@ class ManualStockDetailsController < ApplicationController
     @manual_stock_detail.status = ManualStockDetail::STATUS[:waiting]
     respond_to do |format|
       if @manual_stock_detail.save
-        format.html { redirect_to manual_stock_manual_stock_detail_path(@manual_stock,@manual_stock_detail), notice: 'Manual stock detail was successfully created.' }
+        format.html { redirect_to manual_stock_manual_stock_detail_path(@manual_stock,@manual_stock_detail), notice: I18n.t('controller.create_success_notice', model: '批量出库明细') }
         format.json { render action: 'show', status: :created, location: @manual_stock_detail }
       else
         format.html { render action: 'new' }
@@ -45,7 +45,7 @@ class ManualStockDetailsController < ApplicationController
   def update
     respond_to do |format|
       if @manual_stock_detail.update(manual_stock_detail_params)
-        format.html { redirect_to manual_stock_manual_stock_detail_path(@manual_stock,@manual_stock_detail), notice: 'Manual stock detail was successfully updated.' }
+        format.html { redirect_to manual_stock_manual_stock_detail_path(@manual_stock,@manual_stock_detail), notice: I18n.t('controller.update_success_notice', model: '批量出库明细') }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

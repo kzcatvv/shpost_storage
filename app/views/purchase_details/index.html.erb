@@ -56,7 +56,7 @@
     g.column do |purchase_detail|
       ActiveSupport::SafeBuffer.new << 
       (link_to t('.edit', :default => t("helpers.links.edit")), edit_purchase_purchase_detail_path(@purchase,purchase_detail), :class => 'btn btn-xs btn-primary' if can? :update, purchase_detail) << ' ' <<
-      (link_to t('.destroy', :default => t("helpers.links.destroy")), purchase_purchase_detail_path(@purchase,purchase_detail), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase_detail)
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), purchase_purchase_detail_path(@purchase,purchase_detail), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase_detail)
       end
   end 
 %>
