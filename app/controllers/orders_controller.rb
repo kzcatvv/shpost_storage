@@ -514,7 +514,7 @@ class OrdersController < ApplicationController
   def packout
       @order_details=[]
       @curr_order=""
-      @orders = Order.where( [ "storage_id = ?", session[:current_storage].id)
+      @orders = Order.where("storage_id = ?", session[:current_storage].id)
       @orders_grid=initialize_grid(@orders)
   end
 
