@@ -514,6 +514,8 @@ class OrdersController < ApplicationController
   def packout
       @order_details=[]
       @curr_order=""
+      @orders = Order.where("storage_id = ?", session[:current_storage].id)
+      @orders_grid=initialize_grid(@orders)
   end
 
   def findorderout
@@ -525,22 +527,28 @@ class OrdersController < ApplicationController
         @curr_order = 0
 
         order = Order.find(params[:orderid])
+        @curr_order = order.id
       # @order_details=@order.order_details
       # @curr_order=@order.id
         curr_dtls = order.order_details.includes(:specification).where("specifications.sixnine_code = ?",params[:tracking_number]).distinct.first
         if curr_dtls.nil?
-           @curr_dtl = 0
+           @curr_dtl = -1
         else
            @curr_dtl = curr_dtls.id
         end 
       else
         order = Order.where(tracking_number: @tracking_number, status: "checked").first
-
-        @curr_order = order.id
-        @order_details = order.order_details
-        @curr_dtl = 0
-        @dtl_cnt = order.order_details.count
-        @act_cnt = 0
+        if order.nil?
+            @curr_order = 0
+            @curr_dtl = 0
+        else
+          @curr_order = order.id
+          @order_details = order.order_details
+          @curr_dtl = 0
+          @dtl_cnt = order.order_details.count
+          @act_cnt = 0
+        end
+        # binding.pry
       end
       respond_to do |format|
           format.js 

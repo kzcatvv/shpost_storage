@@ -1,5 +1,6 @@
 <%- model_class = Order -%>
 <%= define_grid(@orders_grid, hide_submit_button: true, hide_reset_button: true) do |g|
+
     g.column name: model_class.human_attribute_name(:no), attribute: 'no', detach_with_id: :no_filter
 
     g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name', detach_with_id: :customer_name_filter
