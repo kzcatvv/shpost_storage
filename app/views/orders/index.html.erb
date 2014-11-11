@@ -75,6 +75,9 @@
       order.shortage_type_name
     end
    
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |order|
+        order.created_at.to_s(:db)
+    end
 
     g.column do |order|
       ActiveSupport::SafeBuffer.new << 
