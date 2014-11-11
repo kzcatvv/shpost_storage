@@ -14,6 +14,20 @@ class OrdersController < ApplicationController
     @orders_grid = initialize_grid(@orders)
   end
 
+  def packoutwgd1
+      @orders = Order.where("storage_id = ? and status in ('waiting','printed','picking','checked')", session[:current_storage].id)
+      @orders_grid=initialize_grid(@orders)
+
+      render :layout => false
+  end
+
+  def packoutwgd2
+      @orders = Order.where("storage_id = ? and status in ('packed','delivering','delivered','declined','returned')", session[:current_storage].id)
+      @orders_grid=initialize_grid(@orders)
+
+      render :layout => false
+  end
+
   # GET /orderes/1
   # GET /orderes/1.json
   def show
@@ -1181,4 +1195,5 @@ class OrdersController < ApplicationController
     def add_text(index,content)
       index == 0? content:(","+content)
     end
+
 end
