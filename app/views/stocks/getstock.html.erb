@@ -9,7 +9,7 @@
    <%= form_tag("/stocks/getstock", method: "get") do -%>
        <%= label_tag(:sixnine_code, "69码:") %>
        <%= text_field_tag(:sixnine_code) %>
-       <%= label_tag(:ex_code, "第三方编码:") %>
+       <%= label_tag(:ex_code, "第三方商品编码:") %>
        <%= text_field_tag(:ex_code) %>
        <%= submit_tag("查询") %>
    <% end -%>
@@ -18,11 +18,11 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>商户</th>
-      <th>产品规格</th>
+      <th>所属商户</th>
+      <th>商品规格</th>
       <th>供应商</th>
       <th>实际库存</th>
-      <th>虚拟库存</th>
+      <th>预计库存</th>
     </tr>
   </thead>
   <tbody>
