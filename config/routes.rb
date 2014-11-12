@@ -48,6 +48,8 @@ ShpostStorage::Application.routes.draw do
         get 'ordercheck'
         get 'nextbatch'
         get 'packout'
+        get 'packoutwgd1'
+        get 'packoutwgd2'
         get 'findorderout'
         get 'setoutstatus'
         get 'findprintindex'
