@@ -12,6 +12,31 @@
     </div>
   </div>
   <div class="control-group">
+    <%= f.label :address, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :address, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :phone, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :phone, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :postcode, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :postcode, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :tcbd_product_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :tcbd_product_no, :class => 'text_field' %>
+    </div>
+  </div>
+  
+  <div class="control-group">
     <%= f.label :default_storage, :class => 'control-label' %> 
     <div class="controls">
       <%=f.check_box :default_storage,:class =>'check_box'%>

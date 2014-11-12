@@ -16,6 +16,11 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
+    g.column name: model_class.human_attribute_name(:address), attribute: 'address'
+    g.column name: model_class.human_attribute_name(:phone), attribute: 'phone'
+    g.column name: model_class.human_attribute_name(:postcode), attribute: 'postcode'
+    g.column name: model_class.human_attribute_name(:tcbd_product_no), attribute: 'tcbd_product_no'
+
     g.column name: model_class.human_attribute_name(:default_storage), attribute: 'default_storage',filter_type: :boolean do |storage| 
       storage.default_type_name
     end

@@ -7,6 +7,12 @@
                   new_keyclientorder_order_path(@keyclientorder),
                   :class => 'btn btn-primary' %>
     <% end %>
+    <% if can? :pdjs, Keyclientorder %>
+      <%= link_to t('.pdjs', :default => t("helpers.links.pdjs")),
+                  pdjs_keyclientorder_path(@keyclientorder),
+                  :method => 'post',
+                  :class => 'btn btn-primary' %>
+    <% end %>
   </div>
 </div>
 

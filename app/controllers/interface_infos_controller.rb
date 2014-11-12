@@ -65,7 +65,7 @@ class InterfaceInfosController < ApplicationController
 
   def resend
     respond_to do |format|
-      if InterfaceInfo.resend(params[:id]).eql? "success"
+      if InterfaceInfo.resend(params[:id]).eql? "0"
         
         format.html { redirect_to action: 'index' }
         format.json { head :no_content }

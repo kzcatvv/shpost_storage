@@ -174,6 +174,7 @@ zh-CN:
       relationship_import: 商品对应关系导入
       specification_export: 商品规格导出
       r2bad: 移入残次品区
+      pdjs: 商务投递下单
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -345,9 +346,14 @@ zh-CN:
         name: "单位名"
         desc: "单位描述"
         short_name: "英文缩写"
+        tcbd_khdh: "商务投递客户编号"
       storage:
         name: "仓库名"
         desc: "仓库描述"
+        address: "地址"
+        phone: "电话"
+        postcode: "邮编"
+        tcbd_product_no: "商务投递产品编号"
         unit_id: "所属单位"
         default_storage: "默认仓库"
         default_storage_true: "是"

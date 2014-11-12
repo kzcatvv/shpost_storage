@@ -66,6 +66,21 @@ class KeyclientordersController < ApplicationController
     end
   end
 
+  def pdjs
+    Rails.logger.info "pdjs start"
+    pdjs = TcbdSoap.new
+    result = pdjs.order_enter(StorageConfig.config["tcsd"]["order_enter"]["uri"],StorageConfig.config["tcsd"]["order_enter"]["method"],@keyclientorder.id)
+    Rails.logger.info result
+    if result[0] > 0
+      flash[:notice] = result[1]
+    else
+      flash[:alert] = result[1]
+    end
+    Rails.logger.info "pdjs end"
+    redirect_to keyclientorder_orders_url(@keyclientorder)
+
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_keyclientorder
