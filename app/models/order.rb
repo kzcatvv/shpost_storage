@@ -21,14 +21,14 @@ class Order < ActiveRecord::Base
 
   TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems'}
 
-  SHORTAGE_TYPE = { yes: 'yes', no: 'no' }
+  SHORTAGE_TYPE = { yes: '是', no: '否' }
 
   def type_name
     order_type.blank? ? "" : self.class.human_attribute_name("order_type_#{order_type}")
   end
 
   def status_name
-    status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
+    status.blank? ? "" : Order::STATUS_SHOW["#{status}".to_sym]
   end
 
   def transport_type_name
@@ -36,7 +36,7 @@ class Order < ActiveRecord::Base
   end
 
   def shortage_type_name
-    is_shortage.blank? ? "" : self.class.human_attribute_name("is_shortage_#{is_shortage}")
+    is_shortage.blank? ? "" : Order::STATUS_SHOW["#{is_shortage}".to_sym]
   end
 
   def checked_amount
