@@ -173,10 +173,12 @@ zh-CN:
       scan_confirm: "是否确认扫描数量?"
       relationship_import: 商品对应关系导入
       specification_export: 商品规格导出
+      r2bad: 移入残次品区
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
       stock_in: "%{model}入库单"
+      ready2bad: "移入残次品区"
   number:
     currency:
       format:
@@ -538,6 +540,7 @@ zh-CN:
         current_storage: "当前仓库"
         area_code: "区域编号"
         desc: "区域描述"
+        is_bad: "残次品区"
       shelf:
         current_storage: "当前仓库"
         area_code: "区域编号"
@@ -551,6 +554,7 @@ zh-CN:
         max_volume: "最大体积"
         shelf_code: "货架编号"
         desc: "货架描述"
+        is_bad: "残次品货架"
       keyclientorder:
         keyclient_name: 大客户名称
         keyclient_addr: 大客户地址
