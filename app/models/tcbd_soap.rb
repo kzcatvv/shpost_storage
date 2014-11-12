@@ -57,6 +57,8 @@ class TcbdSoap
     begin
       client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
       keyclientorder = Keyclientorder.find keyclientorderid
+      unit = keyclientorder.unit
+      storage = keyclientorder.storage
       orders = keyclientorder.orders.where(transport_type: 'tcsd')
       # 邮件详情
       yjxq = {}
@@ -154,18 +156,21 @@ class TcbdSoap
       yjxq[:yjxq] = yjxq_arr
       # 客户代号
       khdh = 337
+      # khdh = setNum(unit.tcbd_khdh)
       # 产品代号
       cpdh = 11
+      # cpdh = setNum(storage.tcbd_product_no)
       # 寄件人姓名 (仓库的代号或名称)
-      jjrxm = 'jjrxm'.truncate(20)
+      jjrxm = setText(storage.name).truncate(20)
       # 寄件人地址
-      jjrdz = 'jjrdz'.truncate(100)
+      jjrdz = setText(storage.address).truncate(100)
       # 寄件人电话 (仓库客服电话)
-      jjrdh = '12345678'.truncate(30)
+      jjrdh = setText(storage.phone).truncate(30)
       # 寄件人单位
-      jjrdw = 'jjrdw'.truncate(100)
+      jjrdw = setText(unit.name).truncate(100)
       # 寄件人邮编 (按照邮编判收寄局)
       jjryb = '200999'
+      # jjryb = setText(storage.postcode)
 
       Rails.logger.info "yjxq=" + yjxq.to_json
       response = client.call(mehod.to_sym, message: { yjxq: yjxq.to_json, khdh: khdh, cpdh: cpdh, jjrxm: jjrxm, jjrdz: jjrdz, jjrdh: jjrdh, jjrdw: jjrdw, jjryb: jjryb })
