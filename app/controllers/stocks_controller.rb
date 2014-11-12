@@ -126,6 +126,44 @@ class StocksController < ApplicationController
 
   end
 
+  def ready2bad
+    @stock=Stock.find(params[:id])
+
+  end
+
+  def move2bad
+    @stock=Stock.find(params[:stock_id])
+    badmnt = params[:bad_amount]
+    # binding.pry
+    if Integer(badmnt) > Integer(@stock.virtual_amount)
+        flash[:alert] = "输入的残次品数量大于库存预计数量"
+        redirect_to :back
+    else
+        @shelf = Shelf.where("shelf_code = ?",params[:bad_shelf]).first
+        @badstock = Stock.where("shelf_id = ? and business_id = ? and supplier_id = ? and batch_no = ? and specification_id = ?",@shelf.id,@stock.business_id,@stock.supplier_id,@stock.batch_no,@stock.specification_id).first
+        if @badstock.nil?
+          @badstock = Stock.create(shelf: @shelf,business_id: @stock.business_id,supplier_id: @stock.supplier_id,specification_id: @stock.specification_id,batch_no: @stock.batch_no,actual_amount: badmnt,virtual_amount: badmnt)
+          @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: @badstock.actual_amount, checked_at: Time.now)
+        else
+           actmnt= Integer(@badstock.actual_amount)+Integer(badmnt)
+           virmnt= Integer(@badstock.virtual_amount)+Integer(badmnt)
+           @badstock.update_attributes(:actual_amount=>actmnt,:virtual_amount=>virmnt)
+           @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: badmnt, checked_at: Time.now)
+        end
+        
+        sactmnt= Integer(@stock.actual_amount)-Integer(badmnt)
+        svirmnt= Integer(@stock.virtual_amount)-Integer(badmnt)
+        @stock.update_attributes(:actual_amount=>sactmnt,:virtual_amount=>svirmnt)
+        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'move_to_bad', status: 'checked', operation_type: 'out', amount: badmnt, checked_at: Time.now)
+
+
+        flash[:notice] = "移入残次品区成功"
+        redirect_to :action => 'index'
+    end 
+
+
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     # def set_stock
