@@ -10,6 +10,8 @@
   <dd><%= @shelf.shelf_code %></dd>
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @shelf.desc %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:is_bad) %>:</strong></dt>
+  <dd><%= @shelf.bad_type_name %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
