@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141027230129) do
+ActiveRecord::Schema.define(version: 20141110081645) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -116,6 +116,8 @@ ActiveRecord::Schema.define(version: 20141027230129) do
     t.integer  "business_id"
   end
 
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -218,9 +220,9 @@ ActiveRecord::Schema.define(version: 20141027230129) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -229,7 +231,7 @@ ActiveRecord::Schema.define(version: 20141027230129) do
     t.string   "pingan_ordertime"
     t.string   "pingan_operate"
     t.string   "customer_idnumber"
-    t.string   "tracking_info",     limit: 2000
+    t.string   "tracking_info",     limit: 1000
     t.string   "barcode"
     t.string   "batch_no"
   end
@@ -370,6 +372,10 @@ ActiveRecord::Schema.define(version: 20141027230129) do
     t.datetime "updated_at"
     t.integer  "unit_id"
     t.boolean  "default_storage", default: false
+    t.string   "address"
+    t.string   "phone"
+    t.string   "postcode"
+    t.string   "tcbd_product_no"
   end
 
   create_table "suppliers", force: true do |t|
@@ -390,6 +396,7 @@ ActiveRecord::Schema.define(version: 20141027230129) do
     t.datetime "updated_at"
     t.string   "no"
     t.string   "short_name"
+    t.string   "tcbd_khdh"
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true
