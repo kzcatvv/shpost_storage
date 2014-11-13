@@ -10,7 +10,7 @@ class StockLog < ActiveRecord::Base
 
 
   #OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return'}
-  OPERATION = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '电商出库', b2b_stock_out: '大客户出库', order_return: '退货'}
+  OPERATION = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '电商出库', b2b_stock_out: '大客户出库', order_return: '退货', move_to_bad: '残次品移入', bad_stock_in: '残次品入库'}
   #STATUS = {waiting: 'waiting', checked: 'checked'}
   STATUS = {waiting: '处理中', checked: '已确认'}
 
