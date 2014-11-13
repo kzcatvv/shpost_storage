@@ -42,17 +42,4 @@ function displayScore(_this){
     $('#_poifview').attr('src',$(_this).attr('href'));
 }
 
-function myAlert(showstr)  
-    {  
-        var alertInfo = showstr;  //传递alert框里要显示的信息  
-        var timer = 3000;   //设定停留的时间为3000ms，即3秒  
-        //在页面中新建一个框架frame，以便在该frame中弹出一个非模态对话框  
-        document.body.innerHTML += "<iframe style='display:none;' width='500' name='ifrtemp'></iframe>";  
-        //在非模态对话框中弹出一个alert框，并立即关闭该非模态对话框  
-        ifrtemp.showModelessDialog("javascript:alert('"+alertInfo+"');window.close();",  
-                "",  
-                "status:no;resizable:no;help:no;dialogHeight:530px;dialogWidth:40px;");  
-        setTimeout("ifrtemp.location.reload();",timer); //停留一段时间后强行关闭alert窗口  
-    }
-
 </script>
