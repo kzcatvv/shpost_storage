@@ -210,7 +210,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.warning_stocks(storage)
-    select('specification_id as spec_id, business_id as b_id, supplier_id as s_id, sum(virtual_amount) as virtual_amount').joins(:storage).where('storages.id' => storage).group(:specification_id, :business_id, :supplier_id).having('sum(virtual_amount) < (?)', Relationship.select(:warning_amt).where('specification_id = spec_id and business_id = b_id and supplier_id = s_id'))
+    select('specification_id as spec_id, business_id as b_id, supplier_id as s_id, sum(virtual_amount) as virtual_amount').joins(:storage,:shelf).where('storages.id' => storage,'shelves.is_bad' => 'no').group(:specification_id, :business_id, :supplier_id).having('sum(virtual_amount) < (?)', Relationship.select(:warning_amt).where('specification_id = spec_id and business_id = b_id and supplier_id = s_id'))
   end
 
   protected
@@ -221,7 +221,7 @@ class Stock < ActiveRecord::Base
   def self.find_stock(specification, supplier, business)
     Rails.logger.info "------------"+specification.id.to_s+"---------------"
     Rails.logger.info "------------"+business.id.to_s+"---------------"
-    conditions = where(specification: specification, business: business)
+    conditions = where(specification: specification, business: business).includes(:shelf).where("shelves.is_bad='no'")
 
     if ! supplier.nil?
       Rails.logger.info "------------------"+supplier.id.to_s+"--------------------"
