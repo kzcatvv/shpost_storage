@@ -155,22 +155,52 @@ class TcbdSoap
       # 邮件详情
       yjxq[:yjxq] = yjxq_arr
       # 客户代号
-      khdh = 337
-      # khdh = setNum(unit.tcbd_khdh)
+      # khdh = 337
+      if unit.tcbd_khdh.blank?
+        raise "客户代号不能为空"
+      else
+        khdh = setNum(unit.tcbd_khdh)
+      end
       # 产品代号
-      cpdh = 11
-      # cpdh = setNum(storage.tcbd_product_no)
+      # cpdh = 11
+      if storage.tcbd_product_no.blank?
+        raise "产品代号不能为空"
+      else
+        cpdh = setNum(storage.tcbd_product_no)
+      end
       # 寄件人姓名 (仓库的代号或名称)
-      jjrxm = setText(storage.name).truncate(20)
+      if storage.name.blank?
+        raise "仓库名称不能为空"
+      else
+        jjrxm = setText(storage.name).truncate(20)
+      end
       # 寄件人地址
-      jjrdz = setText(storage.address).truncate(100)
+      if storage.address.blank?
+        raise "仓库地址不能为空"
+      else
+        jjrdz = setText(storage.address).truncate(100)
+      end
       # 寄件人电话 (仓库客服电话)
-      jjrdh = setText(storage.phone).truncate(30)
+      if storage.phone.blank?
+        raise "仓库电话不能为空"
+      else
+        jjrdh = setText(storage.phone).truncate(30)
+      end
+      
       # 寄件人单位
-      jjrdw = setText(unit.name).truncate(100)
+      if unit.name.blank?
+        raise "单位名称不能为空"
+      else
+        jjrdw = setText(unit.name).truncate(100)
+      end
+      
       # 寄件人邮编 (按照邮编判收寄局)
-      jjryb = '200999'
-      # jjryb = setText(storage.postcode)
+      # jjryb = '200999'
+      if storage.postcode.blank?
+        raise "寄件仓库邮编不能为空"
+      else
+        jjryb = setText(storage.postcode)
+      end
 
       Rails.logger.info "yjxq=" + yjxq.to_json
       response = client.call(mehod.to_sym, message: { yjxq: yjxq.to_json, khdh: khdh, cpdh: cpdh, jjrxm: jjrxm, jjrdz: jjrdz, jjrdh: jjrdh, jjrdw: jjrdw, jjryb: jjryb })
