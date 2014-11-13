@@ -44,7 +44,7 @@
          </tr>
        </thead>
        <tbody>
-         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]) %>
+         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]).includes(:shelf).where("shelves.is_bad = 'no' ") %>
          <% @selectstocks.each do |stock| %>
            <tr>
               <td><%= Shelf.find(stock.shelf_id).shelf_code %></td>
@@ -74,7 +74,7 @@
          </tr>
        </thead>
        <tbody>
-         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]) %>
+         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]).includes(:shelf).where("shelves.is_bad = 'no' ") %>
          <% @selectstocks.each do |stock| %>
            <tr>
               <td><%= Shelf.find(stock.shelf_id).shelf_code %></td>
@@ -103,7 +103,7 @@
          </tr>
        </thead>
        <tbody>
-         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]) %>
+         <% @selectstocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",key[0],key[1],key[2]).includes(:shelf).where("shelves.is_bad = 'no' ") %>
          <% @selectstocks.each do |stock| %>
            <tr>
               <td><%= Shelf.find(stock.shelf_id).shelf_code %></td>

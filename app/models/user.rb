@@ -43,6 +43,14 @@ class User < ActiveRecord::Base
     !roles.where(storage_id: storage, role: 'sorter').empty?
   end
 
+  def order?(storage)
+    !roles.where(storage_id: storage, role: 'order').empty?
+  end
+
+  def packer?(storage)
+    !roles.where(storage_id: storage, role: 'packer').empty?
+  end
+
   def email_required?
     false
   end

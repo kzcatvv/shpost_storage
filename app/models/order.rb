@@ -17,6 +17,13 @@ class Order < ActiveRecord::Base
 
   STATUS = { waiting: '待处理', printed: '已打印', picking: '拣货中', checked: '已审核', packed: '已包装', delivering: '配送中', delivered: '已签收', declined: '拒收', returned: '已退回' }
 
+  PACKAGING_STATUS = [Order::STATUS[:waiting] , Order::STATUS[:printed], STATUS[:picking], STATUS[:checked]]
+
+  PACKAGED_STATUS = [Order::STATUS[:packed] , Order::STATUS[:delivering], STATUS[:delivered], STATUS[:declined], STATUS[:returned]]
+
+  STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
+
+
   TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS'}
 
   TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems'}

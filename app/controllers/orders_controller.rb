@@ -14,15 +14,15 @@ class OrdersController < ApplicationController
     @orders_grid = initialize_grid(@orders)
   end
 
-  def packoutwgd1
-      @orders = Order.where("storage_id = ? and status in ('waiting','printed','picking','checked')", session[:current_storage].id)
+  def packaging_index
+      @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGING_STATUS)
       @orders_grid=initialize_grid(@orders)
 
       render :layout => false
   end
 
-  def packoutwgd2
-      @orders = Order.where("storage_id = ? and status in ('packed','delivering','delivered','declined','returned')", session[:current_storage].id)
+  def packaged_index
+      @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGED_STATUS).where('created_at > ?', Date.today.to_time)
       @orders_grid=initialize_grid(@orders)
 
       render :layout => false
