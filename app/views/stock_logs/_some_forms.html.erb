@@ -69,8 +69,8 @@
       # end
     end
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: true, custom_filter: StockLog::STATUS.invert do |stock_log|
-        [StockLog::STATUS[stock_log.status.to_sym],{id: "stock_logs_status_#{stock_log.id}"}]
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: true, custom_filter: StockLog::STATUS_SHOW.invert do |stock_log|
+        [StockLog::STATUS_SHOW[stock_log.status.to_sym],{id: "stock_logs_status_#{stock_log.id}"}]
     end
 
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', ordering: false do |stock_log|
