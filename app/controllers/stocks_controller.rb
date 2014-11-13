@@ -139,7 +139,7 @@ class StocksController < ApplicationController
         flash[:alert] = "输入的残次品数量大于库存预计数量"
         redirect_to :back
     else
-        @shelf = Shelf.where("shelf_code = ? and is_bad='no'",params[:bad_shelf]).first
+        @shelf = Shelf.where("shelf_code = ? and is_bad='yes'",params[:bad_shelf]).first
         @badstock = Stock.where("shelf_id = ? and business_id = ? and supplier_id = ? and batch_no = ? and specification_id = ?",@shelf.id,@stock.business_id,@stock.supplier_id,@stock.batch_no,@stock.specification_id).first
         if @badstock.nil?
           @badstock = Stock.create(shelf: @shelf,business_id: @stock.business_id,supplier_id: @stock.supplier_id,specification_id: @stock.specification_id,batch_no: @stock.batch_no,actual_amount: badmnt,virtual_amount: badmnt)
