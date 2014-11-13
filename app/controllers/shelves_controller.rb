@@ -131,7 +131,7 @@ class ShelvesController < ApplicationController
               shelfcode << change(to_string(instance.cell(line,'F').to_s))
               shelfcode << change(to_string(instance.cell(line,'G').to_s))
               # binding.pry
-              shelf = Shelf.create! area_id: area.id,area_length: to_string(instance.cell(line,'C')),area_width: to_string(instance.cell(line,'D')), area_height:to_string(instance.cell(line,'E')), shelf_row:to_string(instance.cell(line,'F')), shelf_column:to_string(instance.cell(line,'G')),max_weight: instance.cell(line,'H').to_i, max_volume: instance.cell(line,'I').to_i,desc: instance.cell(line,'J'),shelf_code:shelfcode
+              shelf = Shelf.create! area_id: area.id,area_length: to_string(instance.cell(line,'C')),area_width: to_string(instance.cell(line,'D')), area_height:to_string(instance.cell(line,'E')), shelf_row:to_string(instance.cell(line,'F')), shelf_column:to_string(instance.cell(line,'G')),max_weight: instance.cell(line,'H').to_i, max_volume: instance.cell(line,'I').to_i,desc: instance.cell(line,'J'),shelf_code:shelfcode,is_bad: area.is_bad
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
