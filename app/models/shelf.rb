@@ -23,6 +23,12 @@ class Shelf < ActiveRecord::Base
   #   else
   # end
 
+  BAD_TYPE = { yes: '是', no: '否' }
+
+  def bad_type_name
+      is_bad.blank? ? "" : Shelf::BAD_TYPE["#{is_bad}".to_sym]
+  end
+
   def self.get_empty_shelf(storage)
     # prior.first
     Shelf.includes(:area).where(area_id: storage.areas).includes(:stocks).where(stocks: {id: nil}).order("priority_level ASC").first

@@ -18,6 +18,10 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
+    g.column name: model_class.human_attribute_name(:is_bad), attribute: 'is_bad',custom_filter: Area::BAD_TYPE.invert do |area| 
+      area.bad_type_name
+    end
+
     g.column do |area|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_area_path(area), :class => 'btn btn-xs btn-primary' if can? :update, area) << ' ' <<

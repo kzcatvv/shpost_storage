@@ -62,7 +62,6 @@ class Ability
             (interface_info.status == "success")
         end
 
-
     elsif user.user?
         can :update, User, id: user.id
         can :read, UserLog, user: {id: user.id}
@@ -169,7 +168,7 @@ class Ability
         can :manage, OrderReturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
-    end
+    else
 
     if user.purchase?(storage)
         can :change, Storage, id: storage.id
@@ -208,6 +207,7 @@ class Ability
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
+    end
     end
     # if user.admin?(storage)
     

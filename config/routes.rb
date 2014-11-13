@@ -80,6 +80,9 @@ ShpostStorage::Application.routes.draw do
   resources :keyclientorders do
     resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails
+    member do
+      post 'pdjs'
+    end
   end
 
 
@@ -97,6 +100,7 @@ ShpostStorage::Application.routes.draw do
 
   resources :shelves do
     get :autocomplete_shelf_shelf_code, :on => :collection
+    get :autocomplete_bad_shelf_code, :on => :collection
     collection do 
       get 'shelf_import'
       post 'shelf_import' => 'shelves#shelf_import'
@@ -126,6 +130,11 @@ ShpostStorage::Application.routes.draw do
       get 'warning_stocks_index'
       get 'findstock'
       get 'getstock'
+    end
+
+    member do
+      get 'move2bad'
+      get 'ready2bad'
     end
   end
 

@@ -23,7 +23,12 @@
       <%= f.text_field :desc, :class => 'text_field' %>
     </div>
   </div>
-
+  <div class="control-group">
+    <%= f.label :tcbd_khdh, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :tcbd_khdh, :class => 'text_field' %>
+    </div>
+  </div>
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

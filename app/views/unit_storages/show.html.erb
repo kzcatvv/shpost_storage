@@ -8,6 +8,14 @@
   <dd><%= @storage.name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @storage.desc %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:address) %>:</strong></dt>
+  <dd><%= @storage.address %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:phone) %>:</strong></dt>
+  <dd><%= @storage.phone %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:postcode) %>:</strong></dt>
+  <dd><%= @storage.postcode %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:tcbd_product_no) %>:</strong></dt>
+  <dd><%= @storage.tcbd_product_no %></dd>
   <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
   <dd><%= Unit.find(@storage.unit_id).name %></dd>
 </dl>

@@ -13,6 +13,14 @@ class ShelvesController < ApplicationController
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
 
+  def autocomplete_bad_shelf_code
+    term = params[:term]
+    # brand_id = params[:brand_id]
+    # country = params[:country]
+    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where("shelf_code LIKE ? and is_bad='yes' ", "%#{term}%").order(:shelf_code).all
+    render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
+  end
+
   def find_current_storage
     @areas = Area.where("storage_id = ?", session[:current_storage].id)
     @shelves = Shelf.where("area_id in (?)", @areas.ids)
@@ -45,7 +53,7 @@ class ShelvesController < ApplicationController
   def create
     @shelf = Shelf.new(shelf_params)
     @shelf.shelf_code = setShelfCode(shelf_params)
-
+    @shelf.is_bad = Area.find(@shelf.area_id).is_bad
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
     # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
@@ -68,7 +76,7 @@ class ShelvesController < ApplicationController
   # PATCH/PUT /shelves/1.json
   def update
     @shelf.shelf_code = setShelfCode(shelf_params)
-    
+    @shelf.is_bad = Area.find(params[:shelf][:area_id]).is_bad
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
     # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
@@ -156,7 +164,7 @@ class ShelvesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shelf_params
-      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume)
+      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume, :is_bad)
     end
 
     def change(text)

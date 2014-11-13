@@ -1,0 +1,22 @@
+<%- model_class = Stock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.ready2bad', 'Move2bad %{model}'], :model => model_class.model_name.human.titleize %></h1>
+</div>
+
+   <%= form_tag(move2bad_stock_path(@stock), method: "get") do %>
+       <%= hidden_field_tag('stock_id', @stock.id) %>
+       <%= hidden_field_tag('stock_virmnt', @stock.virtual_amount) %>
+       <%= label_tag(:lbshelfcode, "货架编号: "+Shelf.find(@stock.shelf_id).shelf_code) %>
+       <%= label_tag(:lbspecificationid, "商品规格名称: "+Specification.find(@stock.specification_id).all_name) %>
+       <%= label_tag(:lbsupplierid, "供应商: "+Supplier.find(@stock.supplier_id).name) %>
+       <%= label_tag(:lbbatchno, "批次号: "+@stock.batch_no) %>
+       <%= label_tag(:lbactmnt, "实际库存: "+@stock.actual_amount.to_s) %>
+       <%= label_tag(:lbvirmnt, "预计库存: "+@stock.virtual_amount.to_s) %>
+       <%= label_tag(:move_amount, "残次品数量:") %>
+       <%= text_field_tag(:bad_amount) %>
+       <%= label_tag(:move_shelf, "残次品货架:") %>
+       <%= text_field_tag(:bad_shelf, nil,'data-autocomplete' => "/shelves/autocomplete_bad_shelf_code") %>
+   </br>
+   </br>
+       <%= submit_tag("提交") %>
+   <% end %>

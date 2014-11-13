@@ -174,10 +174,14 @@ zh-CN:
       relationship_import: 商品对应关系导入
       specification_export: 商品规格导出
       resend_interface_info: 重发接口
+      r2bad: 移入残次品区
+      pdjs: 商务投递下单
+
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
       stock_in: "%{model}入库单"
+      ready2bad: "移入残次品区"
   number:
     currency:
       format:
@@ -344,9 +348,14 @@ zh-CN:
         name: "单位名称"
         desc: "单位描述"
         short_name: "英文缩写"
+        tcbd_khdh: "商务投递客户编号"
       storage:
         name: "仓库名称"
         desc: "仓库描述"
+        address: "地址"
+        phone: "电话"
+        postcode: "邮编"
+        tcbd_product_no: "商务投递产品编号"
         unit_id: "所属单位"
         default_storage: "默认仓库"
         default_storage_true: "是"
@@ -549,6 +558,7 @@ zh-CN:
         current_storage: "当前仓库"
         area_code: "区域编号"
         desc: "区域描述"
+        is_bad: "残次品区"
       shelf:
         current_storage: "当前仓库"
         area_code: "区域编号"
@@ -563,6 +573,8 @@ zh-CN:
         shelf_code: "货架编号"
         desc: "货架描述"
         barcode: "条形码"
+        is_bad: "残次品货架"
+
       keyclientorder:
         keyclient_name: 大客户名称
         keyclient_addr: 大客户地址

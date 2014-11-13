@@ -19,6 +19,8 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
+    g.column name: model_class.human_attribute_name(:tcbd_khdh), attribute: 'tcbd_khdh'
+
     g.column do |unit|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_unit_path(unit), :class => 'btn btn-xs btn-primary' if can? :update, unit) << ' ' <<
