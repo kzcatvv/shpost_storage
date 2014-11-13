@@ -48,6 +48,9 @@ class AreasController < ApplicationController
   def update
     respond_to do |format|
       if @area.update(area_params)
+        @area.shelves.each do |shelf|
+          shelf.update_attribute(:is_bad,@area.is_bad)
+        end
         format.html { redirect_to @area, notice: 'Area was successfully updated.' }
         format.json { head :no_content }
       else
