@@ -13,9 +13,9 @@ class Order < ActiveRecord::Base
 
   TYPE = { b2b: 'b2b', b2c: 'b2c' }
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
-  #STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
+  STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
 
-  STATUS = { waiting: '待处理', printed: '已打印', picking: '拣货中', checked: '已审核', packed: '已包装', delivering: '配送中', delivered: '已签收', declined: '拒收', returned: '已退回' }
+  # STATUS = { waiting: '待处理', printed: '已打印', picking: '拣货中', checked: '已审核', packed: '已包装', delivering: '配送中', delivered: '已签收', declined: '拒收', returned: '已退回' }
 
   PACKAGING_STATUS = [Order::STATUS[:waiting] , Order::STATUS[:printed], STATUS[:picking], STATUS[:checked]]
 

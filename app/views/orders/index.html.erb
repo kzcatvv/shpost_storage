@@ -47,7 +47,7 @@
 
     g.column name: model_class.human_attribute_name(:transport_price), attribute: 'transport_price'
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Order::STATUS.invert do |order| 
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Order::STATUS_SHOW.invert do |order| 
       order.status_name
     end
 
