@@ -33,7 +33,7 @@ class CommoditiesController < ApplicationController
 
     respond_to do |format|
       if @commodity.save
-        format.html { redirect_to @commodity, notice: 'Commodity was successfully created.' }
+        format.html { redirect_to @commodity, notice: I18n.t('controller.create_success_notice', model: '商品') }
         format.json { render action: 'show', status: :created, location: @commodity }
       else
         format.html { render action: 'new' }
@@ -47,7 +47,7 @@ class CommoditiesController < ApplicationController
   def update
     respond_to do |format|
       if @commodity.update(commodity_params)
-        format.html { redirect_to @commodity, notice: 'Commodity was successfully updated.' }
+        format.html { redirect_to @commodity, notice: I18n.t('controller.update_success_notice', model: '商品') }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

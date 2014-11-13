@@ -173,8 +173,10 @@ zh-CN:
       scan_confirm: "是否确认扫描数量?"
       relationship_import: 商品对应关系导入
       specification_export: 商品规格导出
+      resend_interface_info: 重发接口
       r2bad: 移入残次品区
       pdjs: 商务投递下单
+
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -343,12 +345,12 @@ zh-CN:
         unit_id: "所属单位"
       unit:
         "no": "编号"
-        name: "单位名"
+        name: "单位名称"
         desc: "单位描述"
         short_name: "英文缩写"
         tcbd_khdh: "商务投递客户编号"
       storage:
-        name: "仓库名"
+        name: "仓库名称"
         desc: "仓库描述"
         address: "地址"
         phone: "电话"
@@ -374,7 +376,7 @@ zh-CN:
         shelf_id: 所属货架
         business_id: 所属商户
         supplier_id: 供应商
-        batch_no: 批次
+        batch_no: 批次号
         specification_id: 商品规格
         actual_amount: 实际库存
         virtual_amount: 预计库存
@@ -400,24 +402,32 @@ zh-CN:
         shelf_code: "货架编号"
         shelf: "货架编号"
         status_checked: "已确认"
+        status_waiting: "处理中"
+        operation_create_stock: "新建库存"
+        operation_destroy_stock: "删除库存"
+        operation_update_stock: "更新库存"
+        operation_purchase_stock_in: "采购入库"
+        operation_b2c_stock_out: "电商出库"
+        operation_b2b_stock_out: "大客户出库"
+        operation_order_return: "退货"
       supplier:
         "no": "供应商编号"
         name: "名称"
         address: "地址"
         phone: "电话"
-        unit_id: "所属机构"
+        unit_id: "所属单位"
       goodstype:
         id: "序列号"
         gtno: "商品类型编号"
         name: "类型名称"
-        unit_id: "所属机构"
+        unit_id: "所属单位"
       commodity:
         id: "序列号"
         "no": "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
       specification:
-        commodity_id: "商品"
+        commodity_id: "商品名称"
         product_no: "商品规格编号"
         desc: "规格描述"
         sixnine_code: "69码"
@@ -435,14 +445,14 @@ zh-CN:
         spec_desc: "规格描述"
         warning_amt: "预警数量"
       business:
-        "no": "编号"
-        name: "名称"
+        "no": "商户编号"
+        name: "商户名称"
         email: "电子邮件"
         contactor: "联系人"
         address: "地址"
         phone: "电话"
         desc: "备注"
-        unit: "所属机构"
+        unit: "所属单位"
         secret_key: "安全码"
         alertday: "预警天数"
       order:
@@ -465,7 +475,7 @@ zh-CN:
         status: "状态"            
         buyer_desc: "买家留言"        
         seller_desc: "卖家留言"  
-        unit_id: "所属机构"     
+        unit_id: "所属单位"     
         business_id: "所属商户"
         storage_id: "所属仓库"
         keyclientorder_id: "大客户订单编号"
@@ -477,8 +487,10 @@ zh-CN:
         transport_type_gnxb: "国内小包"
         transport_type_ems: "EMS"
         status_waiting: "待处理"
-        status_printed: "已打印面单"
+        status_printed: "已打印"
         status_picking: "拣货中"
+        status_checked: "已审核"
+        status_packed: "已包装"
         status_delivering: "配送中"
         status_delivered: "已签收"
         status_declined: "拒收"
@@ -511,9 +523,9 @@ zh-CN:
         status_closed: "已关闭"
       purchase_detail:
         name: "名称"
-        purchase_id: "采购单"
+        purchase_id: "采购单编号"
         supplier_id: "供应商"
-        specification_id: "规格"
+        specification_id: "商品规格"
         qg_period: "保质期"
         batch_no: "批次号"
         amount: "数量"
@@ -525,7 +537,7 @@ zh-CN:
       manual_stock:
         "no": "编号"
         name: "名称"
-        unit_id: "所属机构"
+        unit_id: "所属单位"
         business_id: "所属商户"
         desc: "备注"
         status: "状态"
@@ -533,9 +545,9 @@ zh-CN:
         status_closed: "已关闭"
       manual_stock_detail:
         name: "名称"
-        manual_stock_id: "批量出库单"
+        manual_stock_id: "出库单编号"
         supplier_id: "供应商"
-        specification_id: "规格"
+        specification_id: "商品规格"
         amount: "数量"
         desc: "备注"
         status: "状态"
@@ -550,7 +562,7 @@ zh-CN:
       shelf:
         current_storage: "当前仓库"
         area_code: "区域编号"
-        area: "区域"
+        area: "区域名称"
         area_length: "区域排数"
         area_width: "区域列数"
         area_height: "区域层数"
@@ -560,7 +572,9 @@ zh-CN:
         max_volume: "最大体积"
         shelf_code: "货架编号"
         desc: "货架描述"
+        barcode: "条形码"
         is_bad: "残次品货架"
+
       keyclientorder:
         keyclient_name: 大客户名称
         keyclient_addr: 大客户地址
@@ -568,8 +582,8 @@ zh-CN:
         phone: 联系电话
         desc: 备注
         batch_no: 订单批次编号
-        unit_id: 单位
-        storage_id: 仓库
+        unit_id: 所属单位
+        storage_id: 所属仓库
         business_id: 所属商户
       keyclientorderdetail:
         keyclientorder_id: 订单批次编号

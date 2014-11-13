@@ -35,7 +35,7 @@ class RelationshipsController < ApplicationController
     #@relationship.specification_id = params[:specification_id][:id]
     respond_to do |format|
       if @relationship.save
-        format.html { redirect_to @relationship, notice: 'Relationship was successfully created.' }
+        format.html { redirect_to @relationship, notice: I18n.t('controller.create_success_notice', model: '对应关系')}
         format.json { render action: 'show', status: :created, location: @relationship }
       else
         format.html { render action: 'new' }
@@ -49,7 +49,7 @@ class RelationshipsController < ApplicationController
   def update
     respond_to do |format|
       if @relationship.update(relationship_params)
-        format.html { redirect_to @relationship, notice: 'Relationship was successfully updated.' }
+        format.html { redirect_to @relationship, notice: I18n.t('controller.update_success_notice', model: '对应关系') }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

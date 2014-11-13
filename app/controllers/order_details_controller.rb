@@ -30,7 +30,7 @@ class OrderDetailsController < ApplicationController
 
     respond_to do |format|
       if @order_detail.save
-        format.html { redirect_to order_order_detail_path(@order,@order_detail), notice: 'orderdetail was successfully created.' }
+        format.html { redirect_to order_order_detail_path(@order,@order_detail), notice: I18n.t('controller.create_success_notice', model: '订单明细')}
         format.json { render action: 'show', status: :created, location: @order_detail }
       else
         format.html { render action: 'new' }
@@ -44,7 +44,7 @@ class OrderDetailsController < ApplicationController
   def update
     respond_to do |format|
       if @order_detail.update(order_detail_params)
-        format.html { redirect_to order_order_detail_path(@order,@order_detail), notice: 'orderdetail was successfully updated.' }
+        format.html { redirect_to order_order_detail_path(@order,@order_detail), notice: I18n.t('controller.update_success_notice', model: '订单明细')}
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

@@ -34,7 +34,7 @@ class SpecificationsController < ApplicationController
     respond_to do |format|
       if @specification.save
         # @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s) 
-        format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: 'Specification was successfully created.' }
+        format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: I18n.t('controller.create_success_notice', model: '商品规格') }
         format.json { render action: 'show', status: :created, location: @specification }
       else
         format.html { render action: 'new' }
@@ -50,7 +50,7 @@ class SpecificationsController < ApplicationController
     respond_to do |format|
       if @specification.update(specification_params)
         # @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s)
-        format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: 'Specification was successfully updated.' }
+        format.html { redirect_to commodity_specification_path(@commodity,@specification), notice: I18n.t('controller.update_success_notice', model: '商品规格') }
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }

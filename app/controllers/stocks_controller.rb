@@ -29,7 +29,7 @@ class StocksController < ApplicationController
     respond_to do |format|
       if @stock.save
         @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'create_stock', status: 'checked', operation_type: 'in', amount: @stock.actual_amount, checked_at: Time.now)
-        format.html { redirect_to @stock, notice: 'Stock was successfully created.' }
+        format.html { redirect_to @stock, notice: I18n.t('controller.create_success_notice', model: '库存') }
         format.json { render action: 'show', status: :created, location: @stock }
       else
         format.html { render action: 'new' }
@@ -53,7 +53,7 @@ class StocksController < ApplicationController
         # end
         @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'update_stock', status: 'checked', operation_type: 'reset', amount: @stock.actual_amount, checked_at: Time.now)
 
-        format.html { redirect_to @stock, notice: 'Stock was successfully updated.' }
+        format.html { redirect_to @stock, notice: I18n.t('controller.update_success_notice', model: '库存')}
         format.json { head :no_content }
       else
         format.html { render action: 'edit' }
@@ -139,7 +139,7 @@ class StocksController < ApplicationController
         flash[:alert] = "输入的残次品数量大于库存预计数量"
         redirect_to :back
     else
-        @shelf = Shelf.where("shelf_code = ?",params[:bad_shelf]).first
+        @shelf = Shelf.where("shelf_code = ? and is_bad='yes'",params[:bad_shelf]).first
         @badstock = Stock.where("shelf_id = ? and business_id = ? and supplier_id = ? and batch_no = ? and specification_id = ?",@shelf.id,@stock.business_id,@stock.supplier_id,@stock.batch_no,@stock.specification_id).first
         if @badstock.nil?
           @badstock = Stock.create(shelf: @shelf,business_id: @stock.business_id,supplier_id: @stock.supplier_id,specification_id: @stock.specification_id,batch_no: @stock.batch_no,actual_amount: badmnt,virtual_amount: badmnt)

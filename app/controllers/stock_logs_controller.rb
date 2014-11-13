@@ -73,7 +73,7 @@ class StockLogsController < ApplicationController
       if !params[:shelfid].nil?
         puts current_storage.id
         # puts Area.where(storage: current_storage).ids
-        shelf_modify = Shelf.where(area_id: Area.where(storage: current_storage).ids, shelf_code: params[:shelfid]).first
+        shelf_modify = Shelf.where(area_id: Area.where(storage: current_storage).ids, shelf_code: params[:shelfid],is_bad: 'no').first
         if !shelf_modify.blank?
           if shelf_modify.id != @stock.shelf.id.to_s
             if @stock_log.operation_type == StockLog::OPERATION_TYPE[:out]
