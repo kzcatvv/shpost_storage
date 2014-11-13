@@ -92,6 +92,105 @@ function ajaxspecifications() {
   });
 };
 
+function selfAlert(msgstr,timer){  
+    //该值可以作为返回值，初始化时为 0 ，点击确定后变为 1 ，点击关闭后变为 2 ，自动关闭 3   
+    var alertValue = 0;   
+  
+    //确定遮罩层的高度，宽度  
+    // var h = screen.availHeight;  
+    // var w = screen.availWidth;  
+    // //创建遮罩层，它的主要作用就是使网页中的其他元素不可用。  
+    // var dv = document.createElement("div");  
+    // dv.setAttribute('id','bg');  
+    // //设置样式  
+    // dv.style.height = h + "px";  
+    // dv.style.width = w + "px";  
+    // dv.style.zIndex = "1111";  
+    // dv.style.top = 0;  
+    // dv.style.left = 0;  
+      
+    // //如果不想遮罩，可以去掉这两句  
+    // // dv.style.background = "#fff";  
+    // // dv.style.filter = "alpha(opacity=0)";  
+  
+    // //设为绝对定位很重要  
+    // dv.style.position = "absolute";  
+    // //将该元素添加至body中  
+    // document.body.appendChild(dv);  
+  
+    //创建提示对话框面板  
+    var dvMsg = document.createElement("div");  
+    dvMsg.style.position = "absolute";  
+    dvMsg.setAttribute('id','msg');  
+    dvMsg.style.width = "280px";  
+    dvMsg.style.height = "100px";  
+    dvMsg.style.top="30%";  
+    dvMsg.style.left="40%";  
+    dvMsg.style.background = "white";  
+    dvMsg.style.zIndex = "1112";  
+      
+    //可以继续采用如上形式创建模拟对话框表格，这里为了方便采用html形式  
+    strHtml =  "<table width='280' height='25' border='0' cellspacing='0' cellpadding='0' align='center'>"  
+    strHtml += "    <tr height='25' style='line-height:25px;'>"  
+    strHtml += "        <td width='250' title='移动' style='cursor:move;background:#CFD7EC url(title_bg_left.gif) no-repeat top left;' onmousedown='oMove(parentNode.parentNode.parentNode.parentNode);'>"  
+    strHtml += "            <font style='font-size:12px;font-weight:bold;color:#000;margin-left:10px;'>消息提示框</font></td>"  
+    strHtml += "        <td width='30' style='background:#CFD7EC url(title_bg_right.gif) no-repeat right top;'>"  
+    strHtml += "    <td></tr>"  
+    strHtml +=  "</table>"  
+    strHtml +=  "<table width='280' height='145' border='0' cellspacing='0' cellpadding='0' align='center' style='border:1px solid #343434'>"  
+    strHtml += "    <tr height='113' bgcolor='#F4F4F4'><td width='' style='padding-left:10;'></td>"  
+    strHtml += "        <td width='200' align='left'>" + msgstr + "</td></tr>"  
+    strHtml += "    <tr height='27'><td colspan='2' style='background:#F4F4F4;padding-top:0px;' valign='top' align='center'>"  
+    strHtml += "         <input type='button' value='确&nbsp;定' style='width:70;' onclick='btnclick()'></td></tr>"  
+    strHtml += "</table>"  
+    dvMsg.innerHTML = strHtml;  
+    document.body.appendChild(dvMsg);  
+  
+    //点击关闭按钮  
+    imgClose = function (){  
+        alertValue = 2; // 2 代表点击了关闭按钮  
+        // document.body.removeChild(dv);  
+        document.body.removeChild(dvMsg);  
+    }  
+    //点击确定按钮  
+    btnclick = function (){  
+        alertValue = 1; // 1 代表点击了确定按钮  
+        // document.body.removeChild(dv);  
+        document.body.removeChild(dvMsg);  
+    }  
+      
+    remove = function ()  
+    {  
+        //timer时间过后如果仍未点击，则自动关闭selfAlert框  
+        if(alertValue==0){  
+            // document.body.removeChild(dv);  
+            document.body.removeChild(dvMsg);  
+        }  
+    }  
+    //timer秒后自动关闭selfAlert(提示框)  
+    setTimeout("remove()",timer);  
+      
+    //实现鼠标拖动对话框  
+    oMove = function(obj) {  
+        var otop,oleft;  
+        otop = event.y - obj.offsetTop;  
+        oleft = event.x - obj.offsetLeft;  
+        obj.setCapture();  
+  
+        obj.onmousemove  = function()  
+        {  
+            obj.style.left = event.x - oleft;  
+            obj.style.top = event.y - otop;  
+        }  
+        obj.onmouseup  = function()  
+        {  
+            obj.onmousemove = null;  
+            obj.style.filter = null;  
+            obj.releaseCapture();  
+        }  
+    }  
+} 
+
 function clickin(current)
 {
   param = current.id.split('_');
