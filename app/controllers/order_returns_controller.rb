@@ -89,7 +89,9 @@ class OrderReturnsController < ApplicationController
         if @order_return.nil?
           @order_return=OrderReturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,status:"waiting")
         end
-        stock=Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
+        
+        stock = Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
+
         stock.update(virtual_amount: @orderdtl.amount+stock.virtual_amount)
         stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
         @orderdtl.stock_logs << stklog

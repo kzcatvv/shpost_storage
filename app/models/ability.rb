@@ -1,27 +1,27 @@
 class Ability
-    include CanCan::Ability
+  include CanCan::Ability
 
-    def initialize(user,storage = nil)
-        if user.superadmin?
-            can :manage, User
-            can :manage, Unit
-            can :manage, UserLog
-            can :manage, Role
-            can :manage, Storage
-            can :role, :unitadmin
-            can :role, :user
-            can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
-    # cannot :role, :superadmin
-    cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
-    can :update, User, id: user.id
-    can :manage, Sequence
-    #can :manage, User
+  def initialize(user,storage = nil)
+    if user.superadmin?
+        can :manage, User
+        can :manage, Unit
+        can :manage, UserLog
+        can :manage, Role
+        can :manage, Storage
+        can :role, :unitadmin
+        can :role, :user
+        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
+        # cannot :role, :superadmin
+        cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
+        can :update, User, id: user.id
+        can :manage, Sequence
+        #can :manage, User
 
-    can :manage, InterfaceInfo
+        can :manage, InterfaceInfo
 
-    cannot :resend, InterfaceInfo do |interface_info|
-        (interface_info.status == "success")
-    end
+        cannot :resend, InterfaceInfo do |interface_info|
+            (interface_info.status == "success")
+        end
 
     elsif user.unitadmin?
     #can :manage, :all
@@ -181,8 +181,10 @@ class Ability
 
         can :manage, OrderReturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
-        can :new, Stock
-        can :manage, Stock, shelf: {area: {storage_id: storage.id} }
+        # can :new, Stock
+        can :read, Stock, shelf: {area: {storage_id: storage.id} }
+        can :ready2bad, Stock, shelf: {area: {storage_id: storage.id} }
+        can :move2bad, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
 
@@ -204,8 +206,7 @@ class Ability
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
 
-        can :new, Stock
-        can :manage, Stock, shelf: {area: {storage_id: storage.id} }
+        can :read, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
 
@@ -266,8 +267,9 @@ class Ability
             (manual_stock_detail.manual_stock.storage_id == storage.id) && (manual_stock_detail.status == ManualStockDetail::STATUS[:stock_out])
         end
 
-        can :new, Stock
-        can :manage, Stock, shelf: {area: {storage_id: storage.id} }
+        can :read, Stock, shelf: {area: {storage_id: storage.id} }
+        can :ready2bad, Stock, shelf: {area: {storage_id: storage.id} }
+        can :move2bad, Stock, shelf: {area: {storage_id: storage.id} }
 
 
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}

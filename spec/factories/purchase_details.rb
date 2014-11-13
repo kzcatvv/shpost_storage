@@ -7,7 +7,7 @@ FactoryGirl.define do
     purchase_id 1
     supplier_id 1
     specification_id 1
-    qg_period  "180 day"
+    expiration_date  "180 day"
     sequence(:batch_no) { |n| "20140402001#{n}"}
     # batch_no   "20140402001"
     amount 100

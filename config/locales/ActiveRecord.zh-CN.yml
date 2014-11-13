@@ -383,6 +383,7 @@ zh-CN:
         desc: 备注
         status: "状态"
         status_checked: "已确认"
+        expiration_date: "保质期"
       stock_log:
         user_id: "用户"
         username: "操作用户"
@@ -525,8 +526,8 @@ zh-CN:
         name: "名称"
         purchase_id: "采购单编号"
         supplier_id: "供应商"
-        specification_id: "商品规格"
-        qg_period: "保质期"
+        specification_id: "规格"
+        expiration_date: "保质期"
         batch_no: "批次号"
         amount: "数量"
         sum: "金额"

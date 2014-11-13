@@ -43,6 +43,7 @@ class PurchaseDetailsController < ApplicationController
   # PATCH/PUT /purchase_detailes/1
   # PATCH/PUT /purchase_detailes/1.json
   def update
+    binding.pry
     respond_to do |format|
       if @purchase_detail.update(purchase_detail_params)
         format.html { redirect_to purchase_purchase_detail_path(@purchase,@purchase_detail), notice: I18n.t('controller.update_success_notice', model: '采购单明细')  }
@@ -72,6 +73,6 @@ class PurchaseDetailsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_detail_params
-      params.require(:purchase_detail).permit(:name,:purchase_id, :specification_id, :supplier_id, :qg_period, :batch_no, :amount, :sum, :desc)
+      params.require(:purchase_detail).permit(:name,:purchase_id, :specification_id, :supplier_id, :expiration_date, :batch_no, :amount, :sum, :desc)
     end
 end
