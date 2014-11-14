@@ -44,7 +44,7 @@ class PrintController < ApplicationController
         if params[:flag]=='filter'
             time = Time.new
             batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-            @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_no: batch_no,user: current_user,status: "printed")
+            @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],batch_no: batch_no,user: current_user,status: "printed")
         end
         @transport_type=params[:transport_type]
         #regular = /([\D]*)([\d]*)/

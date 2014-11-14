@@ -52,7 +52,7 @@ describe KeyclientorderOrdersController do
       end
 
       it " get the create order" do
-          session[:current_storage] = @storage1
+          session[:current_storage] = @storage1.id
           expect { post :create, keyclientorder_id: 2, order: FactoryGirl.attributes_for(:new_order) }.to change(Order, :count).by(1)
           expect { post :create, keyclientorder_id: 2, order: FactoryGirl.attributes_for(:new_order) }.to change(OrderDetail, :count).by(1)
       end

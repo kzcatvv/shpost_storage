@@ -17,11 +17,14 @@ class ApplicationController < ActionController::Base
   end
 
   def current_ability
-    @current_ability ||= Ability.new(current_user, session[:current_storage])
+    @current_ability ||= Ability.new(current_user, current_storage)
   end
 
   def current_storage
-    session[:current_storage]
+    if !session[:current_storage].blank?
+      Storage.find session[:current_storage]
+    end
+
   end
 
   def configure_charsets

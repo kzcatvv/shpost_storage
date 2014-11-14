@@ -218,7 +218,7 @@ describe AreasController do
       @area = FactoryGirl.create(:area)
       @role = FactoryGirl.create(:role)
       sign_in @user
-      session[:current_storage] = @area.storage
+      session[:current_storage] = @area.storage.id
     end
 
     it_behaves_like "user/admin access to areas"

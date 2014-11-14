@@ -3,7 +3,7 @@ class AreasController < ApplicationController
   load_and_authorize_resource :area
 
   def find_current_storage
-    @areas = Area.where("storage_id = ?", session[:current_storage].id)
+    @areas = Area.where("storage_id = ?", session[:current_storage])
   end
 
   # GET /areas
@@ -19,7 +19,7 @@ class AreasController < ApplicationController
 
   # GET /areas/new
   def new
-    @area.storage_id = session[:current_storage].id
+    @area.storage_id = session[:current_storage]
   end
 
   # GET /areas/1/edit
@@ -30,7 +30,7 @@ class AreasController < ApplicationController
   # POST /areas.json
   def create
     # @area = Area.new(area_params)
-    @area.storage_id = session[:current_storage].id
+    @area.storage_id = session[:current_storage]
 
     respond_to do |format|
       if @area.save

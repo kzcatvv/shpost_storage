@@ -10,7 +10,7 @@ class OrdersController < ApplicationController
   end
 
   def order_alert
-    @orders = Order.where( [ "status = ? and storage_id = ? and created_at < ?", 'waiting',session[:current_storage].id, Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders = Order.where( [ "status = ? and storage_id = ? and created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
     @orders_grid = initialize_grid(@orders)
   end
 
@@ -166,7 +166,7 @@ class OrdersController < ApplicationController
     if ordercnt > 0
       time = Time.new
       # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-      @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,user: current_user,status: "waiting")
+      @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],user: current_user,status: "waiting")
       orders=Order.where(id: findorders)
       orders.update_all(keyclientorder_id: @keycorder)
 
@@ -528,7 +528,7 @@ class OrdersController < ApplicationController
   def packout
       @order_details=[]
       @curr_order=""
-      @orders = Order.where("storage_id = ?", session[:current_storage].id)
+      @orders = Order.where("storage_id = ?", session[:current_storage])
       @orders_grid=initialize_grid(@orders)
   end
 
@@ -1188,7 +1188,7 @@ class OrdersController < ApplicationController
     def getKeycOrderID()
       time = Time.new
       batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-      keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage].id,batch_no: batch_no,user: current_user,status: "printed")
+      keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],batch_no: batch_no,user: current_user,status: "printed")
       return keycorder.id
     end
 

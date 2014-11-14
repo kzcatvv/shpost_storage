@@ -96,7 +96,7 @@
                 </ul>
               </li>
               <% if !session[:current_storage].nil? %>
-              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  <%= session[:current_storage].name %><b class="caret"></b></a>
+              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  <%= Storage.find(session[:current_storage]).name %><b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                   <% current_user.storages.each do |s| %>
                     <li>

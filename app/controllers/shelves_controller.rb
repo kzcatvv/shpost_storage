@@ -22,7 +22,7 @@ class ShelvesController < ApplicationController
   end
 
   def find_current_storage
-    @areas = Area.where("storage_id = ?", session[:current_storage].id)
+    @areas = Area.where("storage_id = ?", session[:current_storage])
     @shelves = Shelf.where("area_id in (?)", @areas.ids)
   end
 
