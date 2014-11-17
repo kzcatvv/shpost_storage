@@ -6,7 +6,9 @@ class InterfaceInfosController < ApplicationController
   # GET /interface_infos.json
   def index
     @interface_infos = InterfaceInfo.all
-    @interface_infos_grid = initialize_grid(@interface_infos)
+    @interface_infos_grid = initialize_grid(@interface_infos,
+      :order => 'interface_infos.first_time',
+      :order_direction => 'desc')
   end
 
   # GET /interface_infos/1
