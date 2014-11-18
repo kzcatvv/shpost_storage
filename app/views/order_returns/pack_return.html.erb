@@ -4,7 +4,7 @@
 
 </div>
 <div>
-   <%= label_tag 'name', '面单号:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls", onkeypress: "ReEnterPress(event)"  %>
+   <%= label_tag 'name', '面单号:', class: 'control-group' %><%= text_field_tag 'orderreturn_tracking_number', nil, class: "controls", onkeypress: "ReEnterPress(event)"  %>
 </div>
 <div>
    <%= label_tag 'name1', '退件原因设置:', class: 'control-group' %>
@@ -55,10 +55,10 @@ function ReEnterPress(e){ //传入 event
       $.ajax({
             type : 'GET',
             url : '/order_returns/find_tracking_number/',
-            data: { tracking_number: $('#tracking_number').val()},
+            data: { tracking_number: $('#orderreturn_tracking_number').val()},
             dataType : 'script'
             });
-      $('#tracking_number').val("");
+      $('#orderreturn_tracking_number').val("");
       return false;   
     }   
 }
