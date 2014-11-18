@@ -194,7 +194,7 @@ function selfAlert(msgstr,timer){
 function clickin(current)
 {
   param = current.id.split('_');
-  if ($("td#stock_logs_status_"+param[3]).text()!="waiting") {
+  if ($("td#stock_logs_status_"+param[3]).text()!="处理中") {
     return false;
   }
   // if (param[2] == "amount") {
@@ -330,11 +330,11 @@ function addTr(slid,index)
         var jsonData = eval("("+data.responseText+")");
         tablereplace(index,"p","id",jsonData.id);
         tablereplace(index,"a","id",jsonData.id);
-		tablereplace(index,"a","href",jsonData.id);
+        tablereplace(index,"a","href",jsonData.id);
         tablereplace(index,"input","id",jsonData.id);
         tablereplace(index,"select","id",jsonData.id);
         amountset(index,jsonData.id,0);
-        statusset(slid,index,jsonData.id,"waiting");
+        statusset(slid,index,jsonData.id,"处理中");
         linkset(index,jsonData.id, jsonData.pid);
       }
     }

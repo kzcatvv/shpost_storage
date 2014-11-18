@@ -72,7 +72,7 @@ class PurchasesController < ApplicationController
   def stock_in
     #@stock_logs = []
       
-    Stock.purchase_stock_in(@purchase)
+    Stock.purchase_stock_in(@purchase, current_user)
 
     @stock_logs_grid = initialize_grid(@purchase.stock_logs)
   end

@@ -69,7 +69,7 @@ class ManualStocksController < ApplicationController
 
   def stock_out
     begin
-      Stock.manual_stock_stock_out(@manual_stock)
+      Stock.manual_stock_stock_out(@manual_stock, current_user)
 
       @stock_logs_grid = initialize_grid(@manual_stock.stock_logs)
     rescue Exception => e

@@ -5,7 +5,7 @@ class OrderReturnsController < ApplicationController
   # GET /order_returns
   # GET /order_returns.json
   def index
-    @order_returns = OrderReturn.all
+
   end
 
   # GET /order_returns/1
@@ -15,7 +15,7 @@ class OrderReturnsController < ApplicationController
 
   # GET /order_returns/new
   def new
-    @order_return = OrderReturn.new
+
   end
 
   # GET /order_returns/1/edit
@@ -25,7 +25,6 @@ class OrderReturnsController < ApplicationController
   # POST /order_returns
   # POST /order_returns.json
   def create
-    @order_return = OrderReturn.new(order_return_params)
 
     respond_to do |format|
       if @order_return.save
@@ -55,7 +54,6 @@ class OrderReturnsController < ApplicationController
   # DELETE /order_returns/1
   # DELETE /order_returns/1.json
   def destroy
-    @order_return.destroy
     respond_to do |format|
       format.html { redirect_to order_returns_url }
       format.json { head :no_content }
@@ -68,7 +66,13 @@ class OrderReturnsController < ApplicationController
 
   def find_tracking_number
     @order = Order.where(tracking_number: params[:tracking_number]).accessible_by(current_ability).first
-    @order_details = @order.order_details
+    if @order.nil?
+      @curr_order=0
+      @order_details=[]
+    else
+      @curr_order=@order.id
+      @order_details = @order.order_details
+    end
     respond_to do |format|
           format.js 
     end
@@ -78,26 +82,39 @@ class OrderReturnsController < ApplicationController
   def do_return
     sklogs=[]
     time = Time.now
+    # binding.pry
     # @batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + (OrderReturn.select(:batch_no).distinct.count+1).to_s.rjust(5,'0')
+    @order_return=OrderReturn.create(unit_id:current_user.unit_id,storage_id:current_storage.id,status:"waiting")
+    @batchid = @order_return.batch_no
     params[:cbids].each do |id|
       reason=params[("rereason_"+id).to_sym]
       isbad=params[("st_"+id).to_sym]
-      if isbad == "否"
-        @orderdtl = OrderDetail.find(id)
-        @order = @orderdtl.order
-        @order_return = OrderReturn.where(order_detail: @orderdtl).first
-        if @order_return.nil?
-          @order_return=OrderReturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,status:"waiting")
+        @orderdtl=OrderDetail.find(id)
+        @order=@orderdtl.order
+        if isbad == "否"
+          @order_return_detail=@order_return.order_return_details.build(order_detail_id: id,return_reason: reason,is_bad: 'no',status: 'waiting')
+          @order_return_detail.save
+          stock = Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
+          op='order_return'
+        else
+          @order_return_detail=@order_return.order_return_details.build(order_detail_id: id,return_reason: reason,is_bad: 'yes',status: 'waiting')
+          @order_return_detail.save
+          stock = Stock.where(business_id: @order.business_id,supplier_id: @orderdtl.supplier_id,specification_id: @orderdtl.specification_id).joins(:shelf).where("shelves.is_bad='yes'").first
+          if stock.nil?
+            sts=current_storage.areas
+            @shelf=Shelf.where("shelves.is_bad='yes'").includes(:area).where(area_id: sts).order("priority_level ASC").first
+            stock=Stock.create(shelf: @shelf,business_id: @order.business_id,supplier_id: @orderdtl.supplier_id,specification_id: @orderdtl.specification_id,batch_no: @orderdtl.batch_no,actual_amount: 0,virtual_amount: 0)
+          end
+          stock=Stock.find(stock)
+          op='order_bad_return'
         end
-        
-        stock = Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
 
         stock.update(virtual_amount: @orderdtl.amount+stock.virtual_amount)
-        stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
+        stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[op.to_sym], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
         @orderdtl.stock_logs << stklog
         sl=StockLog.where(id: stklog)
         sklogs += sl
-      end
+      
     end
     @stock_logs = StockLog.where(id: sklogs)
 
@@ -106,12 +123,12 @@ class OrderReturnsController < ApplicationController
 
   def return_check
 
-      @order_returns=OrderReturn.where("batch_no=? and is_bad='否'",params[:format])
-      @order_returns.each do |ot|
+      @order_return=OrderReturn.where("batch_no=?",params[:format]).first
+      @order_return.order_return_details.each do |ot|
         @orderdtl=OrderDetail.find(ot.order_detail_id)
-        stlogs=@orderdtl.stock_logs.where("operation='order_return'")
+        stlogs=@orderdtl.stock_logs.where("operation='order_return' or operation='order_bad_return' ")
         stlogs.each do |stlog|
-          stlog.order_check
+          stlog.check
         end
         ot.return_in
       end
