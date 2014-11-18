@@ -83,9 +83,9 @@ class OrderReturnsController < ApplicationController
       reason=params[("rereason_"+id).to_sym]
       isbad=params[("st_"+id).to_sym]
       if isbad == "否"
-        @orderdtl=OrderDetail.find(id)
-        @order=@orderdtl.order
-        @order_return=OrderReturn.where(order_detail: @orderdtl).first
+        @orderdtl = OrderDetail.find(id)
+        @order = @orderdtl.order
+        @order_return = OrderReturn.where(order_detail: @orderdtl).first
         if @order_return.nil?
           @order_return=OrderReturn.create(order_detail:@orderdtl,return_reason:reason,is_bad:isbad,status:"waiting")
         end

@@ -68,41 +68,15 @@ class ManualStocksController < ApplicationController
   end
 
   def stock_out
-    product_hash = {}
-    sklogs=[]
+    begin
+      Stock.manual_stock_stock_out(@manual_stock)
 
-    Stock.transaction do
-      begin
-
-    manual_stock=ManualStock.find(params[:id])
-
-    if Stock.check_out_stocks(manual_stock, manual_stock.manual_stock_details, current_storage)
-      manual_stock.manual_stock_details.each do |detail|
-        product_hash = Stock.get_product_hash(manual_stock,detail,product_hash)
-        # product = [order.business,orderdtl.specification,orderdtl.supplier]
-        # if allcnt.has_key?(product)
-        #     allcnt[product][0]=allcnt[product][0]+orderdtl.amount
-        #     allcnt[product][1]<<orderdtl
-        # else
-        #     allcnt[product]=[orderdtl.amount, [orderdtl]]
-        # end
-      end
-    end
-
-    # puts allcnt
-
-    sklogs = Stock.stock_out(product_hash, current_storage, current_user)
-
-    @stock_logs = StockLog.where(id: sklogs)
-    #binding.pry
-    @stock_logs_grid = initialize_grid(@stock_logs)
-
-      rescue Exception => e
-        Rails.logger.error e.backtrace
-        flash[:alert] = e.message
-        redirect_to :action => 'findprintindex'
-        raise ActiveRecord::Rollback
-      end
+      @stock_logs_grid = initialize_grid(@manual_stock.stock_logs)
+    rescue Exception => e
+      Rails.logger.error e.backtrace
+      flash[:alert] = e.message
+      redirect_to :action => 'findprintindex'
+      raise ActiveRecord::Rollback
     end
   end
 
@@ -110,7 +84,7 @@ class ManualStocksController < ApplicationController
     @stock_logs = @manual_stock.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
     respond_to do |format|
-      if @manual_stock.check
+      if @manual_stock.check!
         format.html { render action: 'stock_out' }
         format.json { head :no_content }
       else
@@ -124,7 +98,7 @@ class ManualStocksController < ApplicationController
     @stock_logs = @manual_stock.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
 
-    StockLog.find(params[:stock_log]).check
+    StockLog.find(params[:stock_log]).check!
     render action: 'stock_out'
   end
 
