@@ -2,11 +2,11 @@
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-    <% if can? :new, Stock %>
+<!--     <% if can? :new, Stock %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
                   new_stock_path,
                   :class => 'btn btn-primary' %>
-    <% end %>
+    <% end %> -->
   </div>
 </div>
 
@@ -45,7 +45,7 @@
 
     g.column do |stock|
       ActiveSupport::SafeBuffer.new << 
-        (link_to t('.edit', :default => t("helpers.links.edit")), edit_stock_path(stock), :class => 'btn btn-xs btn-primary' if can? :update, stock) << ' ' <<
+        # (link_to t('.edit', :default => t("helpers.links.edit")), edit_stock_path(stock), :class => 'btn btn-xs btn-primary' if can? :update, stock) << ' ' <<
         (link_to t('.r2bad', :default => t("helpers.links.r2bad")), ready2bad_stock_path(stock), :class => 'btn btn-xs btn-primary' if stock.shelf.is_bad == 'no')
 
 
