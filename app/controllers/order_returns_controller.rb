@@ -93,7 +93,8 @@ class OrderReturnsController < ApplicationController
         stock = Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
 
         stock.update(virtual_amount: @orderdtl.amount+stock.virtual_amount)
-        stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
+        # stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:order_return], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
+        stklog = StockLog.create_stock_log(stock,current_user,StockLog::OPERATION[:order_return],StockLog::STATUS[:waiting],StockLog::OPERATION_TYPE[:in],@orderdtl.amount,nil,nil,nil,nil)
         @orderdtl.stock_logs << stklog
         sl=StockLog.where(id: stklog)
         sklogs += sl

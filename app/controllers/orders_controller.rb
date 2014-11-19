@@ -257,7 +257,8 @@ class OrdersController < ApplicationController
                      outbl = true
                      outstock.update_attribute(:virtual_amount , setamount)
                      outstock.save
-                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out], keyclientorderdetail_id: keydtl.id)
+                     # stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out], keyclientorderdetail_id: keydtl.id)
+                     stklog = StockLog.create_stock_log(outstock,current_user,StockLog::OPERATION[:b2b_stock_out],StockLog::STATUS[:waiting],StockLog::OPERATION_TYPE[:out],amount,keydtl.id,nil,nil,nil)
                      #sklogs += StockLog.where(id: stklog)
                      ods=keyorder.order_details.where(specification_id: keydtl.specification_id,supplier_id: keydtl.supplier_id).offset(offsetcnt/keydtl.amount).limit((lastamount+amount)/keydtl.amount)
                      stklog.order_details << ods
@@ -265,7 +266,8 @@ class OrdersController < ApplicationController
                      amount = amount - outstock.virtual_amount
                      getamount = outstock.virtual_amount
                      outbl = false
-                     stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out], keyclientorderdetail_id: keydtl.id)
+                     # stklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2b_stock_out], status: StockLog::STATUS[:waiting], amount: outstock.virtual_amount, operation_type: StockLog::OPERATION_TYPE[:out], keyclientorderdetail_id: keydtl.id)
+                     stklog = StockLog.create_stock_log(outstock,current_user,StockLog::OPERATION[:b2b_stock_out],StockLog::STATUS[:waiting],StockLog::OPERATION_TYPE[:out],outstock.virtual_amount,keydtl.id,nil,nil,nil)
                      #sklogs += StockLog.where(id: stklog)
                      if amount + outstock.virtual_amount == keydtl.amount * keyordercnt
                       if getamount/keydtl.amount == 0

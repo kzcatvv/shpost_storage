@@ -2,7 +2,7 @@ class StockLog < ActiveRecord::Base
   belongs_to :user
   belongs_to :stock
   belongs_to :purchase_detail
-  belongs_to :manual_detail
+  belongs_to :manual_stock_detail
   belongs_to :keyclientorderdetail
   has_one :shelf, through: :stock
   has_and_belongs_to_many :order_details
@@ -43,6 +43,15 @@ class StockLog < ActiveRecord::Base
 
   def self.order_without_return
     where(operation: [OPERATION[:b2c_stock_out], OPERATION[:b2b_stock_out]])
+  end
+
+  def self.create_stock_log(stock,user,operation,status,operation_type,amount,kid=nil,pid=nil,mid=nil,checked_at=nil)
+    StockLog.create(stock: stock, user: user, operation: operation, 
+      status: status, amount: amount, operation_type: operation_type, 
+      shelf_id: stock.shelf_id, business_id: stock.business_id, 
+      supplier_id: stock.supplier_id, specification_id: stock.specification_id, 
+      checked_at: checked_at, purchase_detail_id: pid, 
+      manual_stock_detail_id: mid, keyclientorderdetail_id: kid)
   end
 
   def check

@@ -28,7 +28,8 @@ class StocksController < ApplicationController
   def create
     respond_to do |format|
       if @stock.save
-        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'create_stock', status: 'checked', operation_type: 'in', amount: @stock.actual_amount, checked_at: Time.now)
+        # @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'create_stock', status: 'checked', operation_type: 'in', amount: @stock.actual_amount, checked_at: Time.now)
+        @stock_log = StockLog.create_stock_log(@stock,current_user,StockLog::OPERATION[:create_stock],StockLog::STATUS[:checked],StockLog::OPERATION_TYPE[:in],@stock.actual_amount,nil,nil,nil,Time.now)
         format.html { redirect_to @stock, notice: I18n.t('controller.create_success_notice', model: '库存') }
         format.json { render action: 'show', status: :created, location: @stock }
       else
@@ -51,7 +52,8 @@ class StocksController < ApplicationController
         #   operation_type = 'out'
         #   amount = before_amount - @stock.actual_amount
         # end
-        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'update_stock', status: 'checked', operation_type: 'reset', amount: @stock.actual_amount, checked_at: Time.now)
+        # @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'update_stock', status: 'checked', operation_type: 'reset', amount: @stock.actual_amount, checked_at: Time.now)
+        @stock_log = StockLog.create_stock_log(@stock,current_user,StockLog::OPERATION[:update_stock],StockLog::STATUS[:checked],StockLog::OPERATION_TYPE[:reset],@stock.actual_amount,nil,nil,nil,Time.now)
 
         format.html { redirect_to @stock, notice: I18n.t('controller.update_success_notice', model: '库存')}
         format.json { head :no_content }
@@ -66,7 +68,8 @@ class StocksController < ApplicationController
   # DELETE /stocks/1.json
   def destroy
     @stock.destroy
-    @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'destroy_stock', status: 'checked', operation_type: 'out', amount: @stock.actual_amount, checked_at: Time.now)
+    # @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'destroy_stock', status: 'checked', operation_type: 'out', amount: @stock.actual_amount, checked_at: Time.now)
+    @stock_log = StockLog.create_stock_log(@stock,current_user,StockLog::OPERATION[:destroy_stock],StockLog::STATUS[:checked],StockLog::OPERATION_TYPE[:out],@stock.actual_amount,nil,nil,nil,Time.now)
     respond_to do |format|
       format.html { redirect_to stocks_url }
       format.json { head :no_content }
@@ -143,18 +146,21 @@ class StocksController < ApplicationController
         @badstock = Stock.where("shelf_id = ? and business_id = ? and supplier_id = ? and batch_no = ? and specification_id = ?",@shelf.id,@stock.business_id,@stock.supplier_id,@stock.batch_no,@stock.specification_id).first
         if @badstock.nil?
           @badstock = Stock.create(shelf: @shelf,business_id: @stock.business_id,supplier_id: @stock.supplier_id,specification_id: @stock.specification_id,batch_no: @stock.batch_no,actual_amount: badmnt,virtual_amount: badmnt)
-          @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: @badstock.actual_amount, checked_at: Time.now)
+          # @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: @badstock.actual_amount, checked_at: Time.now)
+          @badstock_log = StockLog.create_stock_log(@badstock,current_user,'bad_stock_in',StockLog::STATUS[:checked],StockLog::OPERATION_TYPE[:in],@badstock.actual_amount,nil,nil,nil,Time.now)
         else
            actmnt= Integer(@badstock.actual_amount)+Integer(badmnt)
            virmnt= Integer(@badstock.virtual_amount)+Integer(badmnt)
            @badstock.update_attributes(:actual_amount=>actmnt,:virtual_amount=>virmnt)
-           @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: badmnt, checked_at: Time.now)
+           # @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: badmnt, checked_at: Time.now)
+           @badstock_log = StockLog.create_stock_log(@badstock,current_user,'bad_stock_in',StockLog::STATUS[:checked],StockLog::OPERATION_TYPE[:in],badmnt,nil,nil,nil,Time.now)
         end
         
         sactmnt= Integer(@stock.actual_amount)-Integer(badmnt)
         svirmnt= Integer(@stock.virtual_amount)-Integer(badmnt)
         @stock.update_attributes(:actual_amount=>sactmnt,:virtual_amount=>svirmnt)
-        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'move_to_bad', status: 'checked', operation_type: 'out', amount: badmnt, checked_at: Time.now)
+        # @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'move_to_bad', status: 'checked', operation_type: 'out', amount: badmnt, checked_at: Time.now)
+        @stock_log = StockLog.create_stock_log(@stock,current_user,'move_to_bad',StockLog::STATUS[:checked],StockLog::OPERATION_TYPE[:out],badmnt,nil,nil,nil,Time.now)
 
 
         flash[:notice] = "移入残次品区成功"

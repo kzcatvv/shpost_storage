@@ -83,7 +83,8 @@ class Stock < ActiveRecord::Base
               stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
             end
             if stocklog.blank?
-              stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out])
+              # stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:out], shelf_id: outstock.shelf_id, business_id: outstock.business_id, supplier_id: outstock.supplier_id, specification_id: outstock.specification_id)
+              stocklog = StockLog.create_stock_log(outstock,current_user,StockLog::OPERATION[:b2c_stock_out],StockLog::STATUS[:waiting],StockLog::OPERATION_TYPE[:out],amount,nil,nil,nil,nil)
             else
               stocklog.update_attribute(:amount, stocklog.amount + amount)
             end
@@ -103,7 +104,8 @@ class Stock < ActiveRecord::Base
               stocklog = outstock.find_same_stocklog(details.first.order.keyclientorder)
             end
             if stocklog.blank?
-              stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: available_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+              # stocklog = StockLog.create(stock: outstock, user: current_user, operation: StockLog::OPERATION[:b2c_stock_out], status: StockLog::STATUS[:waiting], amount: available_amount, operation_type: StockLog::OPERATION_TYPE[:out], shelf_id: outstock.shelf_id, business_id: outstock.business_id, supplier_id: outstock.supplier_id, specification_id: outstock.specification_id)
+              stocklog = StockLog.create_stock_log(outstock,current_user,StockLog::OPERATION[:b2c_stock_out],StockLog::STATUS[:waiting],StockLog::OPERATION_TYPE[:out],available_amount,nil,nil,nil,nil)
             else
               stocklog.update_attribute(:amount, stocklog.amount + available_amount)
             end
