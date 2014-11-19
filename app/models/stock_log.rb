@@ -2,7 +2,7 @@ class StockLog < ActiveRecord::Base
   belongs_to :user
   belongs_to :stock
   belongs_to :purchase_detail
-  belongs_to :manual_detail
+  belongs_to :manual_stock_detail
   belongs_to :keyclientorderdetail
   has_one :shelf, through: :stock
   has_and_belongs_to_many :order_details
@@ -20,6 +20,7 @@ class StockLog < ActiveRecord::Base
 
   #before_create :set_desc
   before_save :set_desc
+  before_save :set_stock_info
 
   def status_name
     status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
@@ -38,6 +39,15 @@ class StockLog < ActiveRecord::Base
   def set_desc
     if !stock.blank?
     self.desc = "#{OPERATION_TYPE[operation_type.to_sym]}#{stock.try(:specification).try(:commodity).try :name}-#{stock.try(:specification).try :model}共计#{self.amount}，批次：#{stock.batch_no}，商户：#{stock.try(:business).try :name}，供应商：#{stock.try(:supplier).try :name}，货架：#{stock.try(:shelf).try :shelf_code}"
+    end
+  end
+
+  def set_stock_info
+    if !stock.blank?
+      self.shelf_id = stock.shelf_id
+      self.business_id = stock.business_id
+      self.supplier_id = stock.supplier_id
+      self.specification_id = stock.specification_id
     end
   end
 
