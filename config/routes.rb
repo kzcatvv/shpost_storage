@@ -223,6 +223,10 @@ ShpostStorage::Application.routes.draw do
      resources :shelves, :controller => 'area_shelf'
   end
 
+  resources :suppliers do
+     resources :relationships, :controller => 'supplier_relationship'
+  end
+
   # get 'scans' => 'scans#scans'
   # post 'scans_check' => 'scans#scans_check'
 

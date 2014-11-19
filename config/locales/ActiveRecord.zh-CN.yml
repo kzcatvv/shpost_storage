@@ -176,6 +176,7 @@ zh-CN:
       resend_interface_info: 重发接口
       r2bad: 移入残次品区
       pdjs: 商务投递下单
+      relationships: 商品对应关系管理
 
     titles:
       edit: 编辑%{model}
