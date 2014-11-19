@@ -44,7 +44,7 @@
       # if stock_log.status == 'waiting'
         # select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
         content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'}) <<
-        text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")
+        text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => if stock_log.order_details.first.order_return_detail.is_bad=="no" then "/shelves/autocomplete_shelf_shelf_code" else "/shelves/autocomplete_bad_shelf_code" end)
 
       # else
       #   stock_log.stock.shelf.shelf_code
