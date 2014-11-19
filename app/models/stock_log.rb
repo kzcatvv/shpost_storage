@@ -20,6 +20,7 @@ class StockLog < ActiveRecord::Base
 
   #before_create :set_desc
   before_save :set_desc
+  before_save :set_stock_info
 
   def status_name
     status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
@@ -41,17 +42,17 @@ class StockLog < ActiveRecord::Base
     end
   end
 
-  def self.order_without_return
-    where(operation: [OPERATION[:b2c_stock_out], OPERATION[:b2b_stock_out]])
+  def set_stock_info
+    if !stock.blank?
+      self.shelf_id = stock.shelf_id
+      self.business_id = stock.business_id
+      self.supplier_id = stock.supplier_id
+      self.specification_id = stock.specification_id
+    end
   end
 
-  def self.create_stock_log(stock,user,operation,status,operation_type,amount,kid=nil,pid=nil,mid=nil,checked_at=nil)
-    StockLog.create(stock: stock, user: user, operation: operation, 
-      status: status, amount: amount, operation_type: operation_type, 
-      shelf_id: stock.shelf_id, business_id: stock.business_id, 
-      supplier_id: stock.supplier_id, specification_id: stock.specification_id, 
-      checked_at: checked_at, purchase_detail_id: pid, 
-      manual_stock_detail_id: mid, keyclientorderdetail_id: kid)
+  def self.order_without_return
+    where(operation: [OPERATION[:b2c_stock_out], OPERATION[:b2b_stock_out]])
   end
 
   def check

@@ -82,8 +82,7 @@ class PurchasesController < ApplicationController
 
           stock.save
 
-          # x.stock_logs.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], purchase_detail: x, amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in], shelf_id: stock.shelf_id, business_id: stock.business_id, supplier_id: stock.supplier_id, specification_id: stock.specification_id)
-          StockLog.create_stock_log(stock,current_user,StockLog::OPERATION[:purchase_stock_in],StockLog::STATUS[:waiting],StockLog::OPERATION_TYPE[:in],stock_in_amount,nil,x.id,nil,nil)
+          x.stock_logs.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], purchase_detail: x, amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
         end
       end
     end
