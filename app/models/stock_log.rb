@@ -51,6 +51,8 @@ class StockLog < ActiveRecord::Base
       self.business_id = stock.business_id
       self.supplier_id = stock.supplier_id
       self.specification_id = stock.specification_id
+      self.expiration_date = stock.expiration_date
+      self.batch_no = stock.batch_no
     end
   end
 
