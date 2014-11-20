@@ -37,12 +37,11 @@ class Stock < ActiveRecord::Base
     order_return.order_return_details.each do |x|
       stock = get_available_stock(x.order_detail.specification, x.order_detail.supplier, x.order.business, nil, x.order.storage, x.broken?)
 
-        stock_in_amount = stock.stock_in_amount(x.order_detail.amount)
+      stock_in_amount = stock.stock_in_amount(x.order_detail.amount)
 
-        stock.save
+      stock.save
 
-        order_return.stock_logs.build(stock: stock, user: operation_user, operation: StockLog::OPERATION[(x.broken?) ? :order_bad_return : :order_return], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
-      end
+      order_return.stock_logs.build(stock: stock, user: operation_user, operation: StockLog::OPERATION[(x.broken?) ? :order_bad_return : :order_return], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
     end
   end
 
