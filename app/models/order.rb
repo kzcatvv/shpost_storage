@@ -7,6 +7,8 @@ class Order < ActiveRecord::Base
   has_many :stock_logs, through: :order_details
   has_many :deliver_notices
 
+  # alias :root_order :keyclientorder
+  # alias :details :order_details
   # before_validation :set_no
 
   # validates_presence_of :no, :message => '不能为空'
@@ -153,6 +155,10 @@ class Order < ActiveRecord::Base
     end
     # status invalid
     return nil
+  end
+
+  def stock_log_operation
+    StockLog::OPERATION[:b2c_stock_out]
   end
 
 end

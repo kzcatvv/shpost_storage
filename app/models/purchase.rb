@@ -3,8 +3,9 @@ class Purchase < ActiveRecord::Base
 	belongs_to :business
   belongs_to :storage
 	has_many :purchase_details, dependent: :destroy
-  has_many :stock_logs, through: :purchase_details
+  # has_many :stock_logs, through: :purchase_details
 	has_many :stocks, through: :purchase_details  
+  has_many :stock_logs, as: :parent
 
 	# validates_presence_of :no, :name, message: '不能为空'
 
@@ -24,9 +25,9 @@ class Purchase < ActiveRecord::Base
     end
   end
 
-  def check
+  def check!
     self.stock_logs.each do |x|
-      x.check
+      x.check!
     end
   end
 

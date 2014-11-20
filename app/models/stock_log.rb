@@ -4,13 +4,16 @@ class StockLog < ActiveRecord::Base
   belongs_to :purchase_detail
   belongs_to :manual_stock_detail
   belongs_to :keyclientorderdetail
+
   has_one :shelf, through: :stock
   has_and_belongs_to_many :order_details
   has_many :orders, through: :order_details
+  # has_many :keyclientorders, through: :orders
+  belongs_to :parent, polymorphic: true
 
 
   OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return',order_bad_return: 'order_bad_return',move_to_bad: 'move_to_bad',bad_stock_in: 'bad_stock_in'}
-  OPERATION_SHOW = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '电商出库', b2b_stock_out: '大客户出库', order_return: '退货',order_bad_return: '残次品退货',move_to_bad: '残次品移入',bad_stock_in: '残次品入库'}
+  OPERATION_SHOW = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '订单出库', b2b_stock_out: '批量出库', order_return: '退货',order_bad_return: '残次品退货',move_to_bad: '残次品移入',bad_stock_in: '残次品入库'}
   STATUS = {waiting: 'waiting', checked: 'checked'}
   STATUS_SHOW = {waiting: '处理中', checked: '已确认'}
 
@@ -55,7 +58,7 @@ class StockLog < ActiveRecord::Base
     where(operation: [OPERATION[:b2c_stock_out], OPERATION[:b2b_stock_out]])
   end
 
-  def check
+  def check!
     if self.waiting?
       if self.operation_type.eql? OPERATION_TYPE[:in]
         self.stock.check_in_amount self.amount
@@ -85,6 +88,7 @@ class StockLog < ActiveRecord::Base
       end
     end
   end
+
 
   # def order_check
   #   #binding.pry

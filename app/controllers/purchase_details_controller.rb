@@ -43,7 +43,6 @@ class PurchaseDetailsController < ApplicationController
   # PATCH/PUT /purchase_detailes/1
   # PATCH/PUT /purchase_detailes/1.json
   def update
-    binding.pry
     respond_to do |format|
       if @purchase_detail.update(purchase_detail_params)
         format.html { redirect_to purchase_purchase_detail_path(@purchase,@purchase_detail), notice: I18n.t('controller.update_success_notice', model: '采购单明细')  }

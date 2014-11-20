@@ -2,7 +2,7 @@ class Keyclientorder < ActiveRecord::Base
   has_many :keyclientorderdetails, dependent: :destroy
   has_many :orders
   has_many :order_details, through: :orders
-  has_many :stock_logs, through: :orders
+  has_many :stock_logs, as: :parent
   belongs_to :unit
   belongs_to :storage
   belongs_to :business
@@ -19,6 +19,7 @@ class Keyclientorder < ActiveRecord::Base
   #     self.batch_id = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + Keyclientorder.count.to_s.rjust(5,'0')
   #   end
   # end
-
-
+  def details
+    order_details
+  end
 end
