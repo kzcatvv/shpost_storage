@@ -1,30 +1,90 @@
 <%- model_class = Order -%>
 <%= define_grid(@orders_grid, hide_submit_button: true, hide_reset_button: true) do |g|
 
+    g.after_row do |order, number_of_columns|
+        content_tag(:tr, class: 'extra-row') do
+              content_tag(:td,
+                   content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"客户单位")
+                        buffer += content_tag(:p,order.customer_unit)
+                      raw buffer
+                       
+                   end +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"客户电话")
+                        buffer += content_tag(:p,order.customer_tel)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"客户地址")
+                        buffer += content_tag(:p,order.province+order.city+order.county+order.customer_address)
+                      raw buffer
+                       
+                   end,width: "20%")+
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"邮编")
+                        buffer += content_tag(:p,order.customer_postcode)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"商品重量")
+                        buffer += content_tag(:p,order.total_weight)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"商品总数")
+                        buffer += content_tag(:p,order.total_amount)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"所属仓库")
+                        buffer += content_tag(:p,Storage.find(order.storage_id).name)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"所属单位")
+                        buffer += content_tag(:p,Unit.find(order.unit_id).name)
+                      raw buffer
+                       
+                   end)+ 
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"订单商品明细")
+                       order.order_details.each do |odl|
+                        buffer += content_tag(:p,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s)
+                       end
+                      raw buffer
+                       
+                   end,width: "20%") )
+         end
+    end
+
     g.column name: model_class.human_attribute_name(:no), attribute: 'no', detach_with_id: :no_filter
 
     g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name', detach_with_id: :customer_name_filter
 
-    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit', detach_with_id: :customer_unit_filter
-
-   
-    g.column name: model_class.human_attribute_name(:customer_tel), attribute: 'customer_tel', detach_with_id: :customer_tel_filter
-
     g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone', detach_with_id: :customer_phone_filter
-
-    g.column name: model_class.human_attribute_name(:province), attribute: 'province', detach_with_id: :province_filter
-
-    g.column name: model_class.human_attribute_name(:city), attribute: 'city',detach_with_id: :city_filter
-
-    g.column name: model_class.human_attribute_name(:county), attribute: 'county',detach_with_id: :county_filter
-
-    g.column name: model_class.human_attribute_name(:customer_address), attribute: 'customer_address',detach_with_id: :customer_address_filter
-
-    g.column name: model_class.human_attribute_name(:customer_postcode), attribute: 'customer_postcode',detach_with_id: :customer_postcode_filter
-
-    g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight',detach_with_id: :total_weight_filter
-
-    g.column name: model_class.human_attribute_name(:total_amount), attribute: 'total_amount',detach_with_id: :total_amount_filter
 
     g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type', detach_with_id: :transport_type_filter,custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
       order.transport_type_name
@@ -34,20 +94,12 @@
       order.status_name
     end
 
-    g.column name: model_class.human_attribute_name(:buyer_desc), attribute: 'buyer_desc',detach_with_id: :buyer_desc_filter
-
-    g.column name: model_class.human_attribute_name(:seller_desc), attribute: 'seller_desc', detach_with_id: :seller_desc_filter
+    g.column name: "备注" do |order|
+      order.buyer_desc+order.seller_desc
+    end
 
     g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id', detach_with_id: :business_id_filter,custom_filter: Business.accessible_by(current_ability).map{|b| [b.name,b.id]} do |order|
       Business.find(order.business_id).name
-    end
-
-    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'name', detach_with_id: :storage_id_filter,model: 'Storage' do |order|
-      order.storage.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'name', detach_with_id: :unit_id_filter,model: 'Unit' do |order|
-      order.unit.try :name
     end
 
     g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number', filter_type: :range, detach_with_id: :tracking_number_filter
@@ -60,5 +112,21 @@
        order.created_at.to_s(:db)
     end
 
+    g.column do |order|
+      button_tag("详细信息", class: "btn btn-default toggle-trigger")
+    end
+
   end 
 %>
+
+<script language="javascript" type="text/javascript"> 
+
+
+$(document).on("page:load ready", function(){
+    $(".toggle-trigger").click(function(){
+        $(this).parents('tr').next('.extra-row').slideToggle("fast");
+        return false;
+    });
+});
+
+</script>
