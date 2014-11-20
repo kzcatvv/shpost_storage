@@ -89,7 +89,6 @@ class OrderReturnsController < ApplicationController
     params[:cbids].each do |id|
       reason=params[("rereason_"+id).to_sym]
       isbad=params[("st_"+id).to_sym]
-      
         @orderdtl=OrderDetail.find(id)
         @order=@orderdtl.order
         if isbad == "否"

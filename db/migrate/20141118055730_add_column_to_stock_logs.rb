@@ -1,4 +1,4 @@
-class Addcolumnstocklogs < ActiveRecord::Migration
+class AddColumnToStockLogs < ActiveRecord::Migration
   def change
     add_column :stock_logs, :shelf_id, :integer
     add_column :stock_logs, :business_id, :integer

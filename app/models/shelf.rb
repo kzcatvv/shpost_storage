@@ -13,8 +13,9 @@ class Shelf < ActiveRecord::Base
 
   validates_uniqueness_of :shelf_code, scope: :area_id, :message => "货架已存在"
  
-  scope :prior, ->{ includes(:stocks).where(stocks: {id: nil}).order("priority_level ASC")}
-  scope :default, ->{ includes(:area).where(area_id: storage.areas).order("priority_level ASC")}
+  scope :empty, ->{ includes(:stocks).where(stocks: {id: nil})}
+
+  BAD_TYPE = { yes: '是', no: '否' }
 
   # def self.min_abs_pl(priority_level)
   #   condition = "abs(#{priority_level} - priority_level) "
@@ -23,15 +24,14 @@ class Shelf < ActiveRecord::Base
   #   else
   # end
 
-  BAD_TYPE = { yes: '是', no: '否' }
 
-  def bad_type_name
-      is_bad.blank? ? "" : Shelf::BAD_TYPE["#{is_bad}".to_sym]
+  def self.in_storage(storage)
+    Shelf.includes(:area).where(area_id: storage.areas).order("priority_level ASC")
   end
 
   def self.get_empty_shelf(storage)
     # prior.first
-    Shelf.includes(:area).where(area_id: storage.areas).includes(:stocks).where(stocks: {id: nil}).order("priority_level ASC").first
+    in_storage(storage).empty.first
   end
 
   def self.get_neighbor_shelf(stocks)
@@ -41,7 +41,11 @@ class Shelf < ActiveRecord::Base
   end
   
   def self.get_default_shelf(storage)
-    Shelf.includes(:area).where(area_id: storage.areas).order("priority_level ASC").first
+    in_storage(storage).first
     # default.first
+  end
+
+  def bad_type_name
+    is_bad.blank? ? "" : Shelf::BAD_TYPE["#{is_bad}".to_sym]
   end
 end

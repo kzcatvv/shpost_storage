@@ -1,4 +1,4 @@
-class ChangeOrderreturnToMainrescouse < ActiveRecord::Migration
+class ChangeOrderReturnToMainrescouse < ActiveRecord::Migration
   def change
   	remove_column :order_returns, :order_detail_id
   	rename_column :order_returns, :return_reason, :unit_id
