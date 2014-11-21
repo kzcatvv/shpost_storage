@@ -138,7 +138,7 @@
                        :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, order) << ' ' <<
       (link_to t('.order_details', :default => t("helpers.links.order_details")),
                       order_order_details_path(order), :class => 'btn btn-xs btn-primary' if can? :order_detail, order) << ' ' <<
-      button_tag("详细信息", class: "btn btn-default toggle-trigger")
+      button_tag("详细信息", class: "btn btn-xs btn-primary")
       end
   end 
 %>
@@ -147,7 +147,7 @@
 
 
 $(document).on("page:load ready", function(){
-    $(".toggle-trigger").click(function(){
+    $("button").click(function(){
         $(this).parents('tr').next('.extra-row').slideToggle("fast");
         return false;
     });
