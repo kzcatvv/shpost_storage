@@ -19,6 +19,10 @@ class Keyclientorder < ActiveRecord::Base
   #     self.batch_id = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + Keyclientorder.count.to_s.rjust(5,'0')
   #   end
   # end
+  def stock_log_operation
+    StockLog::OPERATION[:b2c_stock_out]
+  end
+
   def details
     order_details
   end
