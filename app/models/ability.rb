@@ -164,6 +164,7 @@ class Ability
         # can :check, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         # can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         cannot :destroy, StockLog, status: "checked"
+        cannot :split, StockLog, status: "checked"
 
         can :manage, OrderReturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 

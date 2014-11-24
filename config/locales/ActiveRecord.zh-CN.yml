@@ -177,7 +177,7 @@ zh-CN:
       r2bad: 移入残次品区
       pdjs: 商务投递下单
       relationships: 商品对应关系管理
-
+      split: 拆单
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
