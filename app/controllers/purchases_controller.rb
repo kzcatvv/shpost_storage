@@ -71,31 +71,17 @@ class PurchasesController < ApplicationController
   # PATCH /specifications/1
   def stock_in
     #@stock_logs = []
-    Purchase.transaction do
-      @purchase.purchase_details.each do |x|
-        while x.waiting_amount > 0
-          stock = Stock.get_available_stock(x.specification, x.supplier, @purchase.business, x.batch_no, current_storage)
-          
-          stock_in_amount = stock.stock_in_amount(x.waiting_amount)
-          stock.expiration_date = x.expiration_date
-          #x.amount -= stock_in_amount
+      
+    Stock.purchase_stock_in(@purchase, current_user)
 
-          stock.save
-
-          x.stock_logs.create(stock: stock, user: current_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], purchase_detail: x, amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
-        end
-      end
-    end
-
-    @stock_logs = @purchase.stock_logs
-    @stock_logs_grid = initialize_grid(@stock_logs)
+    @stock_logs_grid = initialize_grid(@purchase.stock_logs)
   end
 
   def check
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
     respond_to do |format|
-      if @purchase.check
+      if @purchase.check!
         format.html { render action: 'stock_in' }
         format.json { head :no_content }
       else
@@ -109,7 +95,7 @@ class PurchasesController < ApplicationController
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
 
-    StockLog.find(params[:stock_log]).check
+    StockLog.find(params[:stock_log]).check!
     render action: 'stock_in'
   end
 

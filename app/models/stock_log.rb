@@ -2,15 +2,18 @@ class StockLog < ActiveRecord::Base
   belongs_to :user
   belongs_to :stock
   belongs_to :purchase_detail
-  belongs_to :manual_detail
+  belongs_to :manual_stock_detail
   belongs_to :keyclientorderdetail
+
   has_one :shelf, through: :stock
   has_and_belongs_to_many :order_details
   has_many :orders, through: :order_details
+  # has_many :keyclientorders, through: :orders
+  belongs_to :parent, polymorphic: true
 
 
-  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return'}
-  OPERATION_SHOW = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '电商出库', b2b_stock_out: '大客户出库', order_return: '退货'}
+  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return',order_bad_return: 'order_bad_return',move_to_bad: 'move_to_bad',bad_stock_in: 'bad_stock_in'}
+  OPERATION_SHOW = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '订单出库', b2b_stock_out: '批量出库', order_return: '退货',order_bad_return: '残次品退货',move_to_bad: '残次品移入',bad_stock_in: '残次品入库'}
   STATUS = {waiting: 'waiting', checked: 'checked'}
   STATUS_SHOW = {waiting: '处理中', checked: '已确认'}
 
@@ -20,6 +23,7 @@ class StockLog < ActiveRecord::Base
 
   #before_create :set_desc
   before_save :set_desc
+  before_save :set_stock_info
 
   def status_name
     status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
@@ -41,11 +45,22 @@ class StockLog < ActiveRecord::Base
     end
   end
 
+  def set_stock_info
+    if !stock.blank?
+      self.shelf_id = stock.shelf_id
+      self.business_id = stock.business_id
+      self.supplier_id = stock.supplier_id
+      self.specification_id = stock.specification_id
+      self.expiration_date = stock.expiration_date
+      self.batch_no = stock.batch_no
+    end
+  end
+
   def self.order_without_return
     where(operation: [OPERATION[:b2c_stock_out], OPERATION[:b2b_stock_out]])
   end
 
-  def check
+  def check!
     if self.waiting?
       if self.operation_type.eql? OPERATION_TYPE[:in]
         self.stock.check_in_amount self.amount
@@ -75,6 +90,7 @@ class StockLog < ActiveRecord::Base
       end
     end
   end
+
 
   # def order_check
   #   #binding.pry

@@ -3,9 +3,12 @@ class ManualStock < ActiveRecord::Base
   belongs_to :business
   belongs_to :storage
   has_many :manual_stock_details, dependent: :destroy
-  has_many :stock_logs, through: :manual_stock_details
-  has_many :stocks, through: :manual_stock_details  
+  has_many :stocks, through: :manual_stock_details
+  
+  has_many :stock_logs, as: :parent 
 
+  # alias :root_order :clone
+  # alias :details :manual_stock_details
   # validates_presence_of :no, :name, message: '不能为空'
 
   STATUS = { opened: 'opened', closed: 'closed'}
@@ -22,9 +25,9 @@ class ManualStock < ActiveRecord::Base
     end
   end
 
-  def check
+  def check!
     self.stock_logs.each do |x|
-      x.check
+      x.check!
     end
   end
 
@@ -43,6 +46,14 @@ class ManualStock < ActiveRecord::Base
 
   def closed?
     self.status.eql? STATUS[:closed]
+  end
+
+  def stock_log_operation
+    StockLog::OPERATION[:b2b_stock_out]
+  end
+
+  def details
+    manual_stock_details.includes(:manual_stock)
   end
 
 end

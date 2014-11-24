@@ -1,4 +1,4 @@
-class Addisbadtoshevles < ActiveRecord::Migration
+class AddIsBadToShevles < ActiveRecord::Migration
   def change
   	add_column :shelves, :is_bad, :string,:default => "no"
   end

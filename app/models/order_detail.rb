@@ -3,6 +3,7 @@ class OrderDetail < ActiveRecord::Base
 	belongs_to :specification
 	belongs_to :order
   has_one :unit, through: :order
+  has_one :order_return_detail
 	has_and_belongs_to_many :stock_logs
 
 	# validates_presence_of :name, :message => '不能为空'

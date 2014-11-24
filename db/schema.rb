@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141119030209) do
+HEAD
+ActiveRecord::Schema.define(version: 20141120013543) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -117,6 +118,8 @@ ActiveRecord::Schema.define(version: 20141119030209) do
     t.integer  "business_id"
   end
 
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -181,16 +184,26 @@ ActiveRecord::Schema.define(version: 20141119030209) do
 
   add_index "order_details_stock_logs", ["order_detail_id", "stock_log_id"], name: "od_sl_by_id", unique: true
 
-  create_table "order_returns", force: true do |t|
-    t.integer  "order_detail_id"
+  create_table "order_return_details", force: true do |t|
+    t.integer  "order_return_id", limit: 255
+    t.integer  "order_detail_id", limit: 255
     t.string   "return_reason"
     t.string   "is_bad"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "batch_no"
+    t.string   "status"
+  end
+
+  create_table "order_returns", force: true do |t|
+    t.integer  "unit_id",    limit: 255
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "storage_id", limit: 255
     t.string   "status"
     t.string   "barcode"
     t.string   "no"
+    t.string   "batch_no"
   end
 
   create_table "orders", force: true do |t|
@@ -230,7 +243,7 @@ ActiveRecord::Schema.define(version: 20141119030209) do
     t.string   "pingan_ordertime"
     t.string   "pingan_operate"
     t.string   "customer_idnumber"
-    t.string   "tracking_info",     limit: 2000
+    t.string   "tracking_info",     limit: 1000
     t.string   "barcode"
     t.string   "batch_no"
   end
@@ -350,6 +363,14 @@ ActiveRecord::Schema.define(version: 20141119030209) do
     t.string   "desc"
     t.integer  "keyclientorderdetail_id"
     t.integer  "manual_stock_detail_id"
+    t.integer  "shelf_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.integer  "parent_id"
+    t.string   "parent_type"
+    t.date     "expiration_date"
+    t.string   "batch_no"
   end
 
   create_table "stocks", force: true do |t|
