@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :purchase_arrives
+
   resources :up_downloads do
     collection do 
       get 'up_download_import'
@@ -122,7 +124,9 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :purchases do
-    resources :purchase_details
+    resources :purchase_details do
+      resources :purchase_arrives
+    end
       collection do 
       get  'purchase_import'
       post 'purchase_import' => 'purchases#purchase_import'

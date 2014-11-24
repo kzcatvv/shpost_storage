@@ -1,0 +1,2 @@
+module PurchaseArrivesHelper
+end
