@@ -43,3 +43,7 @@ padding-left: 50px;
 #menu li a:hover {
 background-color: #0099CC;
 }
+
+.extra-row {
+  display: none;
+}

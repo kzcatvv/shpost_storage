@@ -18,6 +18,7 @@ class Ability
         #can :manage, User
 
         can :manage, InterfaceInfo
+        can :manage, UpDownload
 
         cannot :resend, InterfaceInfo do |interface_info|
             (interface_info.status == "success")
@@ -51,7 +52,9 @@ class Ability
         cannot :role, User, role: 'superadmin'
         can :role, :unitadmin
         can :role, :user
-
+        can [:read, :up_download_export], UpDownload
+        cannot [:create, :to_import, :up_download_import], UpDownload
+        
         # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
@@ -81,6 +84,9 @@ class Ability
         can :read, Relationship, specification: {commodity: {unit_id: user.unit_id}}
 
         cannot :manage, InterfaceInfo
+
+        can [:read, :up_download_export], UpDownload
+        cannot [:create, :to_import, :up_download_import], UpDownload
 
     else
         cannot :manage, :all
