@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @up_download.name %>
+</p>
+
+<p>
+  <strong>Use:</strong>
+  <%= @up_download.use %>
+</p>
+
+<p>
+  <strong>Desc:</strong>
+  <%= @up_download.desc %>
+</p>
+
+<p>
+  <strong>Ver no:</strong>
+  <%= @up_download.ver_no %>
+</p>
+
+<p>
+  <strong>Url:</strong>
+  <%= @up_download.url %>
+</p>
+
+<p>
+  <strong>Oper date:</strong>
+  <%= @up_download.oper_date %>
+</p>
+
+<%= link_to 'Edit', edit_up_download_path(@up_download) %> |
+<%= link_to 'Back', up_downloads_path %>
