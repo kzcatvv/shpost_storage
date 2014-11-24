@@ -19,4 +19,8 @@ class OrderReturnDetail < ActiveRecord::Base
       false
     end
   end
+
+  def broken?
+    (is_bad.eql? 'yes') ? true : false
+  end
 end
