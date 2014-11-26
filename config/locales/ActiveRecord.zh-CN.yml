@@ -720,6 +720,9 @@ zh-CN:
         keyclientorder:
           name: "订单波次查询"
           link: "/keyclientorders"
+        b2bkeyclientorder:
+          name: "b2b订单波次查询"
+          link: "/keyclientorders/b2bindex"
         orderalert:
           name: "预警订单"
           link: "/orders/order_alert"
