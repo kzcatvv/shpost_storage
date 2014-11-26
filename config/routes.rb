@@ -1,7 +1,20 @@
 ShpostStorage::Application.routes.draw do
 
-  
+  resources :up_downloads do
+    collection do 
+      get 'up_download_import'
+      post 'up_download_import' => 'up_downloads#up_download_import'
+      
+      get 'to_import'
+      
+    end
+    member do
+      get 'up_download_export'
+      post 'up_download_export' => 'up_downloads#up_download_export'
+    end
+  end
 
+  
   resources :manual_stocks do
     collection do 
       get  'manual_stock_import'
@@ -226,8 +239,8 @@ ShpostStorage::Application.routes.draw do
      resources :shelves, :controller => 'area_shelf'
   end
 
-  resources :suppliers do
-     resources :relationships, :controller => 'supplier_relationship'
+  resources :businesses do
+     resources :relationships, :controller => 'business_relationship'
   end
 
   # get 'scans' => 'scans#scans'

@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20141125031134) do
 
   create_table "areas", force: true do |t|
@@ -418,6 +419,17 @@ ActiveRecord::Schema.define(version: 20141125031134) do
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true
+
+  create_table "up_downloads", force: true do |t|
+    t.string   "name"
+    t.string   "use"
+    t.string   "desc"
+    t.string   "ver_no"
+    t.string   "url"
+    t.datetime "oper_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "user_logs", force: true do |t|
     t.integer  "user_id",            default: 0,  null: false

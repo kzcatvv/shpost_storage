@@ -84,39 +84,18 @@ class OrderReturnsController < ApplicationController
     time = Time.now
     # binding.pry
     # @batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + (OrderReturn.select(:batch_no).distinct.count+1).to_s.rjust(5,'0')
-    @order_return=OrderReturn.create(unit_id:current_user.unit_id,storage_id:current_storage.id,status:"waiting")
-    @batchid = @order_return.batch_no
-    params[:cbids].each do |id|
-      reason=params[("rereason_"+id).to_sym]
-      isbad=params[("st_"+id).to_sym]
-        @orderdtl=OrderDetail.find(id)
-        @order=@orderdtl.order
-        if isbad == "否"
-          @order_return_detail=@order_return.order_return_details.build(order_detail_id: id,return_reason: reason,is_bad: 'no',status: 'waiting')
-          @order_return_detail.save
-          stock = Stock.find_stock_in_storage(Specification.find(@orderdtl.specification_id),Supplier.find(@orderdtl.supplier_id),Business.find(@order.business_id),current_storage)
-          op='order_return'
-        else
-          @order_return_detail=@order_return.order_return_details.build(order_detail_id: id,return_reason: reason,is_bad: 'yes',status: 'waiting')
-          @order_return_detail.save
-          stock = Stock.where(business_id: @order.business_id,supplier_id: @orderdtl.supplier_id,specification_id: @orderdtl.specification_id).joins(:shelf).where("shelves.is_bad='yes'").first
-          if stock.nil?
-            sts=current_storage.areas
-            @shelf=Shelf.where("shelves.is_bad='yes'").includes(:area).where(area_id: sts).order("priority_level ASC").first
-            stock=Stock.create(shelf: @shelf,business_id: @order.business_id,supplier_id: @orderdtl.supplier_id,specification_id: @orderdtl.specification_id,batch_no: @orderdtl.batch_no,actual_amount: 0,virtual_amount: 0)
-          end
-          stock=Stock.find(stock)
-          op='order_bad_return'
-        end
+    @order_return = OrderReturn.create(unit_id:current_user.unit_id,storage_id:current_storage.id,status:"waiting")
 
-        stock.update(virtual_amount: @orderdtl.amount+stock.virtual_amount)
-        stklog=StockLog.create(stock: stock, user: current_user, operation: StockLog::OPERATION[op.to_sym], status: StockLog::STATUS[:waiting], amount: @orderdtl.amount, operation_type: StockLog::OPERATION_TYPE[:in])
-        @orderdtl.stock_logs << stklog
-        sl=StockLog.where(id: stklog)
-        sklogs += sl
-      
+    params[:cbids].each do |id|
+      reason = params[("rereason_"+id).to_sym]
+      is_bad = params[("st_"+id).to_sym]
+
+      @order_return.order_return_details.build(order_detail_id: id, return_reason: reason, is_bad: (is_bad.eql? '否') ? 'no' : 'yes', status: 'waiting')
     end
-    @stock_logs = StockLog.where(id: sklogs)
+    
+    Stock.order_return_stock_in(@order_return, current_user)
+
+    @stock_logs = @order_return.stock_logs
 
     @stock_logs_grid = initialize_grid(@stock_logs)
   end

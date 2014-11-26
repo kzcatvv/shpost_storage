@@ -29,8 +29,7 @@
                       supplier_path(supplier),
                        :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, supplier) << ' ' <<
       (link_to t('.contacts', :default => t("helpers.links.contacts")),
-                      supplier_contacts_path(supplier), :class => 'btn btn-xs btn-primary' if can? :contacts, supplier) << ' ' <<
-      (link_to t('.relationships', :default => t("helpers.links.relationships")), supplier_relationships_path(supplier), :class => 'btn btn-xs btn-primary' if can? :supplier_relationships, supplier)
+                      supplier_contacts_path(supplier), :class => 'btn btn-xs btn-primary' if can? :contacts, supplier) 
       end
   end 
 %>
