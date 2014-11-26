@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141120013543) do
+ActiveRecord::Schema.define(version: 20141125031134) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -117,8 +117,6 @@ ActiveRecord::Schema.define(version: 20141120013543) do
     t.integer  "business_id"
   end
 
-  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
-
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -135,6 +133,7 @@ ActiveRecord::Schema.define(version: 20141120013543) do
     t.string   "status"
     t.string   "barcode"
     t.string   "no"
+    t.string   "order_type"
   end
 
   create_table "manual_stock_details", force: true do |t|
@@ -231,9 +230,9 @@ ActiveRecord::Schema.define(version: 20141120013543) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
-    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
+    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -242,7 +241,7 @@ ActiveRecord::Schema.define(version: 20141120013543) do
     t.string   "pingan_ordertime"
     t.string   "pingan_operate"
     t.string   "customer_idnumber"
-    t.string   "tracking_info",     limit: 1000
+    t.string   "tracking_info",     limit: 2000
     t.string   "barcode"
     t.string   "batch_no"
   end
@@ -366,8 +365,6 @@ ActiveRecord::Schema.define(version: 20141120013543) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.integer  "parent_id"
-    t.string   "parent_type"
     t.date     "expiration_date"
     t.string   "batch_no"
   end
