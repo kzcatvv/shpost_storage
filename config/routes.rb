@@ -91,6 +91,10 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :keyclientorders do
+    collection do
+        get 'b2bindex'
+        get 'b2bstockout'
+    end
     resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails
     member do
