@@ -802,15 +802,15 @@ zh-CN:
           needrole:
             can: :read
             role: :InterfaceInfo
-    # up_downloads:
-    #   name: "模板管理"
-    #   needrole:
-    #     can: :read
-    #     role: :UpDownload
-    #   submenu:
-    #     up_download:
-    #       name: "模板上传下载"
-    #       link: "/up_downloads"
+    up_downloads:
+      name: "模板管理"
+      needrole:
+        can: :read
+        role: :UpDownload
+      submenu:
+        up_download:
+          name: "模板上传下载"
+          link: "/up_downloads"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 
