@@ -106,10 +106,14 @@ class Ability
         can :manage, Purchase, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
         can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
+        
+        can :manage, PurchaseArrival, purchase_detail: {purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}}
 
         can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
 
         can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
+
+        can :read, PurchaseArrival, purchase_detail: {purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}}
 
         cannot :close, Purchase do |purchase|
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?

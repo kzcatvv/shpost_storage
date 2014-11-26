@@ -2,7 +2,6 @@ class StockLog < ActiveRecord::Base
   belongs_to :user
   belongs_to :stock
   belongs_to :purchase_detail
-  belongs_to :purchase_arrive
   belongs_to :manual_stock_detail
   belongs_to :keyclientorderdetail
   belongs_to :specification

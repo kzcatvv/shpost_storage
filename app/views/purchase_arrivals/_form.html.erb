@@ -1,4 +1,4 @@
-<%= form_for ([ @purchase, @purchase_detail, @purchase_arrive]), :html => { :class => 'form-horizontal' } do |f| %>
+<%= form_for ([ @purchase_detail, @purchase_arrival]), :html => { :class => 'form-horizontal' } do |f| %>
   <%= f.error_messages %>
   <div class="control-group">
     <%= f.label :arrived_amount, :class => 'control-label' %>
@@ -15,12 +15,12 @@
   <div class="control-group">
     <%= f.label :arrived_date, :class => 'control-label' %>
     <div class="controls">
-      <%= f.date_select  :arrived_date %>
+      <%= f.date_select  :arrived_at %>
     </div>
   </div>
   <%= f.submit nil, :class => 'btn btn-primary' %>
-  <% if can? :index, PurchaseArrive %>
+  <% if can? :index, PurchaseArrival %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-              purchase_purchase_detail_purchase_arrives_path(@purchase), :class => 'btn btn-default' %>
+              purchase_detail_purchase_arrivals_path(@purchase_detail), :class => 'btn btn-default' %>
   <% end %>
 <% end %>

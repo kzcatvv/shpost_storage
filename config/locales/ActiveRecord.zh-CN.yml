@@ -154,6 +154,7 @@ zh-CN:
       pddetails: 商品明细管理
       custorders: 客户明细管理
       purchase_details: 采购明细
+      purchase_arrivals: 采购到达明细
       manual_stock_details: 批量出库明细管理
       order_details: 订单明细管理
       stock_in_purchase: 入库单
@@ -301,6 +302,9 @@ zh-CN:
       purchase_detail:
         one: 采购单明细管理
         other: 采购单明细管理
+      purchase_arrival:
+        one: 采购单到达明细管理
+        other: 采购单到达明细管理
       manual_stock:
         one: 出库单
         other: 出库单
@@ -541,6 +545,11 @@ zh-CN:
         status: "状态"
         status_waiting: "处理中"
         status_stock_in: "完成入库"
+      purchase_arrival:
+        arrived_amount: "到货数量"
+        expiration_date: "保质期"
+        arrived_at: "到货日期"
+        batch_no: "到货批次"
       manual_stock:
         "no": "编号"
         name: "名称"
@@ -793,15 +802,15 @@ zh-CN:
           needrole:
             can: :read
             role: :InterfaceInfo
-    up_downloads:
-      name: "模板管理"
-      needrole:
-        can: :read
-        role: :UpDownload
-      submenu:
-        up_download:
-          name: "模板上传下载"
-          link: "/up_downloads"
+    # up_downloads:
+    #   name: "模板管理"
+    #   needrole:
+    #     can: :read
+    #     role: :UpDownload
+    #   submenu:
+    #     up_download:
+    #       name: "模板上传下载"
+    #       link: "/up_downloads"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 

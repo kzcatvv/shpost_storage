@@ -3,7 +3,7 @@ class Sequence < ActiveRecord::Base
 
   Barcodes = {Shelf: 'SH', Specification: 'SP', Purchase: 'PUR', ManualStock: 'MS', Business: 'BUS', Supplier: 'SUP', OrderReturn: 'OR', Keyclientorder: 'KCO', Order: 'ORD'}
 
-  Batchs = {PurchaseDetail: 'PD', Keyclientorder: 'KCO', Order: 'ORD', OrderReturn: 'OR'}
+  Batchs = {PurchaseArrival: 'PA', PurchaseDetail: 'PD', Keyclientorder: 'KCO', Order: 'ORD', OrderReturn: 'OR'}
 
 
   Barcodes.each_key do |x|
