@@ -90,6 +90,8 @@ function ajaxspecifications() {
     var spid = "#"+data.item.obj+"_specification_id";
     $(spid).val(data.item.id);
   });
+
+
 };
 
 function selfAlert(msgstr,timer){  
