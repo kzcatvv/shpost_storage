@@ -8,10 +8,10 @@
 
 <div>
    <%= label_tag 'name', '扫描69码:', class: 'control-group' %><%= text_field_tag 'b2bos_sixnine_code', nil, class: "controls"%>
-   <%= hidden_field_tag('keyco',@keyco )%>
+   
 </div>
 
-<div>
+<div id="keydtl">
   <table class="table table-striped">
   <thead>
     <tr>
@@ -23,6 +23,7 @@
     </tr>
   </thead>
   <tbody>
+    <%= hidden_field_tag('keyco',@keyco )%>
     <% @key_details_hash.each do |key,value| %>
       <%= content_tag(:tr,content_tag(:td, Specification.find(key[0]).all_name )+
         content_tag(:td, Specification.find(key[0]).sixnine_code )+
