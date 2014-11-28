@@ -1,0 +1,14 @@
+<%- model_class = Keyclientorder -%>
+<div class="page-header">
+  <h1>b2b波次出库</h1>
+  <div style="float:right">   
+      <%= link_to t('.b2bstockoutcheck', :default => t("helpers.links.b2bstockoutcheck")),
+                  b2boutcheck_keyclientorders_path(@keyclientorder),
+                  :class => 'btn btn-primary' %>
+  </div>
+</div>
+<%= render :partial => 'keyclientorders/some_forms' %>
+
+<script language="javascript" type="text/javascript"> 
+
+</script>

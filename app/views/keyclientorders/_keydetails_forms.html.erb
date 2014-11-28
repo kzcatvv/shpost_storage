@@ -1,0 +1,24 @@
+<%- model_class = OrderDetail -%>
+<div>
+  <%= hidden_field_tag('orderid',@curr_order )%>
+  <%= hidden_field_tag('dtlcnt',@dtl_cnt )%>
+  <%= hidden_field_tag('actcnt',@act_cnt )%>
+</div>
+<div>
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:specification_id) %></th>
+      <th>69码</th>
+      <th><%= model_class.human_attribute_name(:amount) %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if !@scanspecification.nil? %>
+      <%= content_tag(:tr,content_tag(:td, @scanspecification.all_name )+
+        content_tag(:td, @scanspecification.sixnine_code )+
+        content_tag(:td, text_field_tag("scandetailam_#{@scanspecification.sixnine_code}", "1", disabled: true) ),id: "tr_scan_#{@scanspecification.sixnine_code}" ) %>
+    <% end %>
+  </tbody>
+</table>
+</div>
