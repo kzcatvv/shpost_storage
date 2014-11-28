@@ -179,6 +179,8 @@ zh-CN:
       relationships: 商品对应关系管理
       up_download_import: 模板上传
       up_download_export: 模板下载
+      b2bstockout: 出库
+      b2bstockoutcheck: 出库确认
 
     titles:
       edit: 编辑%{model}
@@ -592,6 +594,7 @@ zh-CN:
         unit_id: 所属单位
         storage_id: 所属仓库
         business_id: 所属商户
+        status: "状态"
       keyclientorderdetail:
         keyclientorder_id: 订单批次编号
         specification_id: 商品规格

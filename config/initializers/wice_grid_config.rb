@@ -144,4 +144,7 @@ if defined?(Wice::Defaults)
   # popup calendar will be shown relative to the popup trigger element or to the mouse pointer
   Wice::Defaults::POPUP_PLACEMENT_STRATEGY = :trigger # :pointer
 
+  # Wice::Defaults::ADDITIONAL_COLUMN_PROCESSORS = {
+  #   selectin_filter:    ['ViewColumnSelectin',   'ConditionsGeneratorColumnSelectin']
+  # }
 end
