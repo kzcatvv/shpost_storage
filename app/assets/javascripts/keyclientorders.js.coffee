@@ -33,7 +33,7 @@ countscan = ->
 splitanorder = -> 
         $.ajax({
           type : 'GET',
-          url : '/keyclientorders/b2bfind69code/',
-          data: { sixninecode: $('#b2bos_sixnine_code').val(),keyco: $('#keyco').val() },
-          dataType : 'script'
+          url : '/keyclientorders/b2bsplitanorder/',
+          data:  $('#keydtl input[type=\'text\'],#keydtl input[type=\'hidden\']'),
+          dataType : 'json'
           });
