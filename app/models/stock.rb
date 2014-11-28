@@ -72,7 +72,7 @@ class Stock < ActiveRecord::Base
 
           stock.save
 
-          order.stock_logs.build(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+          order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])
 
           if amount <= 0
             break
@@ -84,7 +84,6 @@ class Stock < ActiveRecord::Base
 
   def self.is_enough_stock?(order)
     sum_amount_hash = order.details.group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
-
     sum_amount_hash.each do |x, amount|
       total_amount = total_stock_in_storage(Specification.find(x[0]), Supplier.find(x[1]), Business.find(x[2]), Storage.find(x[3]))
 
