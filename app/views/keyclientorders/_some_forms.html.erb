@@ -1,0 +1,112 @@
+<%- model_class = StockLog -%>
+<!-- <%= form_tag('/stock_logs/updateall', method: :post) do -%> -->
+<!--        <%= autocomplete_field_tag 'shelf_code', '', autocomplete_shelf_shelf_code_shelves_path, {id: "1"} %> -->
+
+<%= grid(@stock_logs_grid, show_filters: :no) do |g|
+
+    g.column do |stock_log|
+      hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}")
+      # if @purchase
+      #   [@purchase.id, {id: "stock_logs_id_#{stock_log.id}"}]
+      # else
+      #   [stock_log.id, {id: "stock_logs_id_#{stock_log.id}"}]
+      # end
+    end
+
+    if @purchase
+      g.column name: model_class.human_attribute_name(:pd_name), attribute: 'name', ordering: false, model: 'PurchaseDetail' do |stock_log|
+        # if stock_log.status == 'waiting'
+          select_tag("stock_logs[][pdid]", options_for_select(PurchaseDetail.accessible_by(current_ability).where(purchase: @purchase).map{|u| [u.batch_no+"_"+u.name,u.id]}, stock_log.purchase_detail_id), id: "stock_logs_pdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name, {id: "stock_logs_pdid_#{stock_log.id}", onclick: 'clickin(this);'})
+        # else
+        #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
+        # end
+      end
+    end
+
+    if @orders
+      g.column name: model_class.human_attribute_name(:kcorder_name), attribute: 'batch_no', ordering: false, model: 'Keyclientorderdetail' do |stock_log|
+        # if stock_log.status == 'waiting'
+        if stock_log.keyclientorderdetail
+          select_tag("stock_logs[][kcdid]", options_for_select(Keyclientorderdetail.accessible_by(current_ability).where(keyclientorder: @orders.first.keyclientorder).map{|u| [u.keyclientorder.keyclient_name+"_"+(u.batch_no==nil ? '' : u.batch_no+"_")+u.specification.name,u.id]}, stock_log.keyclientorderdetail.id), id: "stock_logs_kcdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, stock_log.keyclientorderdetail.keyclientorder.keyclient_name+"_"+(stock_log.keyclientorderdetail.batch_no==nil ? '' : stock_log.keyclientorderdetail.batch_no+"_")+stock_log.keyclientorderdetail.specification.name, {id: "stock_logs_kcdid_#{stock_log.id}", onclick: 'clickin(this);'})
+        else
+          select_tag("stock_logs[][kcdid]", options_from_collection_for_select(@stock_logs, 'id', 'stock_out_name', stock_log.id), id: "stock_logs_kcdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, stock_log.stock_out_name, {id: "stock_logs_kcdid_#{stock_log.id}", onclick: 'clickin(this);'})
+        end
+        # else
+        #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
+        # end
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', ordering: false, model: 'Shelf' do |stock_log|
+      # if stock_log.status == 'waiting'
+        # select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+        content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'}) <<
+        text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")
+
+      # else
+      #   stock_log.stock.shelf.shelf_code
+      # end
+    end
+
+    g.column name: model_class.human_attribute_name(:stock_amount), attribute: 'actual_amount',  ordering: false, model: 'Stock' do |stock_log|
+      # [stock_log.stock.actual_amount,{id: "stock_logs_actamount_#{stock_log.id}"}]
+      content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})
+    end
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount',  ordering: false do |stock_log|
+      # if stock_log.status == 'waiting'
+        text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", style: "display: none; width: 40px;", onblur: 'clickout(this)') <<
+        if stock_log.amount == 0 || (stock_log.operation_type == "out" && stock_log.amount > stock_log.stock.actual_amount)
+          content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);', style: 'background-color: red;'})
+        else
+          content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);'})
+        end
+      # else
+      #   [stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"}]
+      # end
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: true, custom_filter: StockLog::STATUS.invert do |stock_log|
+        [StockLog::STATUS[stock_log.status.to_sym],{id: "stock_logs_status_#{stock_log.id}"}]
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', ordering: false do |stock_log|
+        stock_log.created_at.to_s(:db)
+      end
+
+    g.column name: model_class.human_attribute_name(:checked_at), attribute: 'checked_at', ordering: false do |stock_log|
+        stock_log.checked_at.try :to_s, :db
+    end
+
+    g.column do |stock_log|
+      # if stock_log.status == 'waiting'
+        ActiveSupport::SafeBuffer.new <<
+        (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, id: "stock_logs_checklink_#{stock_log.id}", :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
+          # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
+          # (submit_tag('check!!'))  #<< ' ' <<
+          # (button_tag() do
+          #   content_tag(:strong, 'check')
+          # end)  << ' ' <<
+          # (link_to t('.delete', :default => t("helpers.links.delete")), split_stock_log_path(stock_log.id), :class => 'btn btn-xs btn-primary', id: "test_#{stock_log.id}")
+          (link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'destroy(this)', id: "stock_logs_deletelink_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log)
+      end
+    # end
+  end
+%>
+
+<!-- <%= submit_tag('check!!') %> -->
+
+<!-- <% end -%> -->
+
+  <div style="float:right">
+    <% if can? :new, Stock %>
+      <% if @purchase %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+                   "javascript:void(0)", onclick: "add()",
+                    :class => 'btn btn-primary' %>
+      <% end %>
+    <% end %>
+  </div>

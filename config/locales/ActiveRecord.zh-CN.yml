@@ -181,6 +181,8 @@ zh-CN:
       split: 拆单
       up_download_import: 模板上传
       up_download_export: 模板下载
+      b2bstockout: 出库
+      b2bstockoutcheck: 出库确认
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -601,6 +603,7 @@ zh-CN:
         unit_id: 所属单位
         storage_id: 所属仓库
         business_id: 所属商户
+        status: "状态"
       keyclientorderdetail:
         keyclientorder_id: 订单批次编号
         specification_id: 商品规格
@@ -741,6 +744,9 @@ zh-CN:
         keyclientorder:
           name: "订单波次查询"
           link: "/keyclientorders"
+        b2bkeyclientorder:
+          name: "b2b订单波次查询"
+          link: "/keyclientorders/b2bindex"
         orderalert:
           name: "预警订单"
           link: "/orders/order_alert"
