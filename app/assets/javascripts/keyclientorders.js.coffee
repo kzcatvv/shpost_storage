@@ -35,5 +35,5 @@ splitanorder = ->
           type : 'GET',
           url : '/keyclientorders/b2bsplitanorder/',
           data:  $('#keydtl input[type=\'text\'],#keydtl input[type=\'hidden\']'),
-          dataType : 'json'
+          dataType : 'script'
           });
