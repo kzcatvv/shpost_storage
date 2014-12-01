@@ -247,6 +247,16 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.integer  "parent_id"
   end
 
+  create_table "purchase_arrivals", force: true do |t|
+    t.integer  "arrived_amount"
+    t.date     "expiration_date"
+    t.date     "arrived_at"
+    t.string   "batch_no"
+    t.integer  "purchase_detail_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "purchase_details", force: true do |t|
     t.string   "name",                         default: "", null: false
     t.integer  "purchase_id"

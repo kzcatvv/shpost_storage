@@ -1,0 +1,26 @@
+<%= form_for ([ @purchase_detail, @purchase_arrival]), :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+  <div class="control-group">
+    <%= f.label :arrived_amount, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.number_field  :arrived_amount %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :expiration_date, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.date_select  :expiration_date %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :arrived_at, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.date_select  :arrived_at %>
+    </div>
+  </div>
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <% if can? :index, PurchaseArrival %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+              purchase_detail_purchase_arrivals_path(@purchase_detail), :class => 'btn btn-default' %>
+  <% end %>
+<% end %>

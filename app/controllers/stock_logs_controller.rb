@@ -190,6 +190,10 @@ class StockLogsController < ApplicationController
       @stock_log_new.operation_type = @stock_log.operation_type
       @stock_log_new.desc = @stock_log.desc
       @stock_log_new.stock = @stock_log.stock
+      @stock_log_new.parent_id = @stock_log.parent_id
+      @stock_log_new.parent_type = @stock_log.parent_type
+      @stock_log_new.keyclientorderdetail_id = @stock_log.keyclientorderdetail_id
+      @stock_log_new.manual_stock_detail_id = @stock_log.manual_stock_detail_id
 
       @stock_log_new.save();
 

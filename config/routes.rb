@@ -131,10 +131,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :purchases do
     resources :purchase_details
-      collection do 
+
+    collection do 
       get  'purchase_import'
       post 'purchase_import' => 'purchases#purchase_import'
-      end
+    end
 
     member do
       patch 'onecheck'
@@ -144,6 +145,10 @@ ShpostStorage::Application.routes.draw do
       get "scan"
       post "scan_check"
     end
+  end
+
+  resources :purchase_details do
+    resources :purchase_arrivals
   end
 
   resources :stocks do

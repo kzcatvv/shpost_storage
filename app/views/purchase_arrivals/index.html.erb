@@ -1,0 +1,61 @@
+<%- model_class = PurchaseArrival -%>
+<div class="page-header">
+  <h1><%=@purchase_detail.purchase.name%>-<%=@purchase_detail.name%>-<%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :index, PurchaseArrival %>
+      <%= link_to t('.back', :default => t("helpers.links.back")),
+                 purchase_purchase_details_path(@purchase_detail.purchase),
+                  :class => 'btn btn-primary' %>
+    <% end %>
+    <% if can? :new, PurchaseArrival %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                 new_purchase_detail_purchase_arrival_path(@purchase_detail),
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+
+
+
+<%= grid(@purchase_arrivals_grid) do |g|
+    # g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    # g.column name: model_class.human_attribute_name(:purchase_id), attribute: 'no',
+    # model: 'Purchase' do |purchase_detail|
+    #     purchase_detail.purchase.try :no
+    # end
+
+    # g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name',
+    #  model: 'Supplier' do |purchase_detail|
+    #     purchase_detail.supplier.try :name
+    # end
+
+    # g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name',
+    #     model: 'Specification' do |purchase_detail|
+    #     purchase_detail.specification.try :all_name
+    # end
+
+
+    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
+
+    g.column name: model_class.human_attribute_name(:arrived_amount), attribute: 'arrived_amount', filter: false
+
+    g.column name: model_class.human_attribute_name(:expiration_date), attribute: 'expiration_date'
+   
+    g.column name: model_class.human_attribute_name(:arrived_at), attribute: 'arrived_at'
+
+
+
+    # g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: PurchaseDetail::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |purchase_detail| 
+    #   purchase_detail.status_name
+
+    # end
+
+    g.column do |purchase_arrival|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")), edit_purchase_detail_purchase_arrival_path(@purchase_detail,purchase_arrival), :class => 'btn btn-xs btn-primary' if can? :update, purchase_arrival) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), purchase_detail_purchase_arrival_path(@purchase_detail,purchase_arrival), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, purchase_arrival)
+      end
+  end 
+%>
