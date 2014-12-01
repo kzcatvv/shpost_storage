@@ -1,9 +1,4 @@
 <%- model_class = OrderDetail -%>
-<div>
-  <%= hidden_field_tag('orderid',@curr_order )%>
-  <%= hidden_field_tag('dtlcnt',@dtl_cnt )%>
-  <%= hidden_field_tag('actcnt',@act_cnt )%>
-</div>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -15,6 +10,7 @@
   </thead>
   <tbody>
    <% if !@order_details.nil? %>
+    <%= hidden_field_tag('splitorderid',@order_details.first.order.id )%>
     <% @order_details.each do |orderdtl| %>
       <%= content_tag(:tr,content_tag(:td, orderdtl.name )+
         content_tag(:td, Specification.find(orderdtl.specification_id).all_name )+
@@ -24,5 +20,4 @@
     <% end %>
   <% end %>
   </tbody>
-  <%= label_tag 'split_tracking_number', '面单号:', class: 'control-group' %><%= text_field_tag 'so_tra_num', nil, class: "controls"%><input type="button" id="setsplittrackingnumber" value="设置面单号">
 </table>

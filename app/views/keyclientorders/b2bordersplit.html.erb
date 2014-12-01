@@ -5,7 +5,8 @@
   </div>
 
 </div>
-
+  <%= hidden_field_tag('dtlcnt',@dtl_cnt )%>
+  <%= hidden_field_tag('actcnt',@act_cnt )%>
 <div>
    <%= label_tag 'name', '扫描69码:', class: 'control-group' %><%= text_field_tag 'b2bos_sixnine_code', nil, class: "controls"%>
    
@@ -28,7 +29,7 @@
       <%= content_tag(:tr,content_tag(:td, Specification.find(key[0]).all_name )+
         content_tag(:td, Specification.find(key[0]).sixnine_code )+
         content_tag(:td, text_field_tag("detailam_#{Specification.find(key[0]).sixnine_code}", value, disabled: true) )+
-        content_tag(:td, text_field_tag("scanallam_#{Specification.find(key[0]).sixnine_code}", "0", disabled: true) )+
+        content_tag(:td, text_field_tag("scanallam_#{Specification.find(key[0]).sixnine_code}", @scanall[key], disabled: true) )+
         content_tag(:td, text_field_tag("scancuram_#{Specification.find(key[0]).sixnine_code}", "0", disabled: true) ),id: "tr_#{Specification.find(key[0]).sixnine_code}" ) %>
 
     <% end %>
@@ -36,10 +37,11 @@
 </table>
 <input type="button" id="splitorder" value="包装订单">
 </div>
-<%= label_tag 'scanname', '包装扫描明细:', class: 'control-group' %>
+<%= label_tag 'scanname', '拆单明细:', class: 'control-group' %>
 <div id="splitorders">
   <%= render :partial => 'keyclientorders/keydetails_forms' %>
 </div>
+<%= label_tag 'split_tracking_number', '面单号:', class: 'control-group' %><%= text_field_tag 'so_tra_num', nil, class: "controls"%><input type="button" id="setsptnumber" value="设置面单号" >
 
 
 

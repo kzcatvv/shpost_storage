@@ -441,7 +441,7 @@ class OrdersController < ApplicationController
     status = ["waiting","printed","picking"]
     @orders_grid = initialize_grid(@orders,
       :include => [:business],
-      :conditions => ['order_type = ? and status in (?)',"b2c",status],
+      :conditions => ['order_type = ? and status in (?) and is_parent = ?',"b2c",status,true],
       :per_page => 15)
     @allcnt = {}
     @allcnt.clear
