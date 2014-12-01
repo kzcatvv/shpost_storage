@@ -35,6 +35,13 @@ class Keyclientorder < ActiveRecord::Base
     order_details
   end
 
+  def picking_out
+      self.update(status: STATUS[:picking])
+      self.orders.each do |x|
+        x.set_picking
+      end
+  end
+
   def check_out
     if all_checked?
       self.update(status: STATUS[:checked])
