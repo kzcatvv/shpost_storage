@@ -3,9 +3,11 @@ class Order < ActiveRecord::Base
 	belongs_to :unit
 	belongs_to :storage
   belongs_to :keyclientorder
+  belongs_to :parent, :class_name => 'Order'
   has_many :order_details, dependent: :destroy
   has_many :stock_logs, through: :order_details
   has_many :deliver_notices
+  has_many :children, :class_name => 'Order',:foreign_key => 'parent_id',:dependent => :destroy
 
   # alias :root_order :keyclientorder
   # alias :details :order_details

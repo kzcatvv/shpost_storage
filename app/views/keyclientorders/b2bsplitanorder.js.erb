@@ -1,0 +1,4 @@
+$("input[id^='scancuram_']").each(function(){ 
+  $(this).val(0);  
+});
+$('#splitorders').html(" <%= escape_javascript(render(:partial => "keyclientorders/keydetails_forms",:object => @order_details)) %> ");
