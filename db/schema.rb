@@ -230,9 +230,9 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -376,10 +376,10 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.date     "expiration_date"
-    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+    t.date     "expiration_date"
+    t.string   "batch_no"
   end
 
   create_table "stocks", force: true do |t|
