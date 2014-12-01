@@ -229,6 +229,9 @@ ShpostStorage::Application.routes.draw do
   resources :specification_autocom do
      collection do
         get 'autocomplete_specification_name'
+        get 'sp_autocomplete_specification_name'
+        get 'br_autocomplete_specification_name'
+        
      end
   end
 

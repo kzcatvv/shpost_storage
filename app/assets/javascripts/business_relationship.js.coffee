@@ -2,13 +2,13 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 ready = ->
-  $("#keyclientorderdetail_supplier_id").change(koid)
+  $("#business_relationship_supplier_id").change(brsid)
 
 $(document).ready(ready)
 $(document).on('page:load', ready)
 
-koid= ->
-    $('#sid').val($('#keyclientorderdetail_supplier_id').val());
+brsid= ->
+    $('#sid').val($('#business_relationship_supplier_id').val());
     slid = $('#sid').val();
 
     surl = $('#specification_name').attr('data-autocomplete');
@@ -20,7 +20,7 @@ koid= ->
        url = surl+s+slid
     else
        url = surl.slice(0,indexs)+s+slid
-
+    
     $('#specification_name').attr('data-autocomplete',url);
     
     return false;

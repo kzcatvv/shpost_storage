@@ -27,4 +27,17 @@ module ApplicationHelper
        hidden_field(obj_id.to_sym,"specification_id");
     end
 
+    def sp_product_select_autocom(obj_id,obj)
+       
+       concat text_field_tag('specification_name',@spname, 'data-autocomplete' => "/specification_autocom/sp_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
+       hidden_field(obj_id.to_sym,"specification_id");
+    end
+
+    def br_product_select_autocom(obj_id,obj)
+       
+       concat text_field_tag('specification_name',@spname, 'data-autocomplete' => "/specification_autocom/br_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
+       hidden_field(obj_id.to_sym,"specification_id");
+    end
+
+    
 end
