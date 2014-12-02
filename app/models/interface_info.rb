@@ -1,8 +1,8 @@
 class InterfaceInfo < ActiveRecord::Base
 
   STATUS = { success: '成功', failed: '失败' }
-  CLASS_NAME = { TcbdSoap: '同城速递', GnxbSoap: '国内小包', CSBSendWithSOAP: '号码百事通' }
-  METHOD_NAME = { order_query: '邮件查询', sendPointOrder: '获取积分订单', updatePointOrderStatus: '修改积分订单配送状态', pointOrderStatus: '积分订单状态提交', redealWithSavedOrders: '截取积分订单再处理' }
+  CLASS_NAME = { TcbdSoap: '同城速递', GnxbSoap: '国内小包', CSBSendWithSOAP: '号码百事通', StockMon: '月度库存' }
+  METHOD_NAME = { order_query: '邮件查询', sendPointOrder: '获取积分订单', updatePointOrderStatus: '修改积分订单配送状态', pointOrderStatus: '积分订单状态提交', redealWithSavedOrders: '截取积分订单再处理', stock_mon_cnt: '库存月度汇总' }
   OPERATE_TYPE = {auto: '自动', manual: '手动'}
 
   def self.save_info(class_name,method_name,status='1',url=nil,url_method=nil,url_request=nil,url_response=nil,type,params,info_id)
