@@ -22,6 +22,27 @@ namespace :transmitter do
       end
   end
 
+  namespace :stockcnt do
+    desc "BankComm Transmitter"
+      task :tk_stock_mon_cnt => :environment do
+        generate_params 'transmitter.stockcnt.tk_stock_mon_cnt'
+        # while 1==1 do
+          # @count += 1
+          begin
+            # GnxbSoap.order_query(@uri, @method)
+            InterfaceInfo.send_info(StockMon,"stock_mon_cnt",nil,"auto",nil)
+          rescue Exception => e
+            puts e
+            #Rails.errors e.message
+          ensure
+            ActiveRecord::Base.connection_pool.release_connection
+            # puts "#{@title} : #{@count}"
+          end
+          # sleep @interval
+        #end
+      end
+  end
+
   namespace :gnxb do
     desc "BankComm Transmitter"
       task :order_query => :environment do

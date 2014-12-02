@@ -16,14 +16,16 @@ class OrdersController < ApplicationController
 
   def packaging_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGING_STATUS)
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+        :conditions => ['order_type = ? and is_split = ?',"b2c",false])
 
     render :layout => false
   end
 
   def packaged_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGED_STATUS).where('created_at > ?', Date.today.to_time)
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+      :conditions => ['order_type = ? and is_split = ?',"b2c",false])
 
     render :layout => false
   end
@@ -365,37 +367,38 @@ class OrdersController < ApplicationController
     return mi_cnt
   end
 
-  def ordercheck
+#   def ordercheck
 
-    @keyclientorder=Keyclientorder.find(params[:format])
-    @orders=@keyclientorder.orders
-# b2c
-    @orders.each do |order|
-      order.stock_logs.each do |stlog|
-        stlog.check!
-      end
-      order.stock_out
-    end
-    #b2b
-    if !@keyclientorder.keyclientorderdetails.blank?
-      stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
-      stock_logs.each do |stlog|
-        stlog.check!
-      end
-    end
+#     @keyclientorder=Keyclientorder.find(params[:format])
+#     @orders=@keyclientorder.orders
+# # b2c
+#     @orders.each do |order|
+#       order.stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#       order.stock_out
+#     end
+#     #b2b
+#     if !@keyclientorder.keyclientorderdetails.blank?
+#       stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
+#       stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#     end
 
-    if @keyclientorder.keyclient_name == "auto"
-      redirect_to :action => 'findprintindex'
-    else
-      redirect_to "/keyclientorders"
-    end
-  end
+#     if @keyclientorder.keyclient_name == "auto"
+#       redirect_to :action => 'findprintindex'
+#     else
+#       redirect_to "/keyclientorders"
+#     end
+#   end
 
   def packout
     @order_details=[]
     @curr_order=""
     @orders = Order.where("storage_id = ?", session[:current_storage])
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+      :conditions => ['order_type = ? and is_split = ?',"b2c",false])
   end
 
   def findorderout
@@ -441,11 +444,11 @@ class OrdersController < ApplicationController
     status = ["waiting","printed","picking"]
     @orders_grid = initialize_grid(@orders,
       :include => [:business],
-      :conditions => ['order_type = ? and status in (?) and is_parent = ?',"b2c",status,true],
+      :conditions => ['order_type = ? and status in (?) and is_split = ?',"b2c",status,false],
       :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary
+    @slorders = initialize_grid(@orders, :include => [:business], :conditions => ['order_type = ? and status in (?) and is_split = ?',"b2c",status,false]).resultset.limit(nil).to_ary
     @selectorders=Order.where(id: @slorders)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?

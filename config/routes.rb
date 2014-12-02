@@ -58,7 +58,7 @@ ShpostStorage::Application.routes.draw do
      collection do
         get 'findprint'
         get 'stockout'
-        get 'ordercheck'
+        # get 'ordercheck'
         get 'nextbatch'
         get 'packout'
         get 'packaging_index'
@@ -99,6 +99,7 @@ ShpostStorage::Application.routes.draw do
         get 'b2bfind69code'
         get 'b2bsplitanorder'
         get 'b2bsettrackingnumber'
+        get 'ordercheck'
     end
     resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails
@@ -243,9 +244,11 @@ ShpostStorage::Application.routes.draw do
   resources :specification_autocom do
      collection do
         get 'autocomplete_specification_name'
-        get 'sp_autocomplete_specification_name'
+        get 'pd_autocomplete_specification_name'
         get 'br_autocomplete_specification_name'
-        
+        get 'ko_autocomplete_specification_name'
+        get 'os_autocomplete_specification_name'
+        get 'ms_autocomplete_specification_name'
      end
   end
 
@@ -259,6 +262,9 @@ ShpostStorage::Application.routes.draw do
 
   # get 'scans' => 'scans#scans'
   # post 'scans_check' => 'scans#scans_check'
+
+  # report
+  match "/shpost_storage/report/purchase_arrival_report" => "report#purchase_arrival_report", via: [:get, :post]
 
   #stabdar_interface
   match "/shpost_storage/standard_interface/commodity_enter" => "standard_interface#commodity_enter", via: [:get, :post]

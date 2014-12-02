@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141202031756) do
+ActiveRecord::Schema.define(version: 20141202085706) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -250,8 +250,12 @@ ActiveRecord::Schema.define(version: 20141202031756) do
     t.string   "barcode"
     t.string   "batch_no"
     t.integer  "parent_id"
+<<<<<<< HEAD
     t.boolean  "is_parent",                      default: false
     t.float    "volume"
+=======
+    t.boolean  "is_split",                       default: false
+>>>>>>> eb442838d93ea41f3548347f30ac32e8804575e8
   end
 
   create_table "purchase_arrivals", force: true do |t|
@@ -388,6 +392,17 @@ ActiveRecord::Schema.define(version: 20141202031756) do
     t.string   "parent_type"
     t.date     "expiration_date"
     t.string   "batch_no"
+  end
+
+  create_table "stock_mons", force: true do |t|
+    t.string   "summ_date"
+    t.integer  "storage_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.integer  "amount"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "stocks", force: true do |t|

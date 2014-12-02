@@ -2,27 +2,35 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 ready = ->
-  $("#business_relationship_supplier_id").change(brsid)
-  if $('#business_relationship_supplier_id').val()!=null
-     brsid
+  $("#relationship_supplier_id").change(brsid)
+  brsid()
 
-$(document).ready(ready)
-$(document).on('page:load', ready)
+$ ->
+  ready()
+
+$(document).on "page:load",->
+  ready()
 
 brsid= ->
-    $('#sid').val($('#business_relationship_supplier_id').val());
-    slid = $('#sid').val();
+    $('#br_sid').val($('#relationship_supplier_id').val());
+    brid = $('#br_sid').val();
 
-    surl = $('#specification_name').attr('data-autocomplete');
+    surl = $('#br_specification_name').attr('data-autocomplete');
+
+    
     
     s = '&supplierid=';
     indexs = surl.lastIndexOf(s);
-
+    
+    
     if indexs <0
-       url = surl+s+slid
+       url = surl+s+brid
+       
     else
-       url = surl.slice(0,indexs)+s+slid
+       url = surl.slice(0,indexs)+s+brid
     
-    $('#specification_name').attr('data-autocomplete',url);
     
+     
+    $('#br_specification_name').attr("data-autocomplete",url);
+
     return false;

@@ -54,7 +54,7 @@ class Order < ActiveRecord::Base
   end
 
   def parent_type_name
-     if is_parent
+     if is_split
         name = "是"
      else
         name = "否"

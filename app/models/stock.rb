@@ -23,7 +23,7 @@ class Stock < ActiveRecord::Base
       x.purchase_arrivals.each do |arrival|
       # while x.waiting_amount > 0
         while arrival.waiting_amount > 0
-          stock = Stock.get_available_stock(x.specification, x.supplier, purchase.business, arrival.batch_no, purchase.storage, false)
+          stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, arrival.batch_no, purchase.storage, false)
           
           stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
           stock.expiration_date = arrival.expiration_date
