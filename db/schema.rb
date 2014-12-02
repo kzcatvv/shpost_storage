@@ -250,12 +250,8 @@ ActiveRecord::Schema.define(version: 20141202085706) do
     t.string   "barcode"
     t.string   "batch_no"
     t.integer  "parent_id"
-<<<<<<< HEAD
-    t.boolean  "is_parent",                      default: false
-    t.float    "volume"
-=======
     t.boolean  "is_split",                       default: false
->>>>>>> eb442838d93ea41f3548347f30ac32e8804575e8
+    t.float    "volume"
   end
 
   create_table "purchase_arrivals", force: true do |t|
