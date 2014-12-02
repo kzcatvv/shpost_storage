@@ -3,6 +3,8 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 ready = ->
   $("#business_relationship_supplier_id").change(brsid)
+  if $('#business_relationship_supplier_id').val()!=null
+     brsid
 
 $(document).ready(ready)
 $(document).on('page:load', ready)

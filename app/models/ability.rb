@@ -32,11 +32,11 @@ class Ability
         can :manage, Goodstype, unit_id: user.unit_id
         can :manage, Commodity, unit_id: user.unit_id
         can :manage, Specification, commodity: {unit_id: user.unit_id}
-        can :new, Relationship
+        # can :new, Relationship
 
         can [:autocomplete_specification_name,:sp_autocomplete_specification_name,:br_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
 
-        can [:manage,:autocomplete_specification_name,:br_autocomplete_specification_name], Relationship, specification: {commodity: {unit_id: user.unit_id}}
+        can [:manage,:autocomplete_specification_name,:br_autocomplete_specification_name], Relationship, business: {unit_id: user.unit_id}
 
         can [:read, :update], Unit, id: user.unit_id
         can :manage, Sequence, id: user.unit_id
@@ -83,7 +83,7 @@ class Ability
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
 
-        can :read, Relationship, specification: {commodity: {unit_id: user.unit_id}}
+        can :read, Relationship, business: {unit_id: user.unit_id}
 
         cannot :manage, InterfaceInfo
 
