@@ -21,7 +21,8 @@ class ManualStockDetail < ActiveRecord::Base
   end
 
   def waiting_amount
-    self.amount - stock_logs.sum(:amount)
+    # self.amount - stock_logs.sum(:amount)
+    self.amount - self.checked_amount
   end
 
   def stock_out
@@ -37,7 +38,7 @@ class ManualStockDetail < ActiveRecord::Base
   end
 
   def checked_amount
-    self.stock_logs.to_a.sum{|x| x.checked? ? x.amount : 0}
+    self.manual_stock.stock_logs.where(business_id: self.manual_stock.business_id, supplier_id: self.supplier_id, specification_id: self.specification_id).to_a.sum{|x| x.checked? ? x.amount : 0}
   end
 
   # def set_batch_no

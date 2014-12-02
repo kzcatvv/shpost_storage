@@ -20,15 +20,18 @@ class Stock < ActiveRecord::Base
 
   def self.purchase_stock_in(purchase, operation_user = nil)
     purchase.purchase_details.each do |x|
-      while x.waiting_amount > 0
-        stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, x.batch_no, purchase.storage, false)
-        
-        stock_in_amount = stock.stock_in_amount(x.waiting_amount)
-        stock.expiration_date = x.expiration_date
+      x.purchase_arrivals.each do |arrival|
+      # while x.waiting_amount > 0
+        while arrival.waiting_amount > 0
+          stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, arrival.batch_no, purchase.storage, false)
+          
+          stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
+          stock.expiration_date = arrival.expiration_date
 
-        stock.save
+          stock.save
 
-        purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
+          purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
+        end
       end
     end
   end

@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20141202025019) do
 
   create_table "areas", force: true do |t|
@@ -205,7 +206,7 @@ ActiveRecord::Schema.define(version: 20141202025019) do
   end
 
   create_table "orders", force: true do |t|
-    t.string   "no",                             default: "",    null: false
+    t.string   "no",                             default: ""
     t.string   "order_type"
     t.string   "need_invoice"
     t.string   "customer_name"
@@ -256,6 +257,7 @@ ActiveRecord::Schema.define(version: 20141202025019) do
     t.integer  "purchase_detail_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "status"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -377,6 +379,7 @@ ActiveRecord::Schema.define(version: 20141202025019) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
+<<<<<<< HEAD
     t.date     "expiration_date"
     t.string   "batch_no"
     t.integer  "parent_id"
@@ -392,6 +395,10 @@ ActiveRecord::Schema.define(version: 20141202025019) do
     t.integer  "amount"
     t.datetime "created_at"
     t.datetime "updated_at"
+=======
+    t.integer  "parent_id"
+    t.string   "parent_type"
+>>>>>>> efd3f3b84c9507bbbdef355cd78c790fe1324ea5
   end
 
   create_table "stocks", force: true do |t|
@@ -443,6 +450,17 @@ ActiveRecord::Schema.define(version: 20141202025019) do
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true
+
+  create_table "up_downloads", force: true do |t|
+    t.string   "name"
+    t.string   "use"
+    t.string   "desc"
+    t.string   "ver_no"
+    t.string   "url"
+    t.datetime "oper_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "user_logs", force: true do |t|
     t.integer  "user_id",            default: 0,  null: false

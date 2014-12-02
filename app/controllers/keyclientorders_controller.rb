@@ -180,6 +180,34 @@ class KeyclientordersController < ApplicationController
     end
   end
 
+  def ordercheck
+
+    @keyclientorder=Keyclientorder.find(params[:format])
+    @keyclientorder.check!
+    
+#     @orders=@keyclientorder.orders
+# # b2c
+#     @orders.each do |order|
+#       order.stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#       order.stock_out
+#     end
+#     #b2b
+#     if !@keyclientorder.keyclientorderdetails.blank?
+#       stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
+#       stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#     end
+
+    if @keyclientorder.keyclient_name == "auto"
+      redirect_to :action => 'findprintindex'
+    else
+      redirect_to "/keyclientorders"
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_keyclientorder

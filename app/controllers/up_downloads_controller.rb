@@ -75,9 +75,15 @@ class UpDownloadsController < ApplicationController
   def upload_up_download(file)
      if !file.original_filename.empty?
        direct = "#{Rails.root}/public/download/"
+       
+       if !File.exist?(direct)
+           Dir.mkdir(direct)          
+       end
+
        filename = "#{Time.now.strftime("%Y-%m-%d %H:%m:%S")}_#{file.original_filename}"
 
        file_path = direct + filename
+       
        File.open(file_path, "wb") do |f|
           f.write(file.read)
        end

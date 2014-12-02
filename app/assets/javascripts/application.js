@@ -44,6 +44,23 @@ function ajaxspecifications() {
    return false;
   });
 
+  /*$('#relationship_business_id').change(function(){
+
+    $('#bid').val($('#relationship_business_id').val());
+    alert($('#bid').val());
+    $('#specification_name').attr('data-autocomplete','/specification_autocom/autocomplete_specification_name?objid=#{obj_id}&businessid='+$('#bid').val()+'&supplierid=#{supplier_id}');
+
+    return false;
+  });
+
+  $('#relationship_supplier_id').change(function(){
+
+    $('#sid').val($('#relationship_supplier_id').val());
+    alert($('#sid').val());
+    $('#specification_name').attr('data-autocomplete','/specification_autocom/autocomplete_specification_name?objid=#{obj_id}&businessid='+$('#bid').val()+'&supplierid='+$('#sid').val()+'');
+    return false;
+  });*/
+
   $('#return_reason').change(function(){
    if ($('#return_reason').val() == "其他")
    {

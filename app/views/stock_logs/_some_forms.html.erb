@@ -16,8 +16,8 @@
     if @purchase
       g.column name: model_class.human_attribute_name(:pd_name), attribute: 'name', ordering: false, model: 'PurchaseDetail' do |stock_log|
         # if stock_log.status == 'waiting'
-          select_tag("stock_logs[][pdid]", options_for_select(PurchaseDetail.accessible_by(current_ability).where(purchase: @purchase).map{|u| [u.batch_no+"_"+u.specification.name,u.id]}, stock_log.purchase_detail_id), id: "stock_logs_pdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
-          content_tag(:p, stock_log.purchase_detail.batch_no+"_"+stock_log.specification.name, {id: "stock_logs_pdid_#{stock_log.id}", onclick: 'clickin(this);'})
+          # select_tag("stock_logs[][pdid]", options_for_select(PurchaseDetail.accessible_by(current_ability).where(purchase: @purchase).map{|u| [u.batch_no+"_"+u.specification.name,u.id]}, stock_log.purchase_detail_id), id: "stock_logs_pdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, stock_log.batch_no+"_"+stock_log.specification.name, {id: "stock_logs_pdid_#{stock_log.id}", onclick: 'clickin(this);'})
         # else
         #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
         # end
@@ -84,7 +84,7 @@
     g.column do |stock_log|
       # if stock_log.status == 'waiting'
         ActiveSupport::SafeBuffer.new <<
-        (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, id: "stock_logs_checklink_#{stock_log.id}", :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
+        # (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, id: "stock_logs_checklink_#{stock_log.id}", :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
           # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
           # (submit_tag('check!!'))  #<< ' ' <<
           # (button_tag() do
