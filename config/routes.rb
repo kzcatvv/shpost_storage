@@ -97,6 +97,8 @@ ShpostStorage::Application.routes.draw do
         get 'b2boutcheck'
         get 'b2bordersplit'
         get 'b2bfind69code'
+        get 'b2bsplitanorder'
+        get 'b2bsettrackingnumber'
     end
     resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails

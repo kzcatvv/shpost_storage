@@ -55,8 +55,9 @@ class Purchase < ActiveRecord::Base
     self.status.eql? STATUS[:closed]
   end
 
-  def find_details(business_id,supplier_id,specification_id)
-    self.purchase_details.where(supplier: supplier_id, specification: specification_id)
+
+  def stock_in_amount(purchase_detail)
+    self.stock_logs.where(specification: purchase_detail.specification, supplier: purchase_detail.supplier, business: self.business, storage: storage).sum(:amount)
   end
 end
 

@@ -93,6 +93,7 @@ class KeyclientordersController < ApplicationController
       #binding.pry
       @keyclientorder = Keyclientorder.find(params[:format])
       Stock.order_stock_out(@keyclientorder, current_user)
+      @keyclientorder.picking_out
       @stock_logs = @keyclientorder.stock_logs
       @stock_logs_grid = initialize_grid(@stock_logs)
   end
@@ -116,7 +117,11 @@ class KeyclientordersController < ApplicationController
   def b2bordersplit
       @keyclientorder=Keyclientorder.find(params[:format])
       @keyco=@keyclientorder.id
-      @key_details_hash = @keyclientorder.details.group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      @key_details_hash = @keyclientorder.orders.first.order_details.includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      ors = @keyclientorder.orders.where("is_parent = ?",false)
+      @scanall = OrderDetail.where(order_id: ors).includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      @dtl_cnt = @key_details_hash.length
+      @act_cnt = 0
   end
 
   def b2bfind69code
@@ -140,6 +145,36 @@ class KeyclientordersController < ApplicationController
        @curr_sixnine=@scanspecification.sixnine_code
     end
 
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def b2bsplitanorder
+    @keyclientorder = Keyclientorder.find(params[:keyco])
+    parentorder = @keyclientorder.orders.first
+    parentorder.update_attribute(:is_parent,true)
+    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id)
+    ods = parentorder.order_details
+    ods.each do |od|
+      curr_specification = Specification.find(od.specification_id)
+      scanlabal = "scancuram_" + curr_specification.sixnine_code
+      if Integer(params[scanlabal.to_sym]) > 0
+        childorder.order_details.create(name: od.name,specification_id: od.specification_id,amount: params[scanlabal.to_sym],batch_no: od.batch_no,supplier_id: od.supplier_id)
+      end
+    end
+    #binding.pry
+    @order_details = childorder.order_details
+
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def b2bsettrackingnumber
+    @curr_or = Order.find(params[:split_order])
+    @curr_or.update_attribute(:tracking_number,params[:split_tracking_num])
+    @curr_or.b2bsetsplitstatus
     respond_to do |format|
       format.js 
     end

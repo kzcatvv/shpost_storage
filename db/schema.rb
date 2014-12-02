@@ -245,6 +245,7 @@ ActiveRecord::Schema.define(version: 20141201104252) do
     t.string   "barcode"
     t.string   "batch_no"
     t.integer  "parent_id"
+    t.boolean  "is_parent",                      default: false
   end
 
   create_table "purchase_arrivals", force: true do |t|
@@ -381,6 +382,8 @@ ActiveRecord::Schema.define(version: 20141201104252) do
     t.integer  "specification_id"
     t.integer  "parent_id"
     t.string   "parent_type"
+    t.date     "expiration_date"
+    t.string   "batch_no"
   end
 
   create_table "stocks", force: true do |t|

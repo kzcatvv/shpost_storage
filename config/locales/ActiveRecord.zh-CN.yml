@@ -183,6 +183,7 @@ zh-CN:
       up_download_export: 模板下载
       b2bstockout: 出库
       b2bstockoutcheck: 出库确认
+      b2bordersplit: 拆单
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -514,6 +515,7 @@ zh-CN:
         city: "市"
         county: "区"
         tracking_number: "面单号"
+        is_parent: "是否主订单"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        

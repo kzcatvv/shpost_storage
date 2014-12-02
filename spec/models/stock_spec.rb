@@ -24,7 +24,7 @@ describe Stock do
     storage = Storage.find 1
     batch_no = '00002'
     # amount = 100
-    stock = Stock.get_available_stock(specification, supplier, business, batch_no, storage)
+    stock = Stock.get_available_stock_in_storage(specification, supplier, business, batch_no, storage)
     # stocks.each do |stock|
     expect(stock).to be_a(Stock)
     expect(stock).to be_persisted
@@ -32,7 +32,7 @@ describe Stock do
     expect(stock.business).to eq(business)
     expect(stock.supplier).to eq(supplier)
     expect(stock.shelf.shelf_code).to eq("A2-01-01-01-02")
-    expect(stock.is_available?)#.to be true
+    expect(stock.shelf.is_available?)#.to be true
   end
 
   it "get available stock with same specification, business, supplier" do
@@ -42,7 +42,7 @@ describe Stock do
     batch_no = '00003'
     storage = Storage.find 1
     # amount = 100
-    stock = Stock.get_available_stock(specification, supplier, business, batch_no, storage)
+    stock = Stock.get_available_stock_in_storage(specification, supplier, business, batch_no, storage)
     # stocks.each do |stock|
     expect(stock).to be_a(Stock)
     expect(stock).to be_persisted
@@ -50,7 +50,7 @@ describe Stock do
     expect(stock.business).to eq(business)
     expect(stock.supplier).to eq(supplier)
     expect(stock.shelf.shelf_code).to eq("A2-01-01-01-01")
-    expect(stock.is_available?)#.to be true
+    expect(stock.shelf.is_available?)#.to be true
   end
 
   it "get available stock with different specification or business or supplier" do
@@ -60,7 +60,7 @@ describe Stock do
     batch_no = '00003'
     storage = Storage.find 1
     # amount = 100
-    stock = Stock.get_available_stock(specification, supplier, business, batch_no, storage)
+    stock = Stock.get_available_stock_in_storage(specification, supplier, business, batch_no, storage)
     # stocks.each do |stock|
     expect(stock).to be_a(Stock)
     expect(stock).to be_persisted
@@ -68,7 +68,7 @@ describe Stock do
     expect(stock.business).to eq(business)
     expect(stock.supplier).to eq(supplier)
     expect(stock.shelf.shelf_code).to eq("A2-01-01-02-01")
-    expect(stock.is_available?)#.to be true
+    expect(stock.shelf.is_available?)#.to be true
   end
 
   # it "is_available" do

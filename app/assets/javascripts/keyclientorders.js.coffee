@@ -11,6 +11,10 @@ enterpress = (e) ->
 dosplit = ->
   splitanorder()
   return false;
+
+donumber = ->
+  settrackingnumber()
+  return false;
     
 $ ->
   ready()
@@ -21,6 +25,7 @@ $(document).on "page:load",->
 ready = ->
   $("#b2bos_sixnine_code").keypress(enterpress)
   $("#splitorder").click(dosplit)
+  $("#setsptnumber").click(donumber)
 
 countscan = -> 
         $.ajax({
@@ -35,5 +40,13 @@ splitanorder = ->
           type : 'GET',
           url : '/keyclientorders/b2bsplitanorder/',
           data:  $('#keydtl input[type=\'text\'],#keydtl input[type=\'hidden\']'),
-          dataType : 'json'
+          dataType : 'script'
+          });
+
+settrackingnumber = -> 
+        $.ajax({
+          type : 'GET',
+          url : '/keyclientorders/b2bsettrackingnumber/',
+          data: { split_tracking_num: $('#so_tra_num').val(),keyco: $('#keyco').val(),split_order: $('#splitorderid').val() },
+          dataType : 'script'
           });

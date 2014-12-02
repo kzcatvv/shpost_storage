@@ -35,6 +35,8 @@ class Order < ActiveRecord::Base
 
   SHORTAGE_TYPE = { yes: '是', no: '否' }
 
+  PARENT_TYPE = { true: '否', false: '是'}
+
   def type_name
     order_type.blank? ? "" : self.class.human_attribute_name("order_type_#{order_type}")
   end
@@ -48,8 +50,16 @@ class Order < ActiveRecord::Base
   end
 
   def shortage_type_name
-    is_shortage.blank? ? "" : Order::STATUS_SHOW["#{is_shortage}".to_sym]
+    is_shortage.blank? ? "" : Order::SHORTAGE_TYPE["#{is_shortage}".to_sym]
   end
+
+  def parent_type_name
+     if is_parent
+        name = "是"
+     else
+        name = "否"
+     end
+   end
 
   def checked_amount
     self.stock_logs.where("operation <> 'order_return'").to_a.sum{|x| x.checked? ? x.amount : 0}
@@ -112,6 +122,24 @@ class Order < ActiveRecord::Base
         return true
       end
     end
+  end
+
+  def b2bsetsplitstatus
+    self.update(status: STATUS[:packed])
+
+    if self.b2b_can_update_parent
+      self.parent.update(status: STATUS[:packed])
+      self.parent.keyclientorder.update(status: STATUS[:packed])
+    end
+  end
+
+  def b2b_can_update_parent
+    self.parent.children.each do |x|
+      if x.status != "packed"
+        return false
+      end
+    end
+    return true
   end
 
   protected
