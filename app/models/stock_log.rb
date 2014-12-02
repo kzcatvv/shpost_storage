@@ -10,6 +10,9 @@ class StockLog < ActiveRecord::Base
   belongs_to :supplier
 
   has_one :shelf, through: :stock
+  has_one :area, through: :shelf
+  has_one :storage, through: :shelf
+  has_one :unit, through: :shelf
   has_and_belongs_to_many :order_details
   has_many :orders, through: :order_details
   # has_many :keyclientorders, through: :orders
@@ -40,7 +43,7 @@ class StockLog < ActiveRecord::Base
   def stock_out_name
     # stock_log : order_detail = N:1
     # self.order_details.first.specification.name + "_" + self.order_details.first.order.no
-    self.order_details.first.specification.name
+    self.specification.name
   end
 
   def set_desc

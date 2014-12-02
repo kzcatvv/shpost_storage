@@ -81,7 +81,7 @@ class Stock < ActiveRecord::Base
   def self.stock_out(order, operation_user = nil)
     order.waiting_amounts.each do |x, amount|
       if amount > 0
-        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), Supplier.find(x[1]), Business.find(x[2]), order.storage).to_ary
+        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage).to_ary
 
         stocks_in_storage.each do |stock|
           out_amount = stock.stock_out_amount(amount)
@@ -102,7 +102,7 @@ class Stock < ActiveRecord::Base
 
   def self.is_enough_stock?(order)
     order.waiting_amounts.each do |x, amount|
-      total_amount = total_stock_in_storage(Specification.find(x[0]), Supplier.find(x[1]), Business.find(x[2]), order.storage)
+      total_amount = total_stock_in_storage(Specification.find(x[0]), x[1].blank? ? nil, Business.find(x[2]), order.storage)
 
       if total_amount < amount
         return false

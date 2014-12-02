@@ -77,4 +77,11 @@ class InterfaceInfo < ActiveRecord::Base
       end
     end
   end
+
+  def self.auto_resend()
+    failed_interfaces = InterfaceInfo.where("status <> ? and operate_times < ?","success",StorageConfig.config["interface_info"]['auto_resend_times'])
+    failed_interfaces.each do |interface|
+      InterfaceInfo.resend(interface.id)
+    end
+  end
 end

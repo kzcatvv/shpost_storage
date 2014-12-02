@@ -16,7 +16,7 @@ class CSBSendWithSOAP
           context = JSON.parse(ary[0].split(/\n/)[0])
           business = Business.find ary[1].split(/\n/)[0]
           unit = Unit.find ary[2].split(/\n/)[0]
-          order = StandardInterface.order_enter(context,business,unit)
+          order = StandardInterface.order_enter(context,business,unit,true)
           # if order.class is Order, means this order was saved into Order table. otherwise was saved into file
           if order.class == Order
             File.delete(file_path)
@@ -537,7 +537,7 @@ class CSBSendWithSOAP
 
       order_hash.store('ORDER_DETAILS', order_details)
       # puts order_hash
-      order = StandardInterface.order_enter(order_hash, Business.find_by(no: StorageConfig.config["business"]['bst_id']), Unit.find_by(no: StorageConfig.config["unit"]['zb_id']))
+      order = StandardInterface.order_enter(order_hash, Business.find_by(no: StorageConfig.config["business"]['bst_id']), Unit.find_by(no: StorageConfig.config["unit"]['zb_id']), true)
       if !order.blank?
         orderTransStatus << orderId
           rowsum += 1

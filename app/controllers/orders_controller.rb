@@ -309,6 +309,7 @@ class OrdersController < ApplicationController
 
   def stockout
     begin
+    Order.transaction do
       @keyclientorder = Keyclientorder.find(params[:format])
 
       Stock.order_stock_out(@keyclientorder, current_user)
@@ -319,11 +320,12 @@ class OrdersController < ApplicationController
 
       @stock_logs = @keyclientorder.stock_logs
       @stock_logs_grid = initialize_grid(@stock_logs)
+    end
     rescue Exception => e
       Rails.logger.error e.backtrace
       flash[:alert] = e.message
       redirect_to :action => 'findprintindex'
-      raise ActiveRecord::Rollback
+      # raise ActiveRecord::Rollback
     end
   end
 

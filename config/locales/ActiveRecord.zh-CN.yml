@@ -819,6 +819,12 @@ zh-CN:
         up_download:
           name: "模板上传下载"
           link: "/up_downloads"
+    reports:
+      name: "报表汇总"
+      submenu:
+        purchase_arrival_report:
+          name: "补货订单汇总"
+          link: "/shpost_storage/report/purchase_arrival_report"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 

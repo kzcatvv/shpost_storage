@@ -3,7 +3,7 @@ class PurchaseDetail < ActiveRecord::Base
 	belongs_to :supplier
 	belongs_to :purchase
   has_one :unit, through: :purchase
-  # has_many :stock_logs, dependent: :destroy
+  has_many :stock_logs, dependent: :destroy
   has_many :purchase_arrivals, dependent: :destroy
 
   # before_validation :set_batch_no

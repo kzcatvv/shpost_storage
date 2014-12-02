@@ -1,5 +1,15 @@
 namespace :transmitter do
 
+  namespace :interface do
+    desc "Auto resend the failed interface"
+      task :auto_resend => :environment do
+        generate_params 'transmitter.interface.auto_resend'
+
+        InterfaceInfo.auto_resend()
+
+      end
+  end
+
   namespace :tcbd do
     desc "BankComm Transmitter"
       task :order_query => :environment do

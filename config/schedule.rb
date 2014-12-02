@@ -54,4 +54,8 @@ end
 every 12.hours do
   rake "transmitter:tcbd:order_query"
 end
+
+every 1.hours do
+  rake "transmitter:interface:auto_resend"
+end
 # Learn more: http://github.com/javan/whenever

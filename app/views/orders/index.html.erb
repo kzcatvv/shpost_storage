@@ -124,7 +124,7 @@
       order.shortage_type_name
     end
 
-    g.column name: model_class.human_attribute_name(:is_parent), attribute: 'is_parent', filter_type: :boolean do |order| 
+    g.column name: model_class.human_attribute_name(:is_split), attribute: 'is_split', filter_type: :boolean do |order| 
       order.parent_type_name
     end
    
