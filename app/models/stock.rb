@@ -59,9 +59,9 @@ class Stock < ActiveRecord::Base
     broken_stock.check_in_amount(amount)
     broken_stock.save
 
-    StockLog.create(user: current_user, stock: stock, operation:  StockLog::OPERATION[:move_to_bad], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now)
+    StockLog.create(user: operation_user, stock: stock, operation:  StockLog::OPERATION[:move_to_bad], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now)
 
-    StockLog.create(user: current_user, stock: broken_stock, operation:  StockLog::OPERATION[:bad_stock_in], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now)
+    StockLog.create(user: operation_user, stock: broken_stock, operation:  StockLog::OPERATION[:bad_stock_in], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now)
   end
 
   def self.manual_stock_stock_out(manual_stock, operation_user = nil)
