@@ -4,6 +4,8 @@
 ready = ->
   $("#purchase_detail_supplier_id").change(pdsid)
 
+  pdsid
+
 $(document).ready(ready)
 $(document).on('page:load', ready)
 
@@ -20,7 +22,8 @@ pdsid= ->
        url = surl+s+slid
     else
        url = surl.slice(0,indexs)+s+slid
-
+       
+    #alert(url);
     $('#specification_name').attr('data-autocomplete',url);
     
     return false;

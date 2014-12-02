@@ -28,9 +28,9 @@ class BusinessRelationshipController < ApplicationController
   # POST /relationships
   # POST /relationships.json
   def create
-    binding.pry
+    #binding.pry
     #@relationship = Relationship.new(relationship_params)
-    @relationship.specification_id = params[:specification_id][:id]
+    #@relationship.specification_id = params[:specification_id][:id]
     respond_to do |format|
       if @relationship.save
         #format.html { redirect_to @relationship, notice: I18n.t('controller.create_success_notice', model: '对应关系')}

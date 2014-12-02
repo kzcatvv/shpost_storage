@@ -21,24 +21,6 @@ class SpecificationAutocomController < ApplicationController
 
   end
 
-  def sl_autocomplete_specification_name
-    term = params[:term]
-    obj_id = params[:objid]
-    #binding.pry
-    obj = params[:obj]
-    supplier_id = params[:supplierid]
-
-    
-    business_id = Purchase.where('id= ?',"#{obj}").select(:business_id)
-    si=Relationship.joins(:specification).where('relationships.business_id= ? and relationships.supplier_id= ? and ( specifications.sixnine_code like ? or specifications.sku like ? or specifications.all_name like ? )',"#{business_id}","#{supplier_id}","%#{term}%","%#{term}%","%#{term}%").select(:specification_id)
-
-    specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
-
-    # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
-
-  end
-
   def br_autocomplete_specification_name
     term = params[:term]
     obj_id = params[:objid]
