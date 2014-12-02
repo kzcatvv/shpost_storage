@@ -18,13 +18,14 @@ kosid= ->
   surl = $('#ko_specification_name').attr('data-autocomplete');
     
   s = '&supplierid=';
-  indexs = surl.lastIndexOf(s);
+  if surl != undefined
+    indexs = surl.lastIndexOf(s);
 
-  if indexs <0
-    url = surl + s + koid
-  else
-    url = surl.slice(0,indexs) + s + koid
+    if indexs <0
+      url = surl + s + koid
+    else
+      url = surl.slice(0,indexs) + s + koid
 
-  $('#ko_specification_name').attr('data-autocomplete',url);
+    $('#ko_specification_name').attr('data-autocomplete',url);
     
   #return false;

@@ -24,14 +24,16 @@ pdsid = ->
 
   #alert("purchase");
     
-  s = '&supplierid=';
-  indexs = surl.lastIndexOf(s);
+  s = "&supplierid=";
 
-  if indexs <0
-    url = surl + s + supplier_id
-  else
-    url = surl.slice(0,indexs) + s +supplier_id
+  if surl != undefined
+    indexs = surl.lastIndexOf(s);
 
-  $("#pd_specification_name").attr("data-autocomplete",url);
+    if indexs <0
+      url = surl + s + supplier_id
+    else
+      url = surl.slice(0,indexs) + s + supplier_id
+
+    $("#pd_specification_name").attr("data-autocomplete",url);
     
   #return false;
