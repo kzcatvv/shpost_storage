@@ -29,6 +29,9 @@ class ManualStock < ActiveRecord::Base
     self.stock_logs.each do |x|
       x.check!
     end
+    self.manual_stock_details.each do |detail|
+      detail.stock_out
+    end
   end
 
   def can_close?

@@ -76,22 +76,25 @@ class StockLog < ActiveRecord::Base
       self.status = STATUS[:checked]
       self.checked_at = Time.now
 
-      StockLog.transaction do
-        self.save
-        self.stock.save
+      self.save
+      self.stock.save
 
-        if self.belongs_to_purchase?
-          self.purchase_detail.stock_in
-        end
+      # StockLog.transaction do
+      #   self.save
+      #   self.stock.save
 
-        if self.belongs_to_order?
-          self.orders.each{|order| order.checked }
-        end
+      #   if self.belongs_to_purchase?
+      #     self.purchase_detail.stock_in
+      #   end
 
-        if self.belongs_to_manual_stock?
-          ManualStockDetail.find(self.manual_stock_detail_id).stock_out
-        end
-      end
+      #   if self.belongs_to_order?
+      #     self.orders.each{|order| order.checked }
+      #   end
+
+      #   if self.belongs_to_manual_stock?
+      #     ManualStockDetail.find(self.manual_stock_detail_id).stock_out
+      #   end
+      # end
     end
   end
 

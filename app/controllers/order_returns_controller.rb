@@ -103,14 +103,12 @@ class OrderReturnsController < ApplicationController
   def return_check
 
       @order_return=OrderReturn.where("batch_no=?",params[:format]).first
-      @order_return.order_return_details.each do |ot|
-        @orderdtl=OrderDetail.find(ot.order_detail_id)
-        stlogs=@orderdtl.stock_logs.where("operation='order_return' or operation='order_bad_return' ")
-        stlogs.each do |stlog|
-          stlog.check
-        end
-        ot.return_in
+
+      @order_return.stock_logs.each do |x|
+        x.check!
       end
+        # ot.return_in
+      @order_return.check!
       
 
       redirect_to :action => 'pack_return'

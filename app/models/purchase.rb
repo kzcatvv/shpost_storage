@@ -29,6 +29,13 @@ class Purchase < ActiveRecord::Base
     self.stock_logs.each do |x|
       x.check!
     end
+
+    self.purchase_details.each do |detail|
+      detail.stock_in
+      # detail.purchase_arrivals.each do |arrival|
+      #   arrival.check
+      # end
+    end
   end
 
   def can_close?
@@ -48,5 +55,8 @@ class Purchase < ActiveRecord::Base
     self.status.eql? STATUS[:closed]
   end
 
+  def find_details(business_id,supplier_id,specification_id)
+    self.purchase_details.where(supplier: supplier_id, specification: specification_id)
+  end
 end
 
