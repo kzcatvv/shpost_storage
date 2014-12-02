@@ -365,31 +365,31 @@ class OrdersController < ApplicationController
     return mi_cnt
   end
 
-  def ordercheck
+#   def ordercheck
 
-    @keyclientorder=Keyclientorder.find(params[:format])
-    @orders=@keyclientorder.orders
-# b2c
-    @orders.each do |order|
-      order.stock_logs.each do |stlog|
-        stlog.check!
-      end
-      order.stock_out
-    end
-    #b2b
-    if !@keyclientorder.keyclientorderdetails.blank?
-      stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
-      stock_logs.each do |stlog|
-        stlog.check!
-      end
-    end
+#     @keyclientorder=Keyclientorder.find(params[:format])
+#     @orders=@keyclientorder.orders
+# # b2c
+#     @orders.each do |order|
+#       order.stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#       order.stock_out
+#     end
+#     #b2b
+#     if !@keyclientorder.keyclientorderdetails.blank?
+#       stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
+#       stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#     end
 
-    if @keyclientorder.keyclient_name == "auto"
-      redirect_to :action => 'findprintindex'
-    else
-      redirect_to "/keyclientorders"
-    end
-  end
+#     if @keyclientorder.keyclient_name == "auto"
+#       redirect_to :action => 'findprintindex'
+#     else
+#       redirect_to "/keyclientorders"
+#     end
+#   end
 
   def packout
     @order_details=[]

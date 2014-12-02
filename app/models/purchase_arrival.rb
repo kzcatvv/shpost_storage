@@ -21,8 +21,9 @@ class PurchaseArrival < ActiveRecord::Base
   end
 
   def change_detail_status
-    if waiting_amount != 0
+    if self.purchase_detail.waiting_amount != 0
       self.purchase_detail.status = "waiting"
+      self.purchase_detail.save
     end
   end
 end

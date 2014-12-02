@@ -21,7 +21,8 @@ class ManualStockDetail < ActiveRecord::Base
   end
 
   def waiting_amount
-    self.amount - stock_logs.sum(:amount)
+    # self.amount - stock_logs.sum(:amount)
+    self.amount - self.checked_amount
   end
 
   def stock_out
