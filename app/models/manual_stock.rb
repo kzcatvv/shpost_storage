@@ -59,4 +59,15 @@ class ManualStock < ActiveRecord::Base
     manual_stock_details.includes(:manual_stock)
   end
 
+  def waiting_amounts
+    sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+
+    sum_amount.each do |x, amount|
+      sum_amount[x] -= sum_stock_logs[x].blank? ? 0 : sum_stock_logs[x]
+    end
+
+    sum_amount.delete_if {|key, value| value <= 0}
+  end
+
 end
