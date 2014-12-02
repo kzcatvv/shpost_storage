@@ -104,9 +104,9 @@ class OrderReturnsController < ApplicationController
 
       @order_return=OrderReturn.where("batch_no=?",params[:format]).first
 
-      @order_return.stock_logs.each do |x|
-        x.check!
-      end
+      # @order_return.stock_logs.each do |x|
+      #   x.check!
+      # end
         # ot.return_in
       @order_return.check!
       

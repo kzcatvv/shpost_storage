@@ -58,7 +58,7 @@ ShpostStorage::Application.routes.draw do
      collection do
         get 'findprint'
         get 'stockout'
-        get 'ordercheck'
+        # get 'ordercheck'
         get 'nextbatch'
         get 'packout'
         get 'packaging_index'
@@ -99,6 +99,7 @@ ShpostStorage::Application.routes.draw do
         get 'b2bfind69code'
         get 'b2bsplitanorder'
         get 'b2bsettrackingnumber'
+        get 'ordercheck'
     end
     resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails

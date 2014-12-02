@@ -382,8 +382,6 @@ ActiveRecord::Schema.define(version: 20141201104252) do
     t.integer  "specification_id"
     t.integer  "parent_id"
     t.string   "parent_type"
-    t.date     "expiration_date"
-    t.string   "batch_no"
   end
 
   create_table "stocks", force: true do |t|

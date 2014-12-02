@@ -23,7 +23,7 @@ class PurchaseDetail < ActiveRecord::Base
   end
 
   def waiting_amount
-    self.amount - purchase.stock_in_amount(self)
+    self.purchase_arrivals.sum(:arrived_amount) - self.checked_amount
   end
 
   def stock_in
