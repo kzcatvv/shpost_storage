@@ -6,6 +6,10 @@
   <h1><%=t '.title', :default => [:'helpers.titles.stock_in', '%{model} Stock In'], :model => model_class.model_name.human.titleize %></h1>
   <div style="float:right">   
       <a href="javascript:stockin_preview()" class='btn btn-primary' >打印入库单</a>
+      <%= link_to t('.check_purchase', :default => t("helpers.links.check_purchase")),
+                  check_purchase_url(),
+                  method: :patch,
+                  :class => 'btn btn-primary' %>
   </div>
 </div>
 <%= render :partial => 'stock_logs/some_forms' %>

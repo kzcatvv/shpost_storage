@@ -35,11 +35,11 @@ class PurchaseDetail < ActiveRecord::Base
   end
 
   def all_checked?
-    self.amount.eql? self.checked_amount
+    self.purchase_arrivals.sum(:arrived_amount).eql? self.checked_amount
   end
 
   def checked_amount
-    self.stock_logs.to_a.sum{|x| x.checked? ? x.amount : 0}
+    self.purchase.stock_logs.where(business_id: self.purchase.business_id, supplier_id: self.supplier_id, specification_id: self.specification_id).to_a.sum{|x| x.checked? ? x.amount : 0}
   end
 
   # def set_batch_no

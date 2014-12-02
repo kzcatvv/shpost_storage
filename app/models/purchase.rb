@@ -29,6 +29,13 @@ class Purchase < ActiveRecord::Base
     self.stock_logs.each do |x|
       x.check!
     end
+
+    self.purchase_details.each do |detail|
+      detail.stock_in
+      # detail.purchase_arrivals.each do |arrival|
+      #   arrival.check
+      # end
+    end
   end
 
   def can_close?
@@ -47,6 +54,7 @@ class Purchase < ActiveRecord::Base
   def closed?
     self.status.eql? STATUS[:closed]
   end
+
 
   def stock_in_amount(purchase_detail)
     self.stock_logs.where(specification: purchase_detail.specification, supplier: purchase_detail.supplier, business: self.business, storage: storage).sum(:amount)

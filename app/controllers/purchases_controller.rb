@@ -85,7 +85,7 @@ class PurchasesController < ApplicationController
         format.html { render action: 'stock_in' }
         format.json { head :no_content }
       else
-        format.html { render action: 'stock_in', javascript: "alert('123')" }
+        format.html { render action: 'stock_in' }
         format.json { head :no_content }
       end
     end

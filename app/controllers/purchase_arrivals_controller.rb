@@ -28,6 +28,7 @@ class PurchaseArrivalsController < ApplicationController
     # @purchase_arrive = PurchaseArrive.new(purchase_arrive_params)
     # @purchase_arrife.save
     # respond_with(@purchase_arrive)
+    @purchase_arrival.status = "waiting"
     respond_to do |format|
       if @purchase_arrival.save
         format.html { redirect_to purchase_detail_purchase_arrival_path(@purchase_detail,@purchase_arrival), notice: I18n.t('controller.create_success_notice', model: '采购单到货明细') }
