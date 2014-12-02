@@ -1,10 +1,12 @@
 class StandardInterface
+
   def self.commodity_enter(context, business, unit)
     supplier_no = context['SUPPLIER']
     sku = context['SKU']
     spec = context['SPEC']
     name = context['NAME']
     desc = context['DESC']
+    sixnine_code = context['SIXNINE']
 
     supplier = nil
 
@@ -20,15 +22,13 @@ class StandardInterface
     
 
     if relationship.nil?
-      commodity = Commodity.create! name: name, unit: unit, no: 'need_to_edit'
-      specification = Specification.create! commodity: commodity, desc: desc, name: spec, sku: 'need_to_edit', sixnine_code: 'need_to_edit'
+      commodity = Commodity.create! name: name, unit: unit
+      specification = Specification.create! commodity: commodity, desc: desc, name: spec, sixnine_code: sixnine_code
       relationship = Relationship.create! business: business, supplier: supplier, specification: specification, external_code: sku, spec_desc: spec
     end
   end
 
-  def self.order_enter(context, business, unit)
-    order = nil
-    Order.transaction do
+  def self.order_enter(context, business, unit, storage = nil, separate = false)
     order_id = context['ORDER_ID']
     trans_sn = context['TRANS_SN']
     date = context['DATE']
@@ -51,9 +51,11 @@ class StandardInterface
     send_name = context['SEND_NAME']
     send_zip = context['SEND_ZIP']
     send_mobile = context['SEND_MOBILE']
+    weight = context['WEIGHT']
+    volume = context['VOLUME']
+    b2b = context['B2B']
 
-    order_details = context['ORDER_DETAILS']
-
+    # address
     if province.blank?
       province = parse_province addr
     end
@@ -65,64 +67,19 @@ class StandardInterface
     if county.blank?
       county = parse_county addr
     end
+
+    order_details = context['ORDER_DETAILS']
+
     # business_order_id重复check
-    order = Order.where(business_order_id: order_id, business: business, unit: unit)
+    order = Order.where(business_order_id: order_id, business: business, unit: unit).first
 
     if !order.blank?
       return order
     end
 
-    
+    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume, is_parent: (b2b.eql? 'Y') ? true : false
 
-    if business.no == StorageConfig.config["business"]['bst_id'].to_s
-    # one detail one order if business is haobai
-      order_details_size = order_details.size
-      order_details.each do |x|
-        sku = x['SKU']
-        next if sku.blank?
-        qyt = x['QTY']
-        next if qyt.blank?
-        supplier_no = x['SUPPLIER']
-        deliver_no = x['DELIVER_NO']
-        spec = x['SPEC']
-        desc = x['DESC']
-        name = x['NAME']
-        if name.blank?
-          name = desc
-        end
-        price = x['PRICE']
-        amt = x['AMT']
-        if order_details_size == 1
-          order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date
-        else
-          t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
-
-          if !t.blank?
-            return t
-          end
-
-          order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date
-        end
-        supplier = nil
-        if !supplier_no.blank?
-          supplier = Supplier.find_supplier(supplier_no, business)
-        end
-
-        relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
-      
-        if relationship.nil?
-          order = FileInterface.save_order(context, business.id, unit.id)
-          raise ActiveRecord::Rollback
-          break
-        end
-
-        OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc, name: name
-
-      end
-    else
-    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE['b2c'.to_sym], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date
-
-    order_details.each do |x|
+    order_details.each do |x, i|
       sku = x['SKU']
       next if sku.blank?
       qyt = x['QTY']
@@ -151,10 +108,19 @@ class StandardInterface
         break
       end
 
-      OrderDetail.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, order: order, desc: desc, name: name
+      if i > 0 && separate
+        t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
+
+        if !t.blank?
+          return t
+        end
+
+        order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume
+      end
+
+      order.order_details.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, desc: desc, name: name
     end
-    end 
-    end
+
     return order 
   end
 
@@ -165,44 +131,24 @@ class StandardInterface
     trans_sn = context['TRANS_SN']
 
     order = nil
-    if !deliver_no.blank?
-      order = OrderDetail.find_by_business_deliver_no deliver_no
-    end
     if !order_no.blank?
-      order = Order.find_by_no order_no
+      orders = Order.where(no: order_no)
     end
+
+    if !deliver_no.blank?
+      orders ||= Order.where(tracking_number: deliver_no)
+    end
+    
     if !order_id.blank?
-      order = Order.find_by_business_order_id order_id
+      orders ||= Order.where(business_order_id: order_id)
     end
+    
     if !trans_sn.blank?
-      order = Order.find_by_business_trans_no trans_sn
+      orders ||= Order.where(business_trans_no: trans_sn)
     end
-    return order
   end
 
-  # def self.orders_query(context, business, unit)
-  #   order_no = context['ORDER_NO']
-  #   deliver_no = context['DELIVER_NO']
-  #   order_id = context['ORDER_ID']
-  #   trans_sn = context['TRANS_SN']
-
-  #   orders = nil
-  #   if !deliver_no.blank?
-  #     orders = OrderDetail.where business_deliver_no: deliver_no.split(',')
-  #   end
-  #   if !order_no.blank?
-  #     orders = Order.where no: order_no.split(',')
-  #   end
-  #   if !order_id.blank?
-  #     orders = Order.where business_order_id: order_id.split(',')
-  #   end
-  #   if !trans_sn.blank?
-  #     orders = Order.where business_trans_no: trans_sn.split(',')
-  #   end
-  #   return orders
-  # end
-
-  def self.stock_query(context, business, unit)
+  def self.stock_query(context, business, unit, storage = nil)
     query_array = context['QUERY_ARRAY']
     stock_array = []
     query_array.each do |x| 
@@ -220,7 +166,11 @@ class StandardInterface
       if relationship.nil?
         amount = 0
       else
-        amount = Stock.total_stock_in_unit(relationship.specification, relationship.supplier, business, unit)
+        if !storage.nil?
+          amount = Stock.total_stock_in_storage(relationship.specification, relationship.supplier, business, storage)
+        else
+          amount = Stock.total_stock_in_unit(relationship.specification, relationship.supplier, business, unit)
+        end
       end
 
       stock_array << {'SKU' => sku,'AMT' => amount}
@@ -254,5 +204,24 @@ class StandardInterface
       end
     end
   end
-
+  
+  def self.generalise_tracking(tracking_infos)
+    if !tracking_infos.blank?
+      deliver_details = []
+      tracking_infos.split(/\n/).each do |info|
+        deliver_detail = {}
+        x = info.split('#')
+        if x.size == 4
+          deliver_detail['DATE'] = x[0]
+          deliver_detail['LOCAL'] = x[2]
+          # deliver_detail['NAME'] = x[]
+          deliver_detail['DESC'] = x[1]
+        elsif x.size == 2
+          deliver_detail['DATE'] = x[0]
+          deliver_detail['DESC'] = x[1]
+        end
+        deliver_details << deliver_detail
+      end
+    end
+  end
 end
