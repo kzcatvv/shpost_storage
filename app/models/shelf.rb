@@ -64,4 +64,8 @@ class Shelf < ActiveRecord::Base
   def bad_type_name
     is_bad.blank? ? "" : Shelf::BAD_TYPE["#{is_bad}".to_sym]
   end
+
+  def is_available?
+    true
+  end
 end

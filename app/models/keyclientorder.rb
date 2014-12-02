@@ -11,6 +11,10 @@ class Keyclientorder < ActiveRecord::Base
   # before_validation :set_batch_id
 
   validates_presence_of :keyclient_name, :unit_id, :storage_id, :message => '不能为空'
+
+  STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
+  
+  STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
   # validates_uniqueness_of :batch_id, :message => '该订单批次编号已存在'
 
   # def set_batch_id
@@ -23,7 +27,36 @@ class Keyclientorder < ActiveRecord::Base
     StockLog::OPERATION[:b2c_stock_out]
   end
 
+  def status_name
+    status.blank? ? "" : Keyclientorder::STATUS_SHOW["#{status}".to_sym]
+  end
+
   def details
     order_details
+  end
+
+  def picking_out
+      self.update(status: STATUS[:picking])
+      self.orders.each do |x|
+        x.set_picking
+      end
+  end
+
+  def check_out
+    if all_checked?
+      self.update(status: STATUS[:checked])
+      self.orders.each do |x|
+        x.stock_out
+      end
+    end
+  end
+
+  def all_checked?
+    self.stock_logs.each do |x|
+      if ! x.checked?
+        return false
+      end
+    end
+    return true
   end
 end

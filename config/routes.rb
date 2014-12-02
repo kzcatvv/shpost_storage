@@ -91,6 +91,15 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :keyclientorders do
+    collection do
+        get 'b2bindex'
+        get 'b2bstockout'
+        get 'b2boutcheck'
+        get 'b2bordersplit'
+        get 'b2bfind69code'
+        get 'b2bsplitanorder'
+        get 'b2bsettrackingnumber'
+    end
     resources :orders, :controller => 'keyclientorder_orders'
     resources :keyclientorderdetails
     member do
@@ -123,10 +132,11 @@ ShpostStorage::Application.routes.draw do
 
   resources :purchases do
     resources :purchase_details
-      collection do 
+
+    collection do 
       get  'purchase_import'
       post 'purchase_import' => 'purchases#purchase_import'
-      end
+    end
 
     member do
       patch 'onecheck'
@@ -136,6 +146,10 @@ ShpostStorage::Application.routes.draw do
       get "scan"
       post "scan_check"
     end
+  end
+
+  resources :purchase_details do
+    resources :purchase_arrivals
   end
 
   resources :stocks do

@@ -1,0 +1,60 @@
+<%- model_class = Keyclientorder -%>
+<div class="page-header">
+  <h1>B2B订单波次管理</h1>
+  <div style="float:right">
+   <!--  <% if can? :new, Keyclientorder %>
+      <%=link_to t('线下订单导入'), "/orders/orders_b2b_import", target: '_blank',:class => 'btn btn-primary' %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_keyclientorder_path,
+                  :class => 'btn btn-primary' %>
+    <% end %> -->
+  </div>
+</div>
+
+<%= grid(@keyclientorders_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:keyclient_name), attribute: 'keyclient_name'
+
+    g.column name: model_class.human_attribute_name(:keyclient_addr), attribute: 'keyclient_addr'
+
+    g.column name: model_class.human_attribute_name(:contact_person), attribute: 'contact_person'
+    
+    g.column name: model_class.human_attribute_name(:phone), attribute: 'phone'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |keyclientorder|
+      keyclientorder.business.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Keyclientorder::STATUS_SHOW.invert do |keyclientorder| 
+      keyclientorder.status_name
+    end
+
+    g.column name: '订单商品明细' do |keyclientorder|
+      od=content_tag(:tr,content_tag(:td," "))
+      kos=keyclientorder.orders.where("is_parent = ?",true).to_ary
+        kos.each do |ko|
+          ods = ko.order_details.to_ary
+          ods.each do |dl|
+            od=od+content_tag(:tr,content_tag(:td,Specification.find(dl.specification_id).all_name.to_s+" * "+dl.amount.to_s)) 
+          end
+       end
+       content_tag(:table,od)
+
+    end
+
+    g.column do |keyclientorder|
+      ActiveSupport::SafeBuffer.new << 
+        # (link_to t('.edit', :default => t("helpers.links.edit")), edit_keyclientorder_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :update, keyclientorder) << ' ' <<
+        # (link_to t('.destroy', :default => t("helpers.links.destroy")), keyclientorder_path(keyclientorder), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, keyclientorder)<< ' ' <<
+        # (link_to t('.pddetails', :default => t("helpers.links.pddetails")), keyclientorder_keyclientorderdetails_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :details, keyclientorder)<< ' ' <<
+        (link_to t('.b2bstockout', :default => t("helpers.links.b2bstockout")), b2bstockout_keyclientorders_path(keyclientorder), :class => 'btn btn-xs btn-primary' if ( keyclientorder.status == "waiting" or keyclientorder.status == "printed" ) and can? :b2bstockout, keyclientorder)<< ' ' << 
+        (link_to t('.b2bordersplit', :default => t("helpers.links.b2bordersplit")), b2bordersplit_keyclientorders_path(keyclientorder), :class => 'btn btn-xs btn-primary' if ( keyclientorder.status == "waiting" or keyclientorder.status == "printed" or keyclientorder.status == "picking") and can? :b2bordersplit, keyclientorder )
+        # (link_to t('打印面单'), "/print/keytracking?id=#{keyclientorder.id}", target: '_blank',:class => 'btn btn-xs btn-info')<< ' ' <<
+        # (link_to t('生成出库单'), "/orders/stockout?keyclientorder_id=#{keyclientorder.id}", :class => 'btn btn-xs btn-info')
+    end
+  end 
+%>

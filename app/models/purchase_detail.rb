@@ -3,7 +3,8 @@ class PurchaseDetail < ActiveRecord::Base
 	belongs_to :supplier
 	belongs_to :purchase
   has_one :unit, through: :purchase
-  has_many :stock_logs, dependent: :destroy
+  # has_many :stock_logs, dependent: :destroy
+  has_many :purchase_arrivals, dependent: :destroy
 
   # before_validation :set_batch_no
 
@@ -22,7 +23,7 @@ class PurchaseDetail < ActiveRecord::Base
   end
 
   def waiting_amount
-    self.amount - stock_logs.sum(:amount)
+    self.amount - purchase.stock_in_amount(self)
   end
 
   def stock_in

@@ -6,8 +6,16 @@ class KeyclientordersController < ApplicationController
   def index
     #@keyclientorders = Keyclientorder.all
     @keyclientorders_grid = initialize_grid(@keyclientorders,
+                   :conditions => {:order_type => "b2c",
+                                   :storage_id => current_storage.id },
                    :order => 'keyclientorders.id',
                    :order_direction => 'desc',
+                   include: [:business, :storage, :unit])
+  end
+
+  def b2bindex
+    @keyclientorders_grid = initialize_grid(@keyclientorders,
+                   :conditions => {:order_type => "b2b"},
                    include: [:business, :storage, :unit])
   end
 
@@ -79,6 +87,97 @@ class KeyclientordersController < ApplicationController
     Rails.logger.info "pdjs end"
     redirect_to keyclientorder_orders_url(@keyclientorder)
 
+  end
+
+  def b2bstockout
+      #binding.pry
+      @keyclientorder = Keyclientorder.find(params[:format])
+      Stock.order_stock_out(@keyclientorder, current_user)
+      @keyclientorder.picking_out
+      @stock_logs = @keyclientorder.stock_logs
+      @stock_logs_grid = initialize_grid(@stock_logs)
+  end
+
+  def b2boutcheck
+
+    @keyclientorder=Keyclientorder.find(params[:format])
+    @scanspecification = ""
+
+    stock_logs = @keyclientorder.stock_logs
+    stock_logs.each do |stlog|
+      stlog.check!
+    end
+
+    @keyclientorder.check_out
+
+    redirect_to "/keyclientorders/b2bindex"
+
+  end
+
+  def b2bordersplit
+      @keyclientorder=Keyclientorder.find(params[:format])
+      @keyco=@keyclientorder.id
+      @key_details_hash = @keyclientorder.orders.first.order_details.includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      ors = @keyclientorder.orders.where("is_parent = ?",false)
+      @scanall = OrderDetail.where(order_id: ors).includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      @dtl_cnt = @key_details_hash.length
+      @act_cnt = 0
+  end
+
+  def b2bfind69code
+
+    @scanspecification = Specification.where("sixnine_code = ?",params[:sixninecode]).first
+
+    if @scanspecification.nil?
+       @curr_sp=0
+       @curr_sixnine=0
+       @curr_der=1
+    else
+       @keyclientorder=Keyclientorder.find(params[:keyco])
+       si = @keyclientorder.details.select(:specification_id)
+       sncodes=Specification.where(id: si).where("sixnine_code = ?",params[:sixninecode])
+       if sncodes.blank?
+        @curr_der=1
+       else
+        @curr_der=0
+       end
+       @curr_sp=@scanspecification.id
+       @curr_sixnine=@scanspecification.sixnine_code
+    end
+
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def b2bsplitanorder
+    @keyclientorder = Keyclientorder.find(params[:keyco])
+    parentorder = @keyclientorder.orders.first
+    parentorder.update_attribute(:is_parent,true)
+    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id)
+    ods = parentorder.order_details
+    ods.each do |od|
+      curr_specification = Specification.find(od.specification_id)
+      scanlabal = "scancuram_" + curr_specification.sixnine_code
+      if Integer(params[scanlabal.to_sym]) > 0
+        childorder.order_details.create(name: od.name,specification_id: od.specification_id,amount: params[scanlabal.to_sym],batch_no: od.batch_no,supplier_id: od.supplier_id)
+      end
+    end
+    #binding.pry
+    @order_details = childorder.order_details
+
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def b2bsettrackingnumber
+    @curr_or = Order.find(params[:split_order])
+    @curr_or.update_attribute(:tracking_number,params[:split_tracking_num])
+    @curr_or.b2bsetsplitstatus
+    respond_to do |format|
+      format.js 
+    end
   end
 
   private
