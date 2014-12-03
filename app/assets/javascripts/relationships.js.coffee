@@ -5,14 +5,11 @@ ready = ->
   $("#relationship_business_id").change(bid)
   $("#relationship_supplier_id").change(sid)
 
-  bid()
-  sid()
+  bid
+  sid
 
-$ ->
-  ready()
-
-$(document).on "page:load",->
-  ready()
+$(document).ready(ready)
+$(document).on('page:load', ready)
 
 bid= ->
     $('#bid').val($('#relationship_business_id').val());

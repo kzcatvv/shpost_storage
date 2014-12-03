@@ -4,13 +4,10 @@
 ready = ->
   $("#order_detail_supplier_id").change(ossid)
 
-ossid()
+ossid
 
-$ ->
-  ready()
-
-$(document).on "page:load",->
-  ready()
+$(document).ready(ready)
+$(document).on('page:load', ready)
 
 ossid= ->
     $('#os_sid').val($('#order_detail_supplier_id').val());

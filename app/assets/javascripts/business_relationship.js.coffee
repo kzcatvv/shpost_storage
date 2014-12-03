@@ -3,18 +3,15 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 ready = ->
   $("#relationship_supplier_id").change(brsid)
-  brsid()
+  brsid
 
-$ ->
-  ready()
-
-$(document).on "page:load",->
-  ready()
+$(document).ready(ready)
+$(document).on('page:load', ready)
 
 brsid= ->
     $('#br_sid').val($('#relationship_supplier_id').val());
     brid = $('#br_sid').val();
-
+    alert("aaaa");
     surl = $('#br_specification_name').attr('data-autocomplete');
 
     

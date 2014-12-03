@@ -4,13 +4,10 @@
 ready = ->
   $("#manual_stock_detail_supplier_id").change(mssid)
   
-  mssid()
+  mssid
 
-$ ->
-  ready()
-
-$(document).on "page:load",->
-  ready()
+$(document).ready(ready)
+$(document).on('page:load', ready)
 
 mssid= ->
     $('#ms_sid').val($('#manual_stock_detail_supplier_id').val());

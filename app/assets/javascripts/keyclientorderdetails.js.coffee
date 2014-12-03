@@ -4,13 +4,10 @@
 ready = ->
   $("#keyclientorderdetail_supplier_id").change(kosid)
 
-  kosid()
+  kosid
 
-$ ->
-  ready()
-
-$(document).on "page:load",->
-  ready()
+$(document).ready(ready)
+$(document).on('page:load', ready)
 
 kosid= ->
     $('#ko_sid').val($('#keyclientorderdetail_supplier_id').val());
