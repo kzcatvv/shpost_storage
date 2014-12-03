@@ -384,10 +384,10 @@ ActiveRecord::Schema.define(version: 20141204081402) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.date     "expiration_date"
-    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+    t.date     "expiration_date"
+    t.string   "batch_no"
   end
 
   create_table "stock_mons", force: true do |t|

@@ -236,7 +236,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stocks(specification, supplier, business, is_broken = false)
-    conditions = where(specification: specification, business: business)
+    conditions = where(specification: specification, business: business).where('virtual_amount > 0')
 
     if ! is_broken
       conditions = conditions.normal

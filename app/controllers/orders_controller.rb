@@ -6,7 +6,7 @@ class OrdersController < ApplicationController
   # GET /orderes.json
   def index
     @orders_grid = initialize_grid(@orders,
-     :conditions => {:order_type => "b2c"})
+     :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
   end
 
   def order_alert
@@ -444,14 +444,19 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
-    @orders_grid = initialize_grid(@orders,
-      :include => [:business],
-      :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true],
-      :per_page => 15)
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true], :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true]).resultset.limit(nil).to_ary
-    @selectorders=Order.where(id: @slorders)
+    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true])
+
+    #some wice_grad lazy do the resultset is [] without once call
+    begin
+      @slorders.resultset
+    rescue
+
+    end
+    
+    @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
         if !params[:grid][:f]["businesses.name".to_sym].nil?
