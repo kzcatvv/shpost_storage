@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141201104252) do
+ActiveRecord::Schema.define(version: 20141202085706) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -230,9 +230,9 @@ ActiveRecord::Schema.define(version: 20141201104252) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
-    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
+    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -245,7 +245,7 @@ ActiveRecord::Schema.define(version: 20141201104252) do
     t.string   "barcode"
     t.string   "batch_no"
     t.integer  "parent_id"
-    t.boolean  "is_parent",                      default: false
+    t.boolean  "is_split",                       default: false
   end
 
   create_table "purchase_arrivals", force: true do |t|
@@ -378,8 +378,21 @@ ActiveRecord::Schema.define(version: 20141201104252) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
+    t.date     "expiration_date"
+    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+  end
+
+  create_table "stock_mons", force: true do |t|
+    t.string   "summ_date"
+    t.integer  "storage_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.integer  "amount"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "stocks", force: true do |t|

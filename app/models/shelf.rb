@@ -17,9 +17,9 @@ class Shelf < ActiveRecord::Base
 
   scope :prior, ->{ order("priority_level ASC")}
 
-  scope :normal, ->{ where(is_bad: 'yes')}
+  scope :normal, ->{ where(is_bad: 'no')}
 
-  scope :broken, ->{ where(is_bad: 'no')}
+  scope :broken, ->{ where(is_bad: 'yes')}
 
   BAD_TYPE = { yes: '是', no: '否' }
 
