@@ -3,8 +3,12 @@ class ReportController < ApplicationController
   def purchase_arrival_report
     unless request.get?
       business_id = params[:business_id]
-      start_date = params[:start_date]
-      end_date = params[:end_date]
+      start_date = Date.civil(params[:start_date]["start_date(1i)"].to_i,
+                         params[:start_date]["start_date(2i)"].to_i,
+                         params[:start_date]["start_date(3i)"].to_i)
+      end_date = Date.civil(params[:end_date]["end_date(1i)"].to_i,
+                         params[:end_date]["end_date(2i)"].to_i,
+                         params[:end_date]["end_date(3i)"].to_i)
       if business_id.blank?
         flash[:alert] = "请选择一个商户"
         redirect_to :action => 'purchase_arrival_report'
@@ -12,18 +16,18 @@ class ReportController < ApplicationController
         Rails.logger.info "business_id:" + business_id.to_s
         Rails.logger.info "start_date:" + start_date.to_s
         Rails.logger.info "end_date:" + end_date.to_s
-        purchases=Purchase.accessible_by(current_ability).where(business_id: business_id).where("created_at >= '" + start_date.to_s + "' and created_at <= '" + end_date.to_s + "'")
+        purchases=Purchase.accessible_by(current_ability).where(business_id: business_id).where("created_at >= '" + start_date.to_s + "' and created_at <= '" + (end_date+1).to_s + "'")
         if purchases.blank?
           flash[:alert] = "无补货数据"
           redirect_to :action => 'purchase_arrival_report'
         else
-          respond_to do |format|  
-            format.xls {   
+          # respond_to do |format|  
+          #   format.xls {   
               send_data(purchase_arrival_report_xls_content_for(purchases),  
                     :type => "text/excel;charset=utf-8; header=present",  
                     :filename => "补货订单汇总_#{Time.now.strftime("%Y%m%d")}.xls")  
-            }  
-          end
+          #   }  
+          # end
         end
       end
     end
@@ -53,14 +57,14 @@ class ReportController < ApplicationController
               sheet1[count_row,6] = ""
               sheet1[count_row,8] = ""
             else
-              sheet1[count_row,0] = detail.purchase.batch_no
+              sheet1[count_row,0] = detail.purchase.no
               sheet1[count_row,1] = detail.purchase.business.name
               sheet1[count_row,2] = detail.specification.sku
               sheet1[count_row,3] = Relationship.find_by(specification: detail.specification, business: detail.purchase.business, supplier: detail.supplier).external_code
               sheet1[count_row,4] = detail.supplier.name
               sheet1[count_row,5] = detail.specification.name
               sheet1[count_row,6] = detail.amount
-              sheet1[count_row,8] = detail.purchase.created_at
+              sheet1[count_row,8] = detail.purchase.created_at.to_formatted_s(%Y-%m-%d)
 
               previous_detail_id = detail.id
             end
