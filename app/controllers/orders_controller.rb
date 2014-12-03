@@ -16,14 +16,16 @@ class OrdersController < ApplicationController
 
   def packaging_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGING_STATUS)
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+        :conditions => ['order_type = ? and is_split = ?',"b2c",false])
 
     render :layout => false
   end
 
   def packaged_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGED_STATUS).where('created_at > ?', Date.today.to_time)
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+      :conditions => ['order_type = ? and is_split = ?',"b2c",false])
 
     render :layout => false
   end
@@ -395,7 +397,8 @@ class OrdersController < ApplicationController
     @order_details=[]
     @curr_order=""
     @orders = Order.where("storage_id = ?", session[:current_storage])
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+      :conditions => ['order_type = ? and is_split = ?',"b2c",false])
   end
 
   def findorderout
