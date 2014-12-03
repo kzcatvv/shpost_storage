@@ -118,7 +118,7 @@ class KeyclientordersController < ApplicationController
       @keyclientorder=Keyclientorder.find(params[:format])
       @keyco=@keyclientorder.id
       @key_details_hash = @keyclientorder.orders.first.order_details.includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
-      ors = @keyclientorder.orders.where("is_parent = ?",false)
+      ors = @keyclientorder.orders.where("is_split = ?",true)
       @scanall = OrderDetail.where(order_id: ors).includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
       @dtl_cnt = @key_details_hash.length
       @act_cnt = 0
@@ -153,8 +153,7 @@ class KeyclientordersController < ApplicationController
   def b2bsplitanorder
     @keyclientorder = Keyclientorder.find(params[:keyco])
     parentorder = @keyclientorder.orders.first
-    parentorder.update_attribute(:is_parent,true)
-    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id)
+    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id,is_split: true)
     ods = parentorder.order_details
     ods.each do |od|
       curr_specification = Specification.find(od.specification_id)
