@@ -182,63 +182,6 @@ class PurchasesController < ApplicationController
     redirect_to action: :index
   end
 
-  def purchase_arrival_report
-    business_id = nil
-    start_date
-    end_date
-    purchases=Purchase.accessible_by(current_ability).where(business_id: business_id).where("created_at >= '" + start_date + "' and created_at <= '" + end_date + "'")
-    if purchases.nil?
-       flash[:alert] = "无补货数据"
-       redirect_to :action => 'index'
-    else
-      respond_to do |format|  
-        format.xls {   
-          send_data(purchase_arrival_report_xls_content_for(@purchases),  
-                :type => "text/excel;charset=utf-8; header=present",  
-                :filename => "补货订单汇总_#{Time.now.strftime("%Y%m%d")}.xls")  
-        }  
-      end
-    end
-  end
-
-  def purchase_arrival_report_xls_content_for(objs)  
-      xls_report = StringIO.new  
-      book = Spreadsheet::Workbook.new  
-      sheet1 = book.create_worksheet :name => "补货订单汇总"  
-    
-      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
-      sheet1.row(0).default_format = blue  
-  
-      sheet1.row(0).concat %w{采购单编号 商户名称 SKU 商品编码 供应商名称 商品名称 补货数量 到货日 采购单日期 实际到货}
-      count_row = 1
-      objs.each do |obj|
-        previous_detail_id = nil
-        obj.purchase_details.each do |detail|
-          if previous_detail_id == detail.id
-            sheet1[count_row,0] = detail.purchase.batch_no
-            sheet1[count_row,0] = detail.purchase.business.name
-            sheet1[count_row,0] = detail.specification.
-            sheet1[count_row,0] = ""
-            sheet1[count_row,0] = ""
-            sheet1[count_row,0] = ""
-            sheet1[count_row,0] = ""
-            sheet1[count_row,0] = ""
-            sheet1[count_row,0] = ""
-          else
-
-            previous_detail_id = detail.id
-          end
-          detail.purchase_arrivals.each do |arrival|
-          end
-        end
-
-       count_row += 1
-      end  
-  
-      book.write xls_report  
-      xls_report.string  
-    end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_purchase

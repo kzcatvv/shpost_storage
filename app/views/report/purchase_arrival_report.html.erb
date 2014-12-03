@@ -1,0 +1,21 @@
+<center>
+<br><br>
+<font face="微软雅黑" color='#006030' size=6>补货订单汇总</font>   
+
+<br><br><br>
+ 
+
+<%= form_tag("/shpost_storage/report/purchase_arrival_report",format: "xls", method: "post") do -%>
+       <%= label_tag(:business, "商户:") %>
+
+       <%= select_tag("business_id", options_for_select(Business.accessible_by(current_ability).map{|u| [u.name,u.id]}, Business.accessible_by(current_ability).first), id: "business_id") %>
+
+       <%= label_tag(:start_date, "start_date:") %><%= date_select("start_date","start_date", default: 1.month.ago) %>
+       <%= label_tag(:end_date, "end_date:") %><%= date_select("end_date","end_date",default: Date.today) %>
+    
+    <%= submit_tag "订单导出",:class => 'btn btn-primary' %>
+       
+<% end -%>
+
+
+</center>
