@@ -82,7 +82,7 @@ class Stock < ActiveRecord::Base
 
     sum_amount_hash.each do |x, amount|
       if amount > 0
-        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), Supplier.find(x[1]), Business.find(x[2]), Storage.find(x[3])).to_ary
+        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), Storage.find(x[3])).to_ary
 
         stocks_in_storage.each do |stock|
           out_amount = stock.stock_out_amount(amount)
