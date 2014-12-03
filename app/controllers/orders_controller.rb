@@ -445,7 +445,7 @@ class OrdersController < ApplicationController
       :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business], :conditions => {'order_type = ? and status in (?) and is_split = ?',"b2c",status,false}).resultset.limit(nil).to_ary
+    @slorders = initialize_grid(@orders, :include => [:business], :conditions => ['order_type = ? and status in (?) and is_split = ?',"b2c",status,false]).resultset.limit(nil).to_ary
     @selectorders=Order.where(id: @slorders)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
