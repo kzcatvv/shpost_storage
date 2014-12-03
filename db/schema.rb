@@ -250,12 +250,8 @@ ActiveRecord::Schema.define(version: 20141202085706) do
     t.string   "barcode"
     t.string   "batch_no"
     t.integer  "parent_id"
-<<<<<<< HEAD
-    t.boolean  "is_parent",                      default: false
-    t.float    "volume"
-=======
     t.boolean  "is_split",                       default: false
->>>>>>> eb442838d93ea41f3548347f30ac32e8804575e8
+    t.float    "volume"
   end
 
   create_table "purchase_arrivals", force: true do |t|
@@ -384,14 +380,14 @@ ActiveRecord::Schema.define(version: 20141202085706) do
     t.string   "desc"
     t.integer  "keyclientorderdetail_id"
     t.integer  "manual_stock_detail_id"
+    t.date     "expiration_date"
+    t.string   "batch_no"
     t.integer  "shelf_id"
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
     t.integer  "parent_id"
     t.string   "parent_type"
-    t.date     "expiration_date"
-    t.string   "batch_no"
   end
 
   create_table "stock_mons", force: true do |t|
