@@ -74,10 +74,32 @@ class Keyclientorder < ActiveRecord::Base
     sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
     sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
 
-    sum_amount.each do |x, amount|
-      sum_amount[x] -= sum_stock_logs[x].blank? ? 0 : sum_stock_logs[x]
-    end
+    compare_sum_amount(sum_amount, sum_stock_logs)
 
+    #compare without supplier
+    if ! sum_amount.blank? && ! sum_stock_logs.blank?
+      sum_stock_logs_without_supplier = {}
+      sum_stock_logs.each do |x, amount|
+        sum_stock_logs_without_supplier[[x[0], nil, x[2]]] = amount
+      end
+      compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
+    end
+  end
+
+  def compare_sum_amount(sum_amount, sum_stock_logs)
+    sum_amount.each do |x, amount|
+      if sum_stock_logs[x].blank?
+        sum_stock_logs[x] = 0
+      end
+      if sum_amount[x] >= sum_stock_logs[x]
+        sum_amount[x] -= sum_stock_logs[x]
+        sum_stock_logs[x] = 0
+      else
+        sum_stock_logs[x] -= sum_amount[x]
+        sum_amount[x] = 0
+      end
+    end
+    sum_stock_logs.delete_if {|key, value| value <= 0}
     sum_amount.delete_if {|key, value| value <= 0}
   end
 end
