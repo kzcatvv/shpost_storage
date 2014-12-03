@@ -7,7 +7,7 @@ class KeyclientordersController < ApplicationController
     #@keyclientorders = Keyclientorder.all
     @keyclientorders_grid = initialize_grid(@keyclientorders,
                    :conditions => ['order_type <> ?',"b2b"],
-                   :order => 'keyclientorders.id',
+                   :order => 'keyclientorders.created_at',
                    :order_direction => 'desc',
                    include: [:business, :storage, :unit])
   end

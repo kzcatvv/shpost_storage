@@ -28,4 +28,4 @@ kosid= ->
 
     $('#ko_specification_name').attr('data-autocomplete',url);
     
-  #return false;
+  

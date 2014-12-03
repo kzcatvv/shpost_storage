@@ -15,7 +15,7 @@ ready = ->
 mssid= ->
   $('#ms_sid').val($('#manual_stock_detail_supplier_id').val());
   msid = $('#ms_sid').val();
-  #alert("manual stock")
+  
   surl = $('#ms_specification_name').attr('data-autocomplete');
     
   s = '&supplierid=';
@@ -30,4 +30,4 @@ mssid= ->
 
     $('#ms_specification_name').attr('data-autocomplete',url);
     
-  #return false;
+  

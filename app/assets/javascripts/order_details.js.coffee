@@ -15,7 +15,7 @@ ready = ->
 ossid = ->
   $('#os_sid').val($('#order_detail_supplier_id').val());
   osid = $('#os_sid').val();
-  #alert("order detail")
+  
   surl = $('#os_specification_name').attr('data-autocomplete');
     
   s = '&supplierid=';
@@ -29,4 +29,4 @@ ossid = ->
 
     $('#os_specification_name').attr('data-autocomplete',url);
     
-  #return false;
+  

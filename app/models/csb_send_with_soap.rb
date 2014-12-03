@@ -16,7 +16,7 @@ class CSBSendWithSOAP
           context = JSON.parse(ary[0].split(/\n/)[0])
           business = Business.find ary[1].split(/\n/)[0]
           unit = Unit.find ary[2].split(/\n/)[0]
-          order = StandardInterface.order_enter(context,business,unit,unit.default_storage,true)
+          order = StandardInterface.order_enter(context,business,unit,unit.default_storage,false)
           # if order.class is Order, means this order was saved into Order table. otherwise was saved into file
           if order.class == Order
             File.delete(file_path)
@@ -477,7 +477,8 @@ class CSBSendWithSOAP
       orders = orderDetail.elements['CombinationOrder']
     end
     orders.each_element('OrderLabel') { |orderLabel|
-      order_hash = {}
+      orders_array = Array.new
+      
       orderId = nil
       if order_type == StorageConfig.config["csb_interface"]["order_type_1"]
         orderId = orderLabel.attributes['listId']
@@ -492,19 +493,6 @@ class CSBSendWithSOAP
       deadLineDate = orderLabel.attributes['DeadLineDate']
       custRemark = orderLabel.attributes['CustRemark']
       
-      order_hash.store('ORDER_ID',orderId)
-      # puts "ORDER_ID=" << orderId
-      order_hash.store('DATE',createDate)
-      order_hash.store('CUST_NAME',customerName)
-      # puts "CUST_NAME=" << customerName
-      order_hash.store('ADDR',address)
-      #puts "ADDR=" << address
-      order_hash.store('MOBILE',telephone)
-      order_hash.store('ZIP',customerArea)
-      order_hash.store('DESC',custRemark)
-
-      order_details = Array.new
-
       # if gift detail is miss, skip this order and start the next one
       giftDetails = orderLabel.get_elements('GiftDetail')
       if giftDetails.blank?
@@ -514,6 +502,7 @@ class CSBSendWithSOAP
       end
       giftDetails.each do |giftDetail|
         order_detail = {}
+        order_hash = {}
         itemId = giftDetail.attributes['itemId']
         giftLineId = giftDetail.attributes['giftLineId']
         giftName = giftDetail.attributes['GiftName']
@@ -522,8 +511,24 @@ class CSBSendWithSOAP
         if order_type == StorageConfig.config["csb_interface"]["order_type_2"]
           listId = giftDetail.attributes['listId']
           # puts "DELIVER_NO=" << listId
-          order_detail.store('DELIVER_NO', listId)
+          order_detail.store('DELIVER_NO', orderId)
+          order_hash.store('ORDER_ID', listId)
+          order_hash.store('TRANS_SN', orderId)
+        else
+          order_hash.store('ORDER_ID', orderId)
         end
+        # split the multitude details to multitude orders
+        # puts "ORDER_ID=" << orderId
+        order_hash.store('DATE',createDate)
+        order_hash.store('CUST_NAME',customerName)
+        # puts "CUST_NAME=" << customerName
+        order_hash.store('ADDR',address)
+        #puts "ADDR=" << address
+        order_hash.store('MOBILE',telephone)
+        order_hash.store('ZIP',customerArea)
+        order_hash.store('DESC',custRemark)
+
+        order_details = Array.new
 
         order_detail.store('SKU', itemId)
         # puts "SKU=" << itemId
@@ -533,12 +538,18 @@ class CSBSendWithSOAP
         order_detail.store('PRICE', scoreValue)
 
         order_details << order_detail
+
+        order_hash.store('ORDER_DETAILS', order_details)
+
+        orders_array << order_hash
       end
 
-      order_hash.store('ORDER_DETAILS', order_details)
       # puts order_hash
       unit = Unit.find_by(no: StorageConfig.config["unit"]['zb_id'])
-      order = StandardInterface.order_enter(order_hash, Business.find_by(no: StorageConfig.config["business"]['bst_id']), unit, unit.default_storage, true)
+      order = nil
+      orders_array.each do |x|
+        order = StandardInterface.order_enter(x, Business.find_by(no: StorageConfig.config["business"]['bst_id']), unit, unit.default_storage, false)
+      end
       if !order.blank?
         orderTransStatus << orderId
           rowsum += 1

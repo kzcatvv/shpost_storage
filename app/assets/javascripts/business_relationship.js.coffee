@@ -15,7 +15,7 @@ brsid= ->
   $('#br_sid').val($('#relationship_supplier_id').val());
   brid = $('#br_sid').val();
   surl = $('#br_specification_name').attr('data-autocomplete');
-  #alert("business relationship")
+  
   s = '&supplierid=';
   if surl != undefined
     indexs = surl.lastIndexOf(s);
@@ -27,4 +27,4 @@ brsid= ->
       
     $('#br_specification_name').attr("data-autocomplete",url);
 
-  #return false;
+  
