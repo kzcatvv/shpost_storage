@@ -23,7 +23,7 @@
                       content_tag(:div) do
                        # without buffer only the last tag will appear
                        buffer = content_tag(:b,"客户地址")
-                        buffer += content_tag(:p,order.province+order.city+order.county+order.customer_address)
+                        buffer += content_tag(:p,(order.province.nil? ? " " : order.province)+(order.city.nil? ? " " : order.city)+(order.county.nil? ? " " : order.county)+(order.customer_address.nil? ? " " : order.customer_address))
                       raw buffer
                        
                    end,width: "20%")+
@@ -95,7 +95,7 @@
     end
 
     g.column name: "备注" do |order|
-      order.buyer_desc+order.seller_desc
+      (order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc)
     end
 
     g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id', detach_with_id: :business_id_filter,custom_filter: Business.accessible_by(current_ability).map{|b| [b.name,b.id]} do |order|
