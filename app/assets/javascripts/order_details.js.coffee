@@ -2,25 +2,30 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 ready = ->
-  $("#order_detail_supplier_id").change(osid)
+  $("#order_detail_supplier_id").change(ossid)
 
-$(document).ready(ready)
-$(document).on('page:load', ready)
+ossid()
 
-osid= ->
-    $('#sid').val($('#order_detail_supplier_id').val());
-    slid = $('#sid').val();
+$ ->
+  ready()
 
-    surl = $('#specification_name').attr('data-autocomplete');
+$(document).on "page:load",->
+  ready()
+
+ossid= ->
+    $('#os_sid').val($('#order_detail_supplier_id').val());
+    osid = $('#os_sid').val();
+
+    surl = $('#os_specification_name').attr('data-autocomplete');
     
     s = '&supplierid=';
     indexs = surl.lastIndexOf(s);
 
     if indexs <0
-       url = surl+s+slid
+       url = surl+s+osid
     else
-       url = surl.slice(0,indexs)+s+slid
+       url = surl.slice(0,indexs)+s+osid
 
-    $('#specification_name').attr('data-autocomplete',url);
+    $('#os_specification_name').attr('data-autocomplete',url);
     
     return false;

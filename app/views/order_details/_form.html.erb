@@ -10,12 +10,12 @@
     <div class="controls">
      
       <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]},:include_blank => "请选择")%>
-      <%= hidden_field_tag('sid',@slid) %>
+      <%= hidden_field_tag('os_sid',@osid) %>
     </div>
   <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-    <%= sp_product_select_autocom("order_detail",@order.id) %>
+    <%= os_product_select_autocom("order_detail",@order.id) %>
     </div>
 
     <div class="control-group">

@@ -5,14 +5,20 @@ ready = ->
   $("#relationship_business_id").change(bid)
   $("#relationship_supplier_id").change(sid)
 
-$(document).ready(ready)
-$(document).on('page:load', ready)
+  bid()
+  sid()
+
+$ ->
+  ready()
+
+$(document).on "page:load",->
+  ready()
 
 bid= ->
     $('#bid').val($('#relationship_business_id').val());
     bsid = $('#bid').val();
 
-    burl = $('#specification_name').attr('data-autocomplete');
+    burl = $('#r_specification_name').attr('data-autocomplete');
     b = '&businessid=';
     s = '&supplierid=';
     indexb = burl.lastIndexOf(b);
@@ -39,7 +45,7 @@ bid= ->
          url = arr[0]+arr[1]+arr[2]
     
     
-    $('#specification_name').attr('data-autocomplete',url);
+    $('#r_specification_name').attr('data-autocomplete',url);
 
 
     return false;
@@ -48,7 +54,7 @@ sid= ->
     $('#sid').val($('#relationship_supplier_id').val());
     slid = $('#sid').val();
 
-    surl = $('#specification_name').attr('data-autocomplete');
+    surl = $('#r_specification_name').attr('data-autocomplete');
     b = '&businessid=';
     s = '&supplierid=';
     indexb = surl.lastIndexOf(b);
@@ -75,6 +81,6 @@ sid= ->
          url = arr[0]+arr[1]+arr[2]
     
     
-    $('#specification_name').attr('data-autocomplete',url);
+    $('#r_specification_name').attr('data-autocomplete',url);
     return false;
 
