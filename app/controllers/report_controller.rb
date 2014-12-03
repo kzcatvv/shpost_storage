@@ -16,7 +16,7 @@ class ReportController < ApplicationController
         Rails.logger.info "business_id:" + business_id.to_s
         Rails.logger.info "start_date:" + start_date.to_s
         Rails.logger.info "end_date:" + end_date.to_s
-        purchases=Purchase.accessible_by(current_ability).where(business_id: business_id).where("created_at >= '" + start_date.to_s + "' and created_at <= '" + (end_date+1).to_s + "'")
+        purchases=Purchase.accessible_by(current_ability).where(business_id: business_id).where("created_at >= ? and created_at <= ?", start_date, (end_date+1))
         if purchases.blank?
           flash[:alert] = "无补货数据"
           redirect_to :action => 'purchase_arrival_report'
@@ -46,35 +46,52 @@ class ReportController < ApplicationController
       objs.each do |obj|
         previous_detail_id = nil
         obj.purchase_details.each do |detail|
-          detail.purchase_arrivals.each do |arrival|
-            if previous_detail_id == detail.id
-              sheet1[count_row,0] = ""
-              sheet1[count_row,1] = ""
-              sheet1[count_row,2] = ""
-              sheet1[count_row,3] = ""
-              sheet1[count_row,4] = ""
-              sheet1[count_row,5] = ""
-              sheet1[count_row,6] = ""
-              sheet1[count_row,8] = ""
-            else
-              sheet1[count_row,0] = detail.purchase.no
-              sheet1[count_row,1] = detail.purchase.business.name
-              sheet1[count_row,2] = detail.specification.sku
-              sheet1[count_row,3] = Relationship.find_by(specification: detail.specification, business: detail.purchase.business, supplier: detail.supplier).external_code
-              sheet1[count_row,4] = detail.supplier.name
-              sheet1[count_row,5] = detail.specification.name
-              sheet1[count_row,6] = detail.amount
-              sheet1[count_row,8] = detail.purchase.created_at.to_formatted_s(%Y-%m-%d)
+          if detail.purchase_arrivals.blank?
+            sheet1[count_row,0] = detail.purchase.no
+            sheet1[count_row,1] = detail.purchase.business.name
+            sheet1[count_row,2] = detail.specification.sku
+            sheet1[count_row,3] = Relationship.find_by(specification: detail.specification, business: detail.purchase.business, supplier: detail.supplier).external_code
+            sheet1[count_row,4] = detail.supplier.name
+            sheet1[count_row,5] = detail.specification.name
+            sheet1[count_row,6] = detail.amount
+            sheet1[count_row,8] = detail.purchase.created_at.to_date.to_s
 
-              previous_detail_id = detail.id
+            sheet1[count_row,7] = ""
+            sheet1[count_row,9] = "没货"
+
+            previous_detail_id = detail.id
+            count_row += 1
+          else
+            detail.purchase_arrivals.each do |arrival|
+              if previous_detail_id == detail.id
+                sheet1[count_row,0] = ""
+                sheet1[count_row,1] = ""
+                sheet1[count_row,2] = ""
+                sheet1[count_row,3] = ""
+                sheet1[count_row,4] = ""
+                sheet1[count_row,5] = ""
+                sheet1[count_row,6] = ""
+                sheet1[count_row,8] = ""
+              else
+                sheet1[count_row,0] = detail.purchase.no
+                sheet1[count_row,1] = detail.purchase.business.name
+                sheet1[count_row,2] = detail.specification.sku
+                sheet1[count_row,3] = Relationship.find_by(specification: detail.specification, business: detail.purchase.business, supplier: detail.supplier).external_code
+                sheet1[count_row,4] = detail.supplier.name
+                sheet1[count_row,5] = detail.specification.name
+                sheet1[count_row,6] = detail.amount
+                sheet1[count_row,8] = detail.purchase.created_at.to_date.to_s
+
+                previous_detail_id = detail.id
+              end
+              sheet1[count_row,7] = arrival.arrived_at
+              sheet1[count_row,9] = arrival.arrived_amount
+
+              count_row += 1
             end
-            sheet1[count_row,7] = arrival.arrived_at
-            sheet1[count_row,9] = arrival.arrived_amount
-
           end
         end
 
-       count_row += 1
       end  
   
       book.write xls_report  
