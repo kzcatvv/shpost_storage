@@ -102,8 +102,16 @@ function ajaxspecifications() {
     return false; 
   })
 
-  $('#specification_name').bind('railsAutocomplete.select', function(event, data){
+  $('#r_specification_name').bind('railsAutocomplete.select', function(event, data){
     /* Do something here */
+    alert("aaaa");
+    var spid = "#"+data.item.obj+"_specification_id";
+    $(spid).val(data.item.id);
+  });
+
+  $('#br_specification_name').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    alert("aaaa");
     var spid = "#"+data.item.obj+"_specification_id";
     $(spid).val(data.item.id);
   });

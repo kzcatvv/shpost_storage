@@ -23,19 +23,37 @@ module ApplicationHelper
 
     def product_select_autocom(obj_id)
        
-       concat text_field_tag('specification_name',@spname, 'data-autocomplete' => "/specification_autocom/autocomplete_specification_name?objid=#{obj_id}" )
+       concat text_field_tag('r_specification_name',@spname, 'data-autocomplete' => "/specification_autocom/autocomplete_specification_name?objid=#{obj_id}" )
        hidden_field(obj_id.to_sym,"specification_id");
     end
 
-    def sp_product_select_autocom(obj_id,obj)
+    def pd_product_select_autocom(obj_id,obj)
        
-       concat text_field_tag('specification_name',@spname, 'data-autocomplete' => "/specification_autocom/sp_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
+       concat text_field_tag('pd_specification_name',@spname, 'data-autocomplete' => "/specification_autocom/pd_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
+       hidden_field(obj_id.to_sym,"specification_id");
+    end
+
+    def ko_product_select_autocom(obj_id,obj)
+       
+       concat text_field_tag('ko_specification_name',@spname, 'data-autocomplete' => "/specification_autocom/ko_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
+       hidden_field(obj_id.to_sym,"specification_id");
+    end
+
+    def os_product_select_autocom(obj_id,obj)
+       
+       concat text_field_tag('os_specification_name',@spname, 'data-autocomplete' => "/specification_autocom/os_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
+       hidden_field(obj_id.to_sym,"specification_id");
+    end
+
+    def ms_product_select_autocom(obj_id,obj)
+       
+       concat text_field_tag('ms_specification_name',@spname, 'data-autocomplete' => "/specification_autocom/ms_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
        hidden_field(obj_id.to_sym,"specification_id");
     end
 
     def br_product_select_autocom(obj_id,obj)
        
-       concat text_field_tag('specification_name',@spname, 'data-autocomplete' => "/specification_autocom/br_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
+       concat text_field_tag('br_specification_name',@spname, 'data-autocomplete' => "/specification_autocom/br_autocomplete_specification_name?objid=#{obj_id}&obj=#{obj}")
        hidden_field(obj_id.to_sym,"specification_id");
     end
 
