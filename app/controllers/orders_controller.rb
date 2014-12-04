@@ -17,7 +17,7 @@ class OrdersController < ApplicationController
   def packaging_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGING_STATUS)
     @orders_grid=initialize_grid(@orders,
-        :conditions => ['order_type = ? and is_split = ?',"b2c",false])
+        :conditions => ['order_type = ? and is_split != ?',"b2c", true])
 
     render :layout => false
   end
@@ -25,7 +25,7 @@ class OrdersController < ApplicationController
   def packaged_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGED_STATUS).where('created_at > ?', Date.today.to_time)
     @orders_grid=initialize_grid(@orders,
-      :conditions => ['order_type = ? and is_split = ?',"b2c",false])
+      :conditions => ['order_type = ? and is_split != ?',"b2c", true])
 
     render :layout => false
   end
@@ -400,7 +400,7 @@ class OrdersController < ApplicationController
     @curr_order=""
     @orders = Order.where("storage_id = ?", session[:current_storage])
     @orders_grid=initialize_grid(@orders,
-      :conditions => ['order_type = ? and is_split = ?',"b2c",false])
+      :conditions => ['order_type = ? and is_split != ',"b2c", true])
   end
 
   def findorderout
@@ -446,11 +446,11 @@ class OrdersController < ApplicationController
     status = ["waiting","printed","picking"]
     @orders_grid = initialize_grid(@orders,
       :include => [:business],
-      :conditions => ['order_type = ? and status in (?) and is_split = ?',"b2c",status,false],
+      :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true],
       :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business], :conditions => ['order_type = ? and status in (?) and is_split = ?',"b2c",status,false]).resultset.limit(nil).to_ary
+    @slorders = initialize_grid(@orders, :include => [:business], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true]).resultset.limit(nil).to_ary
     @selectorders=Order.where(id: @slorders)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?

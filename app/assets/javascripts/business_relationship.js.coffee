@@ -15,16 +15,16 @@ brsid= ->
   $('#br_sid').val($('#relationship_supplier_id').val());
   brid = $('#br_sid').val();
   surl = $('#br_specification_name').attr('data-autocomplete');
-  #alert("business relationship")
+  
   s = '&supplierid=';
-  indexs = surl.lastIndexOf(s);
-    
-    
-  if indexs <0
-    url = surl + s + brid
-  else
-    url = surl.slice(0,indexs) + s + brid
-    
-  $('#br_specification_name').attr("data-autocomplete",url);
+  if surl != undefined
+    indexs = surl.lastIndexOf(s);
+      
+    if indexs <0
+      url = surl + s + brid
+    else
+      url = surl.slice(0,indexs) + s + brid
+      
+    $('#br_specification_name').attr("data-autocomplete",url);
 
-  #return false;
+  

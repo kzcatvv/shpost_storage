@@ -1,9 +1,7 @@
 # Place all the behaviors and hooks related to the matching controller here.
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
-  #$('#purchase_detail_supplier_id').val()?.pdsid
-  #pdsid
- 
+  
 $ ->
   ready()
 
@@ -16,22 +14,19 @@ ready = ->
 
 pdsid = ->
   supplier_id = $('#purchase_detail_supplier_id').val()
-  #alert(supplier_id)
-  #$('#pd_sid').val(supplier_id);
-  #pdid = $('#pd_sid').val();
-
+  
   surl = $("#pd_specification_name").attr("data-autocomplete");
 
-  #alert("purchase");
-    
-  s = '&supplierid=';
-  indexs = surl.lastIndexOf(s);
+  s = "&supplierid=";
 
-  if indexs <0
-    url = surl + s + supplier_id
-  else
-    url = surl.slice(0,indexs) + s +supplier_id
+  if surl != undefined
+    indexs = surl.lastIndexOf(s);
 
-  $("#pd_specification_name").attr("data-autocomplete",url);
+    if indexs <0
+      url = surl + s + supplier_id
+    else
+      url = surl.slice(0,indexs) + s + supplier_id
+
+    $("#pd_specification_name").attr("data-autocomplete",url);
     
-  #return false;
+ 
