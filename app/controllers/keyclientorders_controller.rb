@@ -6,8 +6,7 @@ class KeyclientordersController < ApplicationController
   def index
     #@keyclientorders = Keyclientorder.all
     @keyclientorders_grid = initialize_grid(@keyclientorders,
-                   :conditions => {:order_type => "b2c",
-                                   :storage_id => current_storage.id },
+                   :conditions => ['order_type <> ?',"b2b"],
                    :order => 'keyclientorders.id',
                    :order_direction => 'desc',
                    include: [:business, :storage, :unit])
@@ -15,8 +14,7 @@ class KeyclientordersController < ApplicationController
 
   def b2bindex
     @keyclientorders_grid = initialize_grid(@keyclientorders,
-                   :conditions => {:order_type => "b2b",
-                                   :storage_id => current_storage.id },
+                   :conditions => {:order_type => "b2b"},
                    include: [:business, :storage, :unit])
   end
 
