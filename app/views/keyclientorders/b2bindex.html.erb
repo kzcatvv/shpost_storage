@@ -35,7 +35,7 @@
 
     g.column name: '订单商品明细' do |keyclientorder|
       od=content_tag(:tr,content_tag(:td," "))
-      kos=keyclientorder.orders.where("is_parent = ?",true).to_ary
+      kos=keyclientorder.orders.where("order_type='b2b' and is_split = ?",false).to_ary
         kos.each do |ko|
           ods = ko.order_details.to_ary
           ods.each do |dl|
