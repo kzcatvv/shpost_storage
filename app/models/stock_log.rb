@@ -43,7 +43,7 @@ class StockLog < ActiveRecord::Base
   def stock_out_name
     # stock_log : order_detail = N:1
     # self.order_details.first.specification.name + "_" + self.order_details.first.order.no
-    self.order_details.first.specification.name
+    self.specification.name
   end
 
   def set_desc

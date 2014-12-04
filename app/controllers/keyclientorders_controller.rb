@@ -201,7 +201,7 @@ class KeyclientordersController < ApplicationController
 #     end
 
     if @keyclientorder.keyclient_name == "auto"
-      redirect_to :action => 'findprintindex'
+      redirect_to '/orders/findprintindex'
     else
       redirect_to "/keyclientorders"
     end
