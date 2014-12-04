@@ -72,7 +72,7 @@ class OrderReturnsController < ApplicationController
     ords.each do |ord|
       rt_id_hash.push(ord.order_detail_id)
     end
-    if ords.nil?
+    if ords.blank?
       if @order.nil?
         @curr_order=0
         @order_details=[]
