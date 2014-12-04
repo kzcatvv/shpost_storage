@@ -512,6 +512,7 @@ class CSBSendWithSOAP
           # puts "DELIVER_NO=" << listId
           order_detail.store('DELIVER_NO', orderId)
           order_hash.store('ORDER_ID', listId)
+          order_hash.store('TRANS_SN', orderId)
         else
           order_hash.store('ORDER_ID', orderId)
         end
