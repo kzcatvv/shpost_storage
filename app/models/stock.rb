@@ -104,7 +104,7 @@ class Stock < ActiveRecord::Base
   def self.is_enough_stock?(order)
     sum_amount_hash = order.details.group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
     sum_amount_hash.each do |x, amount|
-      total_amount = total_stock_in_storage(Specification.find(x[0]), Supplier.find(x[1]), Business.find(x[2]), Storage.find(x[3]))
+      total_amount = total_stock_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), Storage.find(x[3]))
 
       if total_amount < amount
         return false
