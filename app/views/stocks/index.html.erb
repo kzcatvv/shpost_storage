@@ -33,6 +33,10 @@
       stock.business.try :name
     end
 
+    g.column name: '是否残次品', model: 'Shelf', attribute: 'is_bad', custom_filter: Shelf::BAD_TYPE.invert do |stock|
+      stock.shelf.bad_type_name
+    end
+
     g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |stock|
       stock.supplier.try :name
     end
