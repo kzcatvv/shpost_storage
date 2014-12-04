@@ -66,12 +66,28 @@ class OrderReturnsController < ApplicationController
 
   def find_tracking_number
     @order = Order.where(tracking_number: params[:tracking_number]).accessible_by(current_ability).first
-    if @order.nil?
-      @curr_order=0
-      @order_details=[]
+    ods=@order.order_details
+    ords = OrderReturnDetail.where(order_detail_id: ods)
+    rt_id_hash=[]
+    ords.each do |ord|
+      rt_id_hash.push(ord.order_detail_id)
+    end
+    if ords.nil?
+      if @order.nil?
+        @curr_order=0
+        @order_details=[]
+      else
+        @curr_order=@order.id
+        @order_details = @order.order_details
+      end
     else
-      @curr_order=@order.id
-      @order_details = @order.order_details
+      if ods.count <= ords.count
+        @curr_order = -1
+        @order_details=[]
+      else
+        @curr_order=@order.id
+        @order_details = @order.order_details.where("id not in (?)",rt_id_hash)
+      end
     end
     respond_to do |format|
           format.js 
