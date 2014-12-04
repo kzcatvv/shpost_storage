@@ -1,11 +1,11 @@
 namespace :transmitter do
 
-  namespace :autoresend do
+  namespace :interface do
     desc "Auto resend the failed interface"
       task :auto_resend => :environment do
-        generate_params 'transmitter.autoresend.auto_resend'
+        generate_params 'transmitter.interface.auto_resend'
 
-          # InterfaceInfo.send_info(TcbdSoap,"order_query",[@uri,@method],"auto",nil)
+        InterfaceInfo.auto_resend()
 
       end
   end
