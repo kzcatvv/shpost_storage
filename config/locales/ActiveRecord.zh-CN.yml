@@ -606,6 +606,7 @@ zh-CN:
         storage_id: 所属仓库
         business_id: 所属商户
         status: "状态"
+        created_at: "创建时间"
       keyclientorderdetail:
         keyclientorder_id: 订单批次编号
         specification_id: 商品规格
