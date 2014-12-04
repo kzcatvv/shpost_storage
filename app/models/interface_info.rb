@@ -6,7 +6,7 @@ class InterfaceInfo < ActiveRecord::Base
   OPERATE_TYPE = {auto: '自动', manual: '手动'}
 
   def self.save_info(class_name, method_name,status = '1', url = nil, url_method = nil, url_request = nil, url_response = nil, type, params, info_id)
-    binding.pry
+    # binding.pry
     Rails.logger.info "class_name: #{class_name}" 
     Rails.logger.info "method_name: #{method_name}"
     Rails.logger.info "status: #{status}"
