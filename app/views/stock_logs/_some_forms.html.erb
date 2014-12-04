@@ -24,6 +24,12 @@
       end
     end
 
+    if @manual_stock
+      g.column name: model_class.human_attribute_name(:ms_name), attribute: 'name', ordering: false, model: 'PurchaseDetail' do |stock_log|
+          content_tag(:p, stock_log.batch_no+"_"+stock_log.specification.name, {id: "stock_logs_mdid_#{stock_log.id}", onclick: 'clickin(this);'})
+      end
+    end
+
     if @orders
       g.column name: model_class.human_attribute_name(:kcorder_name), attribute: 'batch_no', ordering: false, model: 'Keyclientorderdetail' do |stock_log|
         # if stock_log.status == 'waiting'
