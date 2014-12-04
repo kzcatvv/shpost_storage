@@ -106,7 +106,7 @@ class OrderReturnsController < ApplicationController
       reason = params[("rereason_"+id).to_sym]
       is_bad = params[("st_"+id).to_sym]
 
-      @order_return.order_return_details.build(order_detail_id: id, return_reason: reason, is_bad: (is_bad.eql? '否') ? 'no' : 'yes', status: 'waiting')
+      @order_return.order_return_details.create(order_detail_id: id, return_reason: reason, is_bad: (is_bad.eql? '否') ? 'no' : 'yes', status: 'waiting')
     end
     
     Stock.order_return_stock_in(@order_return, current_user)
