@@ -15,7 +15,8 @@ class KeyclientordersController < ApplicationController
 
   def b2bindex
     @keyclientorders_grid = initialize_grid(@keyclientorders,
-                   :conditions => {:order_type => "b2b"},
+                   :conditions => {:order_type => "b2b",
+                                   :storage_id => current_storage.id },
                    include: [:business, :storage, :unit])
   end
 
