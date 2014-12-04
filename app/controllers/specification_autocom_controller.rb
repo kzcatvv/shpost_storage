@@ -11,10 +11,10 @@ class SpecificationAutocomController < ApplicationController
     supplier_id = params[:supplierid]
     # brand_id = params[:brand_id]
     # country = params[:country]
-    #specifications = Specification.where('sixnine_code LIKE ? or sku LIKE ? or all_name LIKE ?', "%#{term}%","%#{term}%","%#{term}%").accessible_by(current_ability).order(:all_name).all
-    si=Relationship.joins(:specification).where('relationships.business_id= ? and relationships.supplier_id= ? and ( specifications.sixnine_code like ? or specifications.sku like ? or specifications.all_name like ? )',"#{business_id}","#{supplier_id}","%#{term}%","%#{term}%","%#{term}%").select(:specification_id)
+    specifications = Specification.where('sixnine_code LIKE ? or sku LIKE ? or all_name LIKE ?', "%#{term}%","%#{term}%","%#{term}%").accessible_by(current_ability).order(:all_name).all
+    #si=Relationship.joins(:specification).where('relationships.business_id= ? and relationships.supplier_id= ? and ( specifications.sixnine_code like ? or specifications.sku like ? or specifications.all_name like ? )',"#{business_id}","#{supplier_id}","%#{term}%","%#{term}%","%#{term}%").select(:specification_id)
 
-    specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
+    #specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
 
     # binding.pry
     render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }

@@ -32,7 +32,7 @@ class Ability
         can :manage, Goodstype, unit_id: user.unit_id
         can :manage, Commodity, unit_id: user.unit_id
         can :manage, Specification, commodity: {unit_id: user.unit_id}
-        # can :new, Relationship
+        can :new, Relationship
 
         can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
 
