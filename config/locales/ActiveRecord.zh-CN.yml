@@ -515,7 +515,7 @@ zh-CN:
         city: "市"
         county: "区"
         tracking_number: "面单号"
-        is_parent: "是否主订单"
+        is_split: "是否拆分订单"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        

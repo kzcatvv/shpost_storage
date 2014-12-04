@@ -108,6 +108,8 @@
       order.status_name
     end
 
+    g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number'
+
     g.column name: "备注" do |order|
       (order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc)
     end

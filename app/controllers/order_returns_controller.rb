@@ -85,7 +85,7 @@ class OrderReturnsController < ApplicationController
     # binding.pry
     # @batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + (OrderReturn.select(:batch_no).distinct.count+1).to_s.rjust(5,'0')
     @order_return = OrderReturn.create(unit_id:current_user.unit_id,storage_id:current_storage.id,status:"waiting")
-
+    @batchid =@order_return.batch_no
     params[:cbids].each do |id|
       reason = params[("rereason_"+id).to_sym]
       is_bad = params[("st_"+id).to_sym]
