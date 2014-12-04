@@ -46,11 +46,12 @@ class ReportController < ApplicationController
       objs.each do |obj|
         previous_detail_id = nil
         obj.purchase_details.each do |detail|
+          relationship = Relationship.find_by(specification: detail.specification, business: detail.purchase.business, supplier: detail.supplier)
           if detail.purchase_arrivals.blank?
             sheet1[count_row,0] = detail.purchase.no
             sheet1[count_row,1] = detail.purchase.business.name
             sheet1[count_row,2] = detail.specification.sku
-            sheet1[count_row,3] = Relationship.find_by(specification: detail.specification, business: detail.purchase.business, supplier: detail.supplier).external_code
+            sheet1[count_row,3] = relationship.blank? ? "" : relationship.external_code
             sheet1[count_row,4] = detail.supplier.name
             sheet1[count_row,5] = detail.specification.name
             sheet1[count_row,6] = detail.amount
@@ -76,7 +77,7 @@ class ReportController < ApplicationController
                 sheet1[count_row,0] = detail.purchase.no
                 sheet1[count_row,1] = detail.purchase.business.name
                 sheet1[count_row,2] = detail.specification.sku
-                sheet1[count_row,3] = Relationship.find_by(specification: detail.specification, business: detail.purchase.business, supplier: detail.supplier).external_code
+                sheet1[count_row,3] = relationship.blank? ? "" : relationship.external_code
                 sheet1[count_row,4] = detail.supplier.name
                 sheet1[count_row,5] = detail.specification.name
                 sheet1[count_row,6] = detail.amount
