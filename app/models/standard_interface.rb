@@ -77,7 +77,7 @@ class StandardInterface
       return order
     end
 
-    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume, is_split: false
+    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: desc, business: business, unit: unit, storage: storage.blank? ? unit.default_storage : storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume, is_split: false
 
     order_details.each do |x, i|
       sku = x['SKU']
