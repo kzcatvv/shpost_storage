@@ -10,6 +10,9 @@ class StockLog < ActiveRecord::Base
   belongs_to :supplier
 
   has_one :shelf, through: :stock
+  has_one :area, through: :shelf
+  has_one :storage, through: :shelf
+  has_one :unit, through: :shelf
   has_and_belongs_to_many :order_details
   has_many :orders, through: :order_details
   # has_many :keyclientorders, through: :orders
