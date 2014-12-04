@@ -2,6 +2,8 @@ var oid = <%= @curr_order %>;
 
 if (oid == 0){
 	selfAlert("无符合条件的面单号",3000);
+}else if (oid == -1){
+	selfAlert("该订单已全部退件",3000);
 }else{
 	$('#outorders').append(" <%= escape_javascript(render :partial => "order_returns/pack_return_forms",object: @orders ) %> ");
 }
