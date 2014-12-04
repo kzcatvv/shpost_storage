@@ -108,15 +108,15 @@ class StandardInterface
         break
       end
 
-      if i > 0 && separate
-        t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
+      # if i > 0 && separate
+      #   t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
 
-        if !t.blank?
-          return t
-        end
+      #   if !t.blank?
+      #     return t
+      #   end
 
-        order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume
-      end
+      #   order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume
+      # end
 
       order.order_details.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, desc: desc, name: name
     end
