@@ -10,7 +10,7 @@ class OrdersController < ApplicationController
   end
 
   def order_alert
-    @orders = Order.where( [ "status = ? and storage_id = ? and created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders = Order.where( [ "status = ? and storage_id = ? and created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day]).joines(:business).where('alertday is not null')
     @orders_grid = initialize_grid(@orders)
   end
 
