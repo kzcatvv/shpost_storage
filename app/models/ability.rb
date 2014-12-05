@@ -53,7 +53,7 @@ class Ability
         can :role, :unitadmin
         can :role, :user
         can [:read, :up_download_export], UpDownload
-        cannot [:create, :to_import, :up_download_import], UpDownload
+        cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
         
         # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
@@ -88,7 +88,7 @@ class Ability
         cannot :manage, InterfaceInfo
 
         can [:read, :up_download_export], UpDownload
-        cannot [:create, :to_import, :up_download_import], UpDownload
+        cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
 
     else
         cannot :manage, :all

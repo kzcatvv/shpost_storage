@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141202085706) do
+ActiveRecord::Schema.define(version: 20141204081402) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -138,7 +138,7 @@ ActiveRecord::Schema.define(version: 20141202085706) do
     t.string   "status"
     t.string   "barcode"
     t.string   "no"
-    t.string   "order_type"
+    t.string   "order_type",     default: "b2c"
   end
 
   create_table "manual_stock_details", force: true do |t|
@@ -211,7 +211,7 @@ ActiveRecord::Schema.define(version: 20141202085706) do
 
   create_table "orders", force: true do |t|
     t.string   "no",                             default: ""
-    t.string   "order_type"
+    t.string   "order_type",                     default: "b2c"
     t.string   "need_invoice"
     t.string   "customer_name"
     t.string   "customer_unit"
@@ -235,9 +235,9 @@ ActiveRecord::Schema.define(version: 20141202085706) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -388,8 +388,6 @@ ActiveRecord::Schema.define(version: 20141202085706) do
     t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
-    t.date     "expiration_date"
-    t.string   "batch_no"
   end
 
   create_table "stock_mons", force: true do |t|
