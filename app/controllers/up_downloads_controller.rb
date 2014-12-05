@@ -46,6 +46,17 @@ class UpDownloadsController < ApplicationController
   def destroy
     #@up_download.destroy
     #respond_with(@up_download)
+    file_path = @up_download.url
+    if File.exist?(file_path)
+      File.delete(file_path)
+
+      @up_download.destroy
+    end
+    respond_to do |format|
+      format.html { redirect_to up_downloads_url }
+      format.json { head :no_content }
+    end
+    
   end
 
   def to_import

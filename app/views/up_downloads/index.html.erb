@@ -26,7 +26,8 @@
     g.column do |up_download|
       ActiveSupport::SafeBuffer.new << 
       (link_to t('.export', :default => t("helpers.links.up_download_export")),
-                      up_download_export_up_download_path(up_download),:method => 'post', :class => 'btn btn-primary')
+                      up_download_export_up_download_path(up_download),:method => 'post', :class => 'btn btn-primary') << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), up_download_path(up_download), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, up_download)
 
 
     end 
