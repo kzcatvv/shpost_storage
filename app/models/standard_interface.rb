@@ -227,9 +227,9 @@ class StandardInterface
   end
 
   def self.getKeycOrderID(unit,storage,type)
-    time = Time.new
-    batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(keyclient_name: "b2b auto",unit_id: unit.id,storage_id: storage.blank? ? unit.default_storage.id : storage.id,batch_no: batch_no,user: nil,status: "waiting",order_type: type)
+    # time = Time.new
+    # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+    keycorder = Keyclientorder.create(keyclient_name: "b2b auto",unit_id: unit.id,storage_id: storage.blank? ? unit.default_storage.id : storage.id,user: nil,status: "waiting",order_type: type)
     return keycorder.id
   end
 end
