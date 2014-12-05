@@ -63,9 +63,9 @@ class Ability
 
         cannot :resend, InterfaceInfo do |interface_info|
             (interface_info.status == "success")
-        can :manage,BusinessRelationship
 
         end
+        # can :manage,BusinessRelationship
 
     elsif user.user?
         can :update, User, id: user.id
