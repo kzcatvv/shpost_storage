@@ -158,6 +158,8 @@ ShpostStorage::Application.routes.draw do
       get 'warning_stocks_index'
       get 'findstock'
       get 'getstock'
+      get 'stock_stat_report'
+      post 'stock_stat_report_down'
     end
 
     member do
