@@ -411,6 +411,7 @@ zh-CN:
         created_at: "创建时间"
         checked_at: "确认时间"
         pd_name: "采购单明细"
+        "spec_name": "商品规格"
         "shelf_code": "货架编号"
         "shelf": "货架编号"
         shelf_code: "货架编号"

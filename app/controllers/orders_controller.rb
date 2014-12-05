@@ -6,11 +6,11 @@ class OrdersController < ApplicationController
   # GET /orderes.json
   def index
     @orders_grid = initialize_grid(@orders,
-     :conditions => {:order_type => "b2c"})
+     :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
   end
 
   def order_alert
-    @orders = Order.where( [ "status = ? and storage_id = ? and created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders = Order.where( [ "status = ? and storage_id = ? and orders.created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find_by(no: StorageConfig.config["business"]['jh_id']).alertday.day]).joins(:business).where('alertday is not null')
     @orders_grid = initialize_grid(@orders)
   end
 
@@ -444,14 +444,19 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
-    @orders_grid = initialize_grid(@orders,
-      :include => [:business],
-      :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true],
-      :per_page => 15)
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true], :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true]).resultset.limit(nil).to_ary
-    @selectorders=Order.where(id: @slorders)
+    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true])
+
+    #some wice_grad lazy do the resultset is [] without once call
+    begin
+      @slorders.resultset
+    rescue
+
+    end
+    
+    @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
         if !params[:grid][:f]["businesses.name".to_sym].nil?
@@ -1032,8 +1037,8 @@ class OrdersController < ApplicationController
 
   def getKeycOrderID()
     time = Time.new
-    batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],batch_no: batch_no,user: current_user,status: "printed")
+    # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+    keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],user: current_user,status: "printed")
     return keycorder.id
   end
 

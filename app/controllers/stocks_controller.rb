@@ -81,7 +81,7 @@ class StocksController < ApplicationController
     @stocks = Stock.warning_stocks(current_storage)
     @relationships = []
     @stocks.each do |x|
-      @relationships << Relationship.find_by(business_id: x.b_id, specification_id: x.spec_id, supplier_id: x.s_id)
+      @relationships << Relationship.find_by(business_id: x.business_id, specification_id: x.specification_id, supplier_id: x.supplier_id)
     end
   end
 

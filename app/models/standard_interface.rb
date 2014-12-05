@@ -103,20 +103,21 @@ class StandardInterface
       relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
     
       if relationship.nil?
+        order.delete
         order = FileInterface.save_order(context, business.id, unit.id)
-        raise ActiveRecord::Rollback
+        # ActiveRecord::Rollback
         break
       end
 
-      if i > 0 && separate
-        t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
+      # if i > 0 && separate
+      #   t = Order.where(business_order_id: deliver_no, business: business, unit: unit)
 
-        if !t.blank?
-          return t
-        end
+      #   if !t.blank?
+      #     return t
+      #   end
 
-        order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume
-      end
+      #   order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume
+      # end
 
       order.order_details.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, desc: desc, name: name
     end
@@ -226,9 +227,9 @@ class StandardInterface
   end
 
   def self.getKeycOrderID(unit,storage,type)
-    time = Time.new
-    batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(keyclient_name: "b2b auto",unit_id: unit.id,storage_id: storage.blank? ? unit.default_storage.id : storage.id,batch_no: batch_no,user: nil,status: "waiting",order_type: type)
+    # time = Time.new
+    # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+    keycorder = Keyclientorder.create(keyclient_name: "b2b auto",unit_id: unit.id,storage_id: storage.blank? ? unit.default_storage.id : storage.id,user: nil,status: "waiting",order_type: type)
     return keycorder.id
   end
 end

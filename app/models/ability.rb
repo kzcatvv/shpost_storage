@@ -21,7 +21,7 @@ class Ability
         can :manage, UpDownload
 
         cannot :resend, InterfaceInfo do |interface_info|
-            (interface_info.status == "success")
+            (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
         end
 
     elsif user.unitadmin?
@@ -53,7 +53,7 @@ class Ability
         can :role, :unitadmin
         can :role, :user
         can [:read, :up_download_export], UpDownload
-        cannot [:create, :to_import, :up_download_import], UpDownload
+        cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
         
         # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
@@ -62,10 +62,10 @@ class Ability
         can :manage, InterfaceInfo
 
         cannot :resend, InterfaceInfo do |interface_info|
-            (interface_info.status == "success")
-        can :manage,BusinessRelationship
+            (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
 
         end
+        # can :manage,BusinessRelationship
 
     elsif user.user?
         can :update, User, id: user.id
@@ -88,7 +88,7 @@ class Ability
         cannot :manage, InterfaceInfo
 
         can [:read, :up_download_export], UpDownload
-        cannot [:create, :to_import, :up_download_import], UpDownload
+        cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
 
     else
         cannot :manage, :all
