@@ -21,7 +21,7 @@ class Ability
         can :manage, UpDownload
 
         cannot :resend, InterfaceInfo do |interface_info|
-            (interface_info.status == "success")
+            (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
         end
 
     elsif user.unitadmin?
@@ -62,7 +62,7 @@ class Ability
         can :manage, InterfaceInfo
 
         cannot :resend, InterfaceInfo do |interface_info|
-            (interface_info.status == "success")
+            (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
 
         end
         # can :manage,BusinessRelationship

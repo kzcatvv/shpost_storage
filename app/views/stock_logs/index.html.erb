@@ -18,7 +18,7 @@
 
     # g.column name: model_class.human_attribute_name(:object_symbol), attribute: 'object_symbol'
 
-    g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'name', model: 'Specification' do |stock_log|
+    g.column name: model_class.human_attribute_name(:spec_name), attribute: 'name', model: 'Specification' do |stock_log|
         stock_log.specification.try :name
     end
 
