@@ -799,6 +799,9 @@ zh-CN:
         findwarning:
           name: "库存预警查询"
           link: "/stocks/warning_stocks_index"
+        stat_report:
+          name: "库存状态报表下载"
+          link: "/stocks/stock_stat_report"
     logs:
       name: "日志查询"
       submenu:
