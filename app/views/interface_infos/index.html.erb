@@ -5,11 +5,11 @@
 
 <%= grid(@interface_infos_grid) do |g|
     g.column name: model_class.human_attribute_name(:class_name), attribute: 'class_name' do |interface_info| 
-      InterfaceInfo::CLASS_NAME[interface_info.class_name.to_sym]
+      interface_info.class_name.blank? ? "" : InterfaceInfo::CLASS_NAME[interface_info.class_name.to_sym]
     end
 
     g.column name: model_class.human_attribute_name(:method_name), attribute: 'method_name' do |interface_info| 
-      InterfaceInfo::METHOD_NAME[interface_info.method_name.to_sym]
+      interface_info.method_name.blank? ? "" : InterfaceInfo::METHOD_NAME[interface_info.method_name.to_sym]
     end
 
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: InterfaceInfo::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |interface_info| 
