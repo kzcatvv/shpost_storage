@@ -478,7 +478,7 @@ class CSBSendWithSOAP
     end
     orders.each_element('OrderLabel') { |orderLabel|
       orders_array = Array.new
-      order_hash = {}
+      
       orderId = nil
       if order_type == StorageConfig.config["csb_interface"]["order_type_1"]
         orderId = orderLabel.attributes['listId']
@@ -502,6 +502,7 @@ class CSBSendWithSOAP
       end
       giftDetails.each do |giftDetail|
         order_detail = {}
+        order_hash = {}
         itemId = giftDetail.attributes['itemId']
         giftLineId = giftDetail.attributes['giftLineId']
         giftName = giftDetail.attributes['GiftName']
@@ -545,6 +546,7 @@ class CSBSendWithSOAP
 
       # puts order_hash
       unit = Unit.find_by(no: StorageConfig.config["unit"]['zb_id'])
+      order = nil
       orders_array.each do |x|
         order = StandardInterface.order_enter(x, Business.find_by(no: StorageConfig.config["business"]['bst_id']), unit, unit.default_storage, false)
       end
