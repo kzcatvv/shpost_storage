@@ -84,6 +84,7 @@ class Keyclientorder < ActiveRecord::Base
       end
       compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
     end
+    return sum_amount
   end
 
   def compare_sum_amount(sum_amount, sum_stock_logs)
