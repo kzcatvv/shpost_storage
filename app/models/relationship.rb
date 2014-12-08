@@ -3,7 +3,7 @@ class Relationship < ActiveRecord::Base
   belongs_to :supplier
   belongs_to :specification
   has_and_belongs_to_many :contacts
-  validates_presence_of :business_id, :specification_id, :external_code, :message => '不能为空'
+  validates_presence_of :business_id, :specification_id, :message => '不能为空'
 
   def self.find_relationships(sku, supplier = nil, spec_desc = nil, business = nil, unit)
     conditions =  where(external_code: sku)
