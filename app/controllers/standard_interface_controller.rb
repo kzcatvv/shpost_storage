@@ -150,13 +150,14 @@ class StandardInterfaceController < ApplicationController
 
     @context = params[:context]
 
-    return verify_sign
-
     begin
       @context_hash = ActiveSupport::JSON.decode(@context)
     rescue ActiveSupport::JSON.parse_error
-      error_builder('0002')
+      return error_builder('0002')
     end
+    
+    return verify_sign
+
   end
 
   def verify_sign
