@@ -104,7 +104,7 @@ class StandardInterface
     
       if relationship.nil?
         order.delete
-        order = FileInterface.save_order(context, business.id, unit.id)
+        order = FileInterface.save_order(context, business.id, unit.id, (storage.blank? ? unit.default_storage.id : storage.id))
         # ActiveRecord::Rollback
         break
       end

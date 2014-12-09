@@ -16,7 +16,13 @@ class CSBSendWithSOAP
           context = JSON.parse(ary[0].split(/\n/)[0])
           business = Business.find ary[1].split(/\n/)[0]
           unit = Unit.find ary[2].split(/\n/)[0]
-          order = StandardInterface.order_enter(context,business,unit,unit.default_storage,false)
+          storage = ary[3]
+          if !storage.blank?
+            storage = Storage.find storage.split(/\n/)[0]
+          else
+            storage = unit.default_storage
+          end
+          order = StandardInterface.order_enter(context,business,unit,storage,false)
           # if order.class is Order, means this order was saved into Order table. otherwise was saved into file
           if order.class == Order
             File.delete(file_path)
