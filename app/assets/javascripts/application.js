@@ -15,6 +15,7 @@
 //= require jquery.ui.all
 //= require wice_grid
 //= require autocomplete-rails
+//= require datepicker
 
 //= require twitter/bootstrap
 //= require turbolinks
