@@ -1,0 +1,23 @@
+<%- model_class = Stock -%>
+<div class="page-header">
+  <h1>库存状态汇总</h1>
+  <div style="float:right">   
+  </div>
+
+</div>
+<div>
+   <%= form_tag(stock_stat_report_stocks_url(format: "xls")) do -%>
+       <%= label_tag(:summ_dt, "统计年月:",class: 'control-label') %>
+       <%= date_select("stock", "summ_date",discard_day: true,prompt: { month: '请选择月份', year: '请选择年份' }) %>
+       <%= label_tag(:business_id, "商户:",class: 'control-label') %>
+       <%= select("stock","business_id", Business.accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择"),class: 'control-label' ) %>
+       <%= label_tag(:in_stock, "入库口径:") %>
+       <%= check_box_tag('return_in','order_return',false) %> 退货正常入库 &nbsp;&nbsp;<%= check_box_tag('purchase_in','purchase_stock_in',false) %> 采购单入库 &nbsp;&nbsp;<%= check_box_tag('bad_in','bad_stock_in',false) %> 库存入残次品库增加 &nbsp;&nbsp;<%= check_box_tag('bad_return','order_bad_return',false) %> 退货入残次品库 
+       <%= label_tag(:in_stock, "出库口径:") %>
+       <%= check_box_tag('b2c_out','b2c_stock_out',false) %> 订单出库 &nbsp;&nbsp;<%= check_box_tag('b2b_out','b2b_stock_out',false) %> 批量出库 &nbsp;&nbsp;<%= check_box_tag('move_bad','move_to_bad',false) %> 库存入残次品库扣减 
+       </br>
+
+       <%= submit_tag("查询下载",:class => 'btn btn-primary') %>
+   <% end -%>
+</div>
+
