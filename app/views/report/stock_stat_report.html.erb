@@ -6,7 +6,7 @@
 
 </div>
 <div>
-   <%= form_tag(stock_stat_report_stocks_url(format: "xls")) do -%>
+   <%= form_tag("/shpost_storage/report/stock_stat_report",format: "xls", method: "post") do -%>
        <%= label_tag(:summ_dt, "统计年月:",class: 'control-label') %>
        <%= date_select("stock", "summ_date",discard_day: true,prompt: { month: '请选择月份', year: '请选择年份' }) %>
        <%= label_tag(:business_id, "商户:",class: 'control-label') %>
