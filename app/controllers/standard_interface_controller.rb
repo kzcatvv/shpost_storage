@@ -39,7 +39,6 @@ class StandardInterfaceController < ApplicationController
     return error_builder('0005', '商品列表为空') if order_details.blank?
 
     order = StandardInterface.order_enter(@context_hash, @business, @unit, @storage)
-
     if !order.blank?
       if order.class == Order
         success_builder({'ORDER_NO' => order.batch_no })
@@ -174,7 +173,7 @@ class StandardInterfaceController < ApplicationController
       yield
     end
     InterfaceInfo.receive_info(request.url, @return_json, 'auto', @status)
-    render json: @return_json
+    # render json: @return_json
   end
 
   def success_builder(info = nil)
@@ -186,11 +185,13 @@ class StandardInterfaceController < ApplicationController
       @return_json = success.merge info
     end
     # @return_json
+    render json: @return_json
   end
 
   def error_builder(code, msg = nil)
     @status = false
     @return_json = {'FLAG' => 'failure', 'CODE' => code, 'MSG' => msg.nil? ? I18n.t("standard_interface.error.#{code}") : I18n.t("standard_interface.error.#{code}") + ':' + msg }.to_json
     # @return_json
+    render json: @return_json
   end
 end
