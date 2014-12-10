@@ -153,13 +153,13 @@ class ReportController < ApplicationController
 
       stock_hash = Stock.includes(:storage).where("storages.id = ?",current_storage.id).group(:business_id,:supplier_id,:specification_id).sum(:actual_amount)
 
-      respond_to do |format|
-        format.xls {   
+      # respond_to do |format|
+      #   format.xls {   
           send_data(stock_stat_content_for(stock_hash,@business.id,year,month,op_type_in,op_type_out),  
             :type => "text/excel;charset=utf-8; header=present",  
             :filename => "#{year}年#{month}月库存状态表.xls")  
-        }
-      end
+        # }
+      # end
 
     end
    end
