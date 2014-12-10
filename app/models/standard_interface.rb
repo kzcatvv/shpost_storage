@@ -133,7 +133,7 @@ class StandardInterface
 
     order = nil
     if !order_no.blank?
-      orders = Order.where(no: order_no)
+      orders = Order.where(batch_no: order_no)
     end
 
     if !deliver_no.blank?

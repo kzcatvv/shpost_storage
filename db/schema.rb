@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141204081402) do
+ActiveRecord::Schema.define(version: 20141209031618) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -380,6 +380,8 @@ ActiveRecord::Schema.define(version: 20141204081402) do
     t.string   "desc"
     t.integer  "keyclientorderdetail_id"
     t.integer  "manual_stock_detail_id"
+    t.date     "expiration_date"
+    t.string   "batch_no"
     t.integer  "shelf_id"
     t.integer  "business_id"
     t.integer  "supplier_id"
@@ -424,6 +426,7 @@ ActiveRecord::Schema.define(version: 20141204081402) do
     t.string   "phone"
     t.string   "postcode"
     t.string   "tcbd_product_no"
+    t.string   "no"
   end
 
   create_table "suppliers", force: true do |t|

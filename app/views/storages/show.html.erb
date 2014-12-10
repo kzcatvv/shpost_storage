@@ -8,6 +8,8 @@
   <dd><%= @storage.name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:desc) %>:</strong></dt>
   <dd><%= @storage.desc %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:no) %>:</strong></dt>
+  <dd><%= @storage.no %></dd>
   <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
   <dd><%= Unit.find(@storage.unit_id).name %></dd>
 </dl>

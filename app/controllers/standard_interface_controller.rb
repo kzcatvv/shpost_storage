@@ -41,7 +41,7 @@ class StandardInterfaceController < ApplicationController
     order = StandardInterface.order_enter(@context_hash, @business, @unit, @storage)
 
     if !order.blank?
-      success_builder({'ORDER_NO' => order.no })
+      success_builder({'ORDER_NO' => order.batch_no })
     else
       error_builder('9999')
     end
