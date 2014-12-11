@@ -801,9 +801,6 @@ zh-CN:
         findwarning:
           name: "库存预警查询"
           link: "/stocks/warning_stocks_index"
-        stat_report:
-          name: "库存状态报表下载"
-          link: "/stocks/stock_stat_report"
     logs:
       name: "日志查询"
       submenu:
@@ -831,6 +828,9 @@ zh-CN:
         purchase_arrival_report:
           name: "补货订单汇总"
           link: "/shpost_storage/report/purchase_arrival_report"
+        stock_stat_report:
+          name: "库存状态报表下载"
+          link: "/shpost_storage/report/stock_stat_report"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 
