@@ -271,7 +271,7 @@ ShpostStorage::Application.routes.draw do
   #stabdar_interface
   match "/shpost_storage/standard_interface/commodity_enter" => "standard_interface#commodity_enter", via: [:get, :post]
   match "/shpost_storage/standard_interface/order_enter" => "standard_interface#order_enter", via: [:get, :post]
-  match "/shpost_storage/standard_interface/order_query" => "standard_interface#order_query", via: [:get, :post]
+  # match "/shpost_storage/standard_interface/order_query" => "standard_interface#order_query", via: [:get, :post]
   match "/shpost_storage/standard_interface/orders_query" => "standard_interface#orders_query", via: [:get, :post]
   match "/shpost_storage/standard_interface/stock_query" => "standard_interface#stock_query", via: [:get, :post]
 

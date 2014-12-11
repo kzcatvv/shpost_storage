@@ -51,19 +51,19 @@ class StandardInterfaceController < ApplicationController
 
   end
 
-  def order_query
-    orders = StandardInterface.order_query(@context_hash, @business, @unit)
+  # def order_query
+  #   orders = StandardInterface.order_query(@context_hash, @business, @unit)
 
-    if !orders.blank?
-      deliver_details = []
+  #   if !orders.blank?
+  #     deliver_details = []
       
-      deliver_details = self.generalise_tracking(order.tracking_info)
+  #     deliver_details = self.generalise_tracking(order.tracking_info)
 
-      success_builder({'STATUS' => order.status, 'EXPS' => order.transport_type, 'EXPS_NO' => order.tracking_number, 'DELIVER_DETAIL' => deliver_details})
-    else
-      error_builder('9999')
-    end
-  end
+  #     success_builder({'STATUS' => order.status, 'EXPS' => order.transport_type, 'EXPS_NO' => order.tracking_number, 'DELIVER_DETAIL' => deliver_details})
+  #   else
+  #     error_builder('9999')
+  #   end
+  # end
 
   def orders_query
     type = nil
@@ -96,10 +96,10 @@ class StandardInterfaceController < ApplicationController
       orders = StandardInterface.order_query(context, @business, @unit)
 
       if !orders.blank?
-        tracking_infos = orders.tracking_info
+        # tracking_infos = orders.tracking_info
 
         orders.each do |order|
-          deliver_details = order.generalise_tracking(orders.tracking_info)
+          deliver_details = StandardInterface.generalise_tracking(order.tracking_info)
 
           order_detail['FLAG'] = "success"
           order_detail['ORDER_ID'] = id
@@ -117,11 +117,12 @@ class StandardInterfaceController < ApplicationController
         order_detail['EXPS'] = ""
         order_detail['EXPS_NO'] = ""
         order_detail['DESC'] = "订单号不存在"
-        order_detail['DELIVER_DETAIL'] = deliver_details
+        order_detail['DELIVER_DETAIL'] = ""
         order_details << order_detail
       end
     end
-    {'ORDER_DETAIL' => order_details}
+
+    success_builder({'ORDER_DETAIL' => order_details})
   end
 
   def stock_query
@@ -194,4 +195,5 @@ class StandardInterfaceController < ApplicationController
     # @return_json
     render json: @return_json
   end
+
 end
