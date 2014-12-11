@@ -40,7 +40,7 @@ class StandardInterfaceController < ApplicationController
 
     order = StandardInterface.order_enter(@context_hash, @business, @unit, @storage)
     if !order.blank?
-      if order.class == Order
+      if order.is_a? Order
         success_builder({'ORDER_NO' => order.batch_no })
       else
         return error_builder('0006')
