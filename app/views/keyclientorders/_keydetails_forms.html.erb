@@ -9,9 +9,9 @@
     </tr>
   </thead>
   <tbody>
-   <% if !@order_details.nil? %>
-    <%= hidden_field_tag('splitorderid',@order_details.first.order.id )%>
-    <% @order_details.each do |orderdtl| %>
+   <% if !@order.nil? %>
+    <%= hidden_field_tag('splitorderid',@order.id )%>
+    <% @order.order_details.each do |orderdtl| %>
       <%= content_tag(:tr,content_tag(:td, orderdtl.name )+
         content_tag(:td, Specification.find(orderdtl.specification_id).all_name )+
         content_tag(:td, Specification.find(orderdtl.specification_id).sixnine_code )+
@@ -21,3 +21,8 @@
   <% end %>
   </tbody>
 </table>
+</br>
+<% if !@order.nil? %>
+  <%=link_to t('打印面单'), "/print/websplitordertracking?orid=#{@order.id}", target: '_blank',:class => 'btn btn-primary' %>
+<% end %>
+</br>

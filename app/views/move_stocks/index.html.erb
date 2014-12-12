@@ -1,0 +1,36 @@
+<%- model_class = MoveStock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, MoveStock %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_move_stock_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@move_stocks_grid) do |g|
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
+  
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+  
+    
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: MoveStock::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |move_stock| 
+      move_stock.status_name
+
+    end
+
+
+
+    g.column do |move_stock|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")), edit_move_stock_path(move_stock), :class => 'btn btn-xs btn-primary' if can? :update, move_stock) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), move_stock_path(move_stock), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, move_stock) << ' ' <<
+      (link_to t('.movedetail', :default => t("helpers.links.movedetail")), movedetail_move_stocks_path(move_stock), :class => 'btn btn-xs btn-primary' if can? :movedetail, move_stock)
+
+    end
+  end 
+%>

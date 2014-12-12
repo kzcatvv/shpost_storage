@@ -121,6 +121,7 @@ class KeyclientordersController < ApplicationController
       @scanall = OrderDetail.where(order_id: ors).includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
       @dtl_cnt = @key_details_hash.length
       @act_cnt = 0
+      # @order=@keyclientorder.orders.first
   end
 
   def b2bfind69code
@@ -152,7 +153,7 @@ class KeyclientordersController < ApplicationController
   def b2bsplitanorder
     @keyclientorder = Keyclientorder.find(params[:keyco])
     parentorder = @keyclientorder.orders.first
-    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id,is_split: true)
+    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id,is_split: true,customer_name: parentorder.customer_name,customer_unit: parentorder.customer_unit,customer_tel: parentorder.customer_tel,customer_phone: parentorder.customer_phone,customer_address: parentorder.customer_address,customer_postcode: parentorder.customer_postcode,province: parentorder.province,city: parentorder.city,county: parentorder.county)
     ods = parentorder.order_details
     ods.each do |od|
       curr_specification = Specification.find(od.specification_id)
@@ -163,6 +164,7 @@ class KeyclientordersController < ApplicationController
     end
     #binding.pry
     @order_details = childorder.order_details
+    @order = childorder
 
     respond_to do |format|
       format.js 

@@ -1,5 +1,12 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :move_stocks do
+    collection do
+      get 'movedetail'
+      get 'move_check'
+    end
+  end
+
   resources :up_downloads do
     collection do 
       get 'up_download_import'
@@ -291,6 +298,8 @@ ShpostStorage::Application.routes.draw do
   match "/print/keytrackingnum" => "print#keytrackingnum",via: [:get, :post]
   match "/print/webtracking" => "print#webtracking",via: [:get, :post]
   match "/print/webtrackingnum" => "print#webtrackingnum",via: [:get, :post]
+  match "/print/websplitordertracking" => "print#websplitordertracking",via: [:get, :post]
+  match "/print/websplitordertrackingnum" => "print#websplitordertrackingnum",via: [:get, :post]
 
   match "/contact/add" => "contacts#add",via: [:get, :post]
   match "/contact/confirmadd" => "contacts#confirmadd",via: [:get, :post]

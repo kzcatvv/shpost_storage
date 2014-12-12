@@ -74,6 +74,8 @@ class PurchasesController < ApplicationController
       
     Stock.purchase_stock_in(@purchase, current_user)
 
+    @stock_logs = @purchase.stock_logs
+
     @stock_logs_grid = initialize_grid(@purchase.stock_logs)
   end
 
