@@ -124,6 +124,7 @@ ShpostStorage::Application.routes.draw do
   resources :shelves do
     get :autocomplete_shelf_shelf_code, :on => :collection
     get :autocomplete_bad_shelf_code, :on => :collection
+    get :autocomplete_shelf_code_by_stockimp, :on => :collection
     collection do 
       get 'shelf_import'
       post 'shelf_import' => 'shelves#shelf_import'
@@ -158,6 +159,9 @@ ShpostStorage::Application.routes.draw do
       get 'warning_stocks_index'
       get 'findstock'
       get 'getstock'
+      get 'org_stocks_import'
+      post 'org_stocks_import' => 'stocks#org_stocks_import'
+      get 'select_unit'
     end
 
     member do
@@ -249,6 +253,7 @@ ShpostStorage::Application.routes.draw do
         get 'ko_autocomplete_specification_name'
         get 'os_autocomplete_specification_name'
         get 'ms_autocomplete_specification_name'
+        get 'si_autocomplete_specification_name'
      end
   end
 
