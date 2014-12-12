@@ -139,6 +139,16 @@ function ajaxspecifications() {
     $(spid).val(data.item.id);
   });
 
+  $('#org_stocks_import_specificaion').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    $("#si_specificationid").val(data.item.id);
+  });
+  
+  $('#org_stocks_import_shelf_code').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    $("#si_shelfid").val(data.item.id);
+  });
+
 
 
 };
