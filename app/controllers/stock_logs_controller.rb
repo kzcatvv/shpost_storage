@@ -50,7 +50,7 @@ class StockLogsController < ApplicationController
       return render json: {}
     end
 
-    stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.business, @arrival.batch_no, @shelf, false)
+    stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.purchase.business, @arrival.batch_no, @shelf, false)
 
     if @stock_log.blank?
       @stock_log.create(parent: @arrival.purchase_detail.purchase, stock: stock, amount: @amount, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
@@ -62,7 +62,7 @@ class StockLogsController < ApplicationController
   end
 
   def remove
-    @stock_log.delete
+    @stock_log.destroy
     render text: 'remove'
   end
 

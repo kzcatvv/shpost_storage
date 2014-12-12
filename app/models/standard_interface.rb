@@ -103,7 +103,7 @@ class StandardInterface
       relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
     
       if relationship.nil?
-        order.delete
+        order.destroy
         order = FileInterface.save_order(context, business.id, unit.id, (storage.blank? ? unit.default_storage.id : storage.id))
         # ActiveRecord::Rollback
         break
