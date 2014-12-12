@@ -436,11 +436,12 @@ function statusset(slid,index,id,value) {
 }
 
 function linkset(index,id,pid) {
-  check_link_field='<a class="btn btn-xs btn-info" href="/purchases/'+pid+'/onecheck?stock_log='+id+'" id="stock_logs_checklink_'+id+'" rel="nofollow" data-method="patch">确认入库</a>';
+  // remove the check button
+  // check_link_field='<a class="btn btn-xs btn-info" href="/purchases/'+pid+'/onecheck?stock_log='+id+'" id="stock_logs_checklink_'+id+'" rel="nofollow" data-method="patch">确认入库</a>';
   // remove the split button
   // split_link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_splitlink_'+id+'" onclick="split(this)">拆单</a>';
   delete_link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_deletelink_'+id+'" onclick="destroy(this)">删除</a>';
-  $('table.wice-grid tr:eq('+index+') td').last().html(check_link_field+' '+delete_link_field);
+  $('table.wice-grid tr:eq('+index+') td').last().html(delete_link_field);
 }
 
 function removeTr(current)
