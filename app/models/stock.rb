@@ -173,6 +173,11 @@ class Stock < ActiveRecord::Base
      # +  StockLog.virtual_amount_in_storage(specification, supplier, business, storage)
   end
 
+  def self.total_stock_in_shelf(specification, supplier, business, shelf)
+    in_shelf(shelf).find_stocks(specification, supplier, business).sum(:actual_amount) 
+    # + StockLog.virtual_amount_in_unit(specification, supplier, business, unit)
+  end
+
   def find_same_stocklog(keyclientorder)
     stocklogs = self.stock_logs.where(status: "waiting")
     stocklogs.each do |stocklog|

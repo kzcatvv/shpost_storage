@@ -145,23 +145,31 @@ class StockLog < ActiveRecord::Base
     StockLog.in_storage(storage).waiting.operation_in.find_stock_logs(specification, supplier, business).sum(:amount) - StockLog.in_storage(storage).waiting.operation_out.find_stock_logs(specification, supplier, business).sum(:amount)
   end
 
-  def modify_amount()
-    amount = 0
-    operation = self.operation
-    p = self.parent
-    if operation.eql? OPERATION[:b2c_stock_out]
-      sum = OrderDetail.where(order_id: p.orders).joins(:order).where(specification_id: self.specification_id, supplier_id: self.supplier_id).where("Orders.business_id = ?", self.business_id).sum(:amount)
-      others = p.stock_logs.where(supplier_id: self.supplier_id, specification_id: self.specification_id, business_id: self.business_id).sum(:amount)
-      amount = sum - others + self.amount
-    elsif operation.eql? OPERATION[:purchase_stock_in]
-      details = p.purchase_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id)
-      details.each do |detail|
-        amount += detail.purchase_arrivals.sum(:arrived_amount)
+  def update_amount(total_amount)
+    # amount = 0
+    # operation = self.operation
+    # p = self.parent
+    # if operation.eql? OPERATION[:b2c_stock_out]
+    #   sum = OrderDetail.where(order_id: p.orders).joins(:order).where(specification_id: self.specification_id, supplier_id: self.supplier_id).where("Orders.business_id = ?", self.business_id).sum(:amount)
+    #   others = p.stock_logs.where(supplier_id: self.supplier_id, specification_id: self.specification_id, business_id: self.business_id).sum(:amount)
+    #   amount = sum - others + self.amount
+    # end
+    if operation.eql? OPERATION[:purchase_stock_in]
+      # details = p.purchase_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id)
+      # details.each do |detail|
+      #   amount += detail.purchase_arrivals.sum(:arrived_amount)
+      # end
+      max_amount = self.parent.purchase_arrivals.where(batch_no: self.batch_no).sum(:arrived_amount) - self.parent.stock_logs.where(batch_no: self.batch_no).where.not(id: self.id).sum(:amount)
+
+      if total_amount > max_amount
+        total_amount = max_amount
       end
-    elsif operation.eql? OPERATION[:b2b_stock_out]
-      amount = p.manual_stock_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id).sum(:amount)
     end
-    return amount
+    # if operation.eql? OPERATION[:b2b_stock_out]
+    #   amount = p.manual_stock_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id).sum(:amount)
+    # end
+    # return total_amount
+    self.update(amount: total_amount)
   end
 
   private
