@@ -21,6 +21,15 @@ class ShelvesController < ApplicationController
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
 
+  def autocomplete_shelf_code_by_stockimp
+    term = params[:term]
+    storageid = params[:storage_id]
+    # brand_id = params[:brand_id]
+    # country = params[:country]
+    shelves = Shelf.where(area_id: Area.where(storage_id: storageid).ids).where("shelf_code LIKE ? and is_bad='no' ", "%#{term}%").order(:shelf_code).all
+    render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
+  end
+
   def find_current_storage
     @areas = Area.where("storage_id = ?", session[:current_storage])
     @shelves = Shelf.where("area_id in (?)", @areas.ids)
