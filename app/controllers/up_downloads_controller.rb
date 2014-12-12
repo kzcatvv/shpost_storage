@@ -119,6 +119,85 @@ class UpDownloadsController < ApplicationController
         end
     end
   end
+
+  def select_unit
+    @storages = Storage.where(unit_id: params[:unit_id]).map{|u| [u.name,u.id]}.insert(0,"请选择")
+    @business = Business.where(unit_id: params[:unit_id]).map{|u| [u.name,u.id]}.insert(0,"请选择")
+    @suppliers = Supplier.where(unit_id: params[:unit_id]).map{|u| [u.name,u.id]}.insert(0,"请选择")
+      #binding.pry
+    respond_to do |format|
+       format.js 
+    end
+
+  end
+
+  def org_stocks_import
+    unless request.get?
+      if file = upload_stock(params[:file])
+        StockLog.transaction do
+
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+            # binding.pry
+            if Integer(instance.cell(3,5)) != 0 || Integer(instance.cell(3,6)) != 0 || Integer(instance.cell(3,7)) != 0
+              raise "导入失败,初始结存不为0"
+            end 
+            sumstock = 0
+            4.upto(instance.last_row) do |line|
+              sumstock += Integer(instance.cell(line,'E'))
+              sumstock -= Integer(instance.cell(line,'F'))
+            end
+            if Integer(instance.cell(instance.last_row,7)) != sumstock
+              raise "导入失败,明细与期末结存不符"
+            end
+            @stock = Stock.create(shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid],actual_amount: sumstock,virtual_amount: sumstock)
+            
+            4.upto(instance.last_row) do |line|
+              if Integer(instance.cell(line,'E')) < 0
+                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'b2b_stock_out',status: 'checked',amount: -Integer(instance.cell(line,'E')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'out',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
+              end
+              if Integer(instance.cell(line,'E')) > 0
+                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: Integer(instance.cell(line,'E')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'in',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
+              end
+              if Integer(instance.cell(line,'F')) < 0
+                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: -Integer(instance.cell(line,'F')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'in',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
+              end
+              if Integer(instance.cell(line,'F')) > 0
+                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'b2b_stock_out',status: 'checked',amount: Integer(instance.cell(line,'F')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'out',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
+              end
+            end
+
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            Rails.logger.error e.backtrace
+            flash[:alert] = e.message
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
+  def upload_stock(file)
+    if !file.original_filename.empty?
+      direct = "#{Rails.root}/upload/stocks_import/"
+      filename = "#{Time.now.to_f}_#{file.original_filename}"
+
+      file_path = direct + filename
+      File.open(file_path, "wb") do |f|
+        f.write(file.read)
+      end
+      file_path
+    end
+  end
   
 
   private

@@ -45,27 +45,6 @@ class StockLogsController < ApplicationController
     @stock_logs_grid = initialize_grid(@stock_logs, include: [:user,:stock])
   end
 
-  # def updateall
-  #   stock_logs = params[:stock_logs]
-  #   if !stock_logs.nil?
-  #     stock_logs.each do |stock_log|
-  #       @stock_log = StockLog.find(stock_log[:id])
-  #       @stock = @stock_log.stock
-  #       if !stock_log[:shelfid].nil?
-  #         @stock.shelf_id = stock_log[:shelfid]
-  #         @stock_log.save()
-  #       end
-        
-  #       if !stock_log[:amount].nil?
-  #       # @stock_log.status = stock_log[:status]
-  #         @stock_log.amount = stock_log[:amount]
-  #         @stock.save()
-  #       end
-  #     end
-  #   end
-  #   redirect_to request.referer
-  # end
-
   def purchase_modify
     if @shelf.blank? || @arrival.blank?
       return render json: {}

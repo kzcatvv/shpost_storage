@@ -104,7 +104,7 @@ class StandardInterface
     
       if relationship.nil?
         order.delete
-        order = FileInterface.save_order(context, business.id, unit.id)
+        order = FileInterface.save_order(context, business.id, unit.id, (storage.blank? ? unit.default_storage.id : storage.id))
         # ActiveRecord::Rollback
         break
       end
@@ -131,7 +131,7 @@ class StandardInterface
     order_id = context['ORDER_ID']
     trans_sn = context['TRANS_SN']
 
-    order = nil
+    orders = nil
     if !order_no.blank?
       orders = Order.where(batch_no: order_no)
     end
@@ -147,6 +147,8 @@ class StandardInterface
     if !trans_sn.blank?
       orders ||= Order.where(business_trans_no: trans_sn)
     end
+
+    return getB2Borders(orders)
   end
 
   def self.stock_query(context, business, unit, storage = nil)
@@ -179,6 +181,27 @@ class StandardInterface
     return stock_array
   end
 
+  def self.generalise_tracking(tracking_infos)
+    if !tracking_infos.blank?
+      deliver_details = []
+      tracking_infos.split(/\n/).each do |info|
+        deliver_detail = {}
+        x = info.split('#')
+        if x.size == 4
+          deliver_detail['DATE'] = x[0]
+          deliver_detail['LOCAL'] = x[2]
+          # deliver_detail['NAME'] = x[]
+          deliver_detail['DESC'] = x[1]
+        elsif x.size == 2
+          deliver_detail['DATE'] = x[0]
+          deliver_detail['DESC'] = x[1]
+        end
+        deliver_details << deliver_detail
+      end
+    end
+    return deliver_details
+  end
+
   protected
   def self.parse_province(addr)
     if addr.index '省'
@@ -205,25 +228,17 @@ class StandardInterface
       end
     end
   end
-  
-  def self.generalise_tracking(tracking_infos)
-    if !tracking_infos.blank?
-      deliver_details = []
-      tracking_infos.split(/\n/).each do |info|
-        deliver_detail = {}
-        x = info.split('#')
-        if x.size == 4
-          deliver_detail['DATE'] = x[0]
-          deliver_detail['LOCAL'] = x[2]
-          # deliver_detail['NAME'] = x[]
-          deliver_detail['DESC'] = x[1]
-        elsif x.size == 2
-          deliver_detail['DATE'] = x[0]
-          deliver_detail['DESC'] = x[1]
-        end
-        deliver_details << deliver_detail
+
+  def self.getB2Borders(orders)
+    return_orders = []
+    orders.each do |order|
+      if order.has_b2b_split_orders?
+        return_orders += order.get_b2b_split_orders
+      else
+        return_orders << order
       end
     end
+    return return_orders
   end
 
   def self.getKeycOrderID(unit,storage,type)

@@ -39,28 +39,31 @@ class StandardInterfaceController < ApplicationController
     return error_builder('0005', '商品列表为空') if order_details.blank?
 
     order = StandardInterface.order_enter(@context_hash, @business, @unit, @storage)
-
     if !order.blank?
-      success_builder({'ORDER_NO' => order.batch_no })
+      if order.is_a? Order
+        success_builder({'ORDER_NO' => order.batch_no })
+      else
+        return error_builder('0006')
+      end
     else
-      error_builder('9999')
+      return error_builder('9999')
     end
 
   end
 
-  def order_query
-    orders = StandardInterface.order_query(@context_hash, @business, @unit)
+  # def order_query
+  #   orders = StandardInterface.order_query(@context_hash, @business, @unit)
 
-    if !orders.blank?
-      deliver_details = []
+  #   if !orders.blank?
+  #     deliver_details = []
       
-      deliver_details = self.generalise_tracking(order.tracking_info)
+  #     deliver_details = self.generalise_tracking(order.tracking_info)
 
-      success_builder({'STATUS' => order.status, 'EXPS' => order.transport_type, 'EXPS_NO' => order.tracking_number, 'DELIVER_DETAIL' => deliver_details})
-    else
-      error_builder('9999')
-    end
-  end
+  #     success_builder({'STATUS' => order.status, 'EXPS' => order.transport_type, 'EXPS_NO' => order.tracking_number, 'DELIVER_DETAIL' => deliver_details})
+  #   else
+  #     error_builder('9999')
+  #   end
+  # end
 
   def orders_query
     type = nil
@@ -87,16 +90,17 @@ class StandardInterfaceController < ApplicationController
     #orders_got = StandardInterface.orders_query(@context_hash, @business, @unit)
     
     ids.each do |id|
-      order_detail = {}
+
       context_string = "{\"" + type + "\":\"" + id.to_s + "\"}"
       context = ActiveSupport::JSON.decode(context_string)
       orders = StandardInterface.order_query(context, @business, @unit)
 
       if !orders.blank?
-        tracking_infos = orders.tracking_info
+        # tracking_infos = orders.tracking_info
 
         orders.each do |order|
-          deliver_details = order.generalise_tracking(orders.tracking_info)
+          order_detail = {}
+          deliver_details = StandardInterface.generalise_tracking(order.tracking_info)
 
           order_detail['FLAG'] = "success"
           order_detail['ORDER_ID'] = id
@@ -108,17 +112,19 @@ class StandardInterfaceController < ApplicationController
           order_details << order_detail
         end
       else
+        order_detail = {}
         order_detail['FLAG'] = "failure"
         order_detail['ORDER_ID'] = id
         order_detail['STATUS'] = ""
         order_detail['EXPS'] = ""
         order_detail['EXPS_NO'] = ""
         order_detail['DESC'] = "订单号不存在"
-        order_detail['DELIVER_DETAIL'] = deliver_details
+        order_detail['DELIVER_DETAIL'] = ""
         order_details << order_detail
       end
     end
-    {'ORDER_DETAIL' => order_details}
+
+    success_builder({'ORDER_DETAIL' => order_details})
   end
 
   def stock_query
@@ -150,13 +156,14 @@ class StandardInterfaceController < ApplicationController
 
     @context = params[:context]
 
-    return verify_sign
-
     begin
       @context_hash = ActiveSupport::JSON.decode(@context)
     rescue ActiveSupport::JSON.parse_error
-      error_builder('0002')
+      return error_builder('0002')
     end
+    
+    return verify_sign
+
   end
 
   def verify_sign
@@ -169,7 +176,7 @@ class StandardInterfaceController < ApplicationController
       yield
     end
     InterfaceInfo.receive_info(request.url, @return_json, 'auto', @status)
-    render json: @return_json
+    # render json: @return_json
   end
 
   def success_builder(info = nil)
@@ -181,11 +188,14 @@ class StandardInterfaceController < ApplicationController
       @return_json = success.merge info
     end
     # @return_json
+    render json: @return_json
   end
 
   def error_builder(code, msg = nil)
     @status = false
     @return_json = {'FLAG' => 'failure', 'CODE' => code, 'MSG' => msg.nil? ? I18n.t("standard_interface.error.#{code}") : I18n.t("standard_interface.error.#{code}") + ':' + msg }.to_json
     # @return_json
+    render json: @return_json
   end
+
 end

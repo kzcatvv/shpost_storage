@@ -6,6 +6,9 @@ ShpostStorage::Application.routes.draw do
       post 'up_download_import' => 'up_downloads#up_download_import'
       
       get 'to_import'
+      get 'org_stocks_import'
+      post 'org_stocks_import' => 'up_downloads#org_stocks_import'
+      get 'select_unit'
       
     end
     member do
@@ -124,6 +127,7 @@ ShpostStorage::Application.routes.draw do
   resources :shelves do
     get :autocomplete_shelf_shelf_code, :on => :collection
     get :autocomplete_bad_shelf_code, :on => :collection
+    get :autocomplete_shelf_code_by_stockimp, :on => :collection
     collection do 
       get 'shelf_import'
       post 'shelf_import' => 'shelves#shelf_import'
@@ -158,8 +162,6 @@ ShpostStorage::Application.routes.draw do
       get 'warning_stocks_index'
       get 'findstock'
       get 'getstock'
-      get 'stock_stat_report'
-      post 'stock_stat_report_down'
     end
 
     member do
@@ -251,6 +253,7 @@ ShpostStorage::Application.routes.draw do
         get 'ko_autocomplete_specification_name'
         get 'os_autocomplete_specification_name'
         get 'ms_autocomplete_specification_name'
+        get 'si_autocomplete_specification_name'
      end
   end
 
@@ -267,11 +270,12 @@ ShpostStorage::Application.routes.draw do
 
   # report
   match "/shpost_storage/report/purchase_arrival_report" => "report#purchase_arrival_report", via: [:get, :post]
+  match "/shpost_storage/report/stock_stat_report" => "report#stock_stat_report", via: [:get, :post]
 
   #stabdar_interface
   match "/shpost_storage/standard_interface/commodity_enter" => "standard_interface#commodity_enter", via: [:get, :post]
   match "/shpost_storage/standard_interface/order_enter" => "standard_interface#order_enter", via: [:get, :post]
-  match "/shpost_storage/standard_interface/order_query" => "standard_interface#order_query", via: [:get, :post]
+  # match "/shpost_storage/standard_interface/order_query" => "standard_interface#order_query", via: [:get, :post]
   match "/shpost_storage/standard_interface/orders_query" => "standard_interface#orders_query", via: [:get, :post]
   match "/shpost_storage/standard_interface/stock_query" => "standard_interface#stock_query", via: [:get, :post]
 

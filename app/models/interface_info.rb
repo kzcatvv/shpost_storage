@@ -59,7 +59,7 @@ class InterfaceInfo < ActiveRecord::Base
       # self.send(method_name.to_sym, *params)
       # Rails.logger.info "************receive end*********************"
       # Rails.logger.info "************save interface info class_name:" +cls.name+ ", method_name:"+method_name+" start*********************"
-      InterfaceInfo.save_info(nil, nil, status, nil, nil, url_request, url_response, type, nil, info_id)
+      InterfaceInfo.save_info(nil, nil, status, nil, nil, url_request, url_response.to_json, type, nil, info_id)
       # Rails.logger.info "***********save interface info end*********************"
   end
 

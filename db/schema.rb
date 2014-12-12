@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141209031618) do
+ActiveRecord::Schema.define(version: 20141218024742) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20141209031618) do
     t.string   "area_code",  default: "",   null: false
     t.string   "name",       default: "",   null: false
     t.string   "is_bad",     default: "no"
+    t.string   "area_type"
   end
 
   create_table "bcm_interfaces", force: true do |t|
@@ -235,9 +236,9 @@ ActiveRecord::Schema.define(version: 20141209031618) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
-    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
+    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -341,6 +342,7 @@ ActiveRecord::Schema.define(version: 20141209031618) do
     t.string   "barcode"
     t.string   "no"
     t.string   "is_bad",         default: "no"
+    t.string   "shelf_type"
   end
 
   create_table "specifications", force: true do |t|
@@ -380,12 +382,12 @@ ActiveRecord::Schema.define(version: 20141209031618) do
     t.string   "desc"
     t.integer  "keyclientorderdetail_id"
     t.integer  "manual_stock_detail_id"
-    t.date     "expiration_date"
-    t.string   "batch_no"
     t.integer  "shelf_id"
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
+    t.date     "expiration_date"
+    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
   end

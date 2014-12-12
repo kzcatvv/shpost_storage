@@ -14,9 +14,9 @@ class Stock < ActiveRecord::Base
   scope :expiration_date_first, ->{order(:expiration_date )}
   scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, actual_amount DESC")}
   scope :available, -> { where("1 = 1")}
-  scope :normal, -> { includes(:shelf).where("shelves.is_bad = 'no'")}
-  scope :broken, -> { includes(:shelf).where("shelves.is_bad = 'yes'")}
-
+  scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken'")}
+  scope :broken, -> { includes(:shelf).where("shelves.shelf_type = 'broken'")}
+  
 
   def self.purchase_stock_in(purchase, operation_user = nil)
     purchase.purchase_details.each do |x|

@@ -18,8 +18,8 @@
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
-    g.column name: model_class.human_attribute_name(:is_bad), attribute: 'is_bad',custom_filter: Area::BAD_TYPE.invert do |area| 
-      area.bad_type_name
+    g.column name: model_class.human_attribute_name(:area_type), attribute: 'area_type',custom_filter: Area::AREA_TYPE.invert do |area| 
+      area.area_type_name
     end
 
     g.column do |area|

@@ -10,7 +10,9 @@ class Ability
         can :manage, Storage
         can :role, :unitadmin
         can :role, :user
-        can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
+        can :manage, Specification, commodity: {unit_id: user.unit_id}
+        can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name,:si_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
+        can :si_autocomplete_specification_name, Relationship, business: {unit_id: user.unit_id}
         # cannot :role, :superadmin
         cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
         can :update, User, id: user.id
@@ -34,7 +36,7 @@ class Ability
         can :manage, Specification, commodity: {unit_id: user.unit_id}
         can :new, Relationship
 
-        can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
+        can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name,:si_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
 
         can [:manage,:autocomplete_specification_name,:br_autocomplete_specification_name], Relationship, business: {unit_id: user.unit_id}
 

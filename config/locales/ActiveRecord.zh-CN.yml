@@ -581,6 +581,7 @@ zh-CN:
         area_code: "区域编号"
         desc: "区域描述"
         is_bad: "残次品区"
+        area_type: "区域类型"
       shelf:
         current_storage: "当前仓库"
         area_code: "区域编号"
@@ -596,6 +597,8 @@ zh-CN:
         desc: "货架描述"
         barcode: "条形码"
         is_bad: "残次品货架"
+        area_type: "区域类型"
+        shelf_type: "货架类型"
 
       keyclientorder:
         keyclient_name: 大客户名称
@@ -801,9 +804,6 @@ zh-CN:
         findwarning:
           name: "库存预警查询"
           link: "/stocks/warning_stocks_index"
-        stat_report:
-          name: "库存状态报表下载"
-          link: "/stocks/stock_stat_report"
     logs:
       name: "日志查询"
       submenu:
@@ -825,12 +825,18 @@ zh-CN:
         up_download:
           name: "模板上传下载"
           link: "/up_downloads"
+        org_stocks_import:
+          name: "原始库存导入"
+          link: "/up_downloads/org_stocks_import"
     reports:
       name: "报表汇总"
       submenu:
         purchase_arrival_report:
           name: "补货订单汇总"
           link: "/shpost_storage/report/purchase_arrival_report"
+        stock_stat_report:
+          name: "库存状态报表下载"
+          link: "/shpost_storage/report/stock_stat_report"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 

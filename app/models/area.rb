@@ -7,10 +7,15 @@ class Area < ActiveRecord::Base
 
 
 	BAD_TYPE = { yes: '是', no: '否' }
+  AREA_TYPE = {normal: '普通区', broken: '破损区', pick: '拣货区'}
 
 	def bad_type_name
       is_bad.blank? ? "" : Area::BAD_TYPE["#{is_bad}".to_sym]
-    end
+  end
+
+  def area_type_name
+      area_type.blank? ? "" : Area::AREA_TYPE["#{area_type}".to_sym]
+  end
 
   
 

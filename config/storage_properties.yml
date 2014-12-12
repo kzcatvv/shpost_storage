@@ -4,6 +4,7 @@ business:
     jh_id: 10002 #交通银行万里行
     pajf_id: 10003 #平安银行积分商城
     padkh_id: 10004 #平安银行大客户
+    yg_id: 10005 #艺谷
 unit:
     zb_id: 10000 #闸北区局
 tcsd:
