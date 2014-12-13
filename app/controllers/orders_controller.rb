@@ -6,24 +6,26 @@ class OrdersController < ApplicationController
   # GET /orderes.json
   def index
     @orders_grid = initialize_grid(@orders,
-     :conditions => {:order_type => "b2c"})
+     :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
   end
 
   def order_alert
-    @orders = Order.where( [ "status = ? and storage_id = ? and created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find(StorageConfig.config["business"]['jh_id']).alertday.day])
+    @orders = Order.where( [ "status = ? and storage_id = ? and orders.created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find_by(no: StorageConfig.config["business"]['jh_id']).alertday.day]).joins(:business).where('alertday is not null')
     @orders_grid = initialize_grid(@orders)
   end
 
   def packaging_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGING_STATUS)
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+        :conditions => ['order_type = ? and is_split != ?',"b2c", true])
 
     render :layout => false
   end
 
   def packaged_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGED_STATUS).where('created_at > ?', Date.today.to_time)
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+      :conditions => ['order_type = ? and is_split != ?',"b2c", true])
 
     render :layout => false
   end
@@ -307,6 +309,7 @@ class OrdersController < ApplicationController
 
   def stockout
     begin
+    Order.transaction do
       @keyclientorder = Keyclientorder.find(params[:format])
 
       Stock.order_stock_out(@keyclientorder, current_user)
@@ -317,11 +320,12 @@ class OrdersController < ApplicationController
 
       @stock_logs = @keyclientorder.stock_logs
       @stock_logs_grid = initialize_grid(@stock_logs)
+    end
     rescue Exception => e
       Rails.logger.error e.backtrace
       flash[:alert] = e.message
       redirect_to :action => 'findprintindex'
-      raise ActiveRecord::Rollback
+      # raise ActiveRecord::Rollback
     end
   end
 
@@ -365,37 +369,38 @@ class OrdersController < ApplicationController
     return mi_cnt
   end
 
-  def ordercheck
+#   def ordercheck
 
-    @keyclientorder=Keyclientorder.find(params[:format])
-    @orders=@keyclientorder.orders
-# b2c
-    @orders.each do |order|
-      order.stock_logs.each do |stlog|
-        stlog.check!
-      end
-      order.stock_out
-    end
-    #b2b
-    if !@keyclientorder.keyclientorderdetails.blank?
-      stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
-      stock_logs.each do |stlog|
-        stlog.check!
-      end
-    end
+#     @keyclientorder=Keyclientorder.find(params[:format])
+#     @orders=@keyclientorder.orders
+# # b2c
+#     @orders.each do |order|
+#       order.stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#       order.stock_out
+#     end
+#     #b2b
+#     if !@keyclientorder.keyclientorderdetails.blank?
+#       stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
+#       stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#     end
 
-    if @keyclientorder.keyclient_name == "auto"
-      redirect_to :action => 'findprintindex'
-    else
-      redirect_to "/keyclientorders"
-    end
-  end
+#     if @keyclientorder.keyclient_name == "auto"
+#       redirect_to :action => 'findprintindex'
+#     else
+#       redirect_to "/keyclientorders"
+#     end
+#   end
 
   def packout
     @order_details=[]
     @curr_order=""
     @orders = Order.where("storage_id = ?", session[:current_storage])
-    @orders_grid=initialize_grid(@orders)
+    @orders_grid=initialize_grid(@orders,
+      :conditions => ['order_type = ? and is_split != ',"b2c", true])
   end
 
   def findorderout
@@ -439,14 +444,19 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
-    @orders_grid = initialize_grid(@orders,
-      :include => [:business],
-      :conditions => ['order_type = ? and status in (?)',"b2c",status],
-      :per_page => 15)
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true], :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business], :conditions => {:order_type => "b2c",:status => "waiting"}).resultset.limit(nil).to_ary
-    @selectorders=Order.where(id: @slorders)
+    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true])
+
+    #some wice_grad lazy do the resultset is [] without once call
+    begin
+      @slorders.resultset
+    rescue
+
+    end
+    
+    @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
         if !params[:grid][:f]["businesses.name".to_sym].nil?
@@ -1027,8 +1037,8 @@ class OrdersController < ApplicationController
 
   def getKeycOrderID()
     time = Time.new
-    batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],batch_no: batch_no,user: current_user,status: "printed")
+    # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+    keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],user: current_user,status: "printed")
     return keycorder.id
   end
 

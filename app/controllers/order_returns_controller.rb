@@ -66,12 +66,28 @@ class OrderReturnsController < ApplicationController
 
   def find_tracking_number
     @order = Order.where(tracking_number: params[:tracking_number]).accessible_by(current_ability).first
-    if @order.nil?
-      @curr_order=0
-      @order_details=[]
+    ods=@order.order_details
+    ords = OrderReturnDetail.where(order_detail_id: ods)
+    rt_id_hash=[]
+    ords.each do |ord|
+      rt_id_hash.push(ord.order_detail_id)
+    end
+    if ords.blank?
+      if @order.nil?
+        @curr_order=0
+        @order_details=[]
+      else
+        @curr_order=@order.id
+        @order_details = @order.order_details
+      end
     else
-      @curr_order=@order.id
-      @order_details = @order.order_details
+      if ods.count <= ords.count
+        @curr_order = -1
+        @order_details=[]
+      else
+        @curr_order=@order.id
+        @order_details = @order.order_details.where("id not in (?)",rt_id_hash)
+      end
     end
     respond_to do |format|
           format.js 
@@ -85,12 +101,12 @@ class OrderReturnsController < ApplicationController
     # binding.pry
     # @batch_no = time.year.to_s + time.month.to_s.rjust(2,'0') + time.day.to_s.rjust(2,'0') + (OrderReturn.select(:batch_no).distinct.count+1).to_s.rjust(5,'0')
     @order_return = OrderReturn.create(unit_id:current_user.unit_id,storage_id:current_storage.id,status:"waiting")
-
+    @batchid =@order_return.batch_no
     params[:cbids].each do |id|
       reason = params[("rereason_"+id).to_sym]
       is_bad = params[("st_"+id).to_sym]
 
-      @order_return.order_return_details.build(order_detail_id: id, return_reason: reason, is_bad: (is_bad.eql? '否') ? 'no' : 'yes', status: 'waiting')
+      @order_return.order_return_details.create(order_detail_id: id, return_reason: reason, is_bad: (is_bad.eql? '否') ? 'no' : 'yes', status: 'waiting')
     end
     
     Stock.order_return_stock_in(@order_return, current_user)
@@ -103,14 +119,12 @@ class OrderReturnsController < ApplicationController
   def return_check
 
       @order_return=OrderReturn.where("batch_no=?",params[:format]).first
-      @order_return.order_return_details.each do |ot|
-        @orderdtl=OrderDetail.find(ot.order_detail_id)
-        stlogs=@orderdtl.stock_logs.where("operation='order_return' or operation='order_bad_return' ")
-        stlogs.each do |stlog|
-          stlog.check
-        end
-        ot.return_in
-      end
+
+      # @order_return.stock_logs.each do |x|
+      #   x.check!
+      # end
+        # ot.return_in
+      @order_return.check!
       
 
       redirect_to :action => 'pack_return'

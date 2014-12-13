@@ -15,6 +15,7 @@
 //= require jquery.ui.all
 //= require wice_grid
 //= require autocomplete-rails
+//= require datepicker
 
 //= require twitter/bootstrap
 //= require turbolinks
@@ -43,6 +44,23 @@ function ajaxspecifications() {
     });
    return false;
   });
+
+  /*$('#relationship_business_id').change(function(){
+
+    $('#bid').val($('#relationship_business_id').val());
+    alert($('#bid').val());
+    $('#specification_name').attr('data-autocomplete','/specification_autocom/autocomplete_specification_name?objid=#{obj_id}&businessid='+$('#bid').val()+'&supplierid=#{supplier_id}');
+
+    return false;
+  });
+
+  $('#relationship_supplier_id').change(function(){
+
+    $('#sid').val($('#relationship_supplier_id').val());
+    alert($('#sid').val());
+    $('#specification_name').attr('data-autocomplete','/specification_autocom/autocomplete_specification_name?objid=#{obj_id}&businessid='+$('#bid').val()+'&supplierid='+$('#sid').val()+'');
+    return false;
+  });*/
 
   $('#return_reason').change(function(){
    if ($('#return_reason').val() == "其他")
@@ -85,11 +103,52 @@ function ajaxspecifications() {
     return false; 
   })
 
-  $('#specification_name').bind('railsAutocomplete.select', function(event, data){
+  $('#r_specification_name').bind('railsAutocomplete.select', function(event, data){
     /* Do something here */
     var spid = "#"+data.item.obj+"_specification_id";
     $(spid).val(data.item.id);
   });
+
+  $('#br_specification_name').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    var spid = "#"+data.item.obj+"_specification_id";
+    $(spid).val(data.item.id);
+  });
+
+  $('#os_specification_name').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    var spid = "#"+data.item.obj+"_specification_id";
+    $(spid).val(data.item.id);
+  });
+
+  $('#ms_specification_name').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    var spid = "#"+data.item.obj+"_specification_id";
+    $(spid).val(data.item.id);
+  });
+
+  $('#pd_specification_name').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    var spid = "#"+data.item.obj+"_specification_id";
+    $(spid).val(data.item.id);
+  });
+
+  $('#ko_specification_name').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    var spid = "#"+data.item.obj+"_specification_id";
+    $(spid).val(data.item.id);
+  });
+
+  $('#org_stocks_import_specificaion').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    $("#si_specificationid").val(data.item.id);
+  });
+  
+  $('#org_stocks_import_shelf_code').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    $("#si_shelfid").val(data.item.id);
+  });
+
 
 
 };
@@ -377,11 +436,12 @@ function statusset(slid,index,id,value) {
 }
 
 function linkset(index,id,pid) {
-  check_link_field='<a class="btn btn-xs btn-info" href="/purchases/'+pid+'/onecheck?stock_log='+id+'" id="stock_logs_checklink_'+id+'" rel="nofollow" data-method="patch">确认入库</a>';
+  // remove the check button
+  // check_link_field='<a class="btn btn-xs btn-info" href="/purchases/'+pid+'/onecheck?stock_log='+id+'" id="stock_logs_checklink_'+id+'" rel="nofollow" data-method="patch">确认入库</a>';
   // remove the split button
   // split_link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_splitlink_'+id+'" onclick="split(this)">拆单</a>';
   delete_link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_deletelink_'+id+'" onclick="destroy(this)">删除</a>';
-  $('table.wice-grid tr:eq('+index+') td').last().html(check_link_field+' '+delete_link_field);
+  $('table.wice-grid tr:eq('+index+') td').last().html(delete_link_field);
 }
 
 function removeTr(current)

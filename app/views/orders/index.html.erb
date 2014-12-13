@@ -37,7 +37,7 @@
                       content_tag(:div) do
                        # without buffer only the last tag will appear
                        buffer = content_tag(:b,"客户地址")
-                        buffer += content_tag(:p,order.province+order.city+order.county+order.customer_address)
+                        buffer += content_tag(:p,(order.province.nil? ? " " : order.province)+(order.city.nil? ? " " : order.city)+(order.county.nil? ? " " : order.county)+(order.customer_address.nil? ? " " : order.customer_address))
                       raw buffer
                        
                    end,width: "20%")+
@@ -108,8 +108,10 @@
       order.status_name
     end
 
+    g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number'
+
     g.column name: "备注" do |order|
-      order.buyer_desc+order.seller_desc
+      (order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc)
     end
 
     g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |order|
@@ -122,6 +124,10 @@
 
     g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage',custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
       order.shortage_type_name
+    end
+
+    g.column name: model_class.human_attribute_name(:is_split), attribute: 'is_split', filter_type: :boolean do |order| 
+      order.parent_type_name
     end
    
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |order|

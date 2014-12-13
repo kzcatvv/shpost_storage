@@ -46,6 +46,17 @@ class UpDownloadsController < ApplicationController
   def destroy
     #@up_download.destroy
     #respond_with(@up_download)
+    file_path = @up_download.url
+    if File.exist?(file_path)
+      File.delete(file_path)
+
+      @up_download.destroy
+    end
+    respond_to do |format|
+      format.html { redirect_to up_downloads_url }
+      format.json { head :no_content }
+    end
+    
   end
 
   def to_import
@@ -75,9 +86,15 @@ class UpDownloadsController < ApplicationController
   def upload_up_download(file)
      if !file.original_filename.empty?
        direct = "#{Rails.root}/public/download/"
+       
+       if !File.exist?(direct)
+           Dir.mkdir(direct)          
+       end
+
        filename = "#{Time.now.strftime("%Y-%m-%d %H:%m:%S")}_#{file.original_filename}"
 
        file_path = direct + filename
+       
        File.open(file_path, "wb") do |f|
           f.write(file.read)
        end

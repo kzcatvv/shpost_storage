@@ -8,7 +8,7 @@ class StockLogsController < ApplicationController
     @stock_logs_grid = initialize_grid(@stock_logs, 
       order: "stock_logs.id",
       order_direction: 'desc', 
-      include: [:user, :stock, :shelf])
+      include: [:user, :stock, :shelf, :specification])
   end
 
   # GET /stock_logs/1

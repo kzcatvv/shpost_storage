@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141128010327) do
+ActiveRecord::Schema.define(version: 20141209031618) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -103,6 +103,11 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.string   "operate_user"
     t.integer  "operate_times"
     t.string   "params",        limit: 1000
+    t.string   "business_id"
+    t.string   "unit_id"
+    t.string   "storage_id"
+    t.string   "request_ip"
+    t.string   "response_ip"
   end
 
   create_table "keyclientorderdetails", force: true do |t|
@@ -135,7 +140,7 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.string   "status"
     t.string   "barcode"
     t.string   "no"
-    t.string   "order_type"
+    t.string   "order_type",     default: "b2c"
   end
 
   create_table "manual_stock_details", force: true do |t|
@@ -207,8 +212,8 @@ ActiveRecord::Schema.define(version: 20141128010327) do
   end
 
   create_table "orders", force: true do |t|
-    t.string   "no",                             default: "",   null: false
-    t.string   "order_type"
+    t.string   "no",                             default: ""
+    t.string   "order_type",                     default: "b2c"
     t.string   "need_invoice"
     t.string   "customer_name"
     t.string   "customer_unit"
@@ -247,6 +252,8 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.string   "barcode"
     t.string   "batch_no"
     t.integer  "parent_id"
+    t.boolean  "is_split",                       default: false
+    t.float    "volume"
   end
 
   create_table "purchase_arrivals", force: true do |t|
@@ -257,6 +264,7 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.integer  "purchase_detail_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "status"
   end
 
   create_table "purchase_details", force: true do |t|
@@ -374,14 +382,25 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.string   "desc"
     t.integer  "keyclientorderdetail_id"
     t.integer  "manual_stock_detail_id"
+    t.date     "expiration_date"
+    t.string   "batch_no"
     t.integer  "shelf_id"
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.date     "expiration_date"
-    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+  end
+
+  create_table "stock_mons", force: true do |t|
+    t.string   "summ_date"
+    t.integer  "storage_id"
+    t.integer  "business_id"
+    t.integer  "supplier_id"
+    t.integer  "specification_id"
+    t.integer  "amount"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "stocks", force: true do |t|
@@ -409,6 +428,7 @@ ActiveRecord::Schema.define(version: 20141128010327) do
     t.string   "phone"
     t.string   "postcode"
     t.string   "tcbd_product_no"
+    t.string   "no"
   end
 
   create_table "suppliers", force: true do |t|
@@ -433,6 +453,17 @@ ActiveRecord::Schema.define(version: 20141128010327) do
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true
+
+  create_table "up_downloads", force: true do |t|
+    t.string   "name"
+    t.string   "use"
+    t.string   "desc"
+    t.string   "ver_no"
+    t.string   "url"
+    t.datetime "oper_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "user_logs", force: true do |t|
     t.integer  "user_id",            default: 0,  null: false

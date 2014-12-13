@@ -37,6 +37,10 @@
       keyclientorder.business.try :name
     end
 
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |keyclientorder|
+        keyclientorder.created_at.to_s(:db)
+    end
+
     g.column do |keyclientorder|
       ActiveSupport::SafeBuffer.new << 
         # (link_to t('.edit', :default => t("helpers.links.edit")), edit_keyclientorder_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :update, keyclientorder) << ' ' <<

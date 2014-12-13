@@ -6,9 +6,8 @@ class KeyclientordersController < ApplicationController
   def index
     #@keyclientorders = Keyclientorder.all
     @keyclientorders_grid = initialize_grid(@keyclientorders,
-                   :conditions => {:order_type => "b2c",
-                                   :storage_id => current_storage.id },
-                   :order => 'keyclientorders.id',
+                   :conditions => ['order_type <> ?',"b2b"],
+                   :order => 'keyclientorders.created_at',
                    :order_direction => 'desc',
                    include: [:business, :storage, :unit])
   end
@@ -93,6 +92,7 @@ class KeyclientordersController < ApplicationController
       #binding.pry
       @keyclientorder = Keyclientorder.find(params[:format])
       Stock.order_stock_out(@keyclientorder, current_user)
+      @keyclientorder.picking_out
       @stock_logs = @keyclientorder.stock_logs
       @stock_logs_grid = initialize_grid(@stock_logs)
   end
@@ -116,7 +116,11 @@ class KeyclientordersController < ApplicationController
   def b2bordersplit
       @keyclientorder=Keyclientorder.find(params[:format])
       @keyco=@keyclientorder.id
-      @key_details_hash = @keyclientorder.details.group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      @key_details_hash = @keyclientorder.orders.first.order_details.includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      ors = @keyclientorder.orders.where("is_split = ?",true)
+      @scanall = OrderDetail.where(order_id: ors).includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      @dtl_cnt = @key_details_hash.length
+      @act_cnt = 0
   end
 
   def b2bfind69code
@@ -148,7 +152,7 @@ class KeyclientordersController < ApplicationController
   def b2bsplitanorder
     @keyclientorder = Keyclientorder.find(params[:keyco])
     parentorder = @keyclientorder.orders.first
-    childorder = parentorder.children.create(order_type: "b2b",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id)
+    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id,is_split: true)
     ods = parentorder.order_details
     ods.each do |od|
       curr_specification = Specification.find(od.specification_id)
@@ -162,6 +166,43 @@ class KeyclientordersController < ApplicationController
 
     respond_to do |format|
       format.js 
+    end
+  end
+
+  def b2bsettrackingnumber
+    @curr_or = Order.find(params[:split_order])
+    @curr_or.update_attribute(:tracking_number,params[:split_tracking_num])
+    @curr_or.b2bsetsplitstatus
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def ordercheck
+
+    @keyclientorder=Keyclientorder.find(params[:format])
+    @keyclientorder.check!
+    
+#     @orders=@keyclientorder.orders
+# # b2c
+#     @orders.each do |order|
+#       order.stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#       order.stock_out
+#     end
+#     #b2b
+#     if !@keyclientorder.keyclientorderdetails.blank?
+#       stock_logs = StockLog.where(keyclientorderdetail_id: @keyclientorder.keyclientorderdetails)
+#       stock_logs.each do |stlog|
+#         stlog.check!
+#       end
+#     end
+
+    if @keyclientorder.keyclient_name == "auto"
+      redirect_to '/orders/findprintindex'
+    else
+      redirect_to "/keyclientorders"
     end
   end
 

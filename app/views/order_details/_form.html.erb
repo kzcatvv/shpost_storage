@@ -5,11 +5,17 @@
       <%= f.text_field :name, :class => 'text_field' %>
     </div>
   </div>
-  
+  <div class="control-group">
+    <%= f.label :supplier_id, :class => 'control-label' %>
+    <div class="controls">
+     
+      <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]},:include_blank => "请选择")%>
+      <%= hidden_field_tag('os_sid',@osid) %>
+    </div>
   <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-    <%= product_select_autocom("order_detail") %>
+    <%= os_product_select_autocom("order_detail",@order.id) %>
     </div>
 
     <div class="control-group">
@@ -29,12 +35,7 @@
     <div class="controls">
       <%= f.text_field :batch_no, :class => 'text_field' %>
     </div>
-    <div class="control-group">
-    <%= f.label :supplier_id, :class => 'control-label' %>
-    <div class="controls">
-     
-      <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
-    </div>
+    
     <div class="control-group">
     <%= f.label :order_id, :class => 'control-label' %>
     <div class="controls">

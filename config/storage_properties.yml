@@ -4,6 +4,7 @@ business:
     jh_id: 10002 #交通银行万里行
     pajf_id: 10003 #平安银行积分商城
     padkh_id: 10004 #平安银行大客户
+    yg_id: 10005 #艺谷
 unit:
     zb_id: 10000 #闸北区局
 tcsd:
@@ -43,3 +44,5 @@ csb_interface:
     active_code: '0991' #口令验证码
     query_time: '00:00:00' #查询订单截止时间
     query_period: 1 #查询订单周期(天)
+interface_info:
+    auto_resend_times: 5 #自动重发数

@@ -85,7 +85,7 @@ class PurchasesController < ApplicationController
         format.html { render action: 'stock_in' }
         format.json { head :no_content }
       else
-        format.html { render action: 'stock_in', javascript: "alert('123')" }
+        format.html { render action: 'stock_in' }
         format.json { head :no_content }
       end
     end
@@ -151,7 +151,7 @@ class PurchasesController < ApplicationController
               end
 
            #   purchase_detail = PurchaseDetail.create! name:instance.cell(line,'A'),purchase_id: purchase.id,supplier_id: supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'E'),amount:instance.cell(line,'F').to_i,desc:instance.cell(line,'G'),sum:instance.cell(line,'F').to_f, status:"waiting"
-            purchase_detail = PurchaseDetail.create! name:instance.cell(line,'D'),purchase_id: purchase.id,supplier_id:supplier.id,specification_id: specification.id,expiration_date:instance.cell(line,'H'),amount:instance.cell(line,'I').to_i,desc:instance.cell(line,'J'), status:"waiting"
+            purchase_detail = PurchaseDetail.create! name:instance.cell(line,'D'),purchase_id: purchase.id,supplier_id:supplier.id,specification_id: specification.id,expiration_date:instance.cell(line,'H').to_datetime.strftime("%Y-%m-%d %H:%m:%S"),amount:instance.cell(line,'I').to_i,desc:instance.cell(line,'J'), status:"waiting"
 
              # batch_no= purchase_detail.set_batch_no
              # puts 

@@ -81,7 +81,7 @@ class StocksController < ApplicationController
     @stocks = Stock.warning_stocks(current_storage)
     @relationships = []
     @stocks.each do |x|
-      @relationships << Relationship.find_by(business_id: x.b_id, specification_id: x.spec_id, supplier_id: x.s_id)
+      @relationships << Relationship.find_by(business_id: x.business_id, specification_id: x.specification_id, supplier_id: x.supplier_id)
     end
   end
 
@@ -133,36 +133,83 @@ class StocksController < ApplicationController
 
   def move2bad
     @stock=Stock.find(params[:stock_id])
-    badmnt = params[:bad_amount]
+    @shelf = Shelf.broken.where(shelf_code: params[:bad_shelf]).first
+    amount = params[:bad_amount].to_i
     # binding.pry
-    if Integer(badmnt) > Integer(@stock.virtual_amount)
+    if amount > @stock.virtual_amount
         flash[:alert] = "输入的残次品数量大于库存预计数量"
         redirect_to :back
     else
-        @shelf = Shelf.where("shelf_code = ? and is_bad='yes'",params[:bad_shelf]).first
-        @badstock = Stock.where("shelf_id = ? and business_id = ? and supplier_id = ? and batch_no = ? and specification_id = ?",@shelf.id,@stock.business_id,@stock.supplier_id,@stock.batch_no,@stock.specification_id).first
-        if @badstock.nil?
-          @badstock = Stock.create(shelf: @shelf,business_id: @stock.business_id,supplier_id: @stock.supplier_id,specification_id: @stock.specification_id,batch_no: @stock.batch_no,actual_amount: badmnt,virtual_amount: badmnt)
-          @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: @badstock.actual_amount, checked_at: Time.now)
-        else
-           actmnt= Integer(@badstock.actual_amount)+Integer(badmnt)
-           virmnt= Integer(@badstock.virtual_amount)+Integer(badmnt)
-           @badstock.update_attributes(:actual_amount=>actmnt,:virtual_amount=>virmnt)
-           @badstock_log = StockLog.create(user: current_user, stock: @badstock, operation: 'bad_stock_in', status: 'checked', operation_type: 'in', amount: badmnt, checked_at: Time.now)
-        end
-        
-        sactmnt= Integer(@stock.actual_amount)-Integer(badmnt)
-        svirmnt= Integer(@stock.virtual_amount)-Integer(badmnt)
-        @stock.update_attributes(:actual_amount=>sactmnt,:virtual_amount=>svirmnt)
-        @stock_log = StockLog.create(user: current_user, stock: @stock, operation: 'move_to_bad', status: 'checked', operation_type: 'out', amount: badmnt, checked_at: Time.now)
-
+        Stock.broken_stock_change(@stock, @shelf, amount, current_user)
 
         flash[:notice] = "移入残次品区成功"
         redirect_to :action => 'index'
     end 
+  end
 
+  def select_unit
+    @storages = Storage.where(unit_id: params[:unit_id]).accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择")
+    @business = Business.where(unit_id: params[:unit_id]).accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择")
+    @suppliers = Supplier.where(unit_id: params[:unit_id]).accessible_by(current_ability).map{|u| [u.name,u.id]}.insert(0,"请选择")
+      #binding.pry
+    respond_to do |format|
+       format.js 
+    end
 
   end
+
+  def org_stocks_import
+    unless request.get?
+      if file = upload_stock(params[:file])
+        StockLog.transaction do
+
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+            # binding.pry
+            if Integer(instance.cell(3,5)) != 0 || Integer(instance.cell(3,6)) != 0 || Integer(instance.cell(3,7)) != 0
+              raise "导入失败,初始结存不为0"
+            end 
+            sumstock = 0
+            4.upto(instance.last_row) do |line|
+              sumstock += Integer(instance.cell(line,'E'))
+              sumstock -= Integer(instance.cell(line,'F'))
+            end
+            if Integer(instance.cell(instance.last_row,7)) != sumstock
+              raise "导入失败,明细与期末结存不符"
+            end
+            @stock = Stock.create(shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid],actual_amount: sumstock,virtual_amount: sumstock)
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            Rails.logger.error e.backtrace
+            flash[:alert] = e.message
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
+  def upload_stock(file)
+    if !file.original_filename.empty?
+      direct = "#{Rails.root}/upload/stocks_import/"
+      filename = "#{Time.now.to_f}_#{file.original_filename}"
+
+      file_path = direct + filename
+      File.open(file_path, "wb") do |f|
+        f.write(file.read)
+      end
+      file_path
+    end
+  end
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -174,4 +221,7 @@ class StocksController < ApplicationController
     def stock_params
       params.require(:stock).permit(:shelf_id,:batch_no, :business_id, :supplier_id, :purchase_detail_id, :specification_id, :actual_amount, :virtual_amount,:desc)
     end
+
+    
+
 end

@@ -17,9 +17,9 @@ class Shelf < ActiveRecord::Base
 
   scope :prior, ->{ order("priority_level ASC")}
 
-  scope :normal, ->{ where(is_bad: 'yes')}
+  scope :normal, ->{ where(is_bad: 'no')}
 
-  scope :broken, ->{ where(is_bad: 'no')}
+  scope :broken, ->{ where(is_bad: 'yes')}
 
   BAD_TYPE = { yes: '是', no: '否' }
 
@@ -63,5 +63,9 @@ class Shelf < ActiveRecord::Base
 
   def bad_type_name
     is_bad.blank? ? "" : Shelf::BAD_TYPE["#{is_bad}".to_sym]
+  end
+
+  def is_available?
+    true
   end
 end

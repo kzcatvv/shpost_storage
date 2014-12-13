@@ -28,6 +28,7 @@ class BusinessRelationshipController < ApplicationController
   # POST /relationships
   # POST /relationships.json
   def create
+    #binding.pry
     #@relationship = Relationship.new(relationship_params)
     #@relationship.specification_id = params[:specification_id][:id]
     respond_to do |format|

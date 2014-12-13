@@ -10,7 +10,7 @@ class Ability
         can :manage, Storage
         can :role, :unitadmin
         can :role, :user
-        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
+        can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
         # cannot :role, :superadmin
         cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
         can :update, User, id: user.id
@@ -21,12 +21,12 @@ class Ability
         can :manage, UpDownload
 
         cannot :resend, InterfaceInfo do |interface_info|
-            (interface_info.status == "success")
+            (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
         end
 
     elsif user.unitadmin?
     #can :manage, :all
-        can :manage, Business, unit_id: user.unit_id
+        can [:manage,:br_autocomplete_specification_name], Business, unit_id: user.unit_id
         can :manage, Supplier, unit_id: user.unit_id
         can :manage, Contact, supplier: {unit_id: user.unit_id}
         can :manage, Goodstype, unit_id: user.unit_id
@@ -34,9 +34,9 @@ class Ability
         can :manage, Specification, commodity: {unit_id: user.unit_id}
         can :new, Relationship
 
-        can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
+        can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
 
-        can :manage, Relationship, specification: {commodity: {unit_id: user.unit_id}}
+        can [:manage,:autocomplete_specification_name,:br_autocomplete_specification_name], Relationship, business: {unit_id: user.unit_id}
 
         can [:read, :update], Unit, id: user.unit_id
         can :manage, Sequence, id: user.unit_id
@@ -53,7 +53,7 @@ class Ability
         can :role, :unitadmin
         can :role, :user
         can [:read, :up_download_export], UpDownload
-        cannot [:create, :to_import, :up_download_import], UpDownload
+        cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
         
         # cannot :role, User, role: 'unitadmin'
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
@@ -62,8 +62,10 @@ class Ability
         can :manage, InterfaceInfo
 
         cannot :resend, InterfaceInfo do |interface_info|
-            (interface_info.status == "success")
+            (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
+
         end
+        # can :manage,BusinessRelationship
 
     elsif user.user?
         can :update, User, id: user.id
@@ -81,12 +83,12 @@ class Ability
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
 
-        can :read, Relationship, specification: {commodity: {unit_id: user.unit_id}}
+        can :read, Relationship, business: {unit_id: user.unit_id}
 
         cannot :manage, InterfaceInfo
 
         can [:read, :up_download_export], UpDownload
-        cannot [:create, :to_import, :up_download_import], UpDownload
+        cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
 
     else
         cannot :manage, :all

@@ -9,13 +9,14 @@
   <div class="control-group">
     <%= f.label :supplier_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+      <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]},:include_blank => "请选择")%>
+      <%= hidden_field_tag('pd_sid',@pdid) %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
-      <%= product_select_autocom("purchase_detail") %>
+      <%= pd_product_select_autocom("purchase_detail",@purchase.id) %>
      
     </div>
   </div>
@@ -23,7 +24,7 @@
     <%= f.label :expiration_date, :class => 'control-label' %>
     <div class="controls">
 
-      <%= f.date_select  :expiration_date %>
+      <%= f.text_field  :expiration_date %>
     </div>
   </div>
   <div class="control-group">

@@ -68,16 +68,16 @@ class ManualStocksController < ApplicationController
   end
 
   def stock_out
-    begin
-      Stock.manual_stock_stock_out(@manual_stock, current_user)
+    # begin
+    Stock.manual_stock_stock_out(@manual_stock, current_user)
 
-      @stock_logs_grid = initialize_grid(@manual_stock.stock_logs)
-    rescue Exception => e
-      Rails.logger.error e.backtrace
-      flash[:alert] = e.message
-      redirect_to :action => 'findprintindex'
-      raise ActiveRecord::Rollback
-    end
+    @stock_logs_grid = initialize_grid(@manual_stock.stock_logs)
+    # rescue Exception => e
+    #   Rails.logger.error e.backtrace
+    #   flash[:alert] = e.message
+    #   redirect_to :action => 'findprintindex'
+    #   raise ActiveRecord::Rollback
+    # end
   end
 
   def check
