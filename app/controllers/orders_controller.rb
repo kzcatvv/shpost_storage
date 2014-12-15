@@ -607,13 +607,14 @@ class OrdersController < ApplicationController
                 tracking_number = instance.cell(line,'B').to_s.split('.0')[0]
                 if tracking_number.blank?
                   tracking_number = nil
-                end
-                trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
-                case trackingNumber[1].size
-                when 8
-                  tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
-                when 11
-                  tracking_number=trackingNumber[0] + trackingNumber[1]
+                else
+                  trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
+                  case trackingNumber[1].size
+                  when 8
+                    tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
+                  when 11
+                    tracking_number=trackingNumber[0] + trackingNumber[1]
+                  end
                 end
                 #外部订单号
                 business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
