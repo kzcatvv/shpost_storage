@@ -1,9 +1,9 @@
 class FileInterface
-  def self.save_order(order_context, business_id, unit_id)
+  def self.save_order(order_context, business_id, unit_id, storage_id)
     direct = "#{Rails.root}/upload/orders/"
     if !file_exist(direct + "*" + order_context['ORDER_ID'] + "*")
       file_name = "#{Time.now.to_f}_" + order_context['ORDER_ID']
-      file_content = order_context.to_json << "\n" << business_id.to_s << "\n" << unit_id.to_s
+      file_content = order_context.to_json << "\n" << business_id.to_s << "\n" << unit_id.to_s << "\n" << storage_id.to_s
       write_file(direct + file_name,file_content)
       return file_name
     else

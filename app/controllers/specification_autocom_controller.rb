@@ -106,4 +106,17 @@ class SpecificationAutocomController < ApplicationController
     render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
 
   end
+
+  def si_autocomplete_specification_name
+    term = params[:term]
+    business_id = params[:businessid]
+    supplier_id = params[:supplierid]
+    #binding.pry
+    si=Relationship.joins(:specification).where('relationships.business_id= ? and relationships.supplier_id= ? and ( specifications.sixnine_code like ? or specifications.sku like ? or specifications.all_name like ? )',"#{business_id}","#{supplier_id}","%#{term}%","%#{term}%","%#{term}%").select(:specification_id)
+    specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
+
+    # binding.pry
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name} }
+
+  end
 end

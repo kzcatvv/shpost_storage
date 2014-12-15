@@ -15,6 +15,7 @@
 //= require jquery.ui.all
 //= require wice_grid
 //= require autocomplete-rails
+//= require datepicker
 
 //= require twitter/bootstrap
 //= require turbolinks
@@ -136,6 +137,16 @@ function ajaxspecifications() {
     /* Do something here */
     var spid = "#"+data.item.obj+"_specification_id";
     $(spid).val(data.item.id);
+  });
+
+  $('#org_stocks_import_specificaion').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    $("#si_specificationid").val(data.item.id);
+  });
+  
+  $('#org_stocks_import_shelf_code').bind('railsAutocomplete.select', function(event, data){
+    /* Do something here */
+    $("#si_shelfid").val(data.item.id);
   });
 
 
@@ -425,11 +436,12 @@ function statusset(slid,index,id,value) {
 }
 
 function linkset(index,id,pid) {
-  check_link_field='<a class="btn btn-xs btn-info" href="/purchases/'+pid+'/onecheck?stock_log='+id+'" id="stock_logs_checklink_'+id+'" rel="nofollow" data-method="patch">确认入库</a>';
+  // remove the check button
+  // check_link_field='<a class="btn btn-xs btn-info" href="/purchases/'+pid+'/onecheck?stock_log='+id+'" id="stock_logs_checklink_'+id+'" rel="nofollow" data-method="patch">确认入库</a>';
   // remove the split button
   // split_link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_splitlink_'+id+'" onclick="split(this)">拆单</a>';
   delete_link_field='<a class="btn btn-xs btn-danger" href="javascript:void(0);" id="stock_logs_deletelink_'+id+'" onclick="destroy(this)">删除</a>';
-  $('table.wice-grid tr:eq('+index+') td').last().html(check_link_field+' '+delete_link_field);
+  $('table.wice-grid tr:eq('+index+') td').last().html(delete_link_field);
 }
 
 function removeTr(current)
