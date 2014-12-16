@@ -69,6 +69,29 @@ class Order < ActiveRecord::Base
   #   self.order_details.sum(:amount).eql? self.checked_amount
   # end
 
+  def has_b2b_split_orders?
+    if self.order_type.eql? 'b2b' and !self.is_split
+      x = self.keyclientorder.orders
+      x.each do |o|
+        if o.order_type.eql? 'b2c' and o.is_split
+          return true
+        end
+      end
+    end
+    return false
+  end
+
+  def get_b2b_split_orders
+    return_orders = []
+    x = self.keyclientorder.orders
+    x.each do |o|
+      if o.order_type.eql? 'b2c' and o.is_split
+        return_orders << o
+      end
+    end
+    return return_orders
+  end
+
   def checked
     if all_checked?
       self.update(status: STATUS[:checked])
