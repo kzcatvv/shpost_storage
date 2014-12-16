@@ -6,6 +6,9 @@ ShpostStorage::Application.routes.draw do
       post 'up_download_import' => 'up_downloads#up_download_import'
       
       get 'to_import'
+      get 'org_stocks_import'
+      post 'org_stocks_import' => 'up_downloads#org_stocks_import'
+      get 'select_unit'
       
     end
     member do
@@ -159,9 +162,6 @@ ShpostStorage::Application.routes.draw do
       get 'warning_stocks_index'
       get 'findstock'
       get 'getstock'
-      get 'org_stocks_import'
-      post 'org_stocks_import' => 'stocks#org_stocks_import'
-      get 'select_unit'
     end
 
     member do
