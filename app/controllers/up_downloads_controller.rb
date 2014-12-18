@@ -162,7 +162,7 @@ class UpDownloadsController < ApplicationController
             
             4.upto(instance.last_row) do |line|
               if Integer(instance.cell(line,'E')) < 0
-                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'b2c_stock_out',status: 'checked',amount: -Integer(instance.cell(line,'E')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'out',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
+                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'b2b_stock_out',status: 'checked',amount: -Integer(instance.cell(line,'E')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'out',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
               end
               if Integer(instance.cell(line,'E')) > 0
                 @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: Integer(instance.cell(line,'E')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'in',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
@@ -171,7 +171,7 @@ class UpDownloadsController < ApplicationController
                 @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: -Integer(instance.cell(line,'F')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'in',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
               end
               if Integer(instance.cell(line,'F')) > 0
-                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'b2c_stock_out',status: 'checked',amount: Integer(instance.cell(line,'F')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'out',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
+                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'b2b_stock_out',status: 'checked',amount: Integer(instance.cell(line,'F')),checked_at: instance.cell(line,'B').to_s.to_time,created_at: instance.cell(line,'B').to_s.to_time,updated_at: instance.cell(line,'B').to_s.to_time,operation_type: 'out',shelf_id: params[:si_shelfid],business_id: params[:si_businessid],supplier_id: params[:si_supplierid],specification_id: params[:si_specificationid]) 
               end
             end
 
