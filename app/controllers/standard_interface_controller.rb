@@ -103,7 +103,7 @@ class StandardInterfaceController < ApplicationController
           deliver_details = StandardInterface.generalise_tracking(order.tracking_info)
 
           order_detail['FLAG'] = "success"
-          order_detail['ORDER_ID'] = order.batch_no
+          order_detail['ORDER_ID'] = id
           order_detail['STATUS'] = order.status
           order_detail['EXPS'] = order.transport_type
           order_detail['EXPS_NO'] = order.tracking_number
