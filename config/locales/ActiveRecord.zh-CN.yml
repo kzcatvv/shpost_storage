@@ -581,6 +581,7 @@ zh-CN:
         area_code: "区域编号"
         desc: "区域描述"
         is_bad: "残次品区"
+        area_type: "区域类型"
       shelf:
         current_storage: "当前仓库"
         area_code: "区域编号"
@@ -596,6 +597,8 @@ zh-CN:
         desc: "货架描述"
         barcode: "条形码"
         is_bad: "残次品货架"
+        area_type: "区域类型"
+        shelf_type: "货架类型"
 
       keyclientorder:
         keyclient_name: 大客户名称
