@@ -142,5 +142,19 @@ class StockLog < ActiveRecord::Base
     self.status.eql? STATUS[:waiting]
   end
 
-  
+  def modify_amount()
+    amount = 0
+    p = self.parent
+    if p.is_a? keyclientorder
+      amount = p.stock.available_amount
+    elsif p.is_a? Purchase
+      details = p.purchase_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id)
+      details.each do |detail|
+        amount += detail.purchase_arrivals.sum(:arrived_amount)
+      end
+    elsif p.is_a? ManualStock
+      amount = p.manual_stock_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id).sum(:amount)
+    end
+    return amount
+  end
 end
