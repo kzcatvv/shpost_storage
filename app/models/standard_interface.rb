@@ -148,7 +148,7 @@ class StandardInterface
       orders ||= Order.where(business_trans_no: trans_sn)
     end
 
-    return orders
+    return getB2Borders(orders)
   end
 
   def self.stock_query(context, business, unit, storage = nil)
@@ -229,6 +229,17 @@ class StandardInterface
     end
   end
 
+  def self.getB2Borders(orders)
+    return_orders = []
+    orders.each do |order|
+      if order.has_b2b_split_orders?
+        return_orders += order.get_b2b_split_orders
+      else
+        return_orders << order
+      end
+    end
+    return return_orders
+  end
 
   def self.getKeycOrderID(unit,storage,type)
     # time = Time.new
