@@ -1,5 +1,12 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :move_stocks do
+    collection do
+      get 'movedetail'
+      get 'move_check'
+    end
+  end
+
   resources :up_downloads do
     collection do 
       get 'up_download_import'
