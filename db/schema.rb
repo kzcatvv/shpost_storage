@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141209031618) do
+ActiveRecord::Schema.define(version: 20141218023802) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -122,8 +122,6 @@ ActiveRecord::Schema.define(version: 20141209031618) do
     t.integer  "business_id"
   end
 
-  add_index "keyclientorderdetails", ["keyclientorder_id", "specification_id"], name: "index_on_keyorderdtl_id_specification", unique: true
-
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -166,6 +164,20 @@ ActiveRecord::Schema.define(version: 20141209031618) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "barcode"
+  end
+
+  create_table "move_stocks", force: true do |t|
+    t.string   "no"
+    t.integer  "unit_id"
+    t.integer  "amount"
+    t.float    "sum"
+    t.string   "desc"
+    t.string   "status"
+    t.string   "name"
+    t.integer  "storage_id"
+    t.string   "barcode"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "order_details", force: true do |t|
