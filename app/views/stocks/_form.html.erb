@@ -2,7 +2,7 @@
   <div class="control-group">
     <%= f.label :shelf_id, :class => 'control-label' %>
     <div class="controls">
-    <%= f.select(:shelf_id, Shelf.accessible_by(current_ability).where("shelves.is_bad = 'no'").map{|s| [s.shelf_code,s.id]})%>
+    <%= f.select(:shelf_id, Shelf.accessible_by(current_ability).where("shelves.shelf_type != 'broken'").map{|s| [s.shelf_code,s.id]})%>
     </div>
   </div>
   <div class="control-group">

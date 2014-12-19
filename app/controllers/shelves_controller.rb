@@ -9,7 +9,7 @@ class ShelvesController < ApplicationController
     term = params[:term]
     # brand_id = params[:brand_id]
     # country = params[:country]
-    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where("shelf_code LIKE ? and is_bad='no' ", "%#{term}%").order(:shelf_code).all
+    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where("shelf_code LIKE ? and shelf_type!='broken' ", "%#{term}%").order(:shelf_code).all
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
 
@@ -17,7 +17,7 @@ class ShelvesController < ApplicationController
     term = params[:term]
     # brand_id = params[:brand_id]
     # country = params[:country]
-    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where("shelf_code LIKE ? and is_bad='yes' ", "%#{term}%").order(:shelf_code).all
+    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where("shelf_code LIKE ? and shelf_type='broken' ", "%#{term}%").order(:shelf_code).all
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
 
@@ -26,7 +26,7 @@ class ShelvesController < ApplicationController
     storageid = params[:storage_id]
     # brand_id = params[:brand_id]
     # country = params[:country]
-    shelves = Shelf.where(area_id: Area.where(storage_id: storageid).ids).where("shelf_code LIKE ? and is_bad='no' ", "%#{term}%").order(:shelf_code).all
+    shelves = Shelf.where(area_id: Area.where(storage_id: storageid).ids).where("shelf_code LIKE ? and shelf_type!='broken' ", "%#{term}%").order(:shelf_code).all
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
 
@@ -62,7 +62,7 @@ class ShelvesController < ApplicationController
   def create
     @shelf = Shelf.new(shelf_params)
     @shelf.shelf_code = setShelfCode(shelf_params)
-    @shelf.is_bad = Area.find(@shelf.area_id).is_bad
+    @shelf.shelf_type = Area.find(@shelf.area_id).area_type
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
     # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
@@ -85,7 +85,8 @@ class ShelvesController < ApplicationController
   # PATCH/PUT /shelves/1.json
   def update
     @shelf.shelf_code = setShelfCode(shelf_params)
-    @shelf.is_bad = Area.find(params[:shelf][:area_id]).is_bad
+    #@shelf.is_bad = Area.find(params[:shelf][:area_id]).is_bad
+    @shelf.shelf_type = Area.find(params[:shelf][:area_id]).area_type
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
     # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
@@ -140,7 +141,7 @@ class ShelvesController < ApplicationController
               shelfcode << change(to_string(instance.cell(line,'F').to_s))
               shelfcode << change(to_string(instance.cell(line,'G').to_s))
               # binding.pry
-              shelf = Shelf.create! area_id: area.id,area_length: to_string(instance.cell(line,'C')),area_width: to_string(instance.cell(line,'D')), area_height:to_string(instance.cell(line,'E')), shelf_row:to_string(instance.cell(line,'F')), shelf_column:to_string(instance.cell(line,'G')),max_weight: instance.cell(line,'H').to_i, max_volume: instance.cell(line,'I').to_i,desc: instance.cell(line,'J'),shelf_code:shelfcode,is_bad: area.is_bad
+              shelf = Shelf.create! area_id: area.id,area_length: to_string(instance.cell(line,'C')),area_width: to_string(instance.cell(line,'D')), area_height:to_string(instance.cell(line,'E')), shelf_row:to_string(instance.cell(line,'F')), shelf_column:to_string(instance.cell(line,'G')),max_weight: instance.cell(line,'H').to_i, max_volume: instance.cell(line,'I').to_i,desc: instance.cell(line,'J'),shelf_code:shelfcode,shelf_type: area.area_type
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
@@ -173,7 +174,7 @@ class ShelvesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shelf_params
-      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume, :is_bad)
+      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume, :shelf_type)
     end
 
     def change(text)

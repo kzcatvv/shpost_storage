@@ -16,11 +16,17 @@
     if @purchase
       g.column name: model_class.human_attribute_name(:pd_name), attribute: 'name', ordering: false, model: 'PurchaseDetail' do |stock_log|
         # if stock_log.status == 'waiting'
-          select_tag("stock_logs[][pdid]", options_for_select(PurchaseDetail.accessible_by(current_ability).where(purchase: @purchase).map{|u| [u.batch_no+"_"+u.name,u.id]}, stock_log.purchase_detail_id), id: "stock_logs_pdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
-          content_tag(:p, stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name, {id: "stock_logs_pdid_#{stock_log.id}", onclick: 'clickin(this);'})
+          select_tag("stock_logs[][pdid]", options_for_select(@purchase.stock_logs.map{|u| ["#{u.batch_no}_#{u.specification.name}",u.id]}, stock_log.id), id: "stock_logs_pdid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
+          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.name}", {id: "stock_logs_pdid_#{stock_log.id}", onclick: 'clickin(this);'})
         # else
         #   stock_log.purchase_detail.batch_no+"_"+stock_log.purchase_detail.name
         # end
+      end
+    end
+
+    if @manual_stock
+      g.column name: model_class.human_attribute_name(:ms_name), attribute: 'name', ordering: false, model: 'PurchaseDetail' do |stock_log|
+          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.name}", {id: "stock_logs_mdid_#{stock_log.id}", onclick: 'clickin(this);'})
       end
     end
 
@@ -44,7 +50,7 @@
       # if stock_log.status == 'waiting'
         # select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
         content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'}) <<
-        text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => if stock_log.stock.shelf.shelf_type!="broken" then "/shelves/autocomplete_shelf_shelf_code" else "/shelves/autocomplete_bad_shelf_code" end)
+        text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")
 
       # else
       #   stock_log.stock.shelf.shelf_code
@@ -69,8 +75,8 @@
       # end
     end
 
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: true, custom_filter: StockLog::STATUS.invert do |stock_log|
-        [StockLog::STATUS[stock_log.status.to_sym],{id: "stock_logs_status_#{stock_log.id}"}]
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status', ordering: true, custom_filter: StockLog::STATUS_SHOW.invert do |stock_log|
+        [StockLog::STATUS_SHOW[stock_log.status.to_sym],{id: "stock_logs_status_#{stock_log.id}"}]
     end
 
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', ordering: false do |stock_log|
@@ -84,13 +90,15 @@
     g.column do |stock_log|
       # if stock_log.status == 'waiting'
         ActiveSupport::SafeBuffer.new <<
-        (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, id: "stock_logs_checklink_#{stock_log.id}", :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
+        # (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), onecheck_purchase_path(:stock_log=>stock_log), method: :patch, id: "stock_logs_checklink_#{stock_log.id}", :class => 'btn btn-xs btn-info' if @purchase and stock_log.status=='waiting') << ' ' <<
           # (hidden_field_tag "stock_logs[][id]", stock_log.id) << ' ' <<
           # (submit_tag('check!!'))  #<< ' ' <<
           # (button_tag() do
           #   content_tag(:strong, 'check')
           # end)  << ' ' <<
           # (link_to t('.delete', :default => t("helpers.links.delete")), split_stock_log_path(stock_log.id), :class => 'btn btn-xs btn-primary', id: "test_#{stock_log.id}")
+          # remove the split button
+          # (link_to t('.split', :default => t("helpers.links.split")), "javascript:void(0);", onclick: 'split(this)', id: "stock_logs_splitlink_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :split, stock_log) << ' ' <<
           (link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'destroy(this)', id: "stock_logs_deletelink_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log)
       end
     # end
@@ -103,10 +111,8 @@
 
   <div style="float:right">
     <% if can? :new, Stock %>
-      <% if @purchase %>
         <%= link_to t('.new', :default => t("helpers.links.new")),
                    "javascript:void(0)", onclick: "add()",
                     :class => 'btn btn-primary' %>
-      <% end %>
     <% end %>
   </div>
