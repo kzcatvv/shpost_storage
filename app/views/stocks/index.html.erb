@@ -33,8 +33,8 @@
       stock.business.try :name
     end
 
-    g.column name: '是否残次品', model: 'Shelf', attribute: 'is_bad', custom_filter: Shelf::BAD_TYPE.invert do |stock|
-      stock.shelf.bad_type_name
+    g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE.invert do |stock|
+      stock.shelf.shelf_type_name
     end
 
     g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |stock|
@@ -50,7 +50,7 @@
     g.column do |stock|
       ActiveSupport::SafeBuffer.new << 
         # (link_to t('.edit', :default => t("helpers.links.edit")), edit_stock_path(stock), :class => 'btn btn-xs btn-primary' if can? :update, stock) << ' ' <<
-        (link_to t('.r2bad', :default => t("helpers.links.r2bad")), ready2bad_stock_path(stock), :class => 'btn btn-xs btn-primary' if stock.shelf.is_bad == 'no')
+        (link_to t('.r2bad', :default => t("helpers.links.r2bad")), ready2bad_stock_path(stock), :class => 'btn btn-xs btn-primary' if stock.shelf.shelf_type != 'broken')
 
 
 

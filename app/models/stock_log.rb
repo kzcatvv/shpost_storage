@@ -80,24 +80,6 @@ class StockLog < ActiveRecord::Base
       self.checked_at = Time.now
 
       self.save
-      self.stock.save
-
-      # StockLog.transaction do
-      #   self.save
-      #   self.stock.save
-
-      #   if self.belongs_to_purchase?
-      #     self.purchase_detail.stock_in
-      #   end
-
-      #   if self.belongs_to_order?
-      #     self.orders.each{|order| order.checked }
-      #   end
-
-      #   if self.belongs_to_manual_stock?
-      #     ManualStockDetail.find(self.manual_stock_detail_id).stock_out
-      #   end
-      # end
     end
   end
 
@@ -142,5 +124,56 @@ class StockLog < ActiveRecord::Base
     self.status.eql? STATUS[:waiting]
   end
 
-  
+<<<<<<< HEAD
+  def self.in_unit(unit)
+    includes(:unit).where('units.id' => unit)
+  end
+
+  def self.in_storage(storage)
+    includes(:storage).where('storages.id' => storage)
+  end
+
+  def self.operation_in
+    where(operation_type: StockLog::OPERATION_TYPE[:in])
+  end
+
+  def self.operation_out
+    where(operation_type: StockLog::OPERATION_TYPE[:out])
+  end
+
+  def self.find_stock_logs(specification, supplier, business)
+    where(specification: specification, supplier: supplier, business: business)
+  end
+
+  def self.waiting
+    where(status: StockLog::STATUS[:waiting])
+  end
+
+  def self.checked
+    where(status: StockLog::STATUS[:checked])
+  end
+
+  def self.virtual_amount_in_unit(specification, supplier, business, unit)
+    StockLog.in_unit(unit).waiting.operation_in.find_stock_logs(specification, supplier, business).sum(:amount) - StockLog.in_unit(unit).waiting.operation_out.find_stock_logs(specification, supplier, business).sum(:amount)
+  end
+
+  def self.virtual_amount_in_storage(specification, supplier, business, unit)
+    StockLog.in_storage(storage).waiting.operation_in.find_stock_logs(specification, supplier, business).sum(:amount) - StockLog.in_storage(storage).waiting.operation_out.find_stock_logs(specification, supplier, business).sum(:amount)
+=======
+  def modify_amount()
+    amount = 0
+    p = self.parent
+    if p.is_a? keyclientorder
+      amount = p.stock.available_amount
+    elsif p.is_a? Purchase
+      details = p.purchase_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id)
+      details.each do |detail|
+        amount += detail.purchase_arrivals.sum(:arrived_amount)
+      end
+    elsif p.is_a? ManualStock
+      amount = p.manual_stock_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id).sum(:amount)
+    end
+    return amount
+>>>>>>> f067a72d9106c2bfe471f2e91cdaebf8f8be0759
+  end
 end

@@ -90,7 +90,7 @@ class StandardInterfaceController < ApplicationController
     #orders_got = StandardInterface.orders_query(@context_hash, @business, @unit)
     
     ids.each do |id|
-      order_detail = {}
+
       context_string = "{\"" + type + "\":\"" + id.to_s + "\"}"
       context = ActiveSupport::JSON.decode(context_string)
       orders = StandardInterface.order_query(context, @business, @unit)
@@ -99,6 +99,7 @@ class StandardInterfaceController < ApplicationController
         # tracking_infos = orders.tracking_info
 
         orders.each do |order|
+          order_detail = {}
           deliver_details = StandardInterface.generalise_tracking(order.tracking_info)
 
           order_detail['FLAG'] = "success"
@@ -111,6 +112,7 @@ class StandardInterfaceController < ApplicationController
           order_details << order_detail
         end
       else
+        order_detail = {}
         order_detail['FLAG'] = "failure"
         order_detail['ORDER_ID'] = id
         order_detail['STATUS'] = ""

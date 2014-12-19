@@ -9,7 +9,7 @@ class AreaShelfController < ApplicationController
     # brand_id = params[:brand_id]
     # country = params[:country]
 
-    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where(" shelf_code LIKE ? and is_bad='no' ", "%#{term}%").order(:shelf_code).all
+    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where(" shelf_code LIKE ? and shelf_type!='broken' ", "%#{term}%").order(:shelf_code).all
 
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
@@ -53,7 +53,8 @@ class AreaShelfController < ApplicationController
     # @shelf.shelf_code << "-" << change(shelf_params[:area_height])
     # @shelf.shelf_code << "-" << change(shelf_params[:shelf_row])
     # @shelf.shelf_code << "-" << change(shelf_params[:shelf_column])
-    @shelf.is_bad = Area.find(@shelf.area_id).is_bad
+    #@shelf.is_bad = Area.find(@shelf.area_id).is_bad
+    @shelf.shelf_type = Area.find(@shelf.area_id).area_type
 
     respond_to do |format|
       if @shelf.save
@@ -71,7 +72,8 @@ class AreaShelfController < ApplicationController
   def update
     @shelf.shelf_code = setShelfCode(shelf_params)
 
-    @shelf.is_bad = Area.find(params[:shelf][:area_id]).is_bad
+    #@shelf.is_bad = Area.find(params[:shelf][:area_id]).is_bad
+    @shelf.shelf_type = Area.find(params[:shelf][:area_id]).area_type
     
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
@@ -109,7 +111,7 @@ class AreaShelfController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shelf_params
-      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume, :is_bad)
+      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume, :shelf_type)
     end
 
     def change(text)

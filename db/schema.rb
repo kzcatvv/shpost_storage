@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141218023802) do
+ActiveRecord::Schema.define(version: 20141218024742) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20141218023802) do
     t.string   "area_code",  default: "",   null: false
     t.string   "name",       default: "",   null: false
     t.string   "is_bad",     default: "no"
+    t.string   "area_type"
   end
 
   create_table "bcm_interfaces", force: true do |t|
@@ -355,6 +356,7 @@ ActiveRecord::Schema.define(version: 20141218023802) do
     t.string   "barcode"
     t.string   "no"
     t.string   "is_bad",         default: "no"
+    t.string   "shelf_type"
   end
 
   create_table "specifications", force: true do |t|
