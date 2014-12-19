@@ -144,15 +144,18 @@ class StockLog < ActiveRecord::Base
 
   def modify_amount()
     amount = 0
+    operation = self.operation
     p = self.parent
-    if p.is_a? keyclientorder
-      amount = p.stock.available_amount
-    elsif p.is_a? Purchase
+    if operation.eql? OPERATION[:b2c_stock_out]
+      sum = OrderDetail.where(order_id: p.orders).joins(:order).where(specification_id: self.specification_id, supplier_id: self.supplier_id).where("Orders.business_id = ?", self.business_id).sum(:amount)
+      others = p.stock_logs.where(supplier_id: self.supplier_id, specification_id: self.specification_id, business_id: self.business_id).sum(:amount)
+      amount = sum - others + self.amount
+    elsif operation.eql? OPERATION[:purchase_stock_in]
       details = p.purchase_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id)
       details.each do |detail|
         amount += detail.purchase_arrivals.sum(:arrived_amount)
       end
-    elsif p.is_a? ManualStock
+    elsif operation.eql? OPERATION[:b2b_stock_out]
       amount = p.manual_stock_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id).sum(:amount)
     end
     return amount
