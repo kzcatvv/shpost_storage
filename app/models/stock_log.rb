@@ -124,7 +124,6 @@ class StockLog < ActiveRecord::Base
     self.status.eql? STATUS[:waiting]
   end
 
-<<<<<<< HEAD
   def self.in_unit(unit)
     includes(:unit).where('units.id' => unit)
   end
