@@ -158,7 +158,8 @@ class StockLog < ActiveRecord::Base
 
   def self.virtual_amount_in_storage(specification, supplier, business, unit)
     StockLog.in_storage(storage).waiting.operation_in.find_stock_logs(specification, supplier, business).sum(:amount) - StockLog.in_storage(storage).waiting.operation_out.find_stock_logs(specification, supplier, business).sum(:amount)
-
+  end
+  
   def modify_amount()
     amount = 0
     p = self.parent
