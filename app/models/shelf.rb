@@ -21,7 +21,7 @@ class Shelf < ActiveRecord::Base
 
   scope :broken, ->{ where(shelf_type: 'broken')}
 
-  BAD_TYPE = { yes: '是', no: '否' }
+  #BAD_TYPE = { yes: '是', no: '否' }
   SHELF_TYPE = {normal: '普通区', broken: '破损区', pick: '拣货区'}
   # def self.min_abs_pl(priority_level)
   #   condition = "abs(#{priority_level} - priority_level) "
@@ -61,9 +61,9 @@ class Shelf < ActiveRecord::Base
     # default.first
   end
 
-  def bad_type_name
-    is_bad.blank? ? "" : Shelf::BAD_TYPE["#{is_bad}".to_sym]
-  end
+  #def bad_type_name
+  #  is_bad.blank? ? "" : Shelf::BAD_TYPE["#{is_bad}".to_sym]
+  #end
 
   def shelf_type_name
       shelf_type.blank? ? "" : Shelf::SHELF_TYPE["#{shelf_type}".to_sym]

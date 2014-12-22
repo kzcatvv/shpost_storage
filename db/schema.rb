@@ -11,16 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141218023802) do
+
+ActiveRecord::Schema.define(version: 20141219020207) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
     t.string   "desc"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "area_code",  default: "",   null: false
-    t.string   "name",       default: "",   null: false
-    t.string   "is_bad",     default: "no"
+    t.string   "area_code",  default: "", null: false
+    t.string   "name",       default: "", null: false
+    t.string   "area_type"
   end
 
   create_table "bcm_interfaces", force: true do |t|
@@ -249,9 +250,9 @@ ActiveRecord::Schema.define(version: 20141218023802) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -347,14 +348,14 @@ ActiveRecord::Schema.define(version: 20141218023802) do
     t.integer  "priority_level"
     t.string   "shelf_row",      default: ""
     t.string   "shelf_column",   default: ""
-    t.integer  "max_weight",     default: 0,    null: false
-    t.integer  "max_volume",     default: 0,    null: false
+    t.integer  "max_weight",     default: 0,  null: false
+    t.integer  "max_volume",     default: 0,  null: false
     t.string   "area_length",    default: ""
     t.string   "area_width",     default: ""
     t.string   "area_height",    default: ""
     t.string   "barcode"
     t.string   "no"
-    t.string   "is_bad",         default: "no"
+    t.string   "shelf_type"
   end
 
   create_table "specifications", force: true do |t|
