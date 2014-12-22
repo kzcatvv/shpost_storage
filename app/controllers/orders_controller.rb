@@ -329,45 +329,45 @@ class OrdersController < ApplicationController
     end
   end
 
-  def key_check_out_stocks(keyclientorder)
-    orderchk = true
-    has_out = 0
-    keyclientorder.keyclientorderdetails.each do |kdl|
-      outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyclientorder.business, current_storage)
-      sls = keyclientorder.stock_logs.where(stock_id: outstocks.to_ary).distinct
+  # def key_check_out_stocks(keyclientorder)
+  #   orderchk = true
+  #   has_out = 0
+  #   keyclientorder.keyclientorderdetails.each do |kdl|
+  #     outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyclientorder.business, current_storage)
+  #     sls = keyclientorder.stock_logs.where(stock_id: outstocks.to_ary).distinct
 
-      has_out = sls.sum :amount
+  #     has_out = sls.sum :amount
 
-      if kdl.amount * keyclientorder.orders.count - has_out > 0
-        if outstocks.sum(:virtual_amount) - kdl.amount * keyclientorder.orders.count + has_out >= 0
-          chkout = true
-        else 
-          chkout = false
-        end
-        orderchk= orderchk && chkout
-      end
-    end
-    return orderchk
-  end
+  #     if kdl.amount * keyclientorder.orders.count - has_out > 0
+  #       if outstocks.sum(:virtual_amount) - kdl.amount * keyclientorder.orders.count + has_out >= 0
+  #         chkout = true
+  #       else 
+  #         chkout = false
+  #       end
+  #       orderchk= orderchk && chkout
+  #     end
+  #   end
+  #   return orderchk
+  # end
 
-  def get_has_cnt(keyorder)
-    mi_cnt=keyorder.orders.count
-    has_out=0
-    keyorder.keyclientorderdetails.each do |kdl|
-      outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage)
-      sls=keyorder.stock_logs.where(stock_id: outstocks.to_ary).distinct
-      sls.each do |sl|
-        has_out += sl.amount
-      end
-      if outstocks.sum(:virtual_amount)- kdl.amount * keyorder.orders.count + has_out < 0 
-        has_cnt = outstocks.sum(:virtual_amount)/kdl.amount
-        if has_cnt < mi_cnt
-          mi_cnt=has_cnt
-        end
-      end
-    end
-    return mi_cnt
-  end
+  # def get_has_cnt(keyorder)
+  #   mi_cnt=keyorder.orders.count
+  #   has_out=0
+  #   keyorder.keyclientorderdetails.each do |kdl|
+  #     outstocks = Stock.find_stocks_in_storage(kdl.specification, kdl.supplier, keyorder.business, current_storage)
+  #     sls=keyorder.stock_logs.where(stock_id: outstocks.to_ary).distinct
+  #     sls.each do |sl|
+  #       has_out += sl.amount
+  #     end
+  #     if outstocks.sum(:virtual_amount)- kdl.amount * keyorder.orders.count + has_out < 0 
+  #       has_cnt = outstocks.sum(:virtual_amount)/kdl.amount
+  #       if has_cnt < mi_cnt
+  #         mi_cnt=has_cnt
+  #       end
+  #     end
+  #   end
+  #   return mi_cnt
+  # end
 
 #   def ordercheck
 

@@ -9,10 +9,10 @@ class Stock < ActiveRecord::Base
   has_one :unit, through: :shelf
   has_many :stock_logs
 
-  validates_presence_of :specification_id, :actual_amount, :virtual_amount
+  validates_presence_of :specification_id, :actual_amount
 
   scope :expiration_date_first, ->{order(:expiration_date )}
-  scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, virtual_amount DESC")}
+  scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, actual_amount DESC")}
   scope :available, -> { where("1 = 1")}
   scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken'")}
   scope :broken, -> { includes(:shelf).where("shelves.shelf_type = 'broken'")}
@@ -26,9 +26,9 @@ class Stock < ActiveRecord::Base
           stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, arrival.batch_no, purchase.storage, false)
           
           stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
-          stock.expiration_date = arrival.expiration_date
+          # stock.expiration_date = arrival.expiration_date
 
-          stock.save
+          # stock.save
 
           purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
         end
@@ -42,7 +42,7 @@ class Stock < ActiveRecord::Base
 
       stock_in_amount = stock.stock_in_amount(x.order_detail.amount)
 
-      stock.save
+      # stock.save
 
       order_return.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[(x.broken?) ? :order_bad_return : :order_return], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
     end
@@ -51,13 +51,11 @@ class Stock < ActiveRecord::Base
   def self.broken_stock_change(stock, broken_shelf, amount, operation_user = nil)
     broken_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, nil, broken_shelf, true)
 
-    stock.stock_out_amount(amount)
+    amount = stock.stock_out_amount(amount)
     stock.check_out_amount(amount)
-    stock.save
 
-    broken_stock.stock_in_amount(amount)
+    # broken_stock.stock_in_amount(amount)
     broken_stock.check_in_amount(amount)
-    broken_stock.save
 
     StockLog.create(user: operation_user, stock: stock, operation:  StockLog::OPERATION[:move_to_bad], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now)
 
@@ -88,7 +86,7 @@ class Stock < ActiveRecord::Base
 
           amount -= out_amount
 
-          stock.save
+          # stock.save
 
           order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])
 
@@ -123,7 +121,7 @@ class Stock < ActiveRecord::Base
 
     stocks_in_storage_without_batch_no.each do |stock|
       if stock.shelf.is_available?
-        available_stock = create(specification: specification, business: business, supplier: supplier, shelf: stock.shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
+        available_stock =  Stock.new(specification: specification, business: business, supplier: supplier, shelf: stock.shelf, batch_no: batch_no, actual_amount: 0)
         return available_stock
       end
     end
@@ -134,7 +132,7 @@ class Stock < ActiveRecord::Base
     shelf ||= Shelf.get_empty_shelf(storage, is_broken)
     shelf ||= Shelf.get_default_shelf(storage, is_broken)
 
-    create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
+    Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0)
   end
 
   def self.get_available_stock_in_shelf(specification, supplier, business, batch_no, shelf, is_broken = false)
@@ -144,7 +142,7 @@ class Stock < ActiveRecord::Base
       return stock if stock.shelf.is_available?
     end
 
-    create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0, virtual_amount: 0)
+    Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0)
   end
 
   def self.find_stock_in_shelf_with_batch_no(specification, supplier, business, batch_no, shelf)
@@ -164,11 +162,13 @@ class Stock < ActiveRecord::Base
   end
 
   def self.total_stock_in_unit(specification, supplier, business, unit)
-    in_unit(unit).find_stocks(specification, supplier, business).sum_virtual_amount
+    in_unit(unit).find_stocks(specification, supplier, business).sum(:actual_amount) 
+    # + StockLog.virtual_amount_in_unit(specification, supplier, business, unit)
   end
 
   def self.total_stock_in_storage(specification, supplier, business, storage)
-    in_storage(storage).find_stocks(specification, supplier, business).sum_virtual_amount
+    in_storage(storage).find_stocks(specification, supplier, business).sum(:actual_amount)
+     # +  StockLog.virtual_amount_in_storage(specification, supplier, business, storage)
   end
 
   def find_same_stocklog(keyclientorder)
@@ -185,49 +185,60 @@ class Stock < ActiveRecord::Base
     return nil
   end
 
-  def stock_in_amount(amount)
-    in_amount = free_amount(amount)
-    self.virtual_amount += in_amount
-    in_amount
+  def virtual_amount
+    actual_amount + in_amount - out_amount
   end
 
-  def stock_out_amount(amount)
-    if self.available_amount > amount
-      self.virtual_amount -= amount
-      return amount
-    else
-      out_amount = self.available_amount
-      self.virtual_amount -= out_amount
-      return out_amount
-    end
+  def in_amount
+    stock_logs.waiting.operation_in.sum(:amount)
   end
 
-  def check_in_amount(amount)
-    self.actual_amount += amount
+  def out_amount
+    stock_logs.waiting.operation_out.sum(:amount)
   end
 
-  def check_out_amount(amount)
-    self.actual_amount -= amount
-  end
-
-  def check_reset_amount(amount)
-    self.actual_amount = amount
+  def on_shelf_amount
+    actual_amount - out_amount
   end
 
   def free_amount(amount)
     amount
   end
 
-  def available_amount
-    if self.actual_amount <= self.virtual_amount
-      return self.actual_amount
+  def stock_in_amount(amount)
+    free_amount(amount)
+    # self.virtual_amount += in_amount
+    # in_amount
+  end
+
+  def stock_out_amount(amount)
+    if on_shelf_amount > amount
+      # virtual_amount -= amount
+      return amount
     else
-      return self.virtual_amount
+      # out_amount = on_shelf_amount
+      # self.virtual_amount -= out_amount
+      return on_shelf_amount
     end
   end
 
+  def check_in_amount(amount)
+    self.actual_amount += amount
+    self.save
+  end
+
+  def check_out_amount(amount)
+    self.actual_amount -= amount
+    self.save
+  end
+
+  def check_reset_amount(amount)
+    self.actual_amount = amount
+    self.save
+  end
+
   def self.warning_stocks(storage)
-    select('specification_id as spec_id, business_id as b_id, supplier_id as s_id, sum(virtual_amount) as virtual_amount').joins(:storage).in_storage(storage).normal.group(:specification_id, :business_id, :supplier_id).having('sum(virtual_amount) < (?)', Relationship.select(:warning_amt).where('specification_id = spec_id and business_id = b_id and supplier_id = s_id'))
+    select('specification_id as spec_id, business_id as b_id, supplier_id as s_id, sum(actual_amount) as actual_amount').in_storage(storage).normal.group(:specification_id, :business_id, :supplier_id).having('sum(actual_amount) < (?)', Relationship.select(:warning_amt).where('specification_id = spec_id and business_id = b_id and supplier_id = s_id'))
   end
 
   protected
@@ -236,7 +247,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stocks(specification, supplier, business, is_broken = false)
-    conditions = where(specification: specification, business: business).where('virtual_amount > 0')
+    conditions = where(specification: specification, business: business).where('actual_amount > 0')
 
     if ! is_broken
       conditions = conditions.normal

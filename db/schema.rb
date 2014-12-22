@@ -166,6 +166,20 @@ ActiveRecord::Schema.define(version: 20141219020207) do
     t.string   "barcode"
   end
 
+  create_table "move_stocks", force: true do |t|
+    t.string   "no"
+    t.integer  "unit_id"
+    t.integer  "amount"
+    t.float    "sum"
+    t.string   "desc"
+    t.string   "status"
+    t.string   "name"
+    t.integer  "storage_id"
+    t.string   "barcode"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "order_details", force: true do |t|
     t.string   "name",                default: "", null: false
     t.integer  "specification_id"

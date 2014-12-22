@@ -36,6 +36,8 @@ class Ability
         can :manage, Specification, commodity: {unit_id: user.unit_id}
         can :new, Relationship
 
+        can :manage, MoveStock, unit_id: user.unit_id
+
         can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name,:si_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
 
         can [:manage,:autocomplete_specification_name,:br_autocomplete_specification_name], Relationship, business: {unit_id: user.unit_id}

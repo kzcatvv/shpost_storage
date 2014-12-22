@@ -121,6 +121,7 @@ class KeyclientordersController < ApplicationController
       @scanall = OrderDetail.where(order_id: ors).includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
       @dtl_cnt = @key_details_hash.length
       @act_cnt = 0
+      # @order=@keyclientorder.orders.first
   end
 
   def b2bfind69code
@@ -163,6 +164,7 @@ class KeyclientordersController < ApplicationController
     end
     #binding.pry
     @order_details = childorder.order_details
+    @order = childorder
 
     respond_to do |format|
       format.js 
