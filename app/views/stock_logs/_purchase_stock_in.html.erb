@@ -21,22 +21,23 @@
         <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %></td>
         <td>
           <% paid = PurchaseArrival.find_by(batch_no: stock_log.batch_no).id %>
-          <%= select_tag("stock_logs[][paid]", options_for_select(PurchaseArrival.where(purchase_detail_id: @purchase.purchase_details).map{|u| ["#{u.batch_no}_#{u.purchase_detail.specification.name}",u.id]}, paid), id: "stock_logs_paid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
-          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.name}", {id: "stock_logs_paid_#{stock_log.id}", onclick: 'clickin(this);'}) %>
+          <%= select_tag("stock_logs[][paid]", options_for_select(PurchaseArrival.where(purchase_detail_id: @purchase.purchase_details).map{|u| ["#{u.batch_no}_#{u.purchase_detail.specification.name}",u.id]}, paid), id: "stock_logs_paid_#{stock_log.id}", style: "display: none;") <<
+          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.name}", {id: "stock_logs_paid_#{stock_log.id}"}) %>
         </td>
         <td>
-          <%= content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'}) <<
-          text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code") %>
+          <%= content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}"}) <<
+          text_field_tag("stock_logs[][shelfid]", stock_log.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code") <<
+          hidden_field_tag("stock_logs[][shelfid]", stock_log.shelf.id, id: "stock_logs_shelfid_#{stock_log.id}") %>
         </td>
         <td>
           <%= content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})%>
         </td>
         <td>
-          <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", style: "display: none; width: 40px;", onblur: 'clickout(this)') <<
+          <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", style: "display: none; width: 40px;") <<
           if stock_log.amount == 0 || (stock_log.operation_type == "out" && stock_log.amount > stock_log.stock.actual_amount)
-            content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);', style: 'background-color: red;'})
+            content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", style: 'background-color: red;'})
           else
-            content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);'})
+            content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"})
           end %>
         </td>
         <td id="stock_logs_status_<%=stock_log.id%>"><%=  StockLog::STATUS_SHOW[stock_log.status.to_sym] %></td>
