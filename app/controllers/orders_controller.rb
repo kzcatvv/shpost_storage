@@ -713,16 +713,20 @@ class OrdersController < ApplicationController
                 #取得原有订单明细记录
                 ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier_id}","#{specification_id}","#{dorder_id}")
 
-                #原来没有，创建,同时对应订单数量增加
-                if ori_order_detail.blank? and amount.to_i ==0
-                  next
-                elsif  ori_order_detail.blank? and amount.to_i !=0
+                #原来没有，创建
+                if ori_order_detail.blank? 
+                  #数量小等于0，跳过
+                  if amount.to_i <=0
+                    next
+                  #数量大于0，创建，同时对应订单数量增加
+                  else 
                     OrderDetail.create! name: specification.name,batch_no: nil, specification: specification, amount: amount.to_i, supplier: supplier, order: dorder
 
-                  dorder_total_amount = dorder_total_amount + instance.cell(dline,'D').to_i
-                  Order.update(dorder_id,total_amount: dorder_total_amount)
+                    dorder_total_amount = dorder_total_amount + instance.cell(dline,'D').to_i
+                    Order.update(dorder_id,total_amount: dorder_total_amount)
+                  end
+                #原来有，更新原记录
                 else
-                  #更新原记录
                   order_detail_id = ori_order_detail.id
 
                   ori_detail_amount = ori_order_detail.amount
