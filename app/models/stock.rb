@@ -77,6 +77,12 @@ class Stock < ActiveRecord::Base
     end
   end
 
+  def self.order_pick_stock_out(keyclientorder, operation_user = nil)
+    if Stock.is_enough_stock?(keyclientorder)
+      Stock.pick_stock_out(keyclientorder, operation_user)
+    end
+  end
+
 
   def self.stock_out(order, operation_user = nil)
     order.waiting_amounts.each do |x, amount|
@@ -92,6 +98,30 @@ class Stock < ActiveRecord::Base
 
           order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])
 
+          if amount <= 0
+            break
+          end
+        end
+      end 
+    end
+  end
+
+  def self.pick_stock_out(order, operation_user = nil)
+    order.waiting_amounts.each do |x, amount|
+      if amount > 0
+        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage).to_ary
+
+        stocks_in_storage.each do |stock|
+          out_amount = stock.stock_out_amount(amount)
+
+          amount -= out_amount
+
+          # stock.save
+
+          outpick_sl = order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])
+          
+          inpick_sl = outpick_sl.children.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:in]) 
+          
           if amount <= 0
             break
           end
