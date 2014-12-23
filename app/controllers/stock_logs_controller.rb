@@ -2,7 +2,7 @@ class StockLogsController < ApplicationController
   # before_filter :find_current_storage
   load_and_authorize_resource
 
-  before_filter :load_params, only: [:modify, :removetr, :addtr]
+  before_filter :load_params, only: [:modify, :removetr]
 
   # GET /stock_logs
   # GET /stock_logs.json
@@ -50,19 +50,23 @@ class StockLogsController < ApplicationController
       return render json: {}
     end
 
-    stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.business, @arrival.batch_no, @shelf, false)
+    stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.purchase.business, @arrival.batch_no, @shelf, false)
 
     if @stock_log.blank?
-      @stock_log.create(parent: @arrival.purchase_detail.purchase, stock: stock, amount: @amount, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
+      @stock_log.create(parent: @arrival.purchase_detail.purchase, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
     else
-      @stock_log.update(parent: @arrival.purchase_detail.purchase, stock: stock, amount: @amount, batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
+      @stock_log.update(parent: @arrival.purchase_detail.purchase, stock: stock, batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
     end
 
-    render json: {id: @stock_log.id, amount: @stock_log.amount}
+    @stock_log.update_amount(@amount)
+
+    total_amount = Stock.total_stock_in_shelf(@stock_log.specification, @stock_log.supplier, @stock_log.business, @stock_log.shelf)
+
+    render json: {id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount}
   end
 
   def remove
-    @stock_log.delete
+    @stock_log.destroy
     render text: 'remove'
   end
 
