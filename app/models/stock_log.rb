@@ -18,6 +18,10 @@ class StockLog < ActiveRecord::Base
   # has_many :keyclientorders, through: :orders
   belongs_to :parent, polymorphic: true
 
+  belongs_to :pick, :class_name => 'StockLog'
+  has_one :pick_in, :class_name => 'StockLog',:foreign_key => 'pick_id'#,:dependent => :destroy
+
+
   validates_presence_of :operation, :amount
 
   #before_create :set_desc
