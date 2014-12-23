@@ -3,6 +3,9 @@
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
       <%= f.select(:business_id, Business.accessible_by(current_ability).map{|u| [u.name,u.id]},:include_blank => "请选择")%>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_business_path, target: '_blank',
+                  :class => 'btn btn-primary' %>
       <!--<%= hidden_field_tag('bid', @bsid) %>-->
     </div>
   </div>
@@ -10,6 +13,9 @@
     <%= f.label :supplier_id, :class => 'control-label' %>
     <div class="controls">
       <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]},:include_blank => "请选择")%>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_supplier_path, target: '_blank',
+            :class => 'btn btn-primary' %>
       <!--<%= hidden_field_tag('sid',@slid) %>-->
     </div>
   </div>
