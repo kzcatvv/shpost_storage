@@ -86,7 +86,8 @@ class ShelvesController < ApplicationController
   def update
     @shelf.shelf_code = setShelfCode(shelf_params)
     #@shelf.is_bad = Area.find(params[:shelf][:area_id]).is_bad
-    @shelf.shelf_type = Area.find(params[:shelf][:area_id]).area_type
+    #@shelf.shelf_type = Area.find(params[:shelf][:area_id]).area_type
+    @shelf.shelf_type = Area.find(@shelf.area_id).area_type
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
     # @shelf.shelf_code << "-" << change(shelf_params[:area_width])
