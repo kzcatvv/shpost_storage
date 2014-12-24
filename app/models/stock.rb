@@ -28,9 +28,10 @@ class Stock < ActiveRecord::Base
           stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, arrival.batch_no, purchase.storage, false)
           
           stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
-          # stock.expiration_date = arrival.expiration_date
 
-          # stock.save
+          if !arrival.expiration_date.blank?
+            stock.update(expiration_date: arrival.expiration_date)
+          end
 
           purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
         end
@@ -77,11 +78,11 @@ class Stock < ActiveRecord::Base
     end
   end
 
-  def self.order_pick_stock_out(keyclientorder, operation_user = nil)
-    if Stock.is_enough_stock?(keyclientorder)
-      Stock.pick_stock_out(keyclientorder, operation_user)
-    end
-  end
+  # def self.order_pick_stock_out(keyclientorder, operation_user = nil)
+  #   if Stock.is_enough_stock?(keyclientorder)
+  #     Stock.pick_stock_out(keyclientorder, operation_user)
+  #   end
+  # end
 
 
   def self.stock_out(order, operation_user = nil)
