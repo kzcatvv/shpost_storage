@@ -252,60 +252,13 @@ function selfAlert(msgstr,timer){
     }  
 }
 
-function clickin(current)
-{
-  param = current.id.split('_');
-  // alert(param);
-  if ($("td#stock_logs_status_"+param[3]).text()!="处理中") {
-    return false;
-  }
-  // if (param[2] == "amount") {
-    if ($("input#"+current.id).is(":hidden")){ 
-      $(current).hide();
-      $("input#"+current.id).show();
-      $("input#"+current.id).focus();
-    }
-  // } else {
-     if ($("select#"+current.id).is(":hidden")){ 
-       $(current).hide();
-       $("select#"+current.id).show();
-       $("select#"+current.id).focus();
-     }
-  // }
-}
-
-function hideit(current)
-{
-  param = current.id.split('_');
-  $("p#"+current.id).show();
-  if (param[2] == "amount") {
-    if ($(current).val() == "") {
-      $(current).val(0);
-    }
-    $("p#"+current.id).text($(current).val());
-  } else if (param[2] == "shelfid") {
-    if ($(current).val() == "") {
-      // $(current).val("错误的货架");
-      $(current).css("background-color","red");
-    } else {
-      $(current).css("background-color","transparent");
-    }
-    $("p#"+current.id).text($(current).val());
-  } else {
-    $("p#"+current.id).text($(current).find("option:selected").text());
-  }
-  $(current).hide();
-}
-
-function clickout(current)
-{
-  hideit(current);
-  modify(current);
-}
-
 function add() {
   var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
-  var addid = "0"+$("tr[id^=stock_logs_id_0]").length;
+  var addid = "00";
+  if ($("tr[id^=stock_logs_id_0]").last().attr("id") != undefined ) {
+    param = $("tr[id^=stock_logs_id_0]").last().attr("id").split('_');
+    addid = "0"+ (parseInt(param[3])+1);
+  }
   tr.attr("id","stock_logs_id_"+addid);
   tr.appendTo("table#stock_logs");
   // slid=$('table.wice-grid tr:eq(2) input').first().val();
@@ -318,29 +271,24 @@ function add() {
   tablereplace(addid,"select","id",addid);
   tablereplace(addid,"td","id",addid);
 
+  tableset(addid,"id",addid)
   tableset(addid,"amount","0")
   tableset(addid,"actamount","0")
   tableset(addid,"shelfid","")
   tableset(addid,"paid","")
   tableset(addid,"status","处理中")
 
-
-  // amountset(addid,0);
-  // actamountset(addid,0);
-  // statusset(addid,"处理中");
-  // shelfset(addid,"")
-  // arrivalset(addid,"")
-  // linkset(index,jsonData.id, jsonData.pid);
+  ajaxstocklogs();
 }
 
-function split(current)
-{
-  param = current.id.split('_');
-  var index=current.parentNode.parentNode.rowIndex;
-  var tr = $("table.wice-grid tr").eq(index+1).clone();
-  $("table.wice-grid tr").eq(index+1).after(tr)
-  addTr(param[3],index+2)
-}
+// function split(current)
+// {
+//   param = current.id.split('_');
+//   var index=current.parentNode.parentNode.rowIndex;
+//   var tr = $("table.wice-grid tr").eq(index+1).clone();
+//   $("table.wice-grid tr").eq(index+1).after(tr)
+//   addTr(param[3],index+2)
+// }
 
 function exportorder(input)
 {
@@ -381,80 +329,94 @@ function destroy(current) {
   if(confirm("确定删除？")){
     param = current.id.split('_');
     id = param[3];
-    // alert(id)
     removeTr(current);
     var index=current.parentNode.parentNode.rowIndex;
     $("tr#stock_logs_id_"+id).remove();
   }
 }
 
-function modify(current)
+function purchase_modify(current)
 {
   param = current.id.split('_');
   id = param[3];
   amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_amount_"+id).val();
-  shelfid = $("tr#stock_logs_id_"+id+">td>input#stock_logs_shelfid_"+id).val();
+  shelfid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_shelfid_"+id+"][type=hidden]").val();
   arrivalid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_paid_"+id).val();
-  // alert(id);
-  // alert(amount);
-  // alert(shelfid);
-  // alert(arrivalid);
+
+  var x = param[3].substring(0,1)
+  if (x == "0") {
+    x = ""
+  } else {
+    x = param[3]
+  }
+  if (arrivalid == null) {
+    arrivalid = ""
+  }
+
   $.ajax({
     type: "POST",
-    url: "/stock_logs/modify",
-    data: "id=" + param[3] + "&amount=" + amount + "&shelfid=" + shelfid + "&arrivalid=" + arrivalid,
+    url: "/stock_logs/purchase_modify",
+    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&arrival_id=" + arrivalid,
     dataType: "json",
     complete: function(data) {
       if(data.success){
-        // alert(data.responseText)
+        // alert(data.responseText);
         var jsonData = eval("("+data.responseText+")");
-        $("p#stock_logs_actamount_"+param[3]).text(jsonData.actual_amount);
-        if (jsonData.actual_amount < $("p#stock_logs_amount_"+param[3]).text() && jsonData.operation_type == "out") {
-          $("p#stock_logs_amount_"+param[3]).css("background-color","red");
-        } else {
-          $("p#"+current.id).css("background-color","transparent");
-        }
+        // $("p#stock_logs_actamount_"+param[3]).text(jsonData.actual_amount);
+        // if (jsonData.actual_amount < $("p#stock_logs_amount_"+param[3]).text() && jsonData.operation_type == "out") {
+        //   $("p#stock_logs_amount_"+param[3]).css("background-color","red");
+        // } else {
+        //   $("p#"+current.id).css("background-color","transparent");
+        // }
 
         // 20141219
-        tablereplace(addid,"p","id",jsonData.id);
-        tablereplace(addid,"a","id",jsonData.id);
-        tablereplace(addid,"a","href",jsonData.id);
-        tablereplace(addid,"input","id",jsonData.id);
-        tablereplace(addid,"select","id",jsonData.id);
-        tablereplace(addid,"td","id",jsonData.id);
+        if (jsonData.id != undefined) {
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
+          tablereplace(jsonData.id,"p","id",jsonData.id);
+          tablereplace(jsonData.id,"a","id",jsonData.id);
+          tablereplace(jsonData.id,"a","href",jsonData.id);
+          tablereplace(jsonData.id,"input","id",jsonData.id);
+          tablereplace(jsonData.id,"select","id",jsonData.id);
+          tablereplace(jsonData.id,"td","id",jsonData.id);
 
-        tableset(addid,"amount",jsonData.amount)
-        tableset(addid,"actamount",jsonData.actual_amount)
-        tableset(addid,"shelfid",jsonData.shelfid)
-        tableset(addid,"paid",jsonData.paid)
-        // tableset(addid,"status","处理中")
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"amount",""+jsonData.amount)
+          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
+
+          if (amount != jsonData.amount) {
+            alert("该明细最大可入库数量：" + jsonData.amount);
+          }
+          // tableset(param[3],"shelfid",shelfid)
+          // tableset(addid,"paid",jsonData.paid)
+          // tableset(addid,"status","处理中")
+        }
       }
     }
   });
 }
 
-function addTr(slid,index)
-{
-  $.ajax({
-    type: "POST",
-    url: "/stock_logs/addtr",
-    data: "id=" + slid,
-    dataType: "json",
-    complete: function(data) {
-      if(data.success){
-        var jsonData = eval("("+data.responseText+")");
-        tablereplace(index,"p","id",jsonData.id);
-        tablereplace(index,"a","id",jsonData.id);
-        tablereplace(index,"a","href",jsonData.id);
-        tablereplace(index,"input","id",jsonData.id);
-        tablereplace(index,"select","id",jsonData.id);
-        amountset(jsonData.id,0);
-        statusset(jsonData.id,"处理中");
-        linkset(index,jsonData.id, jsonData.pid);
-      }
-    }
-  });
-}
+// function addTr(slid,index)
+// {
+//   $.ajax({
+//     type: "POST",
+//     url: "/stock_logs/addtr",
+//     data: "id=" + slid,
+//     dataType: "json",
+//     complete: function(data) {
+//       if(data.success){
+//         var jsonData = eval("("+data.responseText+")");
+//         tablereplace(index,"p","id",jsonData.id);
+//         tablereplace(index,"a","id",jsonData.id);
+//         tablereplace(index,"a","href",jsonData.id);
+//         tablereplace(index,"input","id",jsonData.id);
+//         tablereplace(index,"select","id",jsonData.id);
+//         amountset(jsonData.id,0);
+//         statusset(jsonData.id,"处理中");
+//         linkset(index,jsonData.id, jsonData.pid);
+//       }
+//     }
+//   });
+// }
 
 function tablereplace(id,column,type,value) {
   $('table#stock_logs tr#stock_logs_id_'+id+' '+column+"[id^=stock_logs]").each(function(){
@@ -471,7 +433,6 @@ function tableset(id,type,value) {
     } else {
       $(this).text(value);
     }
-
   })
   $('table#stock_logs tr#stock_logs_id_'+id+' input#stock_logs_'+type+'_'+id).each(function(){
     // $(this).css('background-color','red');
@@ -481,31 +442,11 @@ function tableset(id,type,value) {
     // $(this).css('background-color','red');
     $(this).val(value);
   })
+  $('table#stock_logs tr#stock_logs_id_'+id+' td#stock_logs_'+type+'_'+id).each(function(){
+    // $(this).css('background-color','red');
+    $(this).text(value);
+  })
 }
-
-// function actamountset(id,value) {
-//   $('table#stock_logs tr#stock_logs_id_'+id+' p#stock_logs_actamount_'+id).each(function(){
-//     // $(this).css('background-color','red');
-//     $(this).text(value);
-//   })
-// }
-
-// function amountset(id,value) {
-//   $('table#stock_logs tr#stock_logs_id_'+id+' p#stock_logs_amount_'+id).each(function(){
-//     // $(this).css('background-color','red');
-//     $(this).text(value);
-//   })
-//   $('table#stock_logs tr#stock_logs_id_'+id+' input#stock_logs_amount_'+id).each(function(){
-//     $(this).val(value);
-//   })
-// }
-
-// function statusset(id,value) {
-//   $('table#stock_logs tr#stock_logs_id_'+id+' td#stock_logs_status_'+id).each(function(){
-//     $(this).attr("id",$(this).attr("id").replace(/[0-9]+$/,id));
-//     $(this).text(value);
-//   })
-// }
 
 function linkset(id) {
   // remove the check button
@@ -519,10 +460,16 @@ function linkset(id) {
 function removeTr(current)
 {
   param = current.id.split('_');
+  var x = param[3].substring(0,1)
+  if (x == "0") {
+    x = ""
+  } else {
+    x = param[3]
+  }
   $.ajax({
     type: "POST",
-    url: "/stock_logs/removetr",
-    data: "id=" + param[3],
+    url: "/stock_logs/remove",
+    data: "id=" + x,
     dataType: "json",
     complete: function() {
       $("p#"+current.id).css("background-color","transparent");
@@ -530,4 +477,74 @@ function removeTr(current)
   });
 }
 
+function iswaiting(current)
+{
+  param = current.id.split('_');
+  if ($("td#stock_logs_status_"+param[3]).text() == "处理中") {
+    return true
+  } else {
+    return false
+  }
+}
 
+function  ajaxstocklogs(){
+  $("input[id^=stock_logs_shelfid]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
+    $("input[id="+this.id+"][type=text]").val(data.item.value);
+    $("input[id="+this.id+"][type=hidden]").val(data.item.id);
+    $("input[id="+this.id+"][type=text]").blur();
+  });
+
+  $("p[id^=stock_logs_paid]").unbind('click').click(function() {
+    if (iswaiting(this)) {
+      $(this).toggle();
+      $("select#"+this.id).toggle();
+      $("select#"+this.id).focus();
+    }
+  });
+
+  $("p[id^=stock_logs_shelfid]").unbind('click').click(function() {
+    if (iswaiting(this)) {
+      $(this).toggle();
+      $("input#"+this.id).toggle();
+      // $("input#"+this.id).val($(this).text());
+      $("input#"+this.id).focus();
+    }
+  });
+
+  $("p[id^=stock_logs_amount]").unbind('click').click(function() {
+    if (iswaiting(this)) {
+      $(this).toggle();
+      $("input#"+this.id).toggle();
+      $("input#"+this.id).focus();
+    }
+  });
+
+  $("select[id^=stock_logs_paid]").unbind('blur').blur(function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    $("p#"+this.id).text($(this).find("option:selected").text());
+    purchase_modify(this);
+  });
+
+  $("input[id^=stock_logs_shelfid]").unbind('blur').blur(function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    if ($(this).val() == "") {
+      $("p#"+this.id).text("未选择");
+    } else {
+      $("p#"+this.id).text($(this).val());
+    }
+    purchase_modify(this);
+  });
+
+  $("input[id^=stock_logs_amount]").unbind('blur').blur(function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    if ($(this).val() == "") {
+      $("p#"+this.id).text("0");
+    } else {
+      $("p#"+this.id).text($(this).val());
+    }
+    purchase_modify(this);
+  });
+}

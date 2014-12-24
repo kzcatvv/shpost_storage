@@ -21,7 +21,6 @@ class StockLog < ActiveRecord::Base
   belongs_to :pick, :class_name => 'StockLog'
   has_one :pick_in, :class_name => 'StockLog',:foreign_key => 'pick_id'#,:dependent => :destroy
 
-
   validates_presence_of :operation, :amount
 
   #before_create :set_desc
@@ -164,7 +163,6 @@ class StockLog < ActiveRecord::Base
       #   amount += detail.purchase_arrivals.sum(:arrived_amount)
       # end
       max_amount = self.parent.purchase_arrivals.where(batch_no: self.batch_no).sum(:arrived_amount) - self.parent.stock_logs.where(batch_no: self.batch_no).where.not(id: self.id).sum(:amount)
-
       if total_amount > max_amount
         total_amount = max_amount
       end

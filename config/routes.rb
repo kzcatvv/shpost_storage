@@ -194,6 +194,8 @@ ShpostStorage::Application.routes.draw do
       post 'modify'
       post 'removetr'
       post 'addtr'
+      post 'purchase_modify'
+      post 'remove'
     end
   end
 
