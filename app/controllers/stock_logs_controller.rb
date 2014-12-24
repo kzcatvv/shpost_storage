@@ -54,12 +54,16 @@ class StockLogsController < ApplicationController
     stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.purchase.business, @arrival.batch_no, @shelf, false)
 
     if @stock_log.blank?
-      @stock_log = StockLog.create(parent: @arrival.purchase_detail.purchase, stock: stock, amount: @amount, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
+      @stock_log = StockLog.create(parent: @arrival.purchase_detail.purchase, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
     else
-      @stock_log.update(parent: @arrival.purchase_detail.purchase, stock: stock, amount: @amount, batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
+      @stock_log.update(parent: @arrival.purchase_detail.purchase, stock: stock, batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
     end
 
-    render json: {id: @stock_log.id, amount: @stock_log.amount}
+    @stock_log.update_amount(@amount)
+
+    total_amount = Stock.total_stock_in_shelf(@stock_log.specification, @stock_log.supplier, @stock_log.business, @stock_log.shelf)
+
+    render json: {id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount}
   end
 
   def remove
@@ -73,7 +77,7 @@ class StockLogsController < ApplicationController
   def load_params
     @stock_log = StockLog.find(params[:id]) if !params[:id].blank?
     @shelf = Shelf.find(params[:shelf_id]) if !params[:shelf_id].blank?
-    (params[:amount].blank?) ? @amount = 0 : @amount = params[:amount]
+    (params[:amount].blank?) ? @amount = 0 : @amount = params[:amount].to_i
     @arrival = PurchaseArrival.find(params[:arrival_id]) if !params[:arrival_id].blank?
   end
 end

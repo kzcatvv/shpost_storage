@@ -132,4 +132,14 @@ class PrintController < ApplicationController
         end
     end
 
+    def websplitordertracking
+        @order = Order.find(params[:orid])
+    end
+
+    def websplitordertrackingnum
+        @order = Order.find(params[:orid])
+        @transport_type = params[:transport_type]
+        @order.update(transport_type: params[:transport_type])
+    end
+
 end

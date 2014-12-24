@@ -9,6 +9,9 @@ class Stock < ActiveRecord::Base
   has_one :unit, through: :shelf
   has_many :stock_logs
 
+  after_touch :clean_orphan_stocks
+  after_update :clean_orphan_stocks
+
   validates_presence_of :specification_id, :actual_amount
 
   scope :expiration_date_first, ->{order(:expiration_date )}
@@ -16,7 +19,6 @@ class Stock < ActiveRecord::Base
   scope :available, -> { where("1 = 1")}
   scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken'")}
   scope :broken, -> { includes(:shelf).where("shelves.shelf_type = 'broken'")}
-  
 
   def self.purchase_stock_in(purchase, operation_user = nil)
     purchase.purchase_details.each do |x|
@@ -171,6 +173,11 @@ class Stock < ActiveRecord::Base
      # +  StockLog.virtual_amount_in_storage(specification, supplier, business, storage)
   end
 
+  def self.total_stock_in_shelf(specification, supplier, business, shelf)
+    in_shelf(shelf).find_stocks(specification, supplier, business).sum(:actual_amount) 
+    # + StockLog.virtual_amount_in_unit(specification, supplier, business, unit)
+  end
+
   def find_same_stocklog(keyclientorder)
     stocklogs = self.stock_logs.where(status: "waiting")
     stocklogs.each do |stocklog|
@@ -280,5 +287,12 @@ class Stock < ActiveRecord::Base
 
   def self.in_shelf(shelf)
     includes(:shelf).where('shelves.id' => shelf)
+  end
+
+  private
+  def clean_orphan_stocks
+    if self.actual_amount.zero? && self.stock_logs.waiting.blank?
+      self.destroy
+    end
   end
 end

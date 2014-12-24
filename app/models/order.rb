@@ -150,10 +150,10 @@ class Order < ActiveRecord::Base
   def b2bsetsplitstatus
     self.update(status: STATUS[:packed])
 
-    if self.b2b_can_update_parent
-      self.parent.update(status: STATUS[:packed])
-      self.parent.keyclientorder.update(status: STATUS[:packed])
-    end
+    # if self.b2b_can_update_parent
+    #   self.parent.update(status: STATUS[:packed])
+    #   self.parent.keyclientorder.update(status: STATUS[:packed])
+    # end
   end
 
   def b2b_can_update_parent

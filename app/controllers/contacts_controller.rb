@@ -75,7 +75,7 @@ class ContactsController < ApplicationController
 
   def confirmadd
     relationship=Relationship.find(params[:rid])
-    relationship.contacts.delete_all
+    relationship.contacts.destroy_all
     contacts=params[:contacts]
     contacts.each do |id|
       contact=Contact.find(id)
@@ -85,7 +85,7 @@ class ContactsController < ApplicationController
 
   def deleterelation
     relationship=Relationship.find(params[:rid])
-    relationship.contacts.delete(Contact.find(params[:id]))
+    relationship.contacts.destroy(Contact.find(params[:id]))
     redirect_to relation_contacts_path(:rid=>params[:rid])
   end
 

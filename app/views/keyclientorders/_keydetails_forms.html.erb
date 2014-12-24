@@ -21,3 +21,8 @@
   <% end %>
   </tbody>
 </table>
+</br>
+<% if !@order.nil? %>
+  <%=link_to t('打印面单'), "/print/websplitordertracking?orid=#{@order.id}", target: '_blank',:class => 'btn btn-primary' %>
+<% end %>
+</br>
