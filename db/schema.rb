@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20141219020207) do
+ActiveRecord::Schema.define(version: 20141223075309) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -165,6 +164,18 @@ ActiveRecord::Schema.define(version: 20141219020207) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "barcode"
+  end
+
+  create_table "mobiles", force: true do |t|
+    t.string   "no"
+    t.string   "mobile_type"
+    t.string   "version"
+    t.integer  "user_id"
+    t.integer  "storage_id"
+    t.time     "last_sign_in_time"
+    t.boolean  "cancel"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "move_stocks", force: true do |t|
@@ -399,10 +410,11 @@ ActiveRecord::Schema.define(version: 20141219020207) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.date     "expiration_date"
-    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+    t.date     "expiration_date"
+    t.string   "batch_no"
+    t.integer  "pick_id"
   end
 
   create_table "stock_mons", force: true do |t|

@@ -185,6 +185,8 @@ class Ability
         can :manage, OrderReturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
+
+        can :manage, Mobile, storage_id: storage.id
     end
 
     if user.order?(storage)

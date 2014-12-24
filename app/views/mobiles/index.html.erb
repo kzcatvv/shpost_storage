@@ -1,0 +1,39 @@
+<%- model_class = Mobile -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Mobile %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_mobile_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@mobiles_grid) do |g|
+    g.column name: model_class.human_attribute_name(:mobile_no), attribute: 'no'
+
+    g.column name: model_class.human_attribute_name(:mobile_type), attribute: 'mobile_type'
+
+    g.column name: model_class.human_attribute_name(:version), attribute: 'version'
+
+    g.column name: model_class.human_attribute_name(:user), attribute: 'user_id' do |mobile|
+        mobile.user.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:last_sign_in_time), attribute: 'last_sign_in_time'
+
+    g.column name: model_class.human_attribute_name(:cancel), attribute: 'cancel' do |mobile|
+      mobile.cancel ? '否' : '是'
+    end
+
+    g.column do |mobile|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_mobile_path(mobile), :class => 'btn btn-xs btn-primary' if can? :update, mobile) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      mobile_path(mobile),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, mobile)
+      end
+  end 
+%>
