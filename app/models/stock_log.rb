@@ -156,19 +156,22 @@ class StockLog < ActiveRecord::Base
       end
     elsif operation.eql? OPERATION[:move_stock_out]
       max_amount = self.stock.actual_amount
-      if total_amount > max_amount
-        total_amount = max_amount
-      end
-      self.pick_in.update(amount: total_amount)     
     elsif operation.eql? OPERATION[:b2b_stock_out]
       on_shelf_amount = self.stock.on_shelf_amount
-      left_amount = self.parent.manual_stock_details.where(supplier: self.supplier, specification: self.specification).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification).where.not(id: self.id).sum(:amount)
+      left_amount = self.parent.manual_stock_details.includes(:manual_stock).where(supplier: self.supplier, specification: self.specification, manual_stocks: {business: self.business}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
+
+      max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
+    elsif operation.eql? OPERATION[:b2c_stock_out]
+      on_shelf_amount = self.stock.on_shelf_amount
+      left_amount = self.parent.order_details.includes(:order).where(supplier: self.supplier, specification: self.specification, orders: {business: self.business}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
+      
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
     end
 
     total_amount = max_amount if total_amount > max_amount
 
     self.update(amount: total_amount)
+    self.pick_in.update(amount: total_amount) if !self.pick_in.blank?
   end
 
   private
