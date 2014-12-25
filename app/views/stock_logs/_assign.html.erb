@@ -1,0 +1,18 @@
+<%- model_class = StockLog -%>
+<!-- <%= form_tag(assign_select_purchase_url(), :method => "get") do %> -->
+<div>
+<table class="table table-striped">
+  <tbody>
+      <tr>
+        <td><p>操作人:</p></td>
+        <td><%= select_tag("assign_user", options_for_select(@sorters.map{|u| ["#{u.name}",u.id]}), id: "assign_user") %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><a href="javascript:void(0);", id='assign_select', class='btn btn-primary' >选择</a></td>
+      </tr>
+  </tbody>
+</table>
+</div>
+<!-- <% end %> -->
+

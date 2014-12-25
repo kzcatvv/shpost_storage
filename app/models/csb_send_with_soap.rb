@@ -247,7 +247,7 @@ class CSBSendWithSOAP
     combinationOrderCount = 0
     
     orders.each do |order|
-      if order.order_details.first.business_deliver_no.blank?
+      if order.business_trans_no.blank?
         originalityOrderCount+=1
         orderLabel = originalityOrder.add_element('OrderLabel')
 
@@ -352,11 +352,19 @@ class CSBSendWithSOAP
         end
         operatorTime.add_text Time.now.strftime("%Y-%m-%d %H:%m:%S")
         if order.business_trans_no.blank?
+          # 原始订单
           orderListId.add_text order.business_order_id
           hostNumber.add_text order.business_order_id
         else
-          orderListId.add_text order.business_order_id
-          hostNumber.add_text order.business_trans_no
+          if order.business_trans_no.eql? order.business_order_id
+            # 未拆单处理归并订单
+            orderListId.add_text detail.business_deliver_no
+            hostNumber.add_text order.business_trans_no
+          else
+            # 拆单处理归并订单
+            orderListId.add_text order.business_order_id
+            hostNumber.add_text order.business_trans_no
+          end
         end
         courier.add_text ""
         courierTel.add_text ""
@@ -483,13 +491,14 @@ class CSBSendWithSOAP
       orders = orderDetail.elements['CombinationOrder']
     end
     orders.each_element('OrderLabel') { |orderLabel|
-      orders_array = Array.new
-      
+      # orders_array = Array.new
+      order_hash = {}
       orderId = nil
       if order_type == StorageConfig.config["csb_interface"]["order_type_1"]
         orderId = orderLabel.attributes['listId']
       else
         orderId = orderLabel.attributes['BigOrderId']
+        order_hash.store('TRANS_SN',orderId)
       end
       createDate = orderLabel.attributes['CreateDate']
       customerName = orderLabel.attributes['CustomerName']
@@ -499,6 +508,19 @@ class CSBSendWithSOAP
       deadLineDate = orderLabel.attributes['DeadLineDate']
       custRemark = orderLabel.attributes['CustRemark']
       
+      order_hash.store('ORDER_ID',orderId)
+      # Rails.logger.info "ORDER_ID=" << orderId
+      order_hash.store('DATE',createDate)
+      order_hash.store('CUST_NAME',customerName)
+      # Rails.logger.info "CUST_NAME=" << customerName
+      order_hash.store('ADDR',address)
+      # Rails.logger.info "ADDR=" << address
+      order_hash.store('MOBILE',telephone)
+      order_hash.store('ZIP',customerArea)
+      order_hash.store('DESC',custRemark)
+
+      order_details = Array.new
+
       # if gift detail is miss, skip this order and start the next one
       giftDetails = orderLabel.get_elements('GiftDetail')
       if giftDetails.blank?
@@ -508,7 +530,7 @@ class CSBSendWithSOAP
       end
       giftDetails.each do |giftDetail|
         order_detail = {}
-        order_hash = {}
+        # order_hash = {}
         itemId = giftDetail.attributes['itemId']
         giftLineId = giftDetail.attributes['giftLineId']
         giftName = giftDetail.attributes['GiftName']
@@ -517,24 +539,22 @@ class CSBSendWithSOAP
         if order_type == StorageConfig.config["csb_interface"]["order_type_2"]
           listId = giftDetail.attributes['listId']
           # puts "DELIVER_NO=" << listId
-          order_detail.store('DELIVER_NO', orderId)
-          order_hash.store('ORDER_ID', listId)
-          order_hash.store('TRANS_SN', orderId)
+          order_detail.store('DELIVER_NO', listId)
         else
-          order_hash.store('ORDER_ID', orderId)
+          order_detail.store('DELIVER_NO', orderId)
         end
-        # split the multitude details to multitude orders
-        # puts "ORDER_ID=" << orderId
-        order_hash.store('DATE',createDate)
-        order_hash.store('CUST_NAME',customerName)
-        # puts "CUST_NAME=" << customerName
-        order_hash.store('ADDR',address)
-        #puts "ADDR=" << address
-        order_hash.store('MOBILE',telephone)
-        order_hash.store('ZIP',customerArea)
-        order_hash.store('DESC',custRemark)
+        # # split the multitude details to multitude orders
+        # # puts "ORDER_ID=" << orderId
+        # order_hash.store('DATE',createDate)
+        # order_hash.store('CUST_NAME',customerName)
+        # # puts "CUST_NAME=" << customerName
+        # order_hash.store('ADDR',address)
+        # #puts "ADDR=" << address
+        # order_hash.store('MOBILE',telephone)
+        # order_hash.store('ZIP',customerArea)
+        # order_hash.store('DESC',custRemark)
 
-        order_details = Array.new
+        # order_details = Array.new
 
         order_detail.store('SKU', itemId)
         # puts "SKU=" << itemId
@@ -545,20 +565,22 @@ class CSBSendWithSOAP
 
         order_details << order_detail
 
-        order_hash.store('ORDER_DETAILS', order_details)
+        # order_hash.store('ORDER_DETAILS', order_details)
 
-        orders_array << order_hash
+        # orders_array << order_hash
       end
+
+      order_hash.store('ORDER_DETAILS', order_details)
 
       # puts order_hash
       unit = Unit.find_by(no: StorageConfig.config["unit"]['zb_id'])
-      order = nil
-      orders_array.each do |x|
-        order = StandardInterface.order_enter(x, Business.find_by(no: StorageConfig.config["business"]['bst_id']), unit, unit.default_storage, false)
-      end
+      # order = nil
+      # orders_array.each do |x|
+      order = StandardInterface.order_enter(order_hash, Business.find_by(no: StorageConfig.config["business"]['bst_id']), unit, unit.default_storage, false)
+      # end
       if !order.blank?
         orderTransStatus << orderId
-          rowsum += 1
+        rowsum += 1
       else
         next
         # return true

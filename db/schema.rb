@@ -411,10 +411,10 @@ ActiveRecord::Schema.define(version: 20141225131718) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.integer  "parent_id"
-    t.string   "parent_type"
     t.date     "expiration_date"
     t.string   "batch_no"
+    t.integer  "parent_id"
+    t.string   "parent_type"
     t.integer  "pick_id"
   end
 
