@@ -3,6 +3,7 @@ class OrderReturn < ActiveRecord::Base
   belongs_to :storage
   has_many :stock_logs, as: :parent
   has_many :order_return_details, dependent: :destroy
+  has_many :tasks, as: :parent
 
   def check!
     self.stock_logs.each do |x|
