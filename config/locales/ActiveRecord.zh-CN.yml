@@ -184,11 +184,14 @@ zh-CN:
       b2bstockout: 出库
       b2bstockoutcheck: 出库确认
       b2bordersplit: 拆单
+      movedetail: 移库明细
+      move_stock_check: 移库确认
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
       stock_in: "%{model}入库单"
       ready2bad: "移入残次品区"
+      move_stock: "移库单"
   number:
     currency:
       format:
@@ -347,6 +350,9 @@ zh-CN:
       mobile:
         one: 设备管理
         other: 设备管理
+      move_stock:
+        one: 移库单管理
+        other: 移库单管理
     attributes:
       user:
         email: "电子邮件"
@@ -659,6 +665,18 @@ zh-CN:
         user: "当前使用人员"
         last_sign_in_time: "最后登入时间"
         cancel: "允许使用"
+      move_stock:
+        "no": "编号"
+        name: "名称"
+        unit_id: "所属机构"
+        business_id: "所属商户"
+        amount: "合计数量"
+        sum: "合计金额"
+        desc: "备注"
+        status: "状态"
+        status_opened: "开放"
+        status_moved: "已移库"
+        status_closed: "已关闭"
   menu:
     permission:
       name: "权限管理"
