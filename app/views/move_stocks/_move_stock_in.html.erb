@@ -1,0 +1,24 @@
+<div>
+<table id="move_stock_dtl" class="table table-striped">
+  <thead>
+    <tr>
+      <th>移出货架</th>
+      <th>库存</th>
+      <th>库存数量</th>
+      <th>移出数量</th>
+      <th>移入货架</th>
+    </tr>
+  </thead>
+  <tbody>
+
+  </tbody>
+</table>
+</div>
+
+<div style="float:right">
+    <% if can? :new, Stock %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+                   "javascript:void(0)", onclick: "add_move_stock_dtl()",
+                    :class => 'btn btn-primary' %>
+    <% end %>
+</div>
