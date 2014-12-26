@@ -1,9 +1,52 @@
-
-
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+  <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
+</object>
+<%- model_class = MoveStock -%>
 <div class="page-header">
-  <h1>Move Stock</h1>
-
+  <h1><%=t '.title', :default => [:'helpers.titles.move_stock', '%{model} Move Stock '], :model => model_class.model_name.human.titleize %></h1>
+  <div style="float:right">   
+      <a href="javascript:movestock_preview()" class='btn btn-primary' >打印移库单</a>
+      <%= link_to t('.move_stock_check', :default => t("helpers.links.move_stock_check")),
+                  check_move_stocks_url(@movestockid),
+                  method: :patch,
+                  :class => 'btn btn-primary' %>
+  </div>
 </div>
-
+<%= hidden_field_tag('movestockid',@movestockid )%>
 <%= render :partial => 'move_stocks/move_stock_in' %>
 
+<script language="javascript" type="text/javascript"> 
+function movestock_preview(){
+    LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));  
+    LODOP.PRINT_INIT("打印移库单");
+    LODOP.SET_PRINT_STYLE("FontSize",18);
+    LODOP.SET_PRINT_STYLE("Bold",1);
+    LODOP.SET_PRINT_STYLE("ItemType",4);
+    LODOP.ADD_PRINT_TEXT(50,"45%",260,39,"移库单");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(50,"75%",260,39,CurentTime(0,0));
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(80,"43%",260,39,'<%= @movestock.name %>');
+    LODOP.SET_PRINT_STYLE("FontSize",15);
+    LODOP.SET_PRINT_STYLE("Bold",1);
+    h=110;
+    LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"移出货架");
+    LODOP.ADD_PRINT_TEXT(h,"25%",260,25,"69码");
+    LODOP.ADD_PRINT_TEXT(h,"40%",260,25,"商品名");
+    LODOP.ADD_PRINT_TEXT(h,"55%",260,25,"数量");
+    LODOP.ADD_PRINT_TEXT(h,"75%",260,25,"移入货架");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    <% @movestock.stock_logs.where("operation = 'move_stock_out'").each do |j| %>
+        h=h+33;
+        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= j.stock.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= j.stock.specification.sixnine_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.stock.specification.all_name %>');
+        LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= j.amount %>');
+        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.pick_in.stock.shelf.shelf_code %>');
+    <% end %>
+    LODOP.PREVIEW();
+  };
+</script>
