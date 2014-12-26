@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :mobiles
+
   resources :move_stocks do
     collection do
       get 'movedetail'

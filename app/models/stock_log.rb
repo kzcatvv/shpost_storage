@@ -149,19 +149,7 @@ class StockLog < ActiveRecord::Base
   end
 
   def update_amount(total_amount)
-    # amount = 0
-    # operation = self.operation
-    # p = self.parent
-    # if operation.eql? OPERATION[:b2c_stock_out]
-    #   sum = OrderDetail.where(order_id: p.orders).joins(:order).where(specification_id: self.specification_id, supplier_id: self.supplier_id).where("Orders.business_id = ?", self.business_id).sum(:amount)
-    #   others = p.stock_logs.where(supplier_id: self.supplier_id, specification_id: self.specification_id, business_id: self.business_id).sum(:amount)
-    #   amount = sum - others + self.amount
-    # end
     if operation.eql? OPERATION[:purchase_stock_in]
-      # details = p.purchase_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id)
-      # details.each do |detail|
-      #   amount += detail.purchase_arrivals.sum(:arrived_amount)
-      # end
       max_amount = self.parent.purchase_arrivals.where(batch_no: self.batch_no).sum(:arrived_amount) - self.parent.stock_logs.where(batch_no: self.batch_no).where.not(id: self.id).sum(:amount)
       if total_amount > max_amount
         total_amount = max_amount
@@ -172,11 +160,14 @@ class StockLog < ActiveRecord::Base
         total_amount = max_amount
       end
       self.pick_in.update(amount: total_amount)     
+    elsif operation.eql? OPERATION[:b2b_stock_out]
+      on_shelf_amount = self.stock.on_shelf_amount
+      left_amount = self.parent.manual_stock_details.where(supplier: self.supplier, specification: self.specification).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification).where.not(id: self.id).sum(:amount)
+      max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
     end
-    # if operation.eql? OPERATION[:b2b_stock_out]
-    #   amount = p.manual_stock_details.where(supplier_id: self.supplier_id, specification_id: self.specification_id).sum(:amount)
-    # end
-    # return total_amount
+
+    total_amount = max_amount if total_amount > max_amount
+
     self.update(amount: total_amount)
   end
 
@@ -193,7 +184,7 @@ class StockLog < ActiveRecord::Base
       self.business_id = stock.business_id
       self.supplier_id = stock.supplier_id
       self.specification_id = stock.specification_id
-      self.expiration_date = stock.expiration_date
+      self.expiration_date = stock.expiration_date if !stock.expiration_date.blank?
       self.batch_no = stock.batch_no
     end
   end

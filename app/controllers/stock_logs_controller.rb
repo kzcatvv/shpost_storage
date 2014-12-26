@@ -53,10 +53,10 @@ class StockLogsController < ApplicationController
 
     stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.purchase.business, @arrival.batch_no, @shelf, false)
 
-    if @stock_log.blank?
-      @stock_log = StockLog.create(parent: @arrival.purchase_detail.purchase, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
+    if @stock_log.try :waiting?
+      @stock_log.update(parent: @arrival.purchase_detail.purchase, stock: stock, operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: @arrival.expiration_date)
     else
-      @stock_log.update(parent: @arrival.purchase_detail.purchase, stock: stock, batch_no: @arrival.batch_no, expiration_date: @arrival.expiration_date)
+      @stock_log = StockLog.create(parent: @arrival.purchase_detail.purchase, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: @arrival.expiration_date)      
     end
 
     @stock_log.update_amount(@amount)
@@ -64,6 +64,30 @@ class StockLogsController < ApplicationController
     total_amount = Stock.total_stock_in_shelf(@stock_log.specification, @stock_log.supplier, @stock_log.business, @stock_log.shelf)
 
     render json: {id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount}
+  end
+
+  def manual_stock_modify
+    if @manual_stock_detail.blank?
+      return render json: {}
+    end
+
+    stocks = Stock.find_stocks_in_storage(@manual_stock_detail.specification, @manual_stock_detail.supplier, @manual_stock_detail.manual_stock.business, current_storage, false)
+
+    stocks_json = stocks.map {|x| {name: "#{x.shelf.shelf_code}(批次:#{x.batch_no},库存:#{x.actual_amount})", id: x.id}}.to_json
+
+    if @stock.blank?
+      return render json: {stocks: stocks_json}
+    else
+      if @stock_log.try :waiting?
+        @stock_log = StockLog.update(parent: @manual_stock_detail.manual_stock, stock: @stock, operation: StockLog::OPERATION[:b2b_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+      else
+        @stock_log = StockLog.create(parent: @manual_stock_detail.manual_stock, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2b_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+      end
+
+      @stock_log.update_amount(@amount)
+
+      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json, }
+    end
   end
 
   def remove
@@ -113,5 +137,8 @@ class StockLogsController < ApplicationController
     @shelf = Shelf.find(params[:shelf_id]) if !params[:shelf_id].blank?
     (params[:amount].blank?) ? @amount = 0 : @amount = params[:amount].to_i
     @arrival = PurchaseArrival.find(params[:arrival_id]) if !params[:arrival_id].blank?
+
+    @manual_stock_detail = ManualStockDetail.find(params[:manual_stock_id]) if !params[:manual_stock_id].blank?
+    @stock = PurchaseArrival.find(params[:stock_id]) if !params[:stock_id].blank?
   end
 end
