@@ -53,10 +53,21 @@ class MoveStocksController < ApplicationController
   end
 
   def movedetail
-
+    @movestock = MoveStock.find(params[:format])
+    @movestockid = MoveStock.find(params[:format]).id
   end
 
-  def move_check
+  def check
+    @move_stock = MoveStock.find(params[:format])
+    @stock_logs = @move_stock.stock_logs
+    @stock_logs_grid = initialize_grid(@stock_logs)
+
+      if @move_stock.check!
+        redirect_to move_stocks_url 
+
+      else
+        redirect_to move_stocks_url
+      end
 
   end
 

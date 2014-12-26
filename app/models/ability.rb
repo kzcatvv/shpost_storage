@@ -169,7 +169,7 @@ class Ability
         can :new, Stock
         can :manage, Stock, shelf: {area: {storage_id: storage.id} }
 
-
+        can :manage, MoveStock, unit_id: user.unit_id
         # can [:read, :getstock, :findstock], Stock, shelf: {area: {storage_id: storage.id}}
 
         # can :new, Stock, shelf: {area: {storage_id: storage.id}}
@@ -290,7 +290,7 @@ class Ability
         can :ready2bad, Stock, shelf: {area: {storage_id: storage.id} }
         can :move2bad, Stock, shelf: {area: {storage_id: storage.id} }
 
-
+        can :manage, MoveStock, unit_id: user.unit_id
         can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
