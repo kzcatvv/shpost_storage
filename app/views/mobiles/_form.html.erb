@@ -1,0 +1,26 @@
+<%= form_for (@mobile), :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+  <div class="control-group">
+    <%= f.label :mobile_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :no, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :mobile_type, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :mobile_type, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :cancel, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:cancel, {"否" => false, "是" => true})%>
+    </div>
+  </div>
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <% if can? :index, Mobile %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+              mobiles_path, :class => 'btn btn-default' %>
+  <% end %>
+<% end %>

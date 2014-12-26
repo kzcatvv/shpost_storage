@@ -344,6 +344,9 @@ zh-CN:
       up_download:
         one: 上传下载模板
         other: 上传下载模板
+      mobile:
+        one: 设备管理
+        other: 设备管理
     attributes:
       user:
         email: "电子邮件"
@@ -649,6 +652,13 @@ zh-CN:
         ver_no: "版本号"
         url: "地址"
         oper_date: "操作时间"
+      mobile:
+        mobile_no: "设备编号"
+        mobile_type: "设备类型"
+        version: "版本"
+        user: "当前使用人员"
+        last_sign_in_time: "最后登入时间"
+        cancel: "允许使用"
   menu:
     permission:
       name: "权限管理"
