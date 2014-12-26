@@ -151,7 +151,7 @@ function ajaxspecifications() {
 
 
 
-};
+}
 
 function selfAlert(msgstr,timer){  
     //该值可以作为返回值，初始化时为 0 ，点击确定后变为 1 ，点击关闭后变为 2 ，自动关闭 3   
@@ -547,4 +547,137 @@ function  ajaxstocklogs(){
     }
     purchase_modify(this);
   });
+}
+
+function add_move_stock_dtl(){
+  var rand = "00";
+  if ($("tr[id^=md_0]").last().attr("id") != undefined ) {
+    param = $("tr[id^=md_0]").last().attr("id").split('_');
+    rand = "0"+ (parseInt(param[1])+1);
+  }
+
+  var htmls = "<tr id='md_"+rand+"'><td><input type=\"hidden\" id='md_stock_log_"+rand+"' name='md_stock_log_"+rand+"'><input type=\"text\" id='md_out_shelf_"+rand+"' name='md_out_shelf_"+rand+"' data-autocomplete='/shelves/autocomplete_shelf_shelf_code'><input type=\"hidden\" id='md_out_shelf_"+rand+"' name='md_out_shelf_"+rand+"'></td>";
+  htmls=htmls + "<td><select id='md_stock_"+rand+"' name='md_stock_"+rand+"'><option value=\"0\">请选择</option></select></td>";
+  htmls=htmls + "<td><input type=\"text\" id='md_stock_amount_"+rand+"' name='md_stock_amount_"+rand+"' value='0' disabled='true'></td>";
+  htmls=htmls + "<td><input type=\"text\" id='md_amount_"+rand+"' name='md_amount_"+rand+"' value='0'></td>";
+  htmls=htmls + "<td><input type=\"text\" id='md_shelf_"+rand+"' name='md_shelf_"+rand+"' data-autocomplete='/shelves/autocomplete_shelf_shelf_code'><input type=\"hidden\" id='md_shelf_"+rand+"' name='md_shelf_"+rand+"'></td>"
+  htmls=htmls + "<td><input type=\"button\" onclick=\"del_move_stock_dtl(this);\", id='md_del_"+rand+"' name='md_del_"+rand+"' class='btn btn-xs btn-danger' value='删除'</td></tr>";
+  
+  $("#move_stock_dtl").append(htmls);
+  $("#dtl_cnt").val(rand);
+
+  ajaxmovestock();
+    
+}
+
+function del_move_stock_dtl(current) {
+  if(confirm("确定删除？")){
+    param = current.id.split('_');
+    id = param[2];
+    if ( $("#md_stock_log_"+id).val() == undefined || $("#md_stock_log_"+id).val() == "" ){
+      $("tr#md_"+id).remove();
+    }else{
+      $("tr#md_"+id).remove();
+    }
+    
+  }
+}
+
+function move_stock_modify(current)
+{
+  param = current.id.split('_');
+  id = param[2];
+  amount = $("#md_amount_"+id).val();
+  shelfid = $("input[id=md_shelf_"+id+"][type=hidden]").val();
+  stockid = $("select#md_stock_"+id).val();
+  stocklogid = $("#md_stock_log_"+id).val();
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/move_stock_modify",
+    data: "stocklogid=" + stocklogid + "&amount=" + amount + "&shelf_id=" + shelfid + "&stock_id=" + stockid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        // alert(data.responseText);
+        var jsonData = eval("("+data.responseText+")");
+        // $("p#stock_logs_actamount_"+param[3]).text(jsonData.actual_amount);
+        // if (jsonData.actual_amount < $("p#stock_logs_amount_"+param[3]).text() && jsonData.operation_type == "out") {
+        //   $("p#stock_logs_amount_"+param[3]).css("background-color","red");
+        // } else {
+        //   $("p#"+current.id).css("background-color","transparent");
+        // }
+
+        // 20141219
+        if (jsonData.stock_log_id != undefined) {
+          $("#md_stock_log_"+id).val(jsonData.stock_log_id);
+          $("#md_stock_amount_"+id).val(jsonData.total_amount);
+          $("#md_amount_"+id).val(jsonData.amount);
+
+          if (amount != jsonData.amount) {
+            alert("该明细最大可移库数量：" + jsonData.amount);
+          }
+          // tableset(param[3],"shelfid",shelfid)
+          // tableset(addid,"paid",jsonData.paid)
+          // tableset(addid,"status","处理中")
+        }
+      }
+    }
+  });
+
+}
+
+function ajaxmovestock() {
+  $("input[id^=md_out_shelf]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
+    $("input[id="+this.id+"][type=text]").val(data.item.value);
+    $("input[id="+this.id+"][type=hidden]").val(data.item.id);
+    $("input[id="+this.id+"][type=text]").blur();
+    param = this.id.split('_');
+    rowid = param[3];
+    $.ajax({
+      type : 'GET',
+      url : '/stocks/find_stock_in_shelf/',
+      data: { shelf_id: data.item.id,
+              row_id: rowid},
+      dataType : 'script'
+    });
+  });
+
+  $("input[id^=md_shelf]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
+    $("input[id="+this.id+"][type=text]").val(data.item.value);
+    $("input[id="+this.id+"][type=hidden]").val(data.item.id);
+    $("input[id="+this.id+"][type=text]").blur();
+    move_stock_modify(this);
+  });
+
+  $("select[id^=md_stock]").change(function(){
+    param = this.id.split('_');
+    rowid = param[2];
+    $.ajax({
+      type : 'GET',
+      url : '/stocks/find_stock_amount/',
+      data: { stock_id: $(this).val(),
+              row_id: rowid},
+      dataType : 'script'
+    });
+  });
+
+  $("select[id^=md_stock]").unbind('blur').blur(function() {
+    move_stock_modify(this);
+  });
+
+  $("input[id^=md_amount]").unbind('blur').blur(function() {
+    param = this.id.split('_');
+
+    if ( parseInt($(this).val()) > parseInt($("#md_stock_amount_"+param[2]).val()) ) {
+          alert($(this).val());
+          $(this).css("color","red");
+    }else{
+      $(this).css("color","black");
+      move_stock_modify(this);
+    }
+    
+    
+  });
+
 }
