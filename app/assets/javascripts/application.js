@@ -395,55 +395,6 @@ function purchase_modify(current)
   });
 }
 
-function stock_out_modify(current)
-{
-  param = current.id.split('_');
-  id = param[3];
-  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_amount_"+id).val();
-  shelfid = $("tr#stock_logs_id_"+id+">td>
-    select#stock_logs_shelfid_"+id).val();
-  arrivalid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_paid_"+id).val();
-
-  var x = param[3].substring(0,1)
-  if (x == "0") {
-    x = ""
-  } else {
-    x = param[3]
-  }
-  if (arrivalid == null) {
-    arrivalid = ""
-  }
-
-  $.ajax({
-    type: "POST",
-    url: "/stock_logs/stock_out_modify",
-    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&arrival_id=" + arrivalid,
-    dataType: "json",
-    complete: function(data) {
-      if(data.success){
-        var jsonData = eval("("+data.responseText+")");
-        if (jsonData.id != undefined) {
-          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
-          tablereplace(jsonData.id,"p","id",jsonData.id);
-          tablereplace(jsonData.id,"a","id",jsonData.id);
-          tablereplace(jsonData.id,"a","href",jsonData.id);
-          tablereplace(jsonData.id,"input","id",jsonData.id);
-          tablereplace(jsonData.id,"select","id",jsonData.id);
-          tablereplace(jsonData.id,"td","id",jsonData.id);
-
-          tableset(jsonData.id,"id",jsonData.id)
-          tableset(jsonData.id,"amount",""+jsonData.amount)
-          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
-
-          if (amount != jsonData.amount) {
-            alert("该明细最大可入库数量：" + jsonData.amount);
-          }
-          
-        }
-      }
-    }
-  });
-}
 
 // function addTr(slid,index)
 // {
@@ -598,65 +549,75 @@ function  ajaxstocklogs(){
     purchase_modify(this);
   });
 
-  $("select[id^=stock_logs_shelfid]").unbind('blur').blur(function() {
-    $(this).toggle();
-    $("p#"+this.id).toggle();
-    $("p#"+this.id).text($(this).find("option:selected").text());
-    purchase_modify(this);
-  });
-}
-
-  function  ajaxstockoutlogs(){
-  $("p[id^=stock_logs_paid]").unbind('click').click(function() {
-    if (iswaiting(this)) {
+  $("p[id^=stock_logs_msid]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){ 
       $(this).toggle();
       $("select#"+this.id).toggle();
       $("select#"+this.id).focus();
     }
-  });
+    }
+  );
 
-  $("p[id^=stock_logs_shelfid]").unbind('click').click(function() {
-    if (iswaiting(this)) {
+  $("p[id^=stock_logs_mshelfid]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){
       $(this).toggle();
       $("select#"+this.id).toggle();
       $("select#"+this.id).focus();
     }
-  });
+    }
+  );
 
-  $("p[id^=stock_logs_amount]").unbind('click').click(function() {
-    if (iswaiting(this)) {
+  $("p[id^=stock_logs_mamount]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){ 
       $(this).toggle();
       $("input#"+this.id).toggle();
       $("input#"+this.id).focus();
     }
-  });
+  }
+  );
 
-  $("select[id^=stock_logs_paid]").unbind('blur').blur(function() {
+  $("select[id^=stock_logs_msid]").unbind('blur').blur(
+    function() {
     $(this).toggle();
     $("p#"+this.id).toggle();
     $("p#"+this.id).text($(this).find("option:selected").text());
-    stock_out_modify(this);
-  });
+    manual_stock_modify(this);
+  }
+  );
 
-  $("select[id^=stock_logs_shelfid]").unbind('blur').blur(function() {
+  $("select[id^=stock_logs_mshelfid]").unbind('blur').blur(
+    function() {
     $(this).toggle();
     $("p#"+this.id).toggle();
     $("p#"+this.id).text($(this).find("option:selected").text());
-    stock_out_modify(this);
-  });
+    manual_stock_modify(this);
+  }
+  );
 
-  $("input[id^=stock_logs_amount]").unbind('blur').blur(function() {
+  $("input[id^=stock_logs_mamount]").unbind('blur').blur(
+    function() {
     $(this).toggle();
     $("p#"+this.id).toggle();
-    if ($(this).val() == "") {
+    if ($(this).val() == ""){
       $("p#"+this.id).text("0");
-    } else {
+    }
+    else {
       $("p#"+this.id).text($(this).val());
     }
-    stock_out_modify(this);
-  });
-  
+    
+    manual_stock_modify(this);
+  }
+  );
+
 }
+
+
+
+
+
 
 function add_move_stock_dtl(){
   var rand = "00";
@@ -790,3 +751,85 @@ function ajaxmovestock() {
   });
 
 }
+
+
+function manual_stock_add() {
+  var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
+  var addid = "00";
+  if ($("tr[id^=stock_logs_id_0]").last().attr("id") != undefined ) {
+    param = $("tr[id^=stock_logs_id_0]").last().attr("id").split('_');
+    addid = "0"+ (parseInt(param[3])+1);
+  }
+  tr.attr("id","stock_logs_id_"+addid);
+  tr.appendTo("table#stock_logs");
+  // slid=$('table.wice-grid tr:eq(2) input').first().val();
+  // var index=tr.index()+2;
+  // addTr(slid,index);
+  tablereplace(addid,"p","id",addid);
+  tablereplace(addid,"a","id",addid);
+  tablereplace(addid,"a","href",addid);
+  tablereplace(addid,"input","id",addid);
+  tablereplace(addid,"select","id",addid);
+  tablereplace(addid,"td","id",addid);
+
+  tableset(addid,"id",addid)
+  tableset(addid,"mamount","0")
+  tableset(addid,"actamount","0")
+  tableset(addid,"mshelfid","")
+  tableset(addid,"msid","")
+  tableset(addid,"status","处理中")
+
+  ajaxstocklogs();
+}
+
+function manual_stock_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
+  shelfid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
+  manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
+
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (manualstockid == null){
+    manualstockid = ""
+  }
+  
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/manual_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&manual_stock_id=" + manualstockid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        if (jsonData.id != undefined){
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
+          tablereplace(jsonData.id,"p","id",jsonData.id);
+          tablereplace(jsonData.id,"a","id",jsonData.id);
+          tablereplace(jsonData.id,"a","href",jsonData.id);
+          tablereplace(jsonData.id,"input","id",jsonData.id);
+          tablereplace(jsonData.id,"select","id",jsonData.id);
+          tablereplace(jsonData.id,"td","id",jsonData.id);
+
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"mamount",""+jsonData.amount)
+          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
+
+          if (amount != jsonData.amount){
+            alert("该明细最大可出库数量：" + jsonData.amount);
+          }
+        } 
+      }    
+        
+    }
+  });
+}
+

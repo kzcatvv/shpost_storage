@@ -630,14 +630,14 @@ class OrdersController < ApplicationController
                 #判断是否已存在该订单
                 if ori_order.blank?
                   #不存在创建
-                  order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'E').to_f, pingan_ordertime: instance.cell(line,'F'), customer_name: instance.cell(line,'G'), customer_address: instance.cell(line,'H'), customer_postcode: instance.cell(line,'I').to_s.split('.0')[0], province: instance.cell(line,'J'), city: instance.cell(line,'K'), county: instance.cell(line,'L'), customer_tel: instance.cell(line,'M').to_s.split('.0')[0],customer_phone: instance.cell(line,'N').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder
+                  order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_name: instance.cell(line,'F'), customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'H').to_s.split('.0')[0], province: instance.cell(line,'I'), city: instance.cell(line,'J'), county: instance.cell(line,'K'), customer_tel: instance.cell(line,'L').to_s.split('.0')[0],customer_phone: instance.cell(line,'M').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder
                 else
                   #待处理状态才能更新
                   order_status = ori_order.status
                   if (order_status <=> "waiting")==0
                     order_id = ori_order.id.to_s
 
-                    Order.update(order_id,tracking_number:tracking_number,transport_type:tran_type,total_weight:instance.cell(line,'E').to_f,pingan_ordertime:instance.cell(line,'F'),customer_name:instance.cell(line,'G'),customer_address:instance.cell(line,'H'),customer_postcode:instance.cell(line,'I').to_s.split('.0')[0],province:instance.cell(line,'J'),city:instance.cell(line,'K'),county:instance.cell(line,'L'),customer_tel:instance.cell(line,'M').to_s.split('.0')[0],customer_phone:instance.cell(line,'N').to_s.split('.0')[0])
+                    Order.update(order_id,tracking_number:tracking_number,transport_type:tran_type,total_weight:instance.cell(line,'D').to_f,pingan_ordertime:instance.cell(line,'E'),customer_name:instance.cell(line,'F'),customer_address:instance.cell(line,'G'),customer_postcode:instance.cell(line,'H').to_s.split('.0')[0],province:instance.cell(line,'I'),city:instance.cell(line,'J'),county:instance.cell(line,'K'),customer_tel:instance.cell(line,'L').to_s.split('.0')[0],customer_phone:instance.cell(line,'M').to_s.split('.0')[0])
                   else
                     raise "导入文件第" + line.to_s + "行数据, 只有待处理状态的订单才能重复导入，导入失败"
                   end
@@ -1045,7 +1045,7 @@ class OrdersController < ApplicationController
             
             until instance.cell(line,'A').blank? do
               #business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
-              batch_no = instance.cell(line,'O').to_s.split('.0')[0]
+              batch_no = instance.cell(line,'N').to_s.split('.0')[0]
               if batch_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
               end
@@ -1089,16 +1089,16 @@ class OrdersController < ApplicationController
               end
               order.keyclientorder_id=koid
               
-              order.total_weight = instance.cell(line,'E').to_f
-              order.pingan_ordertime = instance.cell(line,'F')
-              order.customer_name = instance.cell(line,'G')
-              order.customer_address = instance.cell(line,'H')
-              order.customer_postcode = instance.cell(line,'I').to_s.split('.0')[0]
-              order.province = instance.cell(line,'J')
-              order.city = instance.cell(line,'K')
-              order.county = instance.cell(line,'L')
-              order.customer_tel = instance.cell(line,'M').to_s.split('.0')[0]
-              order.customer_phone = instance.cell(line,'N').to_s.split('.0')[0]
+              order.total_weight = instance.cell(line,'D').to_f
+              order.pingan_ordertime = instance.cell(line,'E')
+              order.customer_name = instance.cell(line,'F')
+              order.customer_address = instance.cell(line,'G')
+              order.customer_postcode = instance.cell(line,'H').to_s.split('.0')[0]
+              order.province = instance.cell(line,'I')
+              order.city = instance.cell(line,'J')
+              order.county = instance.cell(line,'K')
+              order.customer_tel = instance.cell(line,'L').to_s.split('.0')[0]
+              order.customer_phone = instance.cell(line,'M').to_s.split('.0')[0]
               order.save
 
               line = line+1
@@ -1106,7 +1106,7 @@ class OrdersController < ApplicationController
 
             dline = line+2
             dline.upto(instance.last_row) do |dline|
-              batch_no = instance.cell(line,'O').to_s.split('.0')[0]
+              batch_no = instance.cell(line,'E').to_s.split('.0')[0]
               if batch_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
               end
@@ -1361,6 +1361,7 @@ class OrdersController < ApplicationController
 =end
 
 def exportorders_xls_content_for(objs)  
+    
     xls_report = StringIO.new  
     book = Spreadsheet::Workbook.new  
     sheet1 = book.create_worksheet :name => "Orders"  
@@ -1368,25 +1369,32 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 货物描述 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 订单流水号}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 订单流水号}  
     count_row = 1
     objs.each do |obj|
-  
+      transport_type = obj.transport_type
+      case transport_type
+        when "tcsd"
+          tran_type = '同城速递'
+        when "gnxb"
+          tran_type = '国内小包'  
+        when "ems"
+          tran_type = 'EMS'
+      end
       sheet1[count_row,0]=obj.business_order_id
       sheet1[count_row,1]=obj.tracking_number.to_s
-      sheet1[count_row,2]=obj.transport_type
-      sheet1[count_row,3]=obj.buyer_desc
-      sheet1[count_row,4]=obj.total_weight
-      sheet1[count_row,5]=obj.pingan_ordertime
-      sheet1[count_row,6]=obj.customer_name
-      sheet1[count_row,7]=obj.customer_address
-      sheet1[count_row,8]=obj.customer_postcode
-      sheet1[count_row,9]=obj. province
-      sheet1[count_row,10]=obj.city
-      sheet1[count_row,11]=obj.county
-      sheet1[count_row,12]=obj.customer_tel
-      sheet1[count_row,13]=obj.customer_phone
-      sheet1[count_row,14]=obj.batch_no
+      sheet1[count_row,2]=tran_type
+      sheet1[count_row,3]=obj.total_weight
+      sheet1[count_row,4]=obj.pingan_ordertime
+      sheet1[count_row,5]=obj.customer_name
+      sheet1[count_row,6]=obj.customer_address
+      sheet1[count_row,7]=obj.customer_postcode
+      sheet1[count_row,8]=obj. province
+      sheet1[count_row,9]=obj.city
+      sheet1[count_row,10]=obj.county
+      sheet1[count_row,11]=obj.customer_tel
+      sheet1[count_row,12]=obj.customer_phone
+      sheet1[count_row,13]=obj.batch_no
     
       count_row += 1
     end  
