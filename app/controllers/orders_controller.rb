@@ -312,14 +312,21 @@ class OrdersController < ApplicationController
     Order.transaction do
       @keyclientorder = Keyclientorder.find(params[:format])
 
-      Stock.order_stock_out(@keyclientorder, current_user)
+      pickareacnt = Area.where("storage_id = ? and area_type = 'pick' ",current_storage.id).count
+      # if pickareacnt > 0
+        
+      # else
 
-      @keyclientorder.orders.each do |order|
-        order.set_picking
-      end
+        Stock.order_stock_out(@keyclientorder, current_user)
 
-      @stock_logs = @keyclientorder.stock_logs
-      @stock_logs_grid = initialize_grid(@stock_logs)
+        @keyclientorder.orders.each do |order|
+          order.set_picking
+        end
+
+        @stock_logs = @keyclientorder.stock_logs
+      # end
+      
+        @stock_logs_grid = initialize_grid(@stock_logs)
     end
     rescue Exception => e
       Rails.logger.error e.backtrace

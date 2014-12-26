@@ -135,6 +135,7 @@ ShpostStorage::Application.routes.draw do
 
   resources :shelves do
     get :autocomplete_shelf_shelf_code, :on => :collection
+    get :autocomplete_pick_shelf_code, :on => :collection
     get :autocomplete_bad_shelf_code, :on => :collection
     get :autocomplete_shelf_code_by_stockimp, :on => :collection
     collection do 
@@ -171,6 +172,8 @@ ShpostStorage::Application.routes.draw do
       get 'warning_stocks_index'
       get 'findstock'
       get 'getstock'
+      get 'find_stock_in_shelf'
+      get 'find_stock_amount'
     end
 
     member do
@@ -196,6 +199,7 @@ ShpostStorage::Application.routes.draw do
       post 'addtr'
       post 'purchase_modify'
       post 'remove'
+      post 'move_stock_modify'
     end
   end
 

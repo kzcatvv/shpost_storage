@@ -5,51 +5,5 @@
 
 </div>
 
-<%= form_tag('/move_stocks/move_check/', :method => "get") do %>
-<div style="float:right">
-    <%= submit_tag("退件入库", :class=>"btn btn-primary") %>  
-</div>
-<div>
-<table id="move_stock_dtl" class="table table-striped">
-  <thead>
-    <tr>
-      <th>移出货架</th>
-      <th>库存</th>
-      <th>数量</th>
-      <th>移入货架</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= hidden_field_tag("dtl_cnt", @dtlcnt)  %> 
+<%= render :partial => 'move_stocks/move_stock_in' %>
 
-  </tbody>
-</table>
-</div>
-
-<% end %>
-<div style="float:right">
-    <% if can? :new, Stock %>
-        <%= link_to t('.new', :default => t("helpers.links.new")),
-                   "javascript:void(0)", onclick: "add_move_dtl()",
-                    :class => 'btn btn-primary' %>
-    <% end %>
-</div>
-
-
-
-<script language="javascript" type="text/javascript"> 
-
-var rand=1;
-function add_move_dtl(){
-  var htmls = "<tr id='md"+rand+"'><td><input type=\"text\" id='md_out_shelf"+rand+"' name='md_out_shelf"+rand+"' data-autocomplete='/shelves/autocomplete_shelf_shelf_code'></td>";
-  htmls=htmls + "<td><select id='md_stock"+rand+"' name='md_stock"+rand+"'><option value=\"1\">asdf</option></select></td>";
-  htmls=htmls + "<td><input type=\"text\" id='md_amount"+rand+"' name='md_amount"+rand+"'></td>";
-  htmls=htmls + "<td><input type=\"text\" id='md_in_shelf"+rand+"' name='md_in_shelf"+rand+"' data-autocomplete='/shelves/autocomplete_shelf_shelf_code'></td></tr>";
-  
-  $("#move_stock_dtl").append(htmls);
-  $("#dtl_cnt").val(rand);
-  rand++;
-    
-}
-
-</script>

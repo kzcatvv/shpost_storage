@@ -28,8 +28,8 @@ class StockLog < ActiveRecord::Base
   before_save :set_stock_info
   
 
-  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return',order_bad_return: 'order_bad_return',move_to_bad: 'move_to_bad',bad_stock_in: 'bad_stock_in'}
-  OPERATION_SHOW = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '订单出库', b2b_stock_out: '批量出库', order_return: '退货',order_bad_return: '残次品退货',move_to_bad: '残次品移入',bad_stock_in: '残次品入库'}
+  OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return',order_bad_return: 'order_bad_return',move_to_bad: 'move_to_bad',bad_stock_in: 'bad_stock_in',move_stock_out: 'move_stock_out',move_stock_in: 'move_stock_in'}
+  OPERATION_SHOW = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '订单出库', b2b_stock_out: '批量出库', order_return: '退货',order_bad_return: '残次品退货',move_to_bad: '残次品移入',bad_stock_in: '残次品入库',move_stock_out: '货品移出',move_stock_in: '货品移入'}
   STATUS = {waiting: 'waiting', checked: 'checked'}
   STATUS_SHOW = {waiting: '处理中', checked: '已确认'}
 
@@ -151,6 +151,15 @@ class StockLog < ActiveRecord::Base
   def update_amount(total_amount)
     if operation.eql? OPERATION[:purchase_stock_in]
       max_amount = self.parent.purchase_arrivals.where(batch_no: self.batch_no).sum(:arrived_amount) - self.parent.stock_logs.where(batch_no: self.batch_no).where.not(id: self.id).sum(:amount)
+      if total_amount > max_amount
+        total_amount = max_amount
+      end
+    elsif operation.eql? OPERATION[:move_stock_out]
+      max_amount = self.stock.actual_amount
+      if Integer(total_amount) > max_amount
+        total_amount = max_amount
+      end
+      self.pick_in.update(amount: total_amount)     
     elsif operation.eql? OPERATION[:b2b_stock_out]
       on_shelf_amount = self.stock.on_shelf_amount
       left_amount = self.parent.manual_stock_details.where(supplier: self.supplier, specification: self.specification).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification).where.not(id: self.id).sum(:amount)
