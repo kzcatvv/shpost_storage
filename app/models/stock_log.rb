@@ -156,7 +156,7 @@ class StockLog < ActiveRecord::Base
       end
     elsif operation.eql? OPERATION[:move_stock_out]
       max_amount = self.stock.actual_amount
-      if Integer(total_amount) > max_amount
+      if total_amount > max_amount
         total_amount = max_amount
       end
       self.pick_in.update(amount: total_amount)     
