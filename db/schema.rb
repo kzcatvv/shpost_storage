@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20141219020207) do
+ActiveRecord::Schema.define(version: 20141223075309) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -403,6 +402,7 @@ ActiveRecord::Schema.define(version: 20141219020207) do
     t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+    t.integer  "pick_id"
   end
 
   create_table "stock_mons", force: true do |t|

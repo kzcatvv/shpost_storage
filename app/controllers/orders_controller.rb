@@ -618,7 +618,7 @@ class OrdersController < ApplicationController
                 end
                 #外部订单号
                 business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
-                ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id
+                ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id:business_id
 
                 #判断是否已存在该订单
                 if ori_order.blank?
@@ -693,9 +693,9 @@ class OrdersController < ApplicationController
               Rails.logger.info "supplier.id=" + supplier.id.to_s
 
               #根据外部订单号找到对应订单
-              dorders = Order.accessible_by(current_ability).where business_order_id: business_order_id
+              dorders = Order.accessible_by(current_ability).where business_order_id: business_order_id, business_id: business_id
 
-              dorder = Order.accessible_by(current_ability).find_by business_order_id: business_order_id
+              dorder = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business_id
 
               if dorders.size == 0
                 raise "导入文件第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
@@ -1037,9 +1037,13 @@ class OrdersController < ApplicationController
             line = 2
             
             until instance.cell(line,'A').blank? do
-              business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
+              #business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
+              batch_no = instance.cell(line,'O').to_s.split('.0')[0]
+              if batch_no.blank?
+                raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
+              end
 
-              order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id
+              order = Order.accessible_by(current_ability).find_by  batch_no: batch_no
 
               if order.blank?
                 raise "导入文件第" + line.to_s + "行数据, 订单不存在，导入失败"
@@ -1095,6 +1099,11 @@ class OrdersController < ApplicationController
 
             dline = line+2
             dline.upto(instance.last_row) do |dline|
+              batch_no = instance.cell(line,'O').to_s.split('.0')[0]
+              if batch_no.blank?
+                raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
+              end
+
               business_order_id = instance.cell(dline,'A').to_s.split('.0')[0]
               if business_order_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
@@ -1130,8 +1139,8 @@ class OrdersController < ApplicationController
                 raise "导入文件第" + dline.to_s + "行数据, 供应商不存在，导入失败"
               end
 
-              dorders = Order.accessible_by(current_ability).where business_order_id: business_order_id
-              dorder = Order.accessible_by(current_ability).find_by business_order_id: business_order_id
+              dorders = Order.accessible_by(current_ability).where batch_no: batch_no
+              dorder = Order.accessible_by(current_ability).find_by batch_no: batch_no
 
               if dorders.size == 0
                 raise "导入文件第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
@@ -1352,7 +1361,7 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 货物描述 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 货物描述 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 订单流水号}  
     count_row = 1
     objs.each do |obj|
   
@@ -1370,13 +1379,14 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,11]=obj.county
       sheet1[count_row,12]=obj.customer_tel
       sheet1[count_row,13]=obj.customer_phone
+      sheet1[count_row,14]=obj.batch_no
     
       count_row += 1
     end  
 
     detail_row = count_row+1
     sheet1.row(detail_row).default_format = blue 
-    sheet1.row(detail_row).concat %w{订单号(外部) 供应商编号 SKU 数量}
+    sheet1.row(detail_row).concat %w{订单号(外部) 供应商编号 SKU 数量 订单流水号}
     detail_row = detail_row + 1
     objs.each do |obj|
       obj_id = obj.id
@@ -1393,6 +1403,7 @@ def exportorders_xls_content_for(objs)
         sheet1[detail_row,1]=supplier_no
         sheet1[detail_row,2]=sku
         sheet1[detail_row,3]=order_detail.amount
+        sheet1[detail_row,4]=order_detail.order.batch_no
 
         detail_row += 1
       end

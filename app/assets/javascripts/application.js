@@ -395,6 +395,56 @@ function purchase_modify(current)
   });
 }
 
+function stock_out_modify(current)
+{
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_amount_"+id).val();
+  shelfid = $("tr#stock_logs_id_"+id+">td>
+    select#stock_logs_shelfid_"+id).val();
+  arrivalid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_paid_"+id).val();
+
+  var x = param[3].substring(0,1)
+  if (x == "0") {
+    x = ""
+  } else {
+    x = param[3]
+  }
+  if (arrivalid == null) {
+    arrivalid = ""
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/stock_out_modify",
+    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&arrival_id=" + arrivalid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+        if (jsonData.id != undefined) {
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
+          tablereplace(jsonData.id,"p","id",jsonData.id);
+          tablereplace(jsonData.id,"a","id",jsonData.id);
+          tablereplace(jsonData.id,"a","href",jsonData.id);
+          tablereplace(jsonData.id,"input","id",jsonData.id);
+          tablereplace(jsonData.id,"select","id",jsonData.id);
+          tablereplace(jsonData.id,"td","id",jsonData.id);
+
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"amount",""+jsonData.amount)
+          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
+
+          if (amount != jsonData.amount) {
+            alert("该明细最大可入库数量：" + jsonData.amount);
+          }
+          
+        }
+      }
+    }
+  });
+}
+
 // function addTr(slid,index)
 // {
 //   $.ajax({
@@ -547,4 +597,63 @@ function  ajaxstocklogs(){
     }
     purchase_modify(this);
   });
+
+  $("select[id^=stock_logs_shelfid]").unbind('blur').blur(function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    $("p#"+this.id).text($(this).find("option:selected").text());
+    purchase_modify(this);
+  });
+}
+
+  function  ajaxstockoutlogs(){
+  $("p[id^=stock_logs_paid]").unbind('click').click(function() {
+    if (iswaiting(this)) {
+      $(this).toggle();
+      $("select#"+this.id).toggle();
+      $("select#"+this.id).focus();
+    }
+  });
+
+  $("p[id^=stock_logs_shelfid]").unbind('click').click(function() {
+    if (iswaiting(this)) {
+      $(this).toggle();
+      $("select#"+this.id).toggle();
+      $("select#"+this.id).focus();
+    }
+  });
+
+  $("p[id^=stock_logs_amount]").unbind('click').click(function() {
+    if (iswaiting(this)) {
+      $(this).toggle();
+      $("input#"+this.id).toggle();
+      $("input#"+this.id).focus();
+    }
+  });
+
+  $("select[id^=stock_logs_paid]").unbind('blur').blur(function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    $("p#"+this.id).text($(this).find("option:selected").text());
+    stock_out_modify(this);
+  });
+
+  $("select[id^=stock_logs_shelfid]").unbind('blur').blur(function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    $("p#"+this.id).text($(this).find("option:selected").text());
+    stock_out_modify(this);
+  });
+
+  $("input[id^=stock_logs_amount]").unbind('blur').blur(function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    if ($(this).val() == "") {
+      $("p#"+this.id).text("0");
+    } else {
+      $("p#"+this.id).text($(this).val());
+    }
+    stock_out_modify(this);
+  });
+  
 }
