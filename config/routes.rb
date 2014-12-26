@@ -5,7 +5,7 @@ ShpostStorage::Application.routes.draw do
   resources :move_stocks do
     collection do
       get 'movedetail'
-      get 'move_check'
+      patch 'check'
     end
   end
 
