@@ -35,6 +35,10 @@ class Shelf < ActiveRecord::Base
     Shelf.includes(:area).where(area_id: storage.areas).order("priority_level ASC")
   end
 
+  def self.pick_in_storage(storage)
+    Shelf.includes(:area).where(area_id: storage.areas,shelf_type: 'pick').order("priority_level ASC")
+  end
+
   def self.get_empty_shelf(storage, is_broken = false)
     # prior.first
     shelves = in_storage(storage).empty.prior
@@ -59,6 +63,17 @@ class Shelf < ActiveRecord::Base
       shelves.broken.first
     end
     # default.first
+  end
+
+  def self.get_pick_shelf(storage,amount)
+    shelves = pick_in_storage(storage).prior
+    if amount <= shelves.empty.count
+      shelves.empty.prior.limit(amount)
+    else
+
+    end
+
+
   end
 
   #def bad_type_name
