@@ -591,11 +591,12 @@ function move_stock_modify(current)
   shelfid = $("input[id=md_shelf_"+id+"][type=hidden]").val();
   stockid = $("select#md_stock_"+id).val();
   stocklogid = $("#md_stock_log_"+id).val();
+  movestockid = $("#movestockid").val();
 
   $.ajax({
     type: "POST",
     url: "/stock_logs/move_stock_modify",
-    data: "stocklogid=" + stocklogid + "&amount=" + amount + "&shelf_id=" + shelfid + "&stock_id=" + stockid,
+    data: "stocklogid=" + stocklogid + "&amount=" + amount + "&shelf_id=" + shelfid + "&stock_id=" + stockid + "&move_stock_id=" + movestockid,
     dataType: "json",
     complete: function(data) {
       if(data.success){
