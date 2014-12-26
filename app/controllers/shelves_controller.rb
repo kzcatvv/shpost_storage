@@ -13,6 +13,14 @@ class ShelvesController < ApplicationController
     render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
   end
 
+  def autocomplete_pick_shelf_code
+    term = params[:term]
+    # brand_id = params[:brand_id]
+    # country = params[:country]
+    shelves = Shelf.where(area_id: Area.where(storage: current_storage).ids).where("shelf_code LIKE ? and shelf_type='pick' ", "%#{term}%").order(:shelf_code).all
+    render :json => shelves.map { |shelf| {:id => shelf.id, :label => shelf.shelf_code, :value => shelf.shelf_code} }
+  end
+
   def autocomplete_bad_shelf_code
     term = params[:term]
     # brand_id = params[:brand_id]

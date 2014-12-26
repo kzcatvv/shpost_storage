@@ -73,6 +73,40 @@ class StockLogsController < ApplicationController
     render text: 'remove'
   end
 
+  def move_stock_modify
+    
+    if !params[:amount].blank? && !params[:shelf_id].blank? && !params[:stock_id].blank?
+      # binding.pry
+      @orgstock = Stock.find(params[:stock_id])
+      @shelf = Shelf.find(params[:shelf_id])
+      stock = Stock.get_available_stock_in_shelf(@orgstock.specification, @orgstock.supplier, @orgstock.business, @orgstock.batch_no, @shelf, false)
+
+      if params[:stocklogid].blank?
+        
+        @stock_log = StockLog.create(stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:move_stock_out], operation_type: StockLog::OPERATION_TYPE[:out], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)      
+        @pick_stock_log = StockLog.create(stock: stock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:move_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
+        @stock_log.pick_in = @pick_stock_log
+        @stock_log.save
+      else
+
+        @stock_log = StockLog.find(params[:stocklogid])
+        @stock_log.update(stock: @orgstock, batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
+        @stock_log.pick_in.update(stock: stock, batch_no: stock.batch_no, expiration_date: stock.expiration_date)
+      
+      end
+
+      @stock_log.update_amount(params[:amount])
+
+      total_amount = @stock_log.stock.actual_amount
+
+      render json: {stock_log_id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount }
+    
+    else
+      render json: {}
+    end
+   
+  end
+
 
   def load_params
     @stock_log = StockLog.find(params[:id]) if !params[:id].blank?

@@ -147,6 +147,24 @@ class StocksController < ApplicationController
     end 
   end
 
+  def find_stock_in_shelf
+      # binding.pry
+      @stocks = Stock.where(shelf_id: params[:shelf_id]).accessible_by(current_ability).map{|u| [u.batch_no+u.specification.all_name,u.id]}.insert(0,"请选择")
+      @rowid = "md_stock_"+params[:row_id]
+      
+      respond_to do |format|
+        format.js 
+      end
+  end
+
+  def find_stock_amount
+    @actual_amount = Stock.find(params[:stock_id]).actual_amount
+    @rowid = "md_stock_amount_"+params[:row_id].to_s
+    respond_to do |format|
+        format.js 
+    end
+  end
+
   
 
 
