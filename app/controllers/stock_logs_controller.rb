@@ -131,6 +131,15 @@ class StockLogsController < ApplicationController
    
   end
 
+  def move_stock_remove
+    if !params[:stock_log_id].blank?
+      @stock_log=StockLog.find(params[:stock_log_id])
+      @stock_log.pick_in.delete
+      @stock_log.delete
+    end
+    render text: 'remove'
+  end
+
 
   def load_params
     @stock_log = StockLog.find(params[:id]) if !params[:id].blank?
