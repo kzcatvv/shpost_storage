@@ -200,6 +200,7 @@ ShpostStorage::Application.routes.draw do
       post 'purchase_modify'
       post 'remove'
       post 'move_stock_modify'
+      post 'move_stock_remove'
     end
   end
 
