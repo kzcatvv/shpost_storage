@@ -647,6 +647,15 @@ function del_move_stock_dtl(current) {
     if ( $("#md_stock_log_"+id).val() == undefined || $("#md_stock_log_"+id).val() == "" ){
       $("tr#md_"+id).remove();
     }else{
+      $.ajax({
+        type: "POST",
+        url: "/stock_logs/move_stock_remove",
+        data: "stock_log_id=" + $("#md_stock_log_"+id).val(),
+        dataType: "json",
+        complete: function() {
+
+        }
+      });
       $("tr#md_"+id).remove();
     }
     
