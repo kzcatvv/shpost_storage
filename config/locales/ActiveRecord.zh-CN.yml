@@ -832,6 +832,9 @@ zh-CN:
         findwarning:
           name: "库存预警查询"
           link: "/stocks/warning_stocks_index"
+        movestock:
+          name: "移库单管理"
+          link: "/move_stocks"
     logs:
       name: "日志查询"
       submenu:
