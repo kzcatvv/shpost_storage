@@ -463,7 +463,8 @@ class OrdersController < ApplicationController
 
     end
     
-    @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
+    @selectorders=Order.where('order_type = ? and status in (?) and is_split != ?',"b2c",status, true)
+    # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
         if !params[:grid][:f]["businesses.name".to_sym].nil?
@@ -1196,7 +1197,10 @@ class OrdersController < ApplicationController
 
   def exportorders()
     x = params[:ids].split(",")
-    @orders = Order.where(id: x, status: "waiting")
+    @orders = []
+    until x.blank? do
+      @orders += Order.where(id: x.pop(1000), status: "waiting")
+    end
 
     if @orders.nil?
       flash[:alert] = "无订单"
