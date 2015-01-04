@@ -656,12 +656,13 @@ class OrdersController < ApplicationController
               end
 
               #供应商编号
-              supplier_no = instance.cell(dline,'B').to_s
+              supplier_no = instance.cell(dline,'B').to_s.split('.0')[0].rjust(10, '0')
+              #binding.pry
               if supplier_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少供应商，导入失败"
               end
               #sku
-              sku_id = instance.cell(dline,'C').to_s
+              sku_id = instance.cell(dline,'C').to_s.split('.0')[0]
               if sku_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少sku，导入失败"
               end
@@ -1116,12 +1117,12 @@ class OrdersController < ApplicationController
                 raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
 
-              supplier_no = instance.cell(dline,'B').to_s
+              supplier_no = instance.cell(dline,'B').to_s.split('.0')[0].rjust(10, '0')
               if supplier_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少供应商，导入失败"
               end
 
-              sku_id = instance.cell(dline,'C').to_s
+              sku_id = instance.cell(dline,'C').to_s.split('.0')[0]
               if sku_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少sku，导入失败"
               end
