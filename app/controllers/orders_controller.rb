@@ -1052,7 +1052,6 @@ class OrdersController < ApplicationController
               end
 
               order = Order.accessible_by(current_ability).find_by  batch_no: batch_no
-
               if order.blank?
                 raise "导入文件第" + line.to_s + "行数据, 订单不存在，导入失败"
               elsif !order.can_import()
@@ -1107,7 +1106,7 @@ class OrdersController < ApplicationController
 
             dline = line+2
             dline.upto(instance.last_row) do |dline|
-              batch_no = instance.cell(line,'E').to_s.split('.0')[0]
+              batch_no = instance.cell(dline,'E').to_s.split('.0')[0]
               if batch_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
               end

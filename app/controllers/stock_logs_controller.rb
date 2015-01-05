@@ -179,7 +179,7 @@ class StockLogsController < ApplicationController
       ary = params[:keyclientorder_params].split '_'
       @specification = Specification.find ary[0]
       @business = Business.find ary[1]
-      @supplier = Supplier.find ary[3] if !ary[3].blank?
+      @supplier = Supplier.find ary[2] if !ary[2].blank?
     end
   end
 end

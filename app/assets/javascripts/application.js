@@ -612,6 +612,69 @@ function  ajaxstocklogs(){
   }
   );
 
+  $("p[id^=stock_logs_ksid]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){ 
+      $(this).toggle();
+      $("select#"+this.id).toggle();
+      $("select#"+this.id).focus();
+    }
+    }
+  );
+
+  $("p[id^=stock_logs_kshelfid]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){
+      $(this).toggle();
+      $("select#"+this.id).toggle();
+      $("select#"+this.id).focus();
+    }
+    }
+  );
+
+  $("p[id^=stock_logs_kamount]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){ 
+      $(this).toggle();
+      $("input#"+this.id).toggle();
+      $("input#"+this.id).focus();
+    }
+  }
+  );
+
+  $("select[id^=stock_logs_ksid]").unbind('blur').blur(
+    function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    $("p#"+this.id).text($(this).find("option:selected").text());
+    keyclientorder_stock_modify(this);
+  }
+  );
+
+  $("select[id^=stock_logs_kshelfid]").unbind('blur').blur(
+    function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    $("p#"+this.id).text($(this).find("option:selected").text());
+    keyclientorder_stock_modify(this);
+  }
+  );
+
+  $("input[id^=stock_logs_kamount]").unbind('blur').blur(
+    function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    if ($(this).val() == ""){
+      $("p#"+this.id).text("0");
+    }
+    else {
+      $("p#"+this.id).text($(this).val());
+    }
+    
+    keyclientorder_stock_modify(this);
+  }
+  );
+
 }
 
 
@@ -843,3 +906,83 @@ function manual_stock_modify(current){
   });
 }
 
+function keyclientorder_stock_add() {
+  var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
+  var addid = "00";
+  if ($("tr[id^=stock_logs_id_0]").last().attr("id") != undefined ) {
+    param = $("tr[id^=stock_logs_id_0]").last().attr("id").split('_');
+    addid = "0"+ (parseInt(param[3])+1);
+  }
+  tr.attr("id","stock_logs_id_"+addid);
+  tr.appendTo("table#stock_logs");
+  // slid=$('table.wice-grid tr:eq(2) input').first().val();
+  // var index=tr.index()+2;
+  // addTr(slid,index);
+  tablereplace(addid,"p","id",addid);
+  tablereplace(addid,"a","id",addid);
+  tablereplace(addid,"a","href",addid);
+  tablereplace(addid,"input","id",addid);
+  tablereplace(addid,"select","id",addid);
+  tablereplace(addid,"td","id",addid);
+
+  tableset(addid,"id",addid)
+  tableset(addid,"kamount","0")
+  tableset(addid,"actamount","0")
+  tableset(addid,"kshelfid","")
+  tableset(addid,"ksid","")
+  tableset(addid,"status","处理中")
+
+  ajaxstocklogs();
+}
+
+function keyclientorder_stock_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_kamount_"+id).val();
+  shelfid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_kshelfid_"+id).val();
+  ksid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_ksid_"+id).val();
+  kcoid = $("tr#stock_logs_id_"+id+">td>text#stock_logs_kcoid_"+id).text();
+
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (ksid == null){
+    ksid = ""
+  }
+  
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/keyclientorder_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        if (jsonData.id != undefined){
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
+          tablereplace(jsonData.id,"p","id",jsonData.id);
+          tablereplace(jsonData.id,"a","id",jsonData.id);
+          tablereplace(jsonData.id,"a","href",jsonData.id);
+          tablereplace(jsonData.id,"input","id",jsonData.id);
+          tablereplace(jsonData.id,"select","id",jsonData.id);
+          tablereplace(jsonData.id,"td","id",jsonData.id);
+
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"kamount",""+jsonData.amount)
+          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
+
+          if (amount != jsonData.amount){
+            alert("最大可出库数量：" + jsonData.amount);
+          }
+        } 
+      }    
+        
+    }
+  });
+}
