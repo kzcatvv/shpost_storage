@@ -463,7 +463,7 @@ class OrdersController < ApplicationController
 
     end
     
-    @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
+    @selectorders=Order.where("order_type = ? and status in (?) and is_split != ?","b2c",status,true)
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
         if !params[:grid][:f]["businesses.name".to_sym].nil?
