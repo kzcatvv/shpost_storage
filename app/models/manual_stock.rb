@@ -5,7 +5,8 @@ class ManualStock < ActiveRecord::Base
   has_many :manual_stock_details, dependent: :destroy
   has_many :stocks, through: :manual_stock_details
   
-  has_many :stock_logs, as: :parent 
+  has_many :stock_logs, as: :parent
+  has_many :tasks, as: :parent
 
   # alias :root_order :clone
   # alias :details :manual_stock_details
