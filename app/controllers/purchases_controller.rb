@@ -79,6 +79,10 @@ class PurchasesController < ApplicationController
     @stock_logs_grid = initialize_grid(@purchase.stock_logs)
   end
 
+  def assign
+    
+  end
+
   def check
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
