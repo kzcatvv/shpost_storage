@@ -7,6 +7,7 @@ class Keyclientorder < ActiveRecord::Base
   belongs_to :storage
   belongs_to :business
   belongs_to :user
+  has_many :tasks, as: :parent
 
   # before_validation :set_batch_id
 

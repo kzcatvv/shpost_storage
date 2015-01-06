@@ -12,7 +12,7 @@
   </div>
 
 </div>
-<%= render :partial => 'stock_logs/some_forms' %>
+<%= render :partial => 'stock_logs/stock_out' %>
 
 <script language="javascript" type="text/javascript"> 
 function CreateStockoutPage(){
@@ -34,7 +34,7 @@ function CreateStockoutPage(){
     LODOP.ADD_PRINT_TEXT(h,"70%",260,25,"69码");
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
-    <% @stock_logs_grid.all_pages_records.map(&:id).each do |j| %>
+    <% @stock_logs.map(&:id).each do |j| %>
         h=h+33;
         LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= StockLog.find(j).stock.specification.commodity.name %>'+' '+'<%= StockLog.find(j).stock.specification.name %>');
         LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= StockLog.find(j).amount %>');

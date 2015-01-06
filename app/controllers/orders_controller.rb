@@ -465,6 +465,7 @@ class OrdersController < ApplicationController
     
     @selectorders=Order.where('order_type = ? and status in (?) and is_split != ?',"b2c",status, true)
     # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
+
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
         if !params[:grid][:f]["businesses.name".to_sym].nil?
@@ -657,12 +658,13 @@ class OrdersController < ApplicationController
               end
 
               #供应商编号
-              supplier_no = instance.cell(dline,'B').to_s
+              supplier_no = instance.cell(dline,'B').to_s.split('.0')[0].rjust(10, '0')
+              #binding.pry
               if supplier_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少供应商，导入失败"
               end
               #sku
-              sku_id = instance.cell(dline,'C').to_s
+              sku_id = instance.cell(dline,'C').to_s.split('.0')[0]
               if sku_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少sku，导入失败"
               end
@@ -1052,7 +1054,6 @@ class OrdersController < ApplicationController
               end
 
               order = Order.accessible_by(current_ability).find_by  batch_no: batch_no
-
               if order.blank?
                 raise "导入文件第" + line.to_s + "行数据, 订单不存在，导入失败"
               elsif !order.can_import()
@@ -1107,7 +1108,7 @@ class OrdersController < ApplicationController
 
             dline = line+2
             dline.upto(instance.last_row) do |dline|
-              batch_no = instance.cell(line,'E').to_s.split('.0')[0]
+              batch_no = instance.cell(dline,'E').to_s.split('.0')[0]
               if batch_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
               end
@@ -1117,12 +1118,12 @@ class OrdersController < ApplicationController
                 raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
 
-              supplier_no = instance.cell(dline,'B').to_s
+              supplier_no = instance.cell(dline,'B').to_s.split('.0')[0].rjust(10, '0')
               if supplier_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少供应商，导入失败"
               end
 
-              sku_id = instance.cell(dline,'C').to_s
+              sku_id = instance.cell(dline,'C').to_s.split('.0')[0]
               if sku_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少sku，导入失败"
               end

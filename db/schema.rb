@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141223075309) do
+ActiveRecord::Schema.define(version: 20141224201624) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -261,9 +261,9 @@ ActiveRecord::Schema.define(version: 20141223075309) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -385,6 +385,7 @@ ActiveRecord::Schema.define(version: 20141223075309) do
     t.string   "all_name"
     t.string   "barcode"
     t.string   "no"
+    t.boolean  "piece_to_piece"
   end
 
   create_table "standard_interfaces", force: true do |t|
@@ -410,10 +411,10 @@ ActiveRecord::Schema.define(version: 20141223075309) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.integer  "parent_id"
-    t.string   "parent_type"
     t.date     "expiration_date"
     t.string   "batch_no"
+    t.integer  "parent_id"
+    t.string   "parent_type"
     t.integer  "pick_id"
   end
 
@@ -465,6 +466,20 @@ ActiveRecord::Schema.define(version: 20141223075309) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "barcode"
+  end
+
+  create_table "tasks", force: true do |t|
+    t.string   "title"
+    t.string   "barcode"
+    t.string   "type"
+    t.string   "status"
+    t.string   "code"
+    t.integer  "storage_id"
+    t.integer  "parent_id"
+    t.string   "parent_type"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "units", force: true do |t|

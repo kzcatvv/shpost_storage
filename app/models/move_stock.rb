@@ -2,6 +2,7 @@ class MoveStock < ActiveRecord::Base
 	belongs_to :unit
   	belongs_to :storage
   	has_many :stock_logs, as: :parent
+    has_many :tasks, as: :parent
 
   	STATUS = { opened: 'opened', moved: 'moved',closed: 'closed'}
 

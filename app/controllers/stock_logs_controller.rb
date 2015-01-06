@@ -90,6 +90,30 @@ class StockLogsController < ApplicationController
     end
   end
 
+  def keyclientorder_stock_modify
+    if @keyclientorder.blank? || @specification.blank? || @business.blank?
+      return render json: {}
+    end
+
+    stocks = Stock.find_stocks_in_storage(@specification, @business,@supplier, current_storage, false)
+
+    stocks_json = stocks.map {|x| {name: "#{x.shelf.shelf_code}(批次:#{x.batch_no},库存:#{x.actual_amount})", id: x.id}}.to_json
+
+    if @stock.blank?
+      return render json: {stocks: stocks_json}
+    else
+      if @stock_log.try :waiting?
+        @stock_log = StockLog.update(parent: @keyclientorder, stock: @stock, operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+      else
+        @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+      end
+
+      @stock_log.update_amount(@amount)
+
+      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json, }
+    end
+  end
+
   def remove
     if !@stock_log.blank?
       @stock_log.delete
@@ -149,5 +173,13 @@ class StockLogsController < ApplicationController
 
     @manual_stock_detail = ManualStockDetail.find(params[:manual_stock_id]) if !params[:manual_stock_id].blank?
     @stock = PurchaseArrival.find(params[:stock_id]) if !params[:stock_id].blank?
+    @keyclientorder = Keyclientorder.find(params[:keyclientorder]) if !params[:keyclientorder].blank?
+
+    if !params[:keyclientorder_params].blank?
+      ary = params[:keyclientorder_params].split '_'
+      @specification = Specification.find ary[0]
+      @business = Business.find ary[1]
+      @supplier = Supplier.find ary[2] if !ary[2].blank?
+    end
   end
 end
