@@ -80,6 +80,12 @@ class PurchasesController < ApplicationController
   end
 
   def assign
+    @sorters = current_storage.get_sorter()
+  end
+
+  def assign_select
+    puts params
+    puts params[:assign_user]
     
   end
 
