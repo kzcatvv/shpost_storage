@@ -49,126 +49,70 @@ class MobileInterfaceController < ApplicationController
 
     products = []
     task.parent.stock_logs.each do |x|
-      products << {product: x.specification.full_title, business: x.business.name, supplier: x.supplier.name, batch: x.batch_no, product_barcode: x.specification.product_sexnine: x.specification.sixnie_code, product_sn: [], amount: x.amount, scan: x.specification.piece_to_piece, shelf: x.shelf.shelf_code, shelf_barcode: x.shelf.barcode, type: x.operation_type }
+      products << {product: x.specification.full_title, business: x.business.name, supplier: x.supplier.name, batch: x.batch_no, product_barcode: x.specification.barcode, product_sexnine: x.specification.sixnie_code, product_sn: stock.sn.try(:split, '.'), amount: x.amount, scan: x.specification.piece_to_piece, shelf: x.shelf.shelf_code, shelf_barcode: x.shelf.barcode, type: x.operation_type }
     end
 
     success_builder({time: Time.now, mission: task.id, barcode: task.barcode, title: task.title, type: task.type, mission_time: task.created_at, products: products)
   end
 
-  # def order_enter
-  #   order_id = @context_hash['ORDER_ID']
-  #   return error_builder('0005', '订单号为空') if order_id.blank?
-  #   trans_sn = @context_hash['TRANS_SN']
-  #   return error_builder('0005', '交易流水号为空') if trans_sn.blank?
-  #   cust_name = @context_hash['CUST_NAME']
-  #   return error_builder('0005', '收件人姓名为空') if cust_name.blank?
-  #   addr = @context_hash['ADDR']
-  #   return error_builder('0005', '收货人地址为空') if addr.blank?
+  # def mission_upload
+  #   mission = @context_hash['mission']
+  #   products = @context_hash['products']
 
-  #   order_details = @context_hash['ORDER_DETAILS']
-  #   return error_builder('0005', '商品列表为空') if order_details.blank?
+  #   task = Task.find mission
 
-  #   order = StandardInterface.order_enter(@context_hash, @business, @unit, @storage)
-  #   if !order.blank?
-  #     if order.is_a? Order
-  #       success_builder({'ORDER_NO' => order.batch_no })
-  #     else
-  #       return error_builder('0006')
-  #     end
-  #   else
-  #     return error_builder('9999')
+  #   error_builder('0007') if task.blank?
+  #   # task.parent.stock_logs.waiting.delete
+  #   stock_logs = []
+  #   products.each do |x|
+  #     next if x['product'].blank? || x['amount'].blank? || x['type'].blank? || x['shelf'].blank?
+  #     specification ||= Specification.find_by barcode: x['product']
+  #     specification ||= Specification.find_by sexnine: x['product']
+  #     amount = x['amount']
+  #     shelf = Shelf.find_by(:barcode, x['shelf'])
+  #     type = x['type']
+
+  #     task.parent.details.where
+
+  #     Stock.find_stock_in_shelf
+  #     StockLog.create()
   #   end
 
   # end
 
-  # def order_query
-  #   orders = StandardInterface.order_query(@context_hash, @business, @unit)
+  def query
+    barcode = @context_hash['barcode']
 
-  #   if !orders.blank?
-  #     deliver_details = []
-      
-  #     deliver_details = self.generalise_tracking(order.tracking_info)
+    products = []
 
-  #     success_builder({'STATUS' => order.status, 'EXPS' => order.transport_type, 'EXPS_NO' => order.tracking_number, 'DELIVER_DETAIL' => deliver_details})
-  #   else
-  #     error_builder('9999')
-  #   end
-  # end
+    stocks = nil
 
-  # def orders_query
-  #   type = nil
-  #   order_nos = @context_hash['ORDER_NO']
-  #   deliver_nos = @context_hash['DELIVER_NO']
-  #   order_ids = @context_hash['ORDER_ID']
-  #   trans_sns= @context_hash['TRANS_SN']
-  #   ids = []
-  #   order_details = []
-  #   if !order_nos.blank?
-  #     type = "ORDER_NO"
-  #     ids = order_nos.split(',')
-  #   elsif !deliver_nos.blank?
-  #     type = "DELIVER_NO"
-  #     ids = deliver_nos.split(',')
-  #   elsif !order_ids.blank?
-  #     type = "ORDER_ID"
-  #     ids = order_ids.split(',')
-  #   elsif !trans_sns.blank?
-  #     type = "TRANS_SN"
-  #     ids = trans_sns.split(',')
-  #   end
+    specification ||= Specification.find_by barcode: barcode
+    specification ||= Specification.find_by sexnine: barcode
 
-  #   #orders_got = StandardInterface.orders_query(@context_hash, @business, @unit)
+    if ! specification.blank?
+      stocks = Stock.find_stocks_in_storage(specification, nil, nil, storage, nil)
+    end
+
+    stocks ||= Stock.where('sn like ?', bar)
     
-  #   ids.each do |id|
+    if stocks.blank?
+      shelf = Shelf.find_by barcode: barcode
+      if ! shelf.blank?
+        stocks ||= Stock.find_stocks_in_shelf(nil, nil, nil, shelf, nil)
+      end
+    end
 
-  #     context_string = "{\"" + type + "\":\"" + id.to_s + "\"}"
-  #     context = ActiveSupport::JSON.decode(context_string)
-  #     orders = StandardInterface.order_query(context, @business, @unit)
+    if ! stocks.blank?
+      stocks.each do |stock|
+        products << {product: specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: specification.product_sexnine: specification.sixnie_code, product_sn: stock.sn.try(:split, '.'), expiration: stock.expiration, amount: stock.amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at }
+      end
 
-  #     if !orders.blank?
-  #       # tracking_infos = orders.tracking_info
-
-  #       orders.each do |order|
-  #         order_detail = {}
-  #         deliver_details = StandardInterface.generalise_tracking(order.tracking_info)
-
-  #         order_detail['FLAG'] = "success"
-  #         order_detail['ORDER_ID'] = id
-  #         order_detail['STATUS'] = order.status
-  #         order_detail['EXPS'] = order.transport_type
-  #         order_detail['EXPS_NO'] = order.tracking_number
-  #         order_detail['DESC'] = ""
-  #         order_detail['DELIVER_DETAIL'] = deliver_details
-  #         order_details << order_detail
-  #       end
-  #     else
-  #       order_detail = {}
-  #       order_detail['FLAG'] = "failure"
-  #       order_detail['ORDER_ID'] = id
-  #       order_detail['STATUS'] = ""
-  #       order_detail['EXPS'] = ""
-  #       order_detail['EXPS_NO'] = ""
-  #       order_detail['DESC'] = "订单号不存在"
-  #       order_detail['DELIVER_DETAIL'] = ""
-  #       order_details << order_detail
-  #     end
-  #   end
-
-  #   success_builder({'ORDER_DETAIL' => order_details})
-  # end
-
-  # def stock_query
-  #   sku = @context_hash['QUERY_ARRAY']
-  #   return error_builder('0005', '查询列表为空') if sku.blank?
-
-  #   stock_array = StandardInterface.stock_query(@context_hash, @business, @unit)
-
-  #   if !stock_array.blank?
-  #     success_builder('STOCK_ARRAY' => stock_array)
-  #   else
-  #     error_builder('9999')
-  #   end
-  # end
+      success_builder({time: Time.now, products: products)
+    else
+      error_builder('0008')
+    end
+  end
 
   private
   def verify_params

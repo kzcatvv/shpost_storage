@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141224201624) do
+ActiveRecord::Schema.define(version: 20141225131718) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -441,6 +441,7 @@ ActiveRecord::Schema.define(version: 20141224201624) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date     "expiration_date"
+    t.string   "sn"
   end
 
   create_table "storages", force: true do |t|
