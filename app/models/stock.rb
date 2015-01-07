@@ -17,7 +17,7 @@ class Stock < ActiveRecord::Base
   scope :expiration_date_first, ->{order(:expiration_date )}
   scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, actual_amount DESC")}
   scope :available, -> { where("1 = 1")}
-  scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken'")}
+  scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken' or shelves.shelf_type is null")}
   scope :broken, -> { includes(:shelf).where("shelves.shelf_type = 'broken'")}
 
   def self.purchase_stock_in(purchase, operation_user = nil)
@@ -29,11 +29,11 @@ class Stock < ActiveRecord::Base
           
           stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
 
+          purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
+        
           if !arrival.expiration_date.blank?
             stock.update(expiration_date: arrival.expiration_date)
           end
-
-          purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
         end
       end
     end
@@ -154,7 +154,7 @@ class Stock < ActiveRecord::Base
 
     stocks_in_storage_without_batch_no.each do |stock|
       if stock.shelf.is_available?
-        available_stock =  Stock.new(specification: specification, business: business, supplier: supplier, shelf: stock.shelf, batch_no: batch_no, actual_amount: 0)
+        available_stock =  Stock.create(specification: specification, business: business, supplier: supplier, shelf: stock.shelf, batch_no: batch_no, actual_amount: 0)
         return available_stock
       end
     end
@@ -179,11 +179,11 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stock_in_shelf_with_batch_no(specification, supplier, business, batch_no, shelf)
-    in_shelf(shelf).find_stocks(specification, supplier, business).with_batch_no(batch_no).first
+    in_shelf(shelf).find_stocks(specification, supplier, business, false).with_batch_no(batch_no).first
   end
 
   def self.find_stock_in_storage(specification, supplier, business, storage)
-    in_storage(storage).find_stocks(specification, supplier, business).available.prior.first
+    in_storage(storage).find_stocks(specification, supplier, business, false).available.prior.first
   end
 
   def self.find_stocks_in_storage(specification, supplier, business, storage, is_broken = false)
@@ -195,17 +195,17 @@ class Stock < ActiveRecord::Base
   end
 
   def self.total_stock_in_unit(specification, supplier, business, unit)
-    in_unit(unit).find_stocks(specification, supplier, business).sum(:actual_amount) 
+    in_unit(unit).find_stocks(specification, supplier, business, false).sum(:actual_amount) 
     # + StockLog.virtual_amount_in_unit(specification, supplier, business, unit)
   end
 
   def self.total_stock_in_storage(specification, supplier, business, storage)
-    in_storage(storage).find_stocks(specification, supplier, business).sum(:actual_amount)
+    in_storage(storage).find_stocks(specification, supplier, business, false).sum(:actual_amount)
      # +  StockLog.virtual_amount_in_storage(specification, supplier, business, storage)
   end
 
   def self.total_stock_in_shelf(specification, supplier, business, shelf)
-    in_shelf(shelf).find_stocks(specification, supplier, business).sum(:actual_amount) 
+    in_shelf(shelf).find_stocks(specification, supplier, business, false).sum(:actual_amount) 
     # + StockLog.virtual_amount_in_unit(specification, supplier, business, unit)
   end
 
@@ -284,18 +284,29 @@ class Stock < ActiveRecord::Base
     sum(:virtual_amount)
   end
 
-  def self.find_stocks(specification, supplier, business, is_broken = false)
-    conditions = where(specification: specification, business: business).where('actual_amount > 0')
+  def self.find_stocks(specification, supplier, business, is_broken)
+    conditions = where('actual_amount > 0')
 
-    if ! is_broken
-      conditions = conditions.normal
-    else
-      conditions = conditions.broken
+    if ! specification.blank?
+      conditions = conditions.where(specification: specification)
     end
 
-    if ! supplier.nil?
+    if ! business.blank?
+      conditions = conditions.where(business: business)
+    end
+
+    if ! supplier.blank?
       conditions = conditions.where(supplier: supplier)
     end
+
+    if ! is_broken.nil?
+      if is_broken
+        conditions = normal
+      else
+        conditions = broken
+      end
+    end
+
     return conditions
   end
 

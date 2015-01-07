@@ -335,6 +335,32 @@ function destroy(current) {
   }
 }
 
+function assign_select()
+{
+  var userid = $("select#assign_user").val();
+  alert(userid);
+  var uri = window.location.href;
+  alert(uri);
+  param = uri.split('/');
+  $.ajax({
+    type: "POST",
+    url: "/"+param[3]+"/"+param[4]+"/assign_select",
+    data: "assign_user=" + userid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        // alert(data.responseText);
+        // var jsonData = eval("("+data.responseText+")");
+        alert("success");
+      } else {
+        alert("failed");
+      }
+      window.close();
+    }
+  });
+  
+}
+
 function purchase_modify(current)
 {
   param = current.id.split('_');
@@ -678,9 +704,18 @@ function  ajaxstocklogs(){
   }
   );
 
+  $("a[id$=assign]").unbind('click').click(
+    function() {
+      window.open('assign' ,'_assign','top=200,left=300,width=500,height=300,menubar=no,toolbar=no,location=no,directories=no,status=no,scrollbars=no,resizable=no');
+    });
+
+  $("a#assign_select").unbind('click').click(
+    function() {
+      assign_select();
+      // window.close();
+})
+
 }
-
-
 
 
 

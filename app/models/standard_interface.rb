@@ -79,6 +79,8 @@ class StandardInterface
 
     order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: storage.blank? ? unit.default_storage : storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume, is_split: false, keyclientorder_id: (b2b.eql? 'Y') ? getKeycOrderID(unit,storage,'b2b') : nil
 
+    undeal_details = Array.new
+
     order_details.each_with_index do |x, i|
       sku = x['SKU']
       next if sku.blank?
@@ -103,10 +105,15 @@ class StandardInterface
       relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
     
       if relationship.nil?
-        order.destroy
-        order = FileInterface.save_order(context, business.id, unit.id, (storage.blank? ? unit.default_storage.id : storage.id))
-        # ActiveRecord::Rollback
-        break
+        if business.no.eql? StorageConfig.config["business"]['bst_id'].to_s
+          undeal_details << x
+          next
+        else
+          order.destroy
+          order = FileInterface.save_order(context, business.id, unit.id, (storage.blank? ? unit.default_storage.id : storage.id))
+          # ActiveRecord::Rollback
+          break
+        end
       end
 
       # if i > 0 && separate
@@ -120,6 +127,18 @@ class StandardInterface
       # end
 
       order.order_details.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, desc: desc, name: name
+    end
+
+    if !undeal_details.blank?
+      if undeal_details.size.eql? order_details.size
+        order.destroy
+      end
+      context_copy = context
+      undeal_details.each do |detail|
+        context_copy['ORDER_DETAILS'] = Array.new << detail
+        context_copy['ORDER_ID'] = detail['DELIVER_NO']
+        order = FileInterface.save_order(context_copy, business.id, unit.id, (storage.blank? ? unit.default_storage.id : storage.id))
+      end
     end
 
     return order 

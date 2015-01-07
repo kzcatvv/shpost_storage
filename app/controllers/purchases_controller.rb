@@ -79,6 +79,16 @@ class PurchasesController < ApplicationController
     @stock_logs_grid = initialize_grid(@purchase.stock_logs)
   end
 
+  def assign
+    @sorters = current_storage.get_sorter()
+  end
+
+  def assign_select
+    puts params
+    puts params[:assign_user]
+    
+  end
+
   def check
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)

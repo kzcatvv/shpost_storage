@@ -158,12 +158,12 @@ class StockLog < ActiveRecord::Base
       max_amount = self.stock.actual_amount
     elsif operation.eql? OPERATION[:b2b_stock_out]
       on_shelf_amount = self.stock.on_shelf_amount
-      left_amount = self.parent.manual_stock_details.includes(:manual_stock).where(supplier: self.supplier, specification: self.specification, manual_stocks: {business: self.business}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
+      left_amount = self.parent.manual_stock_details.includes(:manual_stock).where(supplier: self.supplier, specification: self.specification, manual_stocks: {business_id: self.business_id}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
 
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
     elsif operation.eql? OPERATION[:b2c_stock_out]
       on_shelf_amount = self.stock.on_shelf_amount
-      left_amount = self.parent.order_details.includes(:order).where(supplier: self.supplier, specification: self.specification, orders: {business: self.business}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
+      left_amount = self.parent.order_details.includes(:order).where(supplier: self.supplier, specification: self.specification, orders: {business_id: self.business_id}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
       
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
     end
