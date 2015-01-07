@@ -16,7 +16,7 @@ class Storage < ActiveRecord::Base
 
    def self.get_default_storage(unit_id)
    	# todo: add a column to show which storage is default in the unit.
-   	Storage.where("unit_id = ?",unit_id).first
+   	# Storage.where("unit_id = ?",unit_id).first
     Storage.find_by(unit_id: unit_id, default_storage: true)
    end
 
