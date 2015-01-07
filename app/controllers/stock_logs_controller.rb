@@ -1,9 +1,9 @@
 class StockLogsController < ApplicationController
   # before_filter :find_current_storage
   load_and_authorize_resource
-  skip_load_and_authorize_resource only: [:purchase_modify, :remove]
+  skip_load_and_authorize_resource only: [:purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove]
 
-  before_filter :load_params, only: [:modify, :purchase_modify, :remove, :addtr]
+  before_filter :load_params, only: [:modify, :purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove, :addtr]
 
   # GET /stock_logs
   # GET /stock_logs.json
@@ -86,7 +86,7 @@ class StockLogsController < ApplicationController
 
       @stock_log.update_amount(@amount)
 
-      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json, }
+      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json }
     end
   end
 
@@ -172,7 +172,7 @@ class StockLogsController < ApplicationController
     @arrival = PurchaseArrival.find(params[:arrival_id]) if !params[:arrival_id].blank?
 
     @manual_stock_detail = ManualStockDetail.find(params[:manual_stock_id]) if !params[:manual_stock_id].blank?
-    @stock = PurchaseArrival.find(params[:stock_id]) if !params[:stock_id].blank?
+    @stock = Stock.find(params[:stock_id]) if !params[:stock_id].blank?
     @keyclientorder = Keyclientorder.find(params[:keyclientorder]) if !params[:keyclientorder].blank?
 
     if !params[:keyclientorder_params].blank?

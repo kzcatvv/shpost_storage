@@ -561,6 +561,9 @@ function  ajaxstocklogs(){
 
   $("p[id^=stock_logs_mshelfid]").unbind('click').click(
     function() {
+      //var size = $("select#"+this.id).options.length;
+      //alert(size);
+      // if isempty(tis)
     if (iswaiting(this)){
       $(this).toggle();
       $("select#"+this.id).toggle();
@@ -859,8 +862,9 @@ function manual_stock_modify(current){
   param = current.id.split('_');
   id = param[3];
   amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
-  shelfid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
   manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
+  //alert(id+" "+stockid);
 
   x = param[3].substring(0,1)
   if (x == "0"){
@@ -873,16 +877,22 @@ function manual_stock_modify(current){
   if (manualstockid == null){
     manualstockid = ""
   }
+
+  if (stockid == null){
+    stockid = ""
+  }
   
 
   $.ajax({
     type: "POST",
     url: "/stock_logs/manual_stock_modify",
-    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&manual_stock_id=" + manualstockid,
+    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&manual_stock_id=" + manualstockid,
     dataType: "json",
     complete: function(data) {
       if (data.success){
         jsonData = eval("("+data.responseText+")");
+        
+        alert(jsonData.id)
         if (jsonData.id != undefined){
           $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
           tablereplace(jsonData.id,"p","id",jsonData.id);
@@ -894,12 +904,28 @@ function manual_stock_modify(current){
 
           tableset(jsonData.id,"id",jsonData.id)
           tableset(jsonData.id,"mamount",""+jsonData.amount)
+          //alert(jsonData.total_amount);
           tableset(jsonData.id,"actamount",""+jsonData.total_amount)
 
           if (amount != jsonData.amount){
             alert("该明细最大可出库数量：" + jsonData.amount);
           }
         } 
+        else {
+          // alert(jsonData.stocks);
+          var jdata = eval(jsonData.stocks);
+          for (var i = 0; i < jdata.length; i++) {
+            var optionstring = "<option value=\"" + jdata[i].id;
+            
+            // if (jdata[i].id == stockid){
+            //   optionstring = optionstring + " selected=\""+"selected";
+              
+            // }
+            
+            optionstring = optionstring + "\" >" + jdata[i].name.split("(")[0] + "</option>";
+            $("#stock_logs_mshelfid_"+id).append(optionstring);      
+          }
+        }
       }    
         
     }

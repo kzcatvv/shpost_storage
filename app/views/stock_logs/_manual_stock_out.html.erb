@@ -25,16 +25,9 @@
           content_tag(:p, "#{stock_log.specification.name}", {id: "stock_logs_msid_#{stock_log.id}"}) %>
         </td>
         <td>
-        <% st = Stock.where(specification_id: stock_log.specification_id) %>
-        <% if !stock_log.supplier.blank? %>
-        <% st = st.where(supplier: stock_log.supplier) %>
-        <% end %>
-        <% shelfids = [] %>
-        <% st.each do |x| %>
-        <% shelfids << x.shelf_id %>
-        <% end %>
+        
 
-        <%= select_tag("stock_logs[][stock_log.shelf_id]", options_for_select(Shelf.where(id: shelfids).map{|s| ["#{s.shelf_code}",s.id]}, stock_log.shelf_id), id: "stock_logs_mshelfid_#{stock_log.id}", style: "display: none;") <<
+        <%= select_tag("stock_logs[][stock_log.stock_id]", "<option></option>".html_safe,  id: "stock_logs_mshelfid_#{stock_log.id}", style: "display: none;") <<
         content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_mshelfid_#{stock_log.id}"}) %>
         </td>
         <td>
