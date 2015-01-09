@@ -1006,7 +1006,7 @@ function manual_stock_modify(current){
   if (amount == null){
     amount = "0"
   }
-  // alert("id"+id+" "+"stockid"+stockid+" "+"manualstockid"+manualstockid+" "+"amount"+amount);
+  alert("id"+id+" "+"stockid"+stockid+" "+"manualstockid"+manualstockid+" "+"amount"+amount);
   
   $.ajax({
     type: "POST",
@@ -1017,7 +1017,7 @@ function manual_stock_modify(current){
       if (data.success){
         jsonData = eval("("+data.responseText+")");
         
-        // alert(data.responseText);
+        alert(data.responseText);
         // var jdata = eval(jsonData.stocks);
         // // alert(jdata);
         // var oplength = $("#stock_logs_mshelfid_"+id).get(0).options.length;
