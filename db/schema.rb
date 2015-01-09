@@ -122,6 +122,8 @@ ActiveRecord::Schema.define(version: 20150109082316) do
     t.integer  "business_id"
   end
 
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -485,6 +487,7 @@ ActiveRecord::Schema.define(version: 20150109082316) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "assign_type"
   end
 
   create_table "units", force: true do |t|

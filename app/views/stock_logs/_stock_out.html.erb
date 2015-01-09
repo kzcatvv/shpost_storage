@@ -5,7 +5,7 @@
     <thead>
       <tr>
         <th></th>
-        <th>批量出库单明细</th>
+        <th>电商出库单</th>
         <th>货架</th>
         <th>库存数量</th>
         <th>出库数量</th>
@@ -18,28 +18,29 @@
     <tbody>
       <% @stock_logs.each do |stock_log| %>
       <tr id="stock_logs_id_<%=stock_log.id%>">
-        <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %></td>
         <td>
-        <% msid =  stock_log.parent.manual_stock_details.where(supplier: stock_log.supplier, specification: stock_log.specification).first.id %>
-        <% msname =  stock_log.parent.manual_stock_details.where(supplier: stock_log.supplier, specification: stock_log.specification).first.name %>
-          <%= select_tag("stock_logs[][msid]", options_for_select(stock_log.parent.manual_stock_details.map{|u| ["#{u.name}_#{u.specification.name}",u.id]}, msid), id: "stock_logs_msid_#{stock_log.id}", style: "display: none;") <<
-          content_tag(:p, "#{msname}_#{stock_log.specification.name}", {id: "stock_logs_msid_#{stock_log.id}"}) %>
+        <%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %>
+        <%= hidden_field_tag("stock_logs[][stock_log.parent.id]", stock_log.parent.id, id: "stock_logs_kcoid_#{stock_log.id}") %></td>
+        <td>
+        <% ksid = stock_log.specification_id.to_s + "_" + stock_log.business_id.to_s + "_" + stock_log.supplier_id.to_s %>
+        <% somaps = OrderDetail.find_by_sql ["select d.specification_id,o.business_id,d.supplier_id,sum(d.amount) from order_details d,orders o,keyclientorders k,stock_logs s where d.order_id=o.id and s.parent_id=k.id and k.id=o.keyclientorder_id and s.id=? group by d.specification_id,o.business_id,d.supplier_id", stock_log.id] %>
+        <%= select_tag("stock_logs[][ksid]", options_for_select(somaps.map{|u| ["#{u.specification.name}_#{u.supplier_id}",u.specification_id.to_s + "_" + u.business_id.to_s + "_" + u.supplier_id.to_s]}, ksid), id: "stock_logs_ksid_#{stock_log.id}", style: "display: none;") <<
+          content_tag(:p, "#{stock_log.specification.name}", {id: "stock_logs_ksid_#{stock_log.id}"}) %>
         </td>
         <td>
-        
-        <%= hidden_field_tag("stock_logs[][#{stock_log.stock_id}]", stock_log.stock_id, id: "stock_logs_stid_#{stock_log.id}") %>
-        <%= select_tag("stock_logs[][#{stock_log.stock_id}]", "<option value=''>未选择</option>".html_safe,  id: "stock_logs_mshelfid_#{stock_log.id}", style: "display: none;") <<
-        content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_mshelfid_#{stock_log.id}"}) %>
+        <%= hidden_field_tag("stock_logs[][#{stock_log.stock_id}]", stock_log.stock_id, id: "stock_logs_kstid_#{stock_log.id}") %>
+        <%= select_tag("stock_logs[][stock_log.stock_id]", "<option value=''>未选择</option>".html_safe, id: "stock_logs_kshelfid_#{stock_log.id}", style: "display: none;") <<
+        content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_kshelfid_#{stock_log.id}"}) %>
         </td>
         <td>
           <%= content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})%>
         </td>
         <td>
-          <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_mamount_#{stock_log.id}", style: "display: none; width: 40px;") <<
+          <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_kamount_#{stock_log.id}", style: "display: none; width: 40px;") <<
           if stock_log.amount == 0 || stock_log.amount > stock_log.stock.actual_amount
-            content_tag(:p, stock_log.amount, {id: "stock_logs_mamount_#{stock_log.id}", style: 'background-color: red;'})
+            content_tag(:p, stock_log.amount, {id: "stock_logs_kamount_#{stock_log.id}", style: 'background-color: red;'})
           else
-            content_tag(:p, stock_log.amount, {id: "stock_logs_mamount_#{stock_log.id}"})
+            content_tag(:p, stock_log.amount, {id: "stock_logs_kamount_#{stock_log.id}"})
           end %>
         </td>
         <td id="stock_logs_status_<%=stock_log.id%>"><%=  StockLog::STATUS_SHOW[stock_log.status.to_sym] %></td>
@@ -60,7 +61,7 @@
   <div style="float:right">
     <% if can? :new, Stock %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
-                   "javascript:void(0)", onclick: "manual_stock_add()",
+                   "javascript:void(0)", onclick: "keyclientorder_stock_add()",
                     :class => 'btn btn-primary' %>
     <% end %>
   </div>
@@ -98,4 +99,5 @@
   </tbody>
 </table>
 </div>
+
 

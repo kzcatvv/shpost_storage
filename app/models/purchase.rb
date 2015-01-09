@@ -59,5 +59,14 @@ class Purchase < ActiveRecord::Base
   def stock_in_amount(purchase_detail)
     self.stock_logs.where(specification: purchase_detail.specification, supplier: purchase_detail.supplier, business: self.business, storage: storage).sum(:amount)
   end
+
+  def has_waiting_stock_logs()
+    x = self.stock_logs.where(status: "waiting").size
+    if x == 0
+      return false
+    else
+      return true
+    end
+  end
 end
 

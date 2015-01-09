@@ -39,6 +39,10 @@ class Stock < ActiveRecord::Base
         end
       end
     end
+
+    if purchase.has_waiting_stock_logs()
+      Task.save_task(purchase,purchase.storage.id,nil)
+    end
   end
 
   def self.order_return_stock_in(order_return, operation_user = nil)
@@ -302,10 +306,10 @@ class Stock < ActiveRecord::Base
     end
 
     if ! is_broken.nil?
-      if is_broken
-        conditions = normal
+      if ! is_broken
+        conditions = conditions.normal
       else
-        conditions = broken
+        conditions = conditions.broken
       end
     end
 
