@@ -62,12 +62,12 @@ class Purchase < ActiveRecord::Base
     self.stock_logs.where(specification: purchase_detail.specification, supplier: purchase_detail.supplier, business: self.business, storage: storage).sum(:amount)
   end
 
-  def tasker_in_work()
-    task = Task.where(parent_type: 'purchase', parent_id: self.id, status: Task::STATUS[:doing], assign_type: 'assigned').first
-    if task.blank?
-      return nil
+  def has_waiting_stock_logs()
+    x = self.stock_logs.where(status: "waiting").size
+    if x == 0
+      return false
     else
-      return task.user
+      return true
     end
   end
 end

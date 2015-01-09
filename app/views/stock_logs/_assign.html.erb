@@ -8,7 +8,7 @@
       <% end %>
       <tr>
         <td><p>操作人:</p></td>
-        <td><%= select_tag("assign_user", options_for_select(@sorters.map{|u| ["#{u.name}",u.id]}), id: "assign_user") %></td>
+        <td><%= select_tag("assign_user", options_for_select(@sorters.map{|u| ["#{u.name}",u.id]},@tasker.blank? ? "" : @tasker.id), id: "assign_user") %></td>
       </tr>
       <tr>
         <td></td>
