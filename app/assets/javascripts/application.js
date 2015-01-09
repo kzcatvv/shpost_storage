@@ -338,9 +338,7 @@ function destroy(current) {
 function assign_select()
 {
   var userid = $("select#assign_user").val();
-  alert(userid);
   var uri = window.location.href;
-  alert(uri);
   param = uri.split('/');
   $.ajax({
     type: "POST",
@@ -351,9 +349,9 @@ function assign_select()
       if(data.success){
         // alert(data.responseText);
         // var jsonData = eval("("+data.responseText+")");
-        alert("success");
+        alert("分配任务成功！");
       } else {
-        alert("failed");
+        alert("分配任务失败！");
       }
       window.close();
     }

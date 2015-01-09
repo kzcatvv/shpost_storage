@@ -9,9 +9,11 @@ class Sequence < ActiveRecord::Base
   Barcodes.each_key do |x|
     x.to_s.constantize.class_eval do
       self.before_save do |obj|
-        if obj.no.blank?
-          obj.no = Sequence.generate_sequence(obj.unit, obj.class)
-          obj.barcode = Sequence.generate_barcode(obj.unit, obj.class, obj.no)
+        if obj.respond_to? :no
+          if obj.no.blank?
+            obj.no = Sequence.generate_sequence(obj.unit, obj.class)
+            obj.barcode = Sequence.generate_barcode(obj.unit, obj.class, obj.no)
+          end
         end
         if obj.barcode.blank?
           obj.barcode = Sequence.generate_barcode(obj.unit, obj.class, Sequence.generate_sequence(obj.unit, obj.class))

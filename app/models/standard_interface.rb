@@ -201,8 +201,8 @@ class StandardInterface
   end
 
   def self.generalise_tracking(tracking_infos)
+    deliver_details = []
     if !tracking_infos.blank?
-      deliver_details = []
       tracking_infos.split(/\n/).each do |info|
         deliver_detail = {}
         x = info.split('#')

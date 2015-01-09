@@ -3,9 +3,12 @@
 <div>
 <table class="table table-striped">
   <tbody>
+      <% if !@tasker.blank? %>
+        <tr><p>【<%= @tasker.name %>】正在处理该任务，请谨慎分配！</p></tr>
+      <% end %>
       <tr>
         <td><p>操作人:</p></td>
-        <td><%= select_tag("assign_user", options_for_select(@sorters.map{|u| ["#{u.name}",u.id]}), id: "assign_user") %></td>
+        <td><%= select_tag("assign_user", options_for_select(@sorters.map{|u| ["#{u.name}",u.id]},@tasker.blank? ? "" : @tasker.id), id: "assign_user") %></td>
       </tr>
       <tr>
         <td></td>

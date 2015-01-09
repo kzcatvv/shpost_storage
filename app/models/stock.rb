@@ -37,6 +37,10 @@ class Stock < ActiveRecord::Base
         end
       end
     end
+
+    if purchase.has_waiting_stock_logs()
+      Task.save_task(purchase,purchase.storage.id,nil)
+    end
   end
 
   def self.order_return_stock_in(order_return, operation_user = nil)
