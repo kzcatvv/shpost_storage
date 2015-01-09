@@ -300,10 +300,10 @@ class Stock < ActiveRecord::Base
     end
 
     if ! is_broken.nil?
-      if is_broken
-        conditions = normal
+      if ! is_broken
+        conditions = conditions.normal
       else
-        conditions = broken
+        conditions = conditions.broken
       end
     end
 

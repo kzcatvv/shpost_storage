@@ -79,7 +79,7 @@ class StockLogsController < ApplicationController
       return render json: {stocks: stocks_json}
     else
       if @stock_log.try :waiting?
-        @stock_log = StockLog.update(parent: @manual_stock_detail.manual_stock, stock: @stock, operation: StockLog::OPERATION[:b2b_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+        @stock_log.update(parent: @manual_stock_detail.manual_stock, stock: @stock, operation: StockLog::OPERATION[:b2b_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
       else
         @stock_log = StockLog.create(parent: @manual_stock_detail.manual_stock, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2b_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
       end
@@ -94,7 +94,7 @@ class StockLogsController < ApplicationController
     if @keyclientorder.blank? || @specification.blank? || @business.blank?
       return render json: {}
     end
-
+    
     stocks = Stock.find_stocks_in_storage(@specification, @business,@supplier, current_storage, false)
 
     stocks_json = stocks.map {|x| {name: "#{x.shelf.shelf_code}(批次:#{x.batch_no},库存:#{x.actual_amount})", id: x.id}}.to_json

@@ -670,7 +670,7 @@ class OrdersController < ApplicationController
               end
 
               #数量
-              amount = instance.cell(dline,'D').to_s
+              amount = instance.cell(dline,'D').to_s.split('.0')[0]
               if amount.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少数量，导入失败"
               end
@@ -732,7 +732,7 @@ class OrdersController < ApplicationController
                   else 
                     OrderDetail.create! name: specification.name,batch_no: nil, specification: specification, amount: amount.to_i, supplier: supplier, order: dorder
 
-                    dorder_total_amount = dorder_total_amount + instance.cell(dline,'D').to_i
+                    dorder_total_amount = dorder_total_amount + amount.to_i
                     Order.update(dorder_id,total_amount: dorder_total_amount)
                   end
                 #原来有，更新原记录
@@ -751,7 +751,7 @@ class OrdersController < ApplicationController
                   elsif amount.to_i > 0
                     OrderDetail.update(order_detail_id,amount: amount.to_i)
 
-                    dorder_total_amount = dorder_total_amount - ori_detail_amount + instance.cell(dline,'D').to_i
+                    dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
                     Order.update(dorder_id,total_amount: dorder_total_amount)
                   #数量小于0，报错
                   else
@@ -1128,7 +1128,7 @@ class OrdersController < ApplicationController
                 raise "导入文件第" + dline.to_s + "行数据, 缺少sku，导入失败"
               end
 
-              amount = instance.cell(dline,'D').to_s
+              amount = instance.cell(dline,'D').to_s.split('.0')[0]
               if amount.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少数量，导入失败"
               end
@@ -1177,7 +1177,7 @@ class OrdersController < ApplicationController
                 elsif amount.to_i > 0
                   OrderDetail.update(order_detail_id,amount: amount.to_i)
 
-                  dorder_total_amount = dorder_total_amount - ori_detail_amount + instance.cell(dline,'D').to_i
+                  dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
                   Order.update(dorder_id,total_amount: dorder_total_amount)
                 else
                   raise "导入文件第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
