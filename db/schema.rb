@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141225131718) do
+ActiveRecord::Schema.define(version: 20150109082316) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -330,6 +330,7 @@ ActiveRecord::Schema.define(version: 20141225131718) do
     t.datetime "updated_at"
     t.string   "spec_desc"
     t.integer  "warning_amt"
+    t.string   "barcode"
   end
 
   create_table "roles", force: true do |t|
@@ -411,11 +412,13 @@ ActiveRecord::Schema.define(version: 20141225131718) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.date     "expiration_date"
-    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+    t.date     "expiration_date"
+    t.string   "batch_no"
     t.integer  "pick_id"
+    t.integer  "relationship_id"
+    t.string   "sn"
   end
 
   create_table "stock_mons", force: true do |t|
@@ -442,6 +445,7 @@ ActiveRecord::Schema.define(version: 20141225131718) do
     t.datetime "updated_at"
     t.date     "expiration_date"
     t.string   "sn"
+    t.integer  "relationship_id"
   end
 
   create_table "storages", force: true do |t|
@@ -472,7 +476,7 @@ ActiveRecord::Schema.define(version: 20141225131718) do
   create_table "tasks", force: true do |t|
     t.string   "title"
     t.string   "barcode"
-    t.string   "type"
+    t.string   "task_type"
     t.string   "status"
     t.string   "code"
     t.integer  "storage_id"

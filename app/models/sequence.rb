@@ -1,7 +1,7 @@
 class Sequence < ActiveRecord::Base
   belongs_to :unit
 
-  Barcodes = {Shelf: 'SH', Specification: 'SP', Purchase: 'PUR', ManualStock: 'MS', Business: 'BUS', Supplier: 'SUP', OrderReturn: 'OR', Keyclientorder: 'KCO', Order: 'ORD', Task: 'TSK'}
+  Barcodes = {Shelf: 'SH', Specification: 'SP', Purchase: 'PUR', ManualStock: 'MS', Business: 'BUS', Supplier: 'SUP', OrderReturn: 'OR', Keyclientorder: 'KCO', Order: 'ORD', Task: 'TAS', Relationship: 'REL'}
 
   Batchs = {PurchaseArrival: 'PA', PurchaseDetail: 'PD', Keyclientorder: 'KCO', Order: 'ORD', OrderReturn: 'OR'}
 
@@ -9,9 +9,11 @@ class Sequence < ActiveRecord::Base
   Barcodes.each_key do |x|
     x.to_s.constantize.class_eval do
       self.before_save do |obj|
-        if obj.no.blank?
-          obj.no = Sequence.generate_sequence(obj.unit, obj.class)
-          obj.barcode = Sequence.generate_barcode(obj.unit, obj.class, obj.no)
+        if obj.respond_to? :no
+          if obj.no.blank?
+            obj.no = Sequence.generate_sequence(obj.unit, obj.class)
+            obj.barcode = Sequence.generate_barcode(obj.unit, obj.class, obj.no)
+          end
         end
         if obj.barcode.blank?
           obj.barcode = Sequence.generate_barcode(obj.unit, obj.class, Sequence.generate_sequence(obj.unit, obj.class))
@@ -69,6 +71,5 @@ class Sequence < ActiveRecord::Base
         obj.barcode = Sequence.generate_sequecne(obj.unit, _class)
       end
     end
-    # puts '12345'
   end
 end
