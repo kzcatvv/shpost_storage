@@ -6,4 +6,5 @@ class Task < ActiveRecord::Base
   validates_uniqueness_of :barcode, :code
 
   STATUS = {doing: 'doing', done: 'done'}
+  ASSIGN_TYPE = {assigned: 'assigned', joined: 'joined'}
 end

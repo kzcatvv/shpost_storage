@@ -80,13 +80,14 @@ class PurchasesController < ApplicationController
   end
 
   def assign
+    @tasker = @purchase.tasker_in_work()
     @sorters = current_storage.get_sorter()
   end
 
   def assign_select
     puts params
     puts params[:assign_user]
-    
+    render json: {}
   end
 
   def check

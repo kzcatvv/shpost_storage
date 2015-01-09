@@ -61,5 +61,14 @@ class Purchase < ActiveRecord::Base
   def stock_in_amount(purchase_detail)
     self.stock_logs.where(specification: purchase_detail.specification, supplier: purchase_detail.supplier, business: self.business, storage: storage).sum(:amount)
   end
+
+  def tasker_in_work()
+    task = Task.where(parent_type: 'purchase', parent_id: self.id, status: Task::STATUS[:doing], assign_type: 'assigned').first
+    if task.blank?
+      return nil
+    else
+      return task.user
+    end
+  end
 end
 
