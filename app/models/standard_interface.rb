@@ -136,7 +136,7 @@ class StandardInterface
       context_copy = context
       undeal_details.each do |detail|
         context_copy['ORDER_DETAILS'] = Array.new << detail
-        context_copy['ORDER_ID'] = detail['DELIVER_NO']
+        context_copy['ORDER_ID'] = detail['DELIVER_NO'].blank? ? context['ORDER_ID'] : detail['DELIVER_NO']
         order = FileInterface.save_order(context_copy, business.id, unit.id, (storage.blank? ? unit.default_storage.id : storage.id))
       end
     end
