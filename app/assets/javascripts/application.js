@@ -585,8 +585,11 @@ function  ajaxstocklogs(){
 
   $("p[id^=stock_logs_mshelfid]").unbind('click').click(
     function() {
-      stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
-      manual_stock_detail_modify(this);
+    param = this.id.split('_');
+    id = param[3];
+    stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
+    manual_stock_detail_modify(this);
+    if (stid != null || stid != "")
       $("select#"+this.id).val(stid);
       
       
@@ -663,8 +666,11 @@ function  ajaxstocklogs(){
 
   $("p[id^=stock_logs_kshelfid]").unbind('click').click(
     function() {
-    keyclientorder_stock_detail_modify(this);
+    param = this.id.split('_');
+    id = param[3];
     kstid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kstid_"+id+"][type=hidden]").val();
+    keyclientorder_stock_detail_modify(this);
+    if (kstid != null || kstid != "")
       $("select#"+this.id).val(kstid);
     if (iswaiting(this)){
       $(this).toggle();
@@ -921,7 +927,8 @@ function manual_stock_detail_modify(current){
   param = current.id.split('_');
   id = param[3];
   manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
-  //alert(id+" "+stockid);
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
+  stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
 
   x = param[3].substring(0,1)
   if (x == "0"){
@@ -935,7 +942,14 @@ function manual_stock_detail_modify(current){
     manualstockid = ""
   }
 
-
+  if (stockid == null || stockid ==""){
+    if (stid != null){
+      stockid = stid
+    }
+    else {
+      stockid = ""
+    }
+  }
 
   $.ajax({
     type: "POST",
@@ -947,22 +961,21 @@ function manual_stock_detail_modify(current){
         jsonData = eval("("+data.responseText+")");
         // alert(data.responseText);
         var jdata = eval(jsonData.stocks);
-        var oplength = $("#stock_logs_mshelfid_"+id).get(0).options.length;
+        // alert(jdata);
+        var oplength = $("select#stock_logs_mshelfid_"+id).get(0).options.length;
         if(jdata.size!=0){
           if (oplength > 1){
             for (var a = 1; a < oplength; a++) {
-              $("#stock_logs_mshelfid_"+id).remove(a); 
+              $("select#stock_logs_mshelfid_"+id).remove(a); 
             }
           }
  
           for (var i = 0; i < jdata.length; i++) {
             var optionstring = "<option value=\"" + jdata[i].id;
-            // if (jdata[i].id == stockid){
-            //   optionstring = optionstring + " selected=\""+"selected";
-                  
-            // }
+            
             optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
-            $("#stock_logs_mshelfid_"+id).append(optionstring)
+            // alert("id:"+id);
+            $("select#stock_logs_mshelfid_"+id).append(optionstring)
           }
         }
       }    
@@ -977,7 +990,7 @@ function manual_stock_modify(current){
   amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
   stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
   stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
-  // alert("stid"+stid);
+  // alert("stockid"+stockid+"stid"+stid);
   manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
 
 
@@ -993,7 +1006,7 @@ function manual_stock_modify(current){
     manualstockid = ""
   }
 
-  if (stockid == null){
+  if (stockid == null || stockid ==""){
     if (stid != null){
       stockid = stid
     }
@@ -1006,7 +1019,7 @@ function manual_stock_modify(current){
   if (amount == null){
     amount = "0"
   }
-  alert("id"+id+" "+"stockid"+stockid+" "+"manualstockid"+manualstockid+" "+"amount"+amount);
+  // alert("id"+id+" "+"stockid"+stockid+" "+"manualstockid"+manualstockid+" "+"amount"+amount);
   
   $.ajax({
     type: "POST",
@@ -1017,7 +1030,7 @@ function manual_stock_modify(current){
       if (data.success){
         jsonData = eval("("+data.responseText+")");
         
-        alert(data.responseText);
+        // alert(data.responseText);
         // var jdata = eval(jsonData.stocks);
         // // alert(jdata);
         // var oplength = $("#stock_logs_mshelfid_"+id).get(0).options.length;
@@ -1168,7 +1181,7 @@ function keyclientorder_stock_detail_modify(current){
     amount = "0"
   }
 
-  if (stockid == null){
+  if (stockid == null || stockid == ""){
     if (kstid != null){
       stockid = kstid
     }
@@ -1189,20 +1202,21 @@ function keyclientorder_stock_detail_modify(current){
     complete: function(data) {
       if (data.success){
         jsonData = eval("("+data.responseText+")");
+        alert(data.responseText);
         var jdata = eval(jsonData.stocks);
-        var oplength = $("#stock_logs_kshelfid_"+id).get(0).options.length;
+        var oplength = $("select#stock_logs_kshelfid_"+id).get(0).options.length;
         
         if(jdata.size!=0){
           if (oplength > 1){
             for (var a = 1; a < oplength; a++) {
-              $("#stock_logs_kshelfid_"+id).remove(a); 
+              $("select#stock_logs_kshelfid_"+id).remove(a); 
             }
           }
  
           for (var i = 0; i < jdata.length; i++) {
             var optionstring = "<option value=\"" + jdata[i].id;
             optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
-            $("#stock_logs_kshelfid_"+id).append(optionstring)
+            $("select#stock_logs_kshelfid_"+id).append(optionstring)
           }
         }
       }    
@@ -1236,7 +1250,7 @@ function keyclientorder_stock_modify(current){
     amount = "0"
   }
 
-  if (stockid == null){
+  if (stockid == null || stockid == ""){
     if (kstid != null){
       stockid = kstid
     }
