@@ -42,7 +42,8 @@
                       edit_relationship_path(relationship), :class => 'btn btn-xs btn-primary' if can? :update, relationship) << ' ' <<
         (link_to t('.destroy', :default => t("helpers.links.destroy")), relationship_path(relationship), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, relationship)<< ' ' <<
         (link_to t('设置联系人'),
-                      relation_contacts_path(:rid=>relationship), :class => 'btn btn-xs btn-primary')
+                      relation_contacts_path(:rid=>relationship), :class => 'btn btn-xs btn-primary') << ' ' <<
+        (link_to t('打印条码'), "/print/relationbarcodeprint?rid=#{relationship.id}", target: '_blank',:class => 'btn btn-xs btn-primary')
     end
   end 
 %>
