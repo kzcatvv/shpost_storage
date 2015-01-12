@@ -589,8 +589,9 @@ function  ajaxstocklogs(){
     id = param[3];
     stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
     manual_stock_detail_modify(this);
-    if (stid != null || stid != "")
+    if (stid != null || stid != ""){
       $("select#"+this.id).val(stid);
+    }
       
       
     if (iswaiting(this)){
@@ -929,7 +930,7 @@ function manual_stock_detail_modify(current){
   manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
   stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
   stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
-
+  
   x = param[3].substring(0,1)
   if (x == "0"){
     x = ""
@@ -961,7 +962,7 @@ function manual_stock_detail_modify(current){
         jsonData = eval("("+data.responseText+")");
         // alert(data.responseText);
         var jdata = eval(jsonData.stocks);
-        // alert(jdata);
+        
         var oplength = $("select#stock_logs_mshelfid_"+id).get(0).options.length;
         if(jdata.size!=0){
           if (oplength > 1){
@@ -974,7 +975,7 @@ function manual_stock_detail_modify(current){
             var optionstring = "<option value=\"" + jdata[i].id;
             
             optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
-            // alert("id:"+id);
+            
             $("select#stock_logs_mshelfid_"+id).append(optionstring)
           }
         }
@@ -990,7 +991,7 @@ function manual_stock_modify(current){
   amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
   stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
   stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
-  // alert("stockid"+stockid+"stid"+stid);
+  // alert("id"+id+"stockid"+stockid+"stid"+stid);
   manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
 
 
@@ -1050,8 +1051,6 @@ function manual_stock_modify(current){
         // }
         // alert(jsonData.id);
         if (jsonData.id != undefined){
-          // alert(param[3])
-          // alert(jsonData.id)
           $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
           tablereplace(jsonData.id,"p","id",jsonData.id);
           tablereplace(jsonData.id,"a","id",jsonData.id);
@@ -1103,59 +1102,7 @@ function keyclientorder_stock_add() {
 
   ajaxstocklogs();
 }
-/*
-function keyclientorder_stock_modify(current){
-  param = current.id.split('_');
-  id = param[3];
-  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_kamount_"+id).val();
-  shelfid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_kshelfid_"+id).val();
-  ksid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_ksid_"+id).val();
-  kcoid = $("tr#stock_logs_id_"+id+">td>text#stock_logs_kcoid_"+id).text();
 
-  x = param[3].substring(0,1)
-  if (x == "0"){
-    x = ""
-  }
-  else {
-    x = param[3]
-  }
-  
-  if (ksid == null){
-    ksid = ""
-  }
-  
-
-  $.ajax({
-    type: "POST",
-    url: "/stock_logs/keyclientorder_stock_modify",
-    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid,
-    dataType: "json",
-    complete: function(data) {
-      if (data.success){
-        jsonData = eval("("+data.responseText+")");
-        if (jsonData.id != undefined){
-          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
-          tablereplace(jsonData.id,"p","id",jsonData.id);
-          tablereplace(jsonData.id,"a","id",jsonData.id);
-          tablereplace(jsonData.id,"a","href",jsonData.id);
-          tablereplace(jsonData.id,"input","id",jsonData.id);
-          tablereplace(jsonData.id,"select","id",jsonData.id);
-          tablereplace(jsonData.id,"td","id",jsonData.id);
-
-          tableset(jsonData.id,"id",jsonData.id)
-          tableset(jsonData.id,"kamount",""+jsonData.amount)
-          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
-
-          if (amount != jsonData.amount){
-            alert("最大可出库数量：" + jsonData.amount);
-          }
-        } 
-      }    
-        
-    }
-  });
-}
-*/
 function keyclientorder_stock_detail_modify(current){
   param = current.id.split('_');
   id = param[3];
@@ -1202,7 +1149,7 @@ function keyclientorder_stock_detail_modify(current){
     complete: function(data) {
       if (data.success){
         jsonData = eval("("+data.responseText+")");
-        alert(data.responseText);
+        // alert(data.responseText);
         var jdata = eval(jsonData.stocks);
         var oplength = $("select#stock_logs_kshelfid_"+id).get(0).options.length;
         
@@ -1271,24 +1218,7 @@ function keyclientorder_stock_modify(current){
     complete: function(data) {
       if (data.success){
         jsonData = eval("("+data.responseText+")");
-        // var jdata = eval(jsonData.stocks);
-        // alert(data.responseText);
-        // var oplength = $("#stock_logs_kshelfid_"+id).get(0).options.length;
-        // if(jdata.size!=0){
-        //   if (oplength > 1){
-        //     for (var a = 1; a < oplength; a++) {
-        //       $("select#stock_logs_kshelfid_"+id).remove(a); 
-        //     }
-        //   }
- 
-        //   for (var i = 0; i < jdata.length; i++) {
-        //     var optionstring = "<option value=\"" + jdata[i].id;
-        //     optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
-        //     // alert("id:"+id);
-        //     $("select#stock_logs_kshelfid_"+id).append(optionstring)
-        //   }
-        // }
-
+        
         if (jsonData.id != undefined){
           $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
           tablereplace(jsonData.id,"p","id",jsonData.id);
