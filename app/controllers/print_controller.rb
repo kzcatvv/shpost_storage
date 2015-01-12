@@ -142,4 +142,8 @@ class PrintController < ApplicationController
         @order.update(transport_type: params[:transport_type])
     end
 
+    def shelfbarcodeprint
+        @shelf = Shelf.find(params[:sid])
+    end
+
 end

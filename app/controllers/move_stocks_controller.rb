@@ -3,6 +3,7 @@ class MoveStocksController < ApplicationController
 
   def index
     @move_stocks_grid = initialize_grid(@move_stocks)
+
   end
 
   def show
@@ -55,6 +56,12 @@ class MoveStocksController < ApplicationController
   def movedetail
     @movestock = MoveStock.find(params[:format])
     @movestockid = MoveStock.find(params[:format]).id
+
+    qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
+    @qr=qrcode.to_img
+    direct = "#{Rails.root}/app/assets/images/"
+    fnm = direct + "really_cool_qr_image.png"
+    @qr=@qr.resize(200, 200).save(fnm)
   end
 
   def check

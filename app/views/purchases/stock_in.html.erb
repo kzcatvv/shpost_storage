@@ -27,10 +27,13 @@ function CreateStockinPage(){
     LODOP.ADD_PRINT_TEXT(50,"75%",260,39,CurentTime(0,0));
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
-    LODOP.ADD_PRINT_TEXT(80,"43%",260,39,'<%= @purchase.no %>');
+    LODOP.ADD_PRINT_BARCODE(80,"35%",260,39,'128A','<%= @purchase.barcode %>');
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(150,"43%",260,39,'<%= @purchase.no %>');
     LODOP.SET_PRINT_STYLE("FontSize",15);
     LODOP.SET_PRINT_STYLE("Bold",1);
-    h=110;
+    h=200;
     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"商品名称规格");
     LODOP.ADD_PRINT_TEXT(h,"40%",260,25,"数量");
     LODOP.ADD_PRINT_TEXT(h,"55%",260,25,"货架");
