@@ -313,19 +313,20 @@ class OrdersController < ApplicationController
       @keyclientorder = Keyclientorder.find(params[:format])
 
       pickareacnt = Area.where("storage_id = ? and area_type = 'pick' ",current_storage.id).count
-      # if pickareacnt > 0
-        
-      # else
+      if pickareacnt > 0
+        Stock.pick_stock_out(@keyclientorder, current_user)
+
+        @stock_logs = @keyclientorder.stock_logs.where(" operation_type = 'out' ")
+      else
 
         Stock.order_stock_out(@keyclientorder, current_user)
 
         @keyclientorder.orders.each do |order|
           order.set_picking
         end
-
-        @stock_logs = @keyclientorder.stock_logs
-      # end
       
+        @stock_logs = @keyclientorder.stock_logs
+      end
         @stock_logs_grid = initialize_grid(@stock_logs)
     end
     rescue Exception => e

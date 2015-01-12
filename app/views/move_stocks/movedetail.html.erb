@@ -14,6 +14,9 @@
 </div>
 <%= hidden_field_tag('movestockid',@movestockid )%>
 <%= render :partial => 'move_stocks/move_stock_in' %>
+<div id="img_div">
+  <%= image_tag("really_cool_qr_image.png") %>
+</div>
 
 <script language="javascript" type="text/javascript"> 
 function movestock_preview(){
@@ -28,10 +31,13 @@ function movestock_preview(){
     LODOP.ADD_PRINT_TEXT(50,"75%",260,39,CurentTime(0,0));
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
-    LODOP.ADD_PRINT_TEXT(80,"43%",260,39,'<%= @movestock.name %>');
+    LODOP.ADD_PRINT_BARCODE(80,"35%",260,39,'128A','<%= @movestock.barcode %>');
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(150,"43%",260,39,'<%= @movestock.name %>');
     LODOP.SET_PRINT_STYLE("FontSize",15);
     LODOP.SET_PRINT_STYLE("Bold",1);
-    h=110;
+    h=200;
     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"移出货架");
     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,"69码");
     LODOP.ADD_PRINT_TEXT(h,"40%",260,25,"商品名");
@@ -47,6 +53,7 @@ function movestock_preview(){
         LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= j.amount %>');
         LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.pick_in.stock.shelf.shelf_code %>');
     <% end %>
+    LODOP.ADD_PRINT_IMAGE(300,"5%",200,200,"<img border='0' src='http://127.0.0.1:3000/assets/really_cool_qr_image.png' />");
     LODOP.PREVIEW();
   };
 </script>

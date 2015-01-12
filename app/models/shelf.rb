@@ -65,15 +65,12 @@ class Shelf < ActiveRecord::Base
     # default.first
   end
 
-  def self.get_pick_shelf(storage,amount)
+  def self.get_pick_shelf(storage)
     shelves = pick_in_storage(storage).prior
-    if amount <= shelves.empty.count
-      shelves.empty.prior.limit(amount)
-    else
+  end
 
-    end
-
-
+  def self.get_empty_pick_shelf(storage)
+    shelves = pick_in_storage(storage).empty.prior
   end
 
   #def bad_type_name

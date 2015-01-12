@@ -85,12 +85,12 @@ function pick_preview(){
     LODOP.SET_PRINT_STYLE("ItemType",4);
     LODOP.ADD_PRINT_TEXT(50,"45%",260,39,"配货单");
     LODOP.SET_PRINT_STYLE("FontSize",12);
-    LODOP.ADD_PRINT_TEXT(90,"5%",260,25,"订单编号：<%= order.no %>");
-    LODOP.ADD_PRINT_TEXT(90,"30%",260,25,"打印时间："+CurentTime(0,0));
-    LODOP.ADD_PRINT_TEXT(90,"60%",160,25,"客户姓名：<%= order.customer_name %>");
-    LODOP.ADD_PRINT_TEXT(90,"80%",160,25,"商品总数：<%= order.total_amount %>");
+    LODOP.ADD_PRINT_TEXT(150,"5%",260,25,"订单编号：<%= order.no %>");
+    LODOP.ADD_PRINT_TEXT(150,"30%",260,25,"打印时间："+CurentTime(0,0));
+    LODOP.ADD_PRINT_TEXT(150,"60%",160,25,"客户姓名：<%= order.customer_name %>");
+    LODOP.ADD_PRINT_TEXT(150,"80%",160,25,"商品总数：<%= order.total_amount %>");
     LODOP.SET_PRINT_STYLE("FontSize",15);
-    h=140;
+    h=200;
     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"商品编号");
     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,"商品名称规格");
     LODOP.ADD_PRINT_TEXT(h,"65%",260,25,"数量");
