@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141224201624) do
+ActiveRecord::Schema.define(version: 20150109082316) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -330,6 +330,7 @@ ActiveRecord::Schema.define(version: 20141224201624) do
     t.datetime "updated_at"
     t.string   "spec_desc"
     t.integer  "warning_amt"
+    t.string   "barcode"
   end
 
   create_table "roles", force: true do |t|
@@ -416,6 +417,8 @@ ActiveRecord::Schema.define(version: 20141224201624) do
     t.integer  "parent_id"
     t.string   "parent_type"
     t.integer  "pick_id"
+    t.integer  "relationship_id"
+    t.string   "sn"
   end
 
   create_table "stock_mons", force: true do |t|
@@ -441,6 +444,8 @@ ActiveRecord::Schema.define(version: 20141224201624) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date     "expiration_date"
+    t.string   "sn"
+    t.integer  "relationship_id"
   end
 
   create_table "storages", force: true do |t|
@@ -471,7 +476,7 @@ ActiveRecord::Schema.define(version: 20141224201624) do
   create_table "tasks", force: true do |t|
     t.string   "title"
     t.string   "barcode"
-    t.string   "type"
+    t.string   "task_type"
     t.string   "status"
     t.string   "code"
     t.integer  "storage_id"
@@ -480,6 +485,7 @@ ActiveRecord::Schema.define(version: 20141224201624) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "assign_type"
   end
 
   create_table "units", force: true do |t|

@@ -79,6 +79,19 @@ class PurchasesController < ApplicationController
     @stock_logs_grid = initialize_grid(@purchase.stock_logs)
   end
 
+  def assign
+    @tasker = Task.tasker_in_work(@purchase)
+    @task_finished = !@purchase.has_waiting_stock_logs()
+    @sorters = current_storage.get_sorter()
+  end
+
+  def assign_select
+    if @purchase.has_waiting_stock_logs()
+      Task.save_task(@purchase,current_storage.id,params[:assign_user])
+    end
+    render json: {}
+  end
+
   def check
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)

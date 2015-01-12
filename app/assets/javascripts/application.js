@@ -335,6 +335,30 @@ function destroy(current) {
   }
 }
 
+function assign_select()
+{
+  var userid = $("select#assign_user").val();
+  var uri = window.location.href;
+  param = uri.split('/');
+  $.ajax({
+    type: "POST",
+    url: "/"+param[3]+"/"+param[4]+"/assign_select",
+    data: "assign_user=" + userid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        // alert(data.responseText);
+        // var jsonData = eval("("+data.responseText+")");
+        alert("分配任务成功！");
+      } else {
+        alert("分配任务失败！");
+      }
+      window.close();
+    }
+  });
+  
+}
+
 function purchase_modify(current)
 {
   param = current.id.split('_');
@@ -561,6 +585,14 @@ function  ajaxstocklogs(){
 
   $("p[id^=stock_logs_mshelfid]").unbind('click').click(
     function() {
+    param = this.id.split('_');
+    id = param[3];
+    stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
+    manual_stock_detail_modify(this);
+    if (stid != null || stid != "")
+      $("select#"+this.id).val(stid);
+      
+      
     if (iswaiting(this)){
       $(this).toggle();
       $("select#"+this.id).toggle();
@@ -583,7 +615,12 @@ function  ajaxstocklogs(){
     function() {
     $(this).toggle();
     $("p#"+this.id).toggle();
-    $("p#"+this.id).text($(this).find("option:selected").text());
+    if ($(this).find("option:selected").text() == "") {
+      $("p#"+this.id).text("未选择");
+    }
+    else {
+      $("p#"+this.id).text($(this).find("option:selected").text());
+    }
     manual_stock_modify(this);
   }
   );
@@ -592,7 +629,12 @@ function  ajaxstocklogs(){
     function() {
     $(this).toggle();
     $("p#"+this.id).toggle();
-    $("p#"+this.id).text($(this).find("option:selected").text());
+    if ($(this).find("option:selected").text() == "") {
+      $("p#"+this.id).text("请先选择批量出库单明细");
+    }
+    else {
+      $("p#"+this.id).text($(this).find("option:selected").text());
+    }
     manual_stock_modify(this);
   }
   );
@@ -612,9 +654,99 @@ function  ajaxstocklogs(){
   }
   );
 
+  $("p[id^=stock_logs_ksid]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){ 
+      $(this).toggle();
+      $("select#"+this.id).toggle();
+      $("select#"+this.id).focus();
+    }
+    }
+  );
+
+  $("p[id^=stock_logs_kshelfid]").unbind('click').click(
+    function() {
+    param = this.id.split('_');
+    id = param[3];
+    kstid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kstid_"+id+"][type=hidden]").val();
+    keyclientorder_stock_detail_modify(this);
+    if (kstid != null || kstid != "")
+      $("select#"+this.id).val(kstid);
+    if (iswaiting(this)){
+      $(this).toggle();
+      $("select#"+this.id).toggle();
+      $("select#"+this.id).focus();
+    }
+    }
+  );
+
+  $("p[id^=stock_logs_kamount]").unbind('click').click(
+    function() {
+    if (iswaiting(this)){ 
+      $(this).toggle();
+      $("input#"+this.id).toggle();
+      $("input#"+this.id).focus();
+    }
+  }
+  );
+
+  $("select[id^=stock_logs_ksid]").unbind('blur').blur(
+    function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    if ($(this).find("option:selected").text() == "") {
+      $("p#"+this.id).text("未选择");
+    }
+    else {
+      $("p#"+this.id).text($(this).find("option:selected").text());
+    }
+    
+    keyclientorder_stock_modify(this);
+  }
+  );
+
+  $("select[id^=stock_logs_kshelfid]").unbind('blur').blur(
+    function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    if ($(this).find("option:selected").text() == "") {
+      $("p#"+this.id).text("请先选择电商出库单明细");
+    }
+    else {
+      $("p#"+this.id).text($(this).find("option:selected").text());
+    }
+    
+    keyclientorder_stock_modify(this);
+  }
+  );
+
+  $("input[id^=stock_logs_kamount]").unbind('blur').blur(
+    function() {
+    $(this).toggle();
+    $("p#"+this.id).toggle();
+    if ($(this).val() == ""){
+      $("p#"+this.id).text("0");
+    }
+    else {
+      $("p#"+this.id).text($(this).val());
+    }
+    
+    keyclientorder_stock_modify(this);
+  }
+  );
+
+  $("a[id$=assign]").unbind('click').click(
+    function() {
+      window.open('assign' ,'_assign','top=200,left=300,width=500,height=300,menubar=no,toolbar=no,location=no,directories=no,status=no,scrollbars=no,resizable=no');
+    });
+
+  $("a#assign_select").unbind('click').click(
+    function() {
+      assign_select();
+      // window.close();
+})
+
 }
-
-
 
 
 
@@ -772,9 +904,7 @@ function manual_stock_add() {
   }
   tr.attr("id","stock_logs_id_"+addid);
   tr.appendTo("table#stock_logs");
-  // slid=$('table.wice-grid tr:eq(2) input').first().val();
-  // var index=tr.index()+2;
-  // addTr(slid,index);
+  
   tablereplace(addid,"p","id",addid);
   tablereplace(addid,"a","id",addid);
   tablereplace(addid,"a","href",addid);
@@ -792,12 +922,13 @@ function manual_stock_add() {
   ajaxstocklogs();
 }
 
-function manual_stock_modify(current){
+
+function manual_stock_detail_modify(current){
   param = current.id.split('_');
   id = param[3];
-  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
-  shelfid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
   manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
+  stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
 
   x = param[3].substring(0,1)
   if (x == "0"){
@@ -810,17 +941,117 @@ function manual_stock_modify(current){
   if (manualstockid == null){
     manualstockid = ""
   }
-  
+
+  if (stockid == null || stockid ==""){
+    if (stid != null){
+      stockid = stid
+    }
+    else {
+      stockid = ""
+    }
+  }
 
   $.ajax({
     type: "POST",
     url: "/stock_logs/manual_stock_modify",
-    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&manual_stock_id=" + manualstockid,
+    data: "id=" + x + "&amount=" + "" + "&stock_id=" + "" + "&manual_stock_id=" + manualstockid,
     dataType: "json",
     complete: function(data) {
       if (data.success){
         jsonData = eval("("+data.responseText+")");
+        // alert(data.responseText);
+        var jdata = eval(jsonData.stocks);
+        // alert(jdata);
+        var oplength = $("select#stock_logs_mshelfid_"+id).get(0).options.length;
+        if(jdata.size!=0){
+          if (oplength > 1){
+            for (var a = 1; a < oplength; a++) {
+              $("select#stock_logs_mshelfid_"+id).remove(a); 
+            }
+          }
+ 
+          for (var i = 0; i < jdata.length; i++) {
+            var optionstring = "<option value=\"" + jdata[i].id;
+            
+            optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
+            // alert("id:"+id);
+            $("select#stock_logs_mshelfid_"+id).append(optionstring)
+          }
+        }
+      }    
+        
+    }
+  });
+}
+
+function manual_stock_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
+  stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
+  // alert("stockid"+stockid+"stid"+stid);
+  manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
+
+
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (manualstockid == null){
+    manualstockid = ""
+  }
+
+  if (stockid == null || stockid ==""){
+    if (stid != null){
+      stockid = stid
+    }
+    else {
+      stockid = ""
+    }
+  }
+  
+
+  if (amount == null){
+    amount = "0"
+  }
+  // alert("id"+id+" "+"stockid"+stockid+" "+"manualstockid"+manualstockid+" "+"amount"+amount);
+  
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/manual_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&manual_stock_id=" + manualstockid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        
+        // alert(data.responseText);
+        // var jdata = eval(jsonData.stocks);
+        // // alert(jdata);
+        // var oplength = $("#stock_logs_mshelfid_"+id).get(0).options.length;
+        // if(jdata.size!=0){
+        //   if (oplength > 1){
+        //     for (var a = 1; a < oplength; a++) {
+        //       $("select#stock_logs_mshelfid_"+id).remove(a); 
+        //     }
+        //   }
+ 
+        //   for (var i = 0; i < jdata.length; i++) {
+        //     var optionstring = "<option value=\"" + jdata[i].id;
+        //     optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
+        //     // alert("id:"+id);
+        //     $("select#stock_logs_mshelfid_"+id).append(optionstring)
+        //   }
+        // }
+        // alert(jsonData.id);
         if (jsonData.id != undefined){
+          // alert(param[3])
+          // alert(jsonData.id)
           $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
           tablereplace(jsonData.id,"p","id",jsonData.id);
           tablereplace(jsonData.id,"a","id",jsonData.id);
@@ -836,10 +1067,248 @@ function manual_stock_modify(current){
           if (amount != jsonData.amount){
             alert("该明细最大可出库数量：" + jsonData.amount);
           }
+
+          
+        }
+      } 
+    }
+  });
+}
+
+
+
+function keyclientorder_stock_add() {
+  var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
+  var addid = "00";
+  if ($("tr[id^=stock_logs_id_0]").last().attr("id") != undefined ) {
+    param = $("tr[id^=stock_logs_id_0]").last().attr("id").split('_');
+    addid = "0"+ (parseInt(param[3])+1);
+  }
+  tr.attr("id","stock_logs_id_"+addid);
+  tr.appendTo("table#stock_logs");
+  
+  tablereplace(addid,"p","id",addid);
+  tablereplace(addid,"a","id",addid);
+  tablereplace(addid,"a","href",addid);
+  tablereplace(addid,"input","id",addid);
+  tablereplace(addid,"select","id",addid);
+  tablereplace(addid,"td","id",addid);
+
+  tableset(addid,"id",addid)
+  tableset(addid,"kamount","0")
+  tableset(addid,"actamount","0")
+  tableset(addid,"kshelfid","")
+  tableset(addid,"ksid","")
+  tableset(addid,"status","处理中")
+
+  ajaxstocklogs();
+}
+/*
+function keyclientorder_stock_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_kamount_"+id).val();
+  shelfid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_kshelfid_"+id).val();
+  ksid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_ksid_"+id).val();
+  kcoid = $("tr#stock_logs_id_"+id+">td>text#stock_logs_kcoid_"+id).text();
+
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (ksid == null){
+    ksid = ""
+  }
+  
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/keyclientorder_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        if (jsonData.id != undefined){
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
+          tablereplace(jsonData.id,"p","id",jsonData.id);
+          tablereplace(jsonData.id,"a","id",jsonData.id);
+          tablereplace(jsonData.id,"a","href",jsonData.id);
+          tablereplace(jsonData.id,"input","id",jsonData.id);
+          tablereplace(jsonData.id,"select","id",jsonData.id);
+          tablereplace(jsonData.id,"td","id",jsonData.id);
+
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"kamount",""+jsonData.amount)
+          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
+
+          if (amount != jsonData.amount){
+            alert("最大可出库数量：" + jsonData.amount);
+          }
         } 
       }    
         
     }
   });
 }
+*/
+function keyclientorder_stock_detail_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_kamount_"+id).val();
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_kshelfid_"+id).val();
+  ksid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_ksid_"+id).val();
+  kcoid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kcoid_"+id+"][type=hidden]").val();
+  kstid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kstid_"+id+"][type=hidden]").val();
 
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (ksid == null){
+    ksid = ""
+  }
+
+  if (amount == null){
+    amount = "0"
+  }
+
+  if (stockid == null || stockid == ""){
+    if (kstid != null){
+      stockid = kstid
+    }
+    else {
+      stockid = ""
+    }
+  }
+
+  if (kcoid == null){
+    kcoid = ""
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/keyclientorder_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        alert(data.responseText);
+        var jdata = eval(jsonData.stocks);
+        var oplength = $("select#stock_logs_kshelfid_"+id).get(0).options.length;
+        
+        if(jdata.size!=0){
+          if (oplength > 1){
+            for (var a = 1; a < oplength; a++) {
+              $("select#stock_logs_kshelfid_"+id).remove(a); 
+            }
+          }
+ 
+          for (var i = 0; i < jdata.length; i++) {
+            var optionstring = "<option value=\"" + jdata[i].id;
+            optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
+            $("select#stock_logs_kshelfid_"+id).append(optionstring)
+          }
+        }
+      }    
+        
+    }
+  });
+}
+
+function keyclientorder_stock_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_kamount_"+id).val();
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_kshelfid_"+id).val();
+  ksid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_ksid_"+id).val();
+  kcoid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kcoid_"+id+"][type=hidden]").val();
+  kstid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kstid_"+id+"][type=hidden]").val();
+
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (ksid == null){
+    ksid = ""
+  }
+
+  if (amount == null){
+    amount = "0"
+  }
+
+  if (stockid == null || stockid == ""){
+    if (kstid != null){
+      stockid = kstid
+    }
+    else {
+      stockid = ""
+    }
+  }
+
+  if (kcoid == null){
+    kcoid = ""
+  }
+  // alert(x+" "+stockid+" "+ksid+" "+kcoid);
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/keyclientorder_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        // var jdata = eval(jsonData.stocks);
+        // alert(data.responseText);
+        // var oplength = $("#stock_logs_kshelfid_"+id).get(0).options.length;
+        // if(jdata.size!=0){
+        //   if (oplength > 1){
+        //     for (var a = 1; a < oplength; a++) {
+        //       $("select#stock_logs_kshelfid_"+id).remove(a); 
+        //     }
+        //   }
+ 
+        //   for (var i = 0; i < jdata.length; i++) {
+        //     var optionstring = "<option value=\"" + jdata[i].id;
+        //     optionstring = optionstring + "\" >" + jdata[i].name + "</option>";
+        //     // alert("id:"+id);
+        //     $("select#stock_logs_kshelfid_"+id).append(optionstring)
+        //   }
+        // }
+
+        if (jsonData.id != undefined){
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
+          tablereplace(jsonData.id,"p","id",jsonData.id);
+          tablereplace(jsonData.id,"a","id",jsonData.id);
+          tablereplace(jsonData.id,"a","href",jsonData.id);
+          tablereplace(jsonData.id,"input","id",jsonData.id);
+          tablereplace(jsonData.id,"select","id",jsonData.id);
+          tablereplace(jsonData.id,"td","id",jsonData.id);
+
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"kamount",""+jsonData.amount)
+          tableset(jsonData.id,"actamount",""+jsonData.total_amount)
+
+          if (amount != jsonData.amount){
+            alert("该明细最大可出库数量：" + jsonData.amount);
+          }
+
+          
+        }
+      } 
+    }
+  });
+}

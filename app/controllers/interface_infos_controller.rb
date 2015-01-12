@@ -5,7 +5,7 @@ class InterfaceInfosController < ApplicationController
   # GET /interface_infos
   # GET /interface_infos.json
   def index
-    @interface_infos = InterfaceInfo.all
+    @interface_infos = InterfaceInfo.where("class_name is not null")
     @interface_infos_grid = initialize_grid(@interface_infos,
       :order => 'interface_infos.first_time',
       :order_direction => 'desc')
@@ -67,7 +67,7 @@ class InterfaceInfosController < ApplicationController
 
   def resend
     respond_to do |format|
-      if InterfaceInfo.resend(params[:id]).eql? "0"
+      if InterfaceInfo.resend(params[:id], current_user.name).eql? "0"
         
         format.html { redirect_to action: 'index' }
         format.json { head :no_content }

@@ -2,6 +2,7 @@ class Relationship < ActiveRecord::Base
   belongs_to :business
   belongs_to :supplier
   belongs_to :specification
+  has_one :unit, through: :specification
   has_and_belongs_to_many :contacts
   validates_presence_of :business_id, :specification_id, :message => '不能为空'
 

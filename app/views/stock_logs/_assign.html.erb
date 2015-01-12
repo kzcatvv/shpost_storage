@@ -1,0 +1,25 @@
+<%- model_class = StockLog -%>
+<!-- <%= form_tag(assign_select_purchase_url(), :method => "get") do %> -->
+<div>
+<table class="table table-striped">
+  <tbody>
+    <% if !@task_finished %>
+      <% if !@tasker.blank? %>
+        <tr><p>【<%= @tasker.name %>】正在处理该任务，请谨慎分配！</p></tr>
+      <% end %>
+      <tr>
+        <td><p>操作人:</p></td>
+        <td><%= select_tag("assign_user", options_for_select(@sorters.map{|u| ["#{u.name}",u.id]},@tasker.blank? ? "" : @tasker.id), id: "assign_user") %></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><a href="javascript:void(0);", id='assign_select', class='btn btn-primary' >选择</a></td>
+      </tr>
+    <% else %>
+      <tr><p>该任务已完成,不能分配!</p></tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+<!-- <% end %> -->
+

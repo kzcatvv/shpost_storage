@@ -464,7 +464,9 @@ class OrdersController < ApplicationController
 
     end
     
-    @selectorders=Order.where("order_type = ? and status in (?) and is_split != ?","b2c",status,true)
+    @selectorders=Order.where('order_type = ? and status in (?) and is_split != ?',"b2c",status, true)
+    # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
+
     if !params[:grid].nil?
       if !params[:grid][:f].nil?
         if !params[:grid][:f]["businesses.name".to_sym].nil?
@@ -631,7 +633,7 @@ class OrdersController < ApplicationController
                 #判断是否已存在该订单
                 if ori_order.blank?
                   #不存在创建
-                  order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_name: instance.cell(line,'F'), customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'H').to_s.split('.0')[0], province: instance.cell(line,'I'), city: instance.cell(line,'J'), county: instance.cell(line,'K'), customer_tel: instance.cell(line,'L').to_s.split('.0')[0],customer_phone: instance.cell(line,'M').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_user.unit.default_storage.id, status: 'waiting', keyclientorder: keyclientorder
+                  order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_name: instance.cell(line,'F'), customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'H').to_s.split('.0')[0], province: instance.cell(line,'I'), city: instance.cell(line,'J'), county: instance.cell(line,'K'), customer_tel: instance.cell(line,'L').to_s.split('.0')[0],customer_phone: instance.cell(line,'M').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_storage.id, status: 'waiting', keyclientorder: keyclientorder
                 else
                   #待处理状态才能更新
                   order_status = ori_order.status
@@ -669,7 +671,7 @@ class OrdersController < ApplicationController
               end
 
               #数量
-              amount = instance.cell(dline,'D').to_s
+              amount = instance.cell(dline,'D').to_s.split('.0')[0]
               if amount.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少数量，导入失败"
               end
@@ -731,7 +733,7 @@ class OrdersController < ApplicationController
                   else 
                     OrderDetail.create! name: specification.name,batch_no: nil, specification: specification, amount: amount.to_i, supplier: supplier, order: dorder
 
-                    dorder_total_amount = dorder_total_amount + instance.cell(dline,'D').to_i
+                    dorder_total_amount = dorder_total_amount + amount.to_i
                     Order.update(dorder_id,total_amount: dorder_total_amount)
                   end
                 #原来有，更新原记录
@@ -750,7 +752,7 @@ class OrdersController < ApplicationController
                   elsif amount.to_i > 0
                     OrderDetail.update(order_detail_id,amount: amount.to_i)
 
-                    dorder_total_amount = dorder_total_amount - ori_detail_amount + instance.cell(dline,'D').to_i
+                    dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
                     Order.update(dorder_id,total_amount: dorder_total_amount)
                   #数量小于0，报错
                   else
@@ -1053,7 +1055,6 @@ class OrdersController < ApplicationController
               end
 
               order = Order.accessible_by(current_ability).find_by  batch_no: batch_no
-
               if order.blank?
                 raise "导入文件第" + line.to_s + "行数据, 订单不存在，导入失败"
               elsif !order.can_import()
@@ -1108,7 +1109,7 @@ class OrdersController < ApplicationController
 
             dline = line+2
             dline.upto(instance.last_row) do |dline|
-              batch_no = instance.cell(line,'E').to_s.split('.0')[0]
+              batch_no = instance.cell(dline,'E').to_s.split('.0')[0]
               if batch_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
               end
@@ -1128,7 +1129,7 @@ class OrdersController < ApplicationController
                 raise "导入文件第" + dline.to_s + "行数据, 缺少sku，导入失败"
               end
 
-              amount = instance.cell(dline,'D').to_s
+              amount = instance.cell(dline,'D').to_s.split('.0')[0]
               if amount.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少数量，导入失败"
               end
@@ -1177,7 +1178,7 @@ class OrdersController < ApplicationController
                 elsif amount.to_i > 0
                   OrderDetail.update(order_detail_id,amount: amount.to_i)
 
-                  dorder_total_amount = dorder_total_amount - ori_detail_amount + instance.cell(dline,'D').to_i
+                  dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
                   Order.update(dorder_id,total_amount: dorder_total_amount)
                 else
                   raise "导入文件第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
@@ -1198,7 +1199,10 @@ class OrdersController < ApplicationController
 
   def exportorders()
     x = params[:ids].split(",")
-    @orders = Order.where(id: x, status: "waiting")
+    @orders = []
+    until x.blank? do
+      @orders += Order.where(id: x.pop(1000), status: "waiting")
+    end
 
     if @orders.nil?
       flash[:alert] = "无订单"
