@@ -268,7 +268,7 @@ ShpostStorage::Application.routes.draw do
   end
 
   resources :specification_autocom do
-     collection do
+      collection do
         get 'autocomplete_specification_name'
         get 'pd_autocomplete_specification_name'
         get 'br_autocomplete_specification_name'
@@ -318,6 +318,14 @@ ShpostStorage::Application.routes.draw do
 
   match "/contact/add" => "contacts#add",via: [:get, :post]
   match "/contact/confirmadd" => "contacts#confirmadd",via: [:get, :post]
+
+  match "/shpost_storage/mobile_interface/login" => "mobile_interface#login", via: [:get, :post]
+  match "/shpost_storage/mobile_interface/logout" => "mobile_interface#logout", via: [:get, :post]
+  match "/shpost_storage/mobile_interface/mission" => "mobile_interface#mission", via: [:get, :post]
+  match "/shpost_storage/mobile_interface/mission_details" => "mobile_interface#mission_details", via: [:get, :post]
+  match "/shpost_storage/mobile_interface/mission_upload" => "mobile_interface#mission_upload", via: [:get, :post]
+  match "/shpost_storage/mobile_interface/query" => "mobile_interface#query", via: [:get, :post]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

@@ -81,11 +81,14 @@ class PurchasesController < ApplicationController
 
   def assign
     @tasker = Task.tasker_in_work(@purchase)
+    @task_finished = !@purchase.has_waiting_stock_logs()
     @sorters = current_storage.get_sorter()
   end
 
   def assign_select
-    Task.save_task(@purchase,current_storage.id,params[:assign_user])
+    if @purchase.has_waiting_stock_logs()
+      Task.save_task(@purchase,current_storage.id,params[:assign_user])
+    end
     render json: {}
   end
 

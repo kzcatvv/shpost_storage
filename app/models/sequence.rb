@@ -1,7 +1,7 @@
 class Sequence < ActiveRecord::Base
   belongs_to :unit
 
-  Barcodes = {Shelf: 'SH', Specification: 'SP', Purchase: 'PUR', ManualStock: 'MS', Business: 'BUS', Supplier: 'SUP', OrderReturn: 'OR', Keyclientorder: 'KCO', Order: 'ORD', Task: 'TSK'}
+  Barcodes = {Shelf: 'SH', Specification: 'SP', Purchase: 'PUR', ManualStock: 'MS', Business: 'BUS', Supplier: 'SUP', OrderReturn: 'OR', Keyclientorder: 'KCO', Order: 'ORD', Task: 'TAS', Relationship: 'REL'}
 
   Batchs = {PurchaseArrival: 'PA', PurchaseDetail: 'PD', Keyclientorder: 'KCO', Order: 'ORD', OrderReturn: 'OR'}
 
@@ -71,6 +71,5 @@ class Sequence < ActiveRecord::Base
         obj.barcode = Sequence.generate_sequecne(obj.unit, _class)
       end
     end
-    # puts '12345'
   end
 end

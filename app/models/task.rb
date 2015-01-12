@@ -7,7 +7,12 @@ class Task < ActiveRecord::Base
   validates_uniqueness_of :barcode, :code
 
   STATUS = {doing: 'doing', done: 'done'}
+
   ASSIGN_TYPE = {assigned: 'assigned', joined: 'joined'}
+
+  def done?
+    (status.eql? Task::STATUS[:done]) ? true : false
+  end
 
   def self.save_task(parent,storage_id,user_id=nil)
     task = Task.where(parent: parent, status: STATUS[:doing], assign_type: ASSIGN_TYPE[:assigned]).first

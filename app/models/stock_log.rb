@@ -17,6 +17,7 @@ class StockLog < ActiveRecord::Base
   has_many :orders, through: :order_details
   # has_many :keyclientorders, through: :orders
   belongs_to :parent, polymorphic: true
+  belongs_to :relationship
 
   belongs_to :pick, :class_name => 'StockLog'
   has_one :pick_in, :class_name => 'StockLog',:foreign_key => 'pick_id'#,:dependent => :destroy
@@ -27,7 +28,7 @@ class StockLog < ActiveRecord::Base
   before_save :set_desc
   before_save :set_stock_info
   
-
+  # OPERATION_HASH = {[Purchase, 'in'] => OPERATION[:purchase_stock_in], [ManualStock, 'out'] => OPERATION[:b2b_stock_out], [Keyclientorder, 'out'] => OPERATION[:b2c_stock_out], [OrderReturn, 'in'] => OPERATION[:order_return]}
   OPERATION = {create_stock: 'create_stock', destroy_stock: 'destroy_stock', update_stock: 'update_stock', purchase_stock_in: 'purchase_stock_in', b2c_stock_out: 'b2c_stock_out', b2b_stock_out: 'b2b_stock_out', order_return: 'order_return',order_bad_return: 'order_bad_return',move_to_bad: 'move_to_bad',bad_stock_in: 'bad_stock_in',move_stock_out: 'move_stock_out',move_stock_in: 'move_stock_in'}
   OPERATION_SHOW = {create_stock: '新建库存', destroy_stock: '删除库存', update_stock: '更新库存', purchase_stock_in: '采购入库', b2c_stock_out: '订单出库', b2b_stock_out: '批量出库', order_return: '退货',order_bad_return: '残次品退货',move_to_bad: '残次品移入',bad_stock_in: '残次品入库',move_stock_out: '货品移出',move_stock_in: '货品移入'}
   STATUS = {waiting: 'waiting', checked: 'checked'}
@@ -188,6 +189,8 @@ class StockLog < ActiveRecord::Base
       self.specification_id = stock.specification_id
       self.expiration_date = stock.expiration_date if !stock.expiration_date.blank?
       self.batch_no = stock.batch_no
+      self.relationship = stock.relationship
+      self.sn = stock.sn
     end
   end
 

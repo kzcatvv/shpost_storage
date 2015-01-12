@@ -8,7 +8,9 @@ class Stock < ActiveRecord::Base
   has_one :storage, through: :shelf
   has_one :unit, through: :shelf
   has_many :stock_logs
+  belongs_to :relationship
 
+  before_save :set_relationship
   after_touch :clean_orphan_stocks
   after_update :clean_orphan_stocks
 
@@ -56,7 +58,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.broken_stock_change(stock, broken_shelf, amount, operation_user = nil)
-    broken_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, nil, broken_shelf, true)
+    broken_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, nil, broken_shelf)
 
     amount = stock.stock_out_amount(amount)
     stock.check_out_amount(amount)
@@ -172,8 +174,8 @@ class Stock < ActiveRecord::Base
     Stock.create(specification: specification, business: business, supplier: supplier, shelf: shelf, batch_no: batch_no, actual_amount: 0)
   end
 
-  def self.get_available_stock_in_shelf(specification, supplier, business, batch_no, shelf, is_broken = false)
-    stocks_in_storage_with_batch_no = find_stocks_in_shelf(specification, supplier, business, shelf, is_broken).with_batch_no(batch_no)
+  def self.get_available_stock_in_shelf(specification, supplier, business, batch_no, shelf)
+    stocks_in_storage_with_batch_no = find_stocks_in_shelf(specification, supplier, business, shelf).with_batch_no(batch_no)
 
     stocks_in_storage_with_batch_no.each do |stock|
       return stock if stock.shelf.is_available?
@@ -194,8 +196,8 @@ class Stock < ActiveRecord::Base
     in_storage(storage).find_stocks(specification, supplier, business, is_broken).expiration_date_first.available.prior
   end
 
-  def self.find_stocks_in_shelf(specification, supplier, business, shelf, is_broken = false)
-    in_shelf(shelf).find_stocks(specification, supplier, business, is_broken).expiration_date_first.available.prior
+  def self.find_stocks_in_shelf(specification, supplier, business, shelf)
+    in_shelf(shelf).find_stocks(specification, supplier, business).expiration_date_first.available.prior
   end
 
   def self.total_stock_in_unit(specification, supplier, business, unit)
@@ -288,7 +290,7 @@ class Stock < ActiveRecord::Base
     sum(:virtual_amount)
   end
 
-  def self.find_stocks(specification, supplier, business, is_broken)
+  def self.find_stocks(specification, supplier, business, is_broken = nil)
     conditions = where('actual_amount > 0')
 
     if ! specification.blank?
@@ -340,5 +342,9 @@ class Stock < ActiveRecord::Base
     if self.actual_amount.zero? && self.stock_logs.waiting.blank?
       self.destroy
     end
+  end
+
+  def set_relationship
+    relationship = Relationship.find_by(specification_id: specification, business_id: business, supplier_id: supplier)
   end
 end

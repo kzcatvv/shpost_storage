@@ -11,8 +11,6 @@ class Purchase < ActiveRecord::Base
 
 	# validates_presence_of :no, :name, message: '不能为空'
 
-
-
   STATUS = { opened: 'opened', closed: 'closed'}
 
   def status_name
