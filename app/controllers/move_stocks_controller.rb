@@ -57,11 +57,28 @@ class MoveStocksController < ApplicationController
     @movestock = @move_stock
     @movestockid = @move_stock.id
 
+    if @move_stock.has_waiting_stock_logs()
+      Task.save_task(@move_stock,@move_stock.storage.id,nil)
+    end
+    
     qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
     @qr=qrcode.to_img
     direct = "#{Rails.root}/app/assets/images/"
     fnm = direct + "really_cool_qr_image.png"
     @qr=@qr.resize(200, 200).save(fnm)
+  end
+
+  def assign
+    @tasker = Task.tasker_in_work(@move_stock)
+    @task_finished = !@move_stock.has_waiting_stock_logs()
+    @sorters = current_storage.get_sorter()
+  end
+
+  def assign_select
+    if @move_stock.has_waiting_stock_logs()
+      Task.save_task(@move_stock,current_storage.id,params[:assign_user])
+    end
+    render json: {}
   end
 
   def check

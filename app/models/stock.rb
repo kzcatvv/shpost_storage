@@ -134,19 +134,19 @@ class Stock < ActiveRecord::Base
         if stocks_in_shelf_type.count > 0
           in_stock = stocks_in_shelf_type.first
         else
-          shelves = Shelf.get_empty_pick_shelf(current_storage)
+          shelves = Shelf.get_empty_pick_shelf(order.storage)
           if shelves.count > 0
             shelf = shelves.first
-            in_stock = Stock.create(specification: x[0], business: x[2], supplier: x[1], shelf: shelf, actual_amount: 0)
+            in_stock = Stock.create(specification_id: x[0], business_id: x[2], supplier_id: x[1], shelf: shelf, actual_amount: 0)
           else
-            pick_shelves = Shelf.get_pick_shelf(current_storage).to_ary
+            pick_shelves = Shelf.get_pick_shelf(order.storage).to_ary
             shelf = Shelf.where(id: pick_shelves[i]).first
             if i == pick_shelves.size - 1
                i = 0
             else
                i += 1
             end
-            in_stock = Stock.create(specification: x[0], business: x[2], supplier: x[1], shelf: shelf, actual_amount: 0)
+            in_stock = Stock.create(specification_id: x[0], business_id: x[2], supplier_id: x[1], shelf: shelf, actual_amount: 0)
           end
 
         end

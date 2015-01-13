@@ -22,7 +22,7 @@
         <td>
         <% msid =  stock_log.parent.manual_stock_details.where(supplier: stock_log.supplier, specification: stock_log.specification).first.id %>
         <% msname =  stock_log.parent.manual_stock_details.where(supplier: stock_log.supplier, specification: stock_log.specification).first.name %>
-          <%= select_tag("stock_logs[][msid]", options_for_select(stock_log.parent.manual_stock_details.map{|u| ["#{u.name}_#{u.specification.name}",u.id]}, msid), id: "stock_logs_msid_#{stock_log.id}", style: "display: none;") <<
+          <%= select_tag("stock_logs[][msid]", options_for_select(stock_log.parent.manual_stock_details.where(status: "waiting").map{|u| ["#{u.name}_#{u.specification.name}",u.id]}, msid), id: "stock_logs_msid_#{stock_log.id}", style: "display: none;") <<
           content_tag(:p, "#{msname}_#{stock_log.specification.name}", {id: "stock_logs_msid_#{stock_log.id}"}) %>
         </td>
         <td>

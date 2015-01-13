@@ -9,6 +9,9 @@
         <th>货架</th>
         <th>库存数量</th>
         <th>出库数量</th>
+        <% if @keyclientorder.storage.need_pick %>
+        <th>拣货区货架</th>
+        <% end %>
         <th>状态</th>
         <th>创建时间</th>
         <th>确认时间</th>
@@ -23,7 +26,7 @@
         <%= hidden_field_tag("stock_logs[][stock_log.parent.id]", stock_log.parent.id, id: "stock_logs_kcoid_#{stock_log.id}") %></td>
         <td>
         <% ksid = stock_log.specification_id.to_s + "_" + stock_log.business_id.to_s + "_" + stock_log.supplier_id.to_s %>
-        <% somaps = OrderDetail.find_by_sql ["select d.specification_id,o.business_id,d.supplier_id,sum(d.amount) from order_details d,orders o,keyclientorders k,stock_logs s where d.order_id=o.id and s.parent_id=k.id and k.id=o.keyclientorder_id and s.id=? group by d.specification_id,o.business_id,d.supplier_id", stock_log.id] %>
+        <% somaps = OrderDetail.find_by_sql ["select d.specification_id,o.business_id,d.supplier_id,sum(d.amount) from order_details d,orders o,keyclientorders k,stock_logs s where d.order_id=o.id and s.parent_id=k.id and k.id=o.keyclientorder_id and o.status!=? and s.id=? group by d.specification_id,o.business_id,d.supplier_id","checked", stock_log.id] %>
         <%= select_tag("stock_logs[][ksid]", options_for_select(somaps.map{|u| ["#{u.specification.name}_#{u.supplier_id}",u.specification_id.to_s + "_" + u.business_id.to_s + "_" + u.supplier_id.to_s]}, ksid), id: "stock_logs_ksid_#{stock_log.id}", style: "display: none;") <<
           content_tag(:p, "#{stock_log.specification.name}", {id: "stock_logs_ksid_#{stock_log.id}"}) %>
         </td>
@@ -43,6 +46,13 @@
             content_tag(:p, stock_log.amount, {id: "stock_logs_kamount_#{stock_log.id}"})
           end %>
         </td>
+        <% if @keyclientorder.storage.need_pick %>
+        <td>
+          <%= text_field_tag( "stock_logs[][pick_shelf]", stock_log.pick_in.shelf.shelf_code, id: "stock_logs_pickshelf_#{stock_log.id}",'data-autocomplete' => "/shelves/autocomplete_pick_shelf_code" ) %>
+          <%= hidden_field_tag("stock_logs[][pick_shelf]", stock_log.pick_in.shelf.id, id: "stock_logs_pickshelf_#{stock_log.id}") %>
+        </td>
+
+        <% end %>
         <td id="stock_logs_status_<%=stock_log.id%>"><%=  StockLog::STATUS_SHOW[stock_log.status.to_sym] %></td>
         <td>
           <%= stock_log.created_at.to_s(:db) %>
@@ -73,7 +83,11 @@
     <% if @manual_stock%>
       <% stocklogs = @manual_stock.stock_logs%>
     <% else %>
-      <% stocklogs = @keyclientorder.stock_logs%>
+      <% if @keyclientorder.storage.need_pick %>
+        <% stocklogs = @keyclientorder.stock_logs.where(" operation_type='out' ")%>
+      <% else %>
+        <% stocklogs = @keyclientorder.stock_logs%>
+      <% end %>
     <% end %>
 <table class="table table-striped">
   <thead>

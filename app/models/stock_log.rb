@@ -173,8 +173,16 @@ class StockLog < ActiveRecord::Base
       left_amount = self.parent.order_details.includes(:order).where(supplier: self.supplier, specification: self.specification, orders: {business_id: self.business_id}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
       
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
-    end
+    elsif operation.eql? OPERATION[:order_return] or operation.eql? OPERATION[:order_bad_return]
+      order_details = self.parent.order_return_details.joins(:order_detail).select(:order_detail_id)
 
+      max_amount = OrderDetail.where(id: order_details).sum(:amount)
+
+      if total_amount > max_amount
+        total_amount = max_amount
+      end
+    end
+    # binding.pry
     total_amount = max_amount if total_amount > max_amount
 
     self.update(amount: total_amount)

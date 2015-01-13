@@ -12,6 +12,8 @@ ShpostStorage::Application.routes.draw do
     end
     member do
       get 'movedetail'
+      get 'assign'
+      post 'assign_select'
     end
   end
 
@@ -216,6 +218,8 @@ ShpostStorage::Application.routes.draw do
       post 'move_stock_remove'
       post 'manual_stock_modify'
       post 'keyclientorder_stock_modify'
+      post 'order_return_modify'
+      post 'mod_stocklog_pickin_shelf'
     end
   end
 

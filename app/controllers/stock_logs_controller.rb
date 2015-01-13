@@ -3,7 +3,7 @@ class StockLogsController < ApplicationController
   load_and_authorize_resource
   skip_load_and_authorize_resource only: [:purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove]
 
-  before_filter :load_params, only: [:modify, :purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove, :addtr]
+  before_filter :load_params, only: [:modify, :purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove, :addtr, :order_return_modify]
 
   # GET /stock_logs
   # GET /stock_logs.json
@@ -105,18 +105,48 @@ class StockLogsController < ApplicationController
       if @stock_log.try :waiting?
         @stock_log.update(parent: @keyclientorder, stock: @stock, operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
       else
-        @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+        if @keyclientorder.storage.need_pick
+          stocks_in_shelf_type = Stock.find_stocks_in_shelf_type(@specification, @supplier, @business, "pick", false)
+            if stocks_in_shelf_type.count > 0
+              in_stock = stocks_in_shelf_type.first
+              in_shelf_code = in_stock.shelf.shelf_code
+            else
+              shelves = Shelf.get_empty_pick_shelf(current_storage)
+                if shelves.count > 0
+                  shelf = shelves.first
+                  in_stock = Stock.create(specification: @specification, business: @business, supplier: @supplier, shelf: shelf, actual_amount: 0)
+                  in_shelf_code = in_stock.shelf.shelf_code
+                else
+                  pick_shelves = Shelf.get_pick_shelf(current_storage).to_ary
+                  shelf = Shelf.where(id: pick_shelves[0]).first
+                  in_stock = Stock.create(specification: @specification, business: @business, supplier: @supplier, shelf: shelf, actual_amount: 0)
+                  in_shelf_code = in_stock.shelf.shelf_code
+                end
+
+            end
+          @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+          @pick_in_stklog = StockLog.create(parent: @keyclientorder, stock: in_stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:in])
+          @stock_log.pick_in = @pick_in_stklog
+          @stock_log.save
+          @pick_in_stklog.update_amount(@amount)
+        else
+          @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+        end
+        
       end
 
       @stock_log.update_amount(@amount)
 
-      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json, }
+      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json, pick_shelf: in_shelf_code }
     end
   end
 
   def remove
     if !@stock_log.blank?
       @stock_log.delete
+    end
+    if !@stock_log.pick_in.blank?
+      @stock_log.pick_in.delete
     end
     render text: 'remove'
   end
@@ -127,7 +157,7 @@ class StockLogsController < ApplicationController
       # binding.pry
       @orgstock = Stock.find(params[:stock_id])
       @shelf = Shelf.find(params[:shelf_id])
-      stock = Stock.get_available_stock_in_shelf(@orgstock.specification, @orgstock.supplier, @orgstock.business, @orgstock.batch_no, @shelf, false)
+      stock = Stock.get_available_stock_in_shelf(@orgstock.specification, @orgstock.supplier, @orgstock.business, @orgstock.batch_no, @shelf)
 
       if params[:stocklogid].blank?
         @move_stock = MoveStock.find(params[:move_stock_id])
@@ -155,6 +185,16 @@ class StockLogsController < ApplicationController
    
   end
 
+  def mod_stocklog_pickin_shelf
+    if !params[:id].blank?
+      @stock_log = StockLog.find(params[:id])
+      @shelf = Shelf.find(params[:shelfid])
+      @stock_log.pick_in.stock.update(shelf: @shelf)
+      @stock_log.pick_in.update(shelf: @shelf)
+    end
+    render json: {}
+  end
+
   def move_stock_remove
     if !params[:stock_log_id].blank?
       @stock_log=StockLog.find(params[:stock_log_id])
@@ -162,6 +202,36 @@ class StockLogsController < ApplicationController
       @stock_log.delete
     end
     render text: 'remove'
+  end
+
+  def order_return_modify
+    if @shelf.blank? || @return.blank?
+      return render json: {}
+    end
+
+    is_bad = @return.is_bad
+
+    stock = Stock.get_available_stock_in_shelf(@return.order_detail.specification, @return.order_detail.supplier, @return.order_detail.order.business, @return.order_return.batch_no, @shelf)
+
+    if @stock_log.try :waiting?
+      if is_bad.eql?"no"
+        @stock_log.update(parent: @return.order_return, stock: stock, operation: StockLog::OPERATION[:order_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: stock.expiration_date)
+      else
+        @stock_log.update(parent: @return.order_return, stock: stock, operation: StockLog::OPERATION[:order_bad_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: stock.expiration_date)
+      end
+    else
+      if is_bad.eql?"no"
+        @stock_log = StockLog.create(parent: @return.order_return, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:order_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: @arrival.expiration_date)   
+      else
+        @stock_log = StockLog.create(parent: @return.order_return, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:order_bad_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: @arrival.expiration_date) 
+      end 
+    end
+
+    @stock_log.update_amount(@amount)
+
+    total_amount = Stock.total_stock_in_shelf(@stock_log.specification, @stock_log.supplier, @stock_log.business, @stock_log.shelf)
+    # binding.pry
+    render json: {id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount}
   end
 
 
@@ -181,5 +251,7 @@ class StockLogsController < ApplicationController
       @business = Business.find ary[1]
       @supplier = Supplier.find ary[2] if !ary[2].blank?
     end
+
+    @return = OrderReturnDetail.find(params[:order_return_detail_id]) if !params[:order_return_detail_id].blank?
   end
 end
