@@ -80,6 +80,19 @@ class ManualStocksController < ApplicationController
     # end
   end
 
+  def assign
+    @tasker = Task.tasker_in_work(@manual_stock)
+    @task_finished = !@manual_stock.has_waiting_stock_logs()
+    @sorters = current_storage.get_sorter()
+  end
+
+  def assign_select
+    if @manual_stock.has_waiting_stock_logs()
+      Task.save_task(@manual_stock,current_storage.id,params[:assign_user])
+    end
+    render json: {}
+  end
+
   def check
     @stock_logs = @manual_stock.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)

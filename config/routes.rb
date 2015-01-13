@@ -38,6 +38,8 @@ ShpostStorage::Application.routes.draw do
     member do
       patch 'onecheck'
       get 'stock_out'
+      get 'assign'
+      post 'assign_select'
       patch 'check'
       patch 'close'
       get 'scan'
