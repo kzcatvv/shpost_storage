@@ -73,7 +73,7 @@ ShpostStorage::Application.routes.draw do
   resources :orders do
      collection do
         get 'findprint'
-        get 'stockout'
+        # get 'stockout'
         # get 'ordercheck'
         get 'nextbatch'
         get 'packout'
@@ -121,6 +121,9 @@ ShpostStorage::Application.routes.draw do
     resources :keyclientorderdetails
     member do
       post 'pdjs'
+      get 'stockout'
+      get 'assign'
+      post 'assign_select'
     end
   end
 

@@ -208,6 +208,49 @@ class KeyclientordersController < ApplicationController
     end
   end
 
+  def stockout
+    begin
+    Order.transaction do
+      # @keyclientorder = Keyclientorder.find(params[:format])
+
+      pickareacnt = Area.where("storage_id = ? and area_type = 'pick' ",current_storage.id).count
+      if pickareacnt > 0
+        Stock.pick_stock_out(@keyclientorder, current_user)
+
+        @stock_logs = @keyclientorder.stock_logs.where(" operation_type = 'out' ")
+      else
+
+        Stock.order_stock_out(@keyclientorder, current_user)
+
+        @keyclientorder.orders.each do |order|
+          order.set_picking
+        end
+      
+        @stock_logs = @keyclientorder.stock_logs
+      end
+        @stock_logs_grid = initialize_grid(@stock_logs)
+    end
+    rescue Exception => e
+      Rails.logger.error e.backtrace
+      flash[:alert] = e.message
+      redirect_to '/orders/findprintindex'
+      # raise ActiveRecord::Rollback
+    end
+  end
+
+  def assign
+    @tasker = Task.tasker_in_work(@keyclientorder)
+    @task_finished = !@keyclientorder.has_waiting_stock_logs()
+    @sorters = current_storage.get_sorter()
+  end
+
+  def assign_select
+    if @keyclientorder.has_waiting_stock_logs()
+      Task.save_task(@keyclientorder,current_storage.id,params[:assign_user])
+    end
+    render json: {}
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     #def set_keyclientorder

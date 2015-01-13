@@ -21,7 +21,7 @@
     <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
      <% if can? :stockout, Order %>
       <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
-                  stockout_orders_url(@orders_grid.current_page_records.first.try(:keyclientorder_id)),
+                  "/keyclientorders/" + @orders_grid.current_page_records.first.try(:keyclientorder_id).to_s + "/stockout" ,
                   :class => 'btn btn-primary' %>
       <% end %>
   </div>
