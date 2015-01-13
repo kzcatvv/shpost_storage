@@ -18,7 +18,7 @@ class MobileInterfaceController < ApplicationController
     return error_builder('0009') if ! @user.sorter?(@storage)
 
     @mobile.update(version: @version, user: @user, last_sign_in_time: Time.now)
-    success_builder({id: @user.id, time: Time.now.strftime('%Y%m%d %H:%M:%S'), version: I18n.t("mobile_interface.version"), url: I18n.t("mobile_interface.url"), update: I18n.t("mobile_interface.update"), shelfcode: Sequence.generate_begin(@storage.unit, Shelf)})
+    success_builder({id: @user.id, time: Time.now.strftime('%Y%m%d %H:%M:%S'), version: I18n.t("mobile_interface.version"), url: I18n.t("mobile_interface.url"), update: I18n.t("mobile_interface.update"), shelfcode: Sequence.generate_initial(@storage.unit, Shelf)})
   end
 
 
