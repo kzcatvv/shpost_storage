@@ -40,6 +40,8 @@ ShpostStorage::Application.routes.draw do
     member do
       patch 'onecheck'
       get 'stock_out'
+      get 'assign'
+      post 'assign_select'
       patch 'check'
       patch 'close'
       get 'scan'
@@ -318,6 +320,7 @@ ShpostStorage::Application.routes.draw do
   match "/print/websplitordertracking" => "print#websplitordertracking",via: [:get, :post]
   match "/print/websplitordertrackingnum" => "print#websplitordertrackingnum",via: [:get, :post]
   match "/print/shelfbarcodeprint" => "print#shelfbarcodeprint",via: [:get, :post]
+  match "/print/relationbarcodeprint" => "print#relationbarcodeprint",via: [:get, :post]
 
 
   match "/contact/add" => "contacts#add",via: [:get, :post]

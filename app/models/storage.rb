@@ -14,6 +14,14 @@ class Storage < ActiveRecord::Base
      end
    end
 
+   def need_pick_name
+     if need_pick
+        name = "是"
+     else
+        name = "否"
+     end
+   end
+
    def self.get_default_storage(unit_id)
    	# todo: add a column to show which storage is default in the unit.
    	# Storage.where("unit_id = ?",unit_id).first

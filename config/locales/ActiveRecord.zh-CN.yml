@@ -383,6 +383,7 @@ zh-CN:
         default_storage: "默认仓库"
         default_storage_true: "是"
         default_storage_false: "否"
+        need_pick: "是否需要二次拣货"
       role:
         user_id: "用户"
         storage_id: "仓库"

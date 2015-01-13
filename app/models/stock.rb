@@ -78,6 +78,9 @@ class Stock < ActiveRecord::Base
     if Stock.is_enough_stock?(manual_stock)
       Stock.stock_out(manual_stock, operation_user)
     end
+    if manual_stock.has_waiting_stock_logs()
+      Task.save_task(manual_stock,manual_stock.storage.id,nil)
+    end
   end
 
   def self.order_stock_out(keyclientorder, operation_user = nil)

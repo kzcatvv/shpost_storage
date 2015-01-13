@@ -43,7 +43,7 @@ class Sequence < ActiveRecord::Base
   end
 
   def self.generate_barcode(unit, _class, count)
-    Barcodes[_class.name.to_sym] + ((unit.short_name.blank?) ? "": unit.short_name) + count + generate_verify(count)
+    self.generate_begin(unit, _class) + count + generate_verify(count)
   end
 
    def self.generate_batch(unit, _class, count)
@@ -65,8 +65,8 @@ class Sequence < ActiveRecord::Base
     sequence.count - 1
   end
 
-  def self.generate_begin(_class)
-    
+  def self.generate_begin(unit, _class)
+    Barcodes[_class.name.to_sym] + ((unit.short_name.blank?) ? "": unit.short_name)
   end
 
   def generate_sequecne(_class)
