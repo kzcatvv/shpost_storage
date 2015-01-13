@@ -1,7 +1,7 @@
 zh-CN:
   mobile_interface:
-    version: 1.0
-    url: ''
+    version: '1.0.16.0114'
+    url: '/apk/shpost_storage.apk'
     update: 'N'
     error: 
       '0001': '签名验证错误'

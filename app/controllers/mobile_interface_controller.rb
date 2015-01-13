@@ -16,9 +16,8 @@ class MobileInterfaceController < ApplicationController
     end
 
     return error_builder('0009') if ! @user.sorter?(@storage)
-
     @mobile.update(version: @version, user: @user, last_sign_in_time: Time.now)
-    success_builder({id: @user.id, time: Time.now.strftime('%Y%m%d %H:%M:%S'), version: I18n.t("mobile_interface.version"), url: I18n.t("mobile_interface.url"), update: I18n.t("mobile_interface.update"), shelfcode: Sequence.generate_initial(@storage.unit, Shelf)})
+    success_builder({id: @user.id, time: Time.now.strftime('%Y%m%d %H:%M:%S'), version: I18n.t("mobile_interface.version"), url: "http://#{request.host}:#{request.port}#{I18n.t('mobile_interface.url')}", update: I18n.t("mobile_interface.update"), shelfcode: Sequence.generate_initial(@storage.unit, Shelf)})
   end
 
 
@@ -60,7 +59,7 @@ class MobileInterfaceController < ApplicationController
     end
 
     products = []
-    parent.stock_logs.each do |x|
+    parent.stock_logs.waiting.each do |x|
       products << {sku: x.relationship.barcode, product: x.specification.full_title, business: x.business.name, supplier: x.supplier.name, batch: x.batch_no, product_barcode: x.relationship.try(:barcode), product_sixnine: x.specification.sixnine_code, product_sn: x.sn.blank? ? nil : x.sn.try(:split, Stock::SN_SPLIT), amount: x.amount, scan: x.relationship.piece_to_piece, shelf: x.shelf.shelf_code, shelf_barcode: x.shelf.barcode, type: x.operation_type }
     end
 
