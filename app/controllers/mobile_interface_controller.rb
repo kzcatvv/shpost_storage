@@ -61,7 +61,7 @@ class MobileInterfaceController < ApplicationController
 
     products = []
     parent.stock_logs.each do |x|
-      products << {sku: x.relationship.barcode, product: x.specification.full_title, business: x.business.name, supplier: x.supplier.name, batch: x.batch_no, product_barcode: x.relationship.barcode, product_sixnine: x.specification.sixnine_code, product_sn: x.sn.try(:split, Stock::SN_SPLIT), amount: x.amount, scan: x.specification.piece_to_piece, shelf: x.shelf.shelf_code, shelf_barcode: x.shelf.barcode, type: x.operation_type }
+      products << {sku: x.relationship.barcode, product: x.specification.full_title, business: x.business.name, supplier: x.supplier.name, batch: x.batch_no, product_barcode: x.relationship.try(:barcode), product_sixnine: x.specification.sixnine_code, product_sn: x.sn.blank? ? nil : x.sn.try(:split, Stock::SN_SPLIT), amount: x.amount, scan: x.relationship.piece_to_piece, shelf: x.shelf.shelf_code, shelf_barcode: x.shelf.barcode, type: x.operation_type }
     end
 
     success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), mission: task.id, barcode: task.barcode, title: task.title, type: task.task_type, mission_time: task.created_at.strftime('%Y%m%d %H:%M:%S'), products: products})
@@ -97,14 +97,14 @@ class MobileInterfaceController < ApplicationController
         next
       end
 
-      shelf = Shelf.find_by(:barcode, x['shelf'])
+      shelf = Shelf.find_by(barcode: x['shelf'])
 
       if shelf.blank?
         code = "0010"
         next
       end
 
-      amount = x['amount']
+      amount = x['amount'].to_i
       
       type = x['type']
       sn = x['sn']
@@ -113,24 +113,27 @@ class MobileInterfaceController < ApplicationController
 
       stock_log ||= parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.find_by(relationship: relationship, operation_type: type)
 
+
       if stock_log.blank?
         code = "0010"
         next
       end
 
       if type.eql? 'in'
-        stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, nil, shelf)
+        stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, stock_log.expiration_date.blank? ? nil : stock_log.batch_no, shelf)
 
-        new_stock_logs << parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
-      elsif type.eql 'out'
-        stocks = find_stocks_in_shelf(relationship.specification, relationship.supplier, relationship.business, stock_log.batch_no, shelf)
+        new_stock_logs << parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT), batch_no: stock_log.batch_no)
+      elsif type.eql? 'out'
+        stocks = Stock.find_stocks_in_shelf(relationship.specification, relationship.supplier, relationship.business, shelf)
 
         stocks.each do |stock|
+          next if stock.on_shelf_amount <= 0
+
           out_amount = stock.stock_out_amount(amount)
 
           amount -= out_amount
 
-          new_stock_logs << parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
+          new_stock_logs << parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
 
           if amount <= 0
             break
@@ -139,7 +142,6 @@ class MobileInterfaceController < ApplicationController
 
         if amount > 0
           code = "0010"
-        next
         end
       end
     end
@@ -247,7 +249,7 @@ class MobileInterfaceController < ApplicationController
     end
     # @return_json
 
-    MobileLog.create(request_ip: request.ip, request: request.url, response: @return_json.to_s, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: 'success', operate_type: request.method, request_params: request.params.to_s)
+    MobileLog.create(request_ip: request.ip, request: request.url, response: @return_json.to_json, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: 'success', operate_type: request.method, request_params: request.params.to_json)
 
     render json: @return_json
   end
@@ -256,7 +258,7 @@ class MobileInterfaceController < ApplicationController
     @status = false
     @return_json = {flag: 'failure', code: code, msg: msg.nil? ? I18n.t("mobile_interface.error.#{code}") :  msg }.to_json
 
-    MobileLog.create(request_ip: request.ip, request: request.url, response: @return_json.to_s, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: 'failure', operate_type: request.method, request_params: request.params.to_s)
+    MobileLog.create(request_ip: request.ip, request: request.url, response: @return_json.to_json, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: 'failure', operate_type: request.method, request_params: request.params.to_json)
     # @return_json
     render json: @return_json
   end

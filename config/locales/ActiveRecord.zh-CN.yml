@@ -470,6 +470,8 @@ zh-CN:
         external_code: "第三方商品编码"
         spec_desc: "规格描述"
         warning_amt: "预警数量"
+        sku: "条码"
+        piece_to_piece: "逐件扫描"
       business:
         "no": "商户编号"
         name: "商户名称"

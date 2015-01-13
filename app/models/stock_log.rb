@@ -195,9 +195,9 @@ class StockLog < ActiveRecord::Base
       self.supplier_id = stock.supplier_id
       self.specification_id = stock.specification_id
       self.expiration_date = stock.expiration_date if !stock.expiration_date.blank?
-      self.batch_no = stock.batch_no
+      self.batch_no = stock.batch_no if !stock.batch_no.blank?
       self.relationship = stock.relationship
-      self.sn = stock.sn
+      # self.sn = stock.sn
     end
   end
 

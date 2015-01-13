@@ -21,6 +21,8 @@ class Stock < ActiveRecord::Base
   scope :available, -> { where("1 = 1")}
   scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken' or shelves.shelf_type is null")}
   scope :broken, -> { includes(:shelf).where("shelves.shelf_type = 'broken'")}
+  scope :not_empty, -> {where('actual_amount > 0')}
+  scope :empty, -> {where('actual_amount = 0')}
 
   SN_SPLIT = "."
 
@@ -29,15 +31,16 @@ class Stock < ActiveRecord::Base
       x.purchase_arrivals.each do |arrival|
       # while x.waiting_amount > 0
         while arrival.waiting_amount > 0
-          stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, arrival.batch_no, purchase.storage, false)
+          stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, arrival.expiration_date.blank? ? nil : arrival.batch_no, purchase.storage, false)
           
           stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
 
-          purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in])
+          purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in], batch_no: arrival.batch_no)
         
           if !arrival.expiration_date.blank?
             stock.update(expiration_date: arrival.expiration_date)
           end
+
         end
       end
     end
@@ -102,6 +105,8 @@ class Stock < ActiveRecord::Base
         stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage).to_ary
 
         stocks_in_storage.each do |stock|
+          next if stock.on_shelf_amount <= 0
+          
           out_amount = stock.stock_out_amount(amount)
 
           amount -= out_amount
@@ -341,7 +346,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stocks(specification, supplier, business, is_broken = nil)
-    conditions = where('actual_amount > 0')
+    conditions = not_empty
 
     if ! specification.blank?
       conditions = conditions.where(specification: specification)
