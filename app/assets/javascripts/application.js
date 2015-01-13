@@ -794,6 +794,7 @@ function  ajaxstocklogs(){
       $("p#"+this.id).text($(this).val());
     }
     order_return_modify(this);
+  });
 
   $("input[id^=stock_logs_pickshelf]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
     $("input[id="+this.id+"][type=text]").val(data.item.value);
@@ -1376,7 +1377,7 @@ function order_return_modify(current)
   if (orid == null) {
     orid = ""
   }
-  alert("id"+id+"shelfid"+shelfid+"orid"+orid+"amount"+amount);
+  // alert("id"+id+"shelfid"+shelfid+"orid"+orid+"amount"+amount);
 
   $.ajax({
     type: "POST",
@@ -1386,7 +1387,7 @@ function order_return_modify(current)
     complete: function(data) {
       if(data.success){
         var jsonData = eval("("+data.responseText+")");
-        alert(data.responseText);
+        // alert(data.responseText);
         
         if (jsonData.id != undefined) {
           $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
