@@ -30,7 +30,20 @@ class Task < ActiveRecord::Base
       elsif parent.is_a? MoveStock
         type = TASK_TYPE[:move]
       end
-      title = parent.no.to_s + "_" + parent.class.name
+      title = ""
+      if parent.respond_to? :batch_no
+        if title.blank? && !parent.batch_no.blank?
+          title = parent.batch_no.to_s + "_" + parent.class.name
+        end
+      end
+      if parent.respond_to? :no
+        if title.blank? && !parent.no.blank?
+          title = parent.no.to_s + "_" + parent.class.name
+        end
+      end
+      if title.blank?
+        title = parent.class.name
+      end
       Task.create(parent: parent, code: generate_code(), user_id: user_id, status: STATUS[:doing], storage_id: storage_id, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
     else
       if !user_id.blank?

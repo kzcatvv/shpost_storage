@@ -90,6 +90,9 @@ class Stock < ActiveRecord::Base
     if Stock.is_enough_stock?(keyclientorder)
       Stock.stock_out(keyclientorder, operation_user)
     end
+    if keyclientorder.has_waiting_stock_logs()
+      Task.save_task(keyclientorder,keyclientorder.storage.id,nil)
+    end
   end
 
   # def self.order_pick_stock_out(keyclientorder, operation_user = nil)
