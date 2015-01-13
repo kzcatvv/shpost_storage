@@ -27,6 +27,10 @@
       storage.default_type_name
     end
 
+    g.column name: model_class.human_attribute_name(:need_pick), attribute: 'need_pick',filter_type: :boolean do |storage| 
+      storage.need_pick_name
+    end
+
     g.column do |storage|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_unit_storage_path(@unit,storage), :class => 'btn btn-xs btn-primary' if can? :update, storage) << ' ' <<

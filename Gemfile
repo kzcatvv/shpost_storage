@@ -104,3 +104,7 @@ gem 'jquery_datepicker'
 
 # gem 'resque-scheduler'
 gem 'whenever'
+
+gem 'rqrcode'
+
+gem 'rqrcode_png'

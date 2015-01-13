@@ -317,6 +317,9 @@ ShpostStorage::Application.routes.draw do
   match "/print/webtrackingnum" => "print#webtrackingnum",via: [:get, :post]
   match "/print/websplitordertracking" => "print#websplitordertracking",via: [:get, :post]
   match "/print/websplitordertrackingnum" => "print#websplitordertrackingnum",via: [:get, :post]
+  match "/print/shelfbarcodeprint" => "print#shelfbarcodeprint",via: [:get, :post]
+  match "/print/relationbarcodeprint" => "print#relationbarcodeprint",via: [:get, :post]
+
 
   match "/contact/add" => "contacts#add",via: [:get, :post]
   match "/contact/confirmadd" => "contacts#confirmadd",via: [:get, :post]

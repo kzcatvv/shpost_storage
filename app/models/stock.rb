@@ -117,8 +117,30 @@ class Stock < ActiveRecord::Base
   end
 
   def self.pick_stock_out(order, operation_user = nil)
+    i=0
     order.waiting_amounts.each do |x, amount|
       if amount > 0
+        stocks_in_shelf_type = Stock.find_stocks_in_shelf_type(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), "pick", false)
+        if stocks_in_shelf_type.count > 0
+          in_stock = stocks_in_shelf_type.first
+        else
+          shelves = Shelf.get_empty_pick_shelf(current_storage)
+          if shelves.count > 0
+            shelf = shelves.first
+            in_stock = Stock.create(specification: x[0], business: x[2], supplier: x[1], shelf: shelf, actual_amount: 0)
+          else
+            pick_shelves = Shelf.get_pick_shelf(current_storage).to_ary
+            shelf = Shelf.where(id: pick_shelves[i]).first
+            if i == pick_shelves.size - 1
+               i = 0
+            else
+               i += 1
+            end
+            in_stock = Stock.create(specification: x[0], business: x[2], supplier: x[1], shelf: shelf, actual_amount: 0)
+          end
+
+        end
+
         stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage).to_ary
 
         stocks_in_storage.each do |stock|
@@ -128,10 +150,11 @@ class Stock < ActiveRecord::Base
 
           # stock.save
 
-          outpick_sl = order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])
-          
-          inpick_sl = outpick_sl.children.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:in]) 
-          
+          outpick_sl = order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])          
+          inpick_sl = order.stock_logs.create(stock: in_stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:in]) 
+          outpick_sl.pick_in = inpick_sl
+          outpick_sl.save
+
           if amount <= 0
             break
           end
@@ -201,6 +224,10 @@ class Stock < ActiveRecord::Base
 
   def self.find_stocks_in_shelf(specification, supplier, business, shelf)
     in_shelf(shelf).find_stocks(specification, supplier, business).expiration_date_first.available.prior
+  end
+
+  def self.find_stocks_in_shelf_type(specification, supplier, business, shelf_type, is_broken = false)
+    in_shelf_type(shelf_type).find_stocks(specification, supplier, business, is_broken).expiration_date_first.available.prior
   end
 
   def self.total_stock_in_unit(specification, supplier, business, unit)
@@ -339,6 +366,12 @@ class Stock < ActiveRecord::Base
   def self.in_shelf(shelf)
     includes(:shelf).where('shelves.id' => shelf)
   end
+
+  def self.in_shelf_type(shelf_type)
+    includes(:shelf).where('shelves.shelf_type' => shelf_type)
+  end
+
+
 
   private
   def clean_orphan_stocks

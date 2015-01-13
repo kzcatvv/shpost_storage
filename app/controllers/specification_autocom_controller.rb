@@ -27,7 +27,7 @@ class SpecificationAutocomController < ApplicationController
     obj = params[:obj]
     business_id = obj
     supplier_id = params[:supplierid]
-    #binding.pry
+    # binding.pry
     si=Relationship.joins(:specification).where('relationships.business_id= ? and relationships.supplier_id= ? and ( specifications.sixnine_code like ? or specifications.sku like ? or specifications.all_name like ? )',"#{business_id}","#{supplier_id}","%#{term}%","%#{term}%","%#{term}%").select(:specification_id)
     specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
 

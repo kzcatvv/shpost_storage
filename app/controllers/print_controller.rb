@@ -142,4 +142,12 @@ class PrintController < ApplicationController
         @order.update(transport_type: params[:transport_type])
     end
 
+    def shelfbarcodeprint
+        @shelf = Shelf.find(params[:sid])
+    end
+
+    def relationbarcodeprint
+        @relationship = Relationship.find(params[:rid])
+    end
+
 end
