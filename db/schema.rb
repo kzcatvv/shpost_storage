@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150109082316) do
+ActiveRecord::Schema.define(version: 20150113014706) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -460,6 +460,7 @@ ActiveRecord::Schema.define(version: 20150109082316) do
     t.string   "postcode"
     t.string   "tcbd_product_no"
     t.string   "no"
+    t.boolean  "need_pick",       default: false
   end
 
   create_table "suppliers", force: true do |t|
