@@ -22,6 +22,8 @@ class Stock < ActiveRecord::Base
   scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken' or shelves.shelf_type is null")}
   scope :broken, -> { includes(:shelf).where("shelves.shelf_type = 'broken'")}
 
+  SN_SPLIT = "."
+
   def self.purchase_stock_in(purchase, operation_user = nil)
     purchase.purchase_details.each do |x|
       x.purchase_arrivals.each do |arrival|
@@ -312,6 +314,24 @@ class Stock < ActiveRecord::Base
     select('specification_id as spec_id, business_id as b_id, supplier_id as s_id, sum(actual_amount) as actual_amount').in_storage(storage).normal.group(:specification_id, :business_id, :supplier_id).having('sum(actual_amount) < (?)', Relationship.select(:warning_amt).where('specification_id = spec_id and business_id = b_id and supplier_id = s_id'))
   end
 
+  def update_sn(sn, type)
+    return if sn.blank?
+
+    if type.eql? StockLog::OPERATION_TYPE[:in]
+      if ! self.sn.blank?
+         self.update(sn: (self.sn.split(Stock::SN_SPLIT) + sn.split(Stock::SN_SPLIT)).uniq.join(Stock::SN_SPLIT))
+      else
+        self.update(sn: sn)
+      end
+    elsif type.eql? StockLog::OPERATION_TYPE[:out]
+      if ! self.sn.blank?
+        self.update(sn: (self.sn.split(Stock::SN_SPLIT) - sn.split(Stock::SN_SPLIT)).join(Stock::SN_SPLIT))
+      end
+    elsif type.eql? StockLog::OPERATION_TYPE[:reset]
+      self.update(sn: sn)
+    end
+  end
+
   protected
   def self.sum_virtual_amount
     sum(:virtual_amount)
@@ -368,8 +388,6 @@ class Stock < ActiveRecord::Base
     includes(:shelf).where('shelves.shelf_type' => shelf_type)
   end
 
-
-
   private
   def clean_orphan_stocks
     if self.actual_amount.zero? && self.stock_logs.waiting.blank?
@@ -378,6 +396,6 @@ class Stock < ActiveRecord::Base
   end
 
   def set_relationship
-    relationship = Relationship.find_by(specification_id: specification, business_id: business, supplier_id: supplier)
+    self.relationship = Relationship.find_by(specification_id: specification, business_id: business, supplier_id: supplier)
   end
 end

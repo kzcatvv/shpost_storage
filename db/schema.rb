@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150109082316) do
+ActiveRecord::Schema.define(version: 20150109160424) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -166,6 +166,22 @@ ActiveRecord::Schema.define(version: 20150109082316) do
     t.string   "barcode"
   end
 
+  create_table "mobile_logs", force: true do |t|
+    t.string   "status"
+    t.string   "operate_type"
+    t.string   "request"
+    t.string   "response"
+    t.string   "request_ip"
+    t.string   "response_ip"
+    t.string   "request_params"
+    t.integer  "user_id"
+    t.integer  "storage_id"
+    t.integer  "unit_id"
+    t.integer  "mobile_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "mobiles", force: true do |t|
     t.string   "no"
     t.string   "mobile_type"
@@ -261,9 +277,9 @@ ActiveRecord::Schema.define(version: 20150109082316) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -412,10 +428,10 @@ ActiveRecord::Schema.define(version: 20150109082316) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.date     "expiration_date"
-    t.string   "batch_no"
     t.integer  "parent_id"
     t.string   "parent_type"
+    t.date     "expiration_date"
+    t.string   "batch_no"
     t.integer  "pick_id"
     t.integer  "relationship_id"
     t.string   "sn"

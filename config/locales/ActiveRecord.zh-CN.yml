@@ -750,6 +750,9 @@ zh-CN:
         shelf:
           name: "货架管理"
           link: "/shelves/"
+        mobile:
+          name: "设备管理"
+          link: "/mobiles/"
           # needrole:
           #   can: :read
           #   role: "shelf"

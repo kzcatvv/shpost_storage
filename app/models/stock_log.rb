@@ -65,8 +65,15 @@ class StockLog < ActiveRecord::Base
       elsif self.operation_type.eql? OPERATION_TYPE[:reset]
         self.stock.check_reset_amount self.amount
       end
+
+      if !self.sn.blank?
+        self.stock.update_sn(self.sn, self.operation_type)
+      end
+
       self.status = STATUS[:checked]
       self.checked_at = Time.now
+
+
 
       self.save
     end

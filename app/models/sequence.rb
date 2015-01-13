@@ -38,7 +38,6 @@ class Sequence < ActiveRecord::Base
     end
   end
 
-
   def self.generate_sequence(unit, _class)
     get_count(unit, _class).to_s(16).upcase.rjust(10, '0')
   end
@@ -66,10 +65,14 @@ class Sequence < ActiveRecord::Base
     sequence.count - 1
   end
 
+  def self.generate_begin(_class)
+    
+  end
+
   def generate_sequecne(_class)
     _class.class_eval do
       before_save do |obj|
-        obj.barcode = Sequence.generate_sequecne(obj.unit, _class)
+        obj.barcode = Sequence.generate_sequece(obj.unit, _class)
       end
     end
   end

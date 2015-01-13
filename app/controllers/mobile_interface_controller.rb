@@ -3,29 +3,32 @@ class MobileInterfaceController < ApplicationController
   before_action :verify_params
   # before_action :verify_sign
   before_action :verify_user, except: [:login, :logout]
-  around_action :interface_return
+  # around_action :save_mobile_log
+  skip_before_filter :verify_authenticity_token 
   #load_and_authorize_resource
 
   def login
     username = @context_hash['username']
     password = @context_hash['password']
-    user = User.find_by(username: username)
-    if user.blank? || !user.valid_password?(password)
+    @user = User.find_by(username: username)
+    if @user.blank? || ! @user.valid_password?(password)
       return error_builder('0005') 
     end
 
-    @mobile.update(version: @version, user: user, last_sign_in_time: Time.now)
-    success_builder({id: user.id, time: Time.now.strftime('%Y-%m-%d %H:%M:%S'), version: I18n.t("mobile_interface.version"), url: I18n.t("mobile_interface.url"), update: I18n.t("mobile_interface.update")})
+    return error_builder('0009') if ! @user.sorter?(@storage)
+
+    @mobile.update(version: @version, user: @user, last_sign_in_time: Time.now)
+    success_builder({id: @user.id, time: Time.now.strftime('%Y%m%d %H:%M:%S'), version: I18n.t("mobile_interface.version"), url: I18n.t("mobile_interface.url"), update: I18n.t("mobile_interface.update"), shelfcode: ''})
   end
 
 
   def logout
     username = @context_hash['username']
-    user = User.find_by(username: username)
-    error_builder('0005') if user.blank?
+    # @user = User.find_by(username: username)
+    # return error_builder('0005') if @user.blank?
 
     @mobile.update(version: @version, user: nil)
-    success_builder({time: Time.now.strftime('%Y-%m-%d %H:%M:%S')})
+    success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S')})
   end
 
   def mission
@@ -34,10 +37,10 @@ class MobileInterfaceController < ApplicationController
     missions = []
 
     tasks.each do |x|
-      missions << {mission: x.id, barcode: x.barcode, title: x.title, type: x.task_type, time: x.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+      missions << {mission: x.id, barcode: x.barcode, title: x.title, type: Task::OPERATE_TYPE[x.parent_type.to_s.to_sym], time: x.created_at.strftime('%Y%m%d %H:%M:%S')}
     end
 
-    success_builder({time: Time.now.strftime('%Y-%m-%d %H:%M:%S'), missions: missions })
+    success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), missions: missions })
   end
 
   def mission_details
@@ -48,18 +51,20 @@ class MobileInterfaceController < ApplicationController
     task ||= Task.find_by(barcode: barcode)
     task ||= Task.find_by(code: barcode)
 
-    return error_builder('0007') if task.blank? || task.done?
+    parent = task.try :parent
 
-    if !task.user.blank? && !task.user.eql?(@user)
-      task = Task.create(title: task.title, task_type: task.task_type, status: Task::STATUS[:doing], parent: task.parent, storage: task.storage, user: @user)
+    return error_builder('0007') if task.blank? || task.done? || parent.blank?
+
+    if ! task.user.blank? && ! task.user.eql?(@user)
+      task = Task.create(title: task.title, task_type: task.task_type, status: Task::STATUS[:doing], parent: parent, storage: task.storage, user: @user)
     end
 
     products = []
-    task.parent.stock_logs.each do |x|
-      products << {product: x.specification.full_title, business: x.business.name, supplier: x.supplier.name, batch: x.batch_no, product_barcode: x.relationship.barcode, product_sixnine: x.specification.sixnine_code, product_sn: stock.sn.try(:split, '.'), amount: x.amount, scan: x.specification.piece_to_piece, shelf: x.shelf.shelf_code, shelf_barcode: x.shelf.barcode, type: x.operation_type }
+    parent.stock_logs.each do |x|
+      products << {sku: x.relationship.barcode, product: x.specification.full_title, business: x.business.name, supplier: x.supplier.name, batch: x.batch_no, product_barcode: x.relationship.barcode, product_sixnine: x.specification.sixnine_code, product_sn: x.sn.try(:split, Stock::SN_SPLIT), amount: x.amount, scan: x.specification.piece_to_piece, shelf: x.shelf.shelf_code, shelf_barcode: x.shelf.barcode, type: x.operation_type }
     end
 
-    success_builder({time: Time.now.strftime('%Y-%m-%d %H:%M:%S'), mission: task.id, barcode: task.barcode, title: task.title, type: task.task_type, mission_time: task.created_at.strftime('%Y-%m-%d %H:%M:%S'), products: products})
+    success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), mission: task.id, barcode: task.barcode, title: task.title, type: task.task_type, mission_time: task.created_at.strftime('%Y%m%d %H:%M:%S'), products: products})
   end
 
   def mission_upload
@@ -68,52 +73,84 @@ class MobileInterfaceController < ApplicationController
 
     task = Task.find mission
 
-    error_builder('0007') if task.blank? || task.done?
+    parent = task.try :parent
+
+    error_builder('0007') if task.blank? || task.done? || parent.blank?
+
 
     new_stock_logs = []
 
-    products.each do |x|
-      next if x['product'].blank? || x['amount'].blank? || x['type'].blank? || x['shelf'].blank?
-      relationship = Relationship.find_by barcode: x['product']
-      specification = Specification.find_by sixnine_code: x['product']
-      amount = x['amount']
-      shelf = Shelf.find_by(:barcode, x['shelf'])
-      type = x['type']
+    code = nil
 
-      if ! relationship.blank?
-        stock_log = task.parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.find_by(relationship: relationship, operation_type: type)
-      elsif ! specification.blank?
-        stock_log = task.parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.find_by(specification: specification, operation_type: type)
-      else
-        stock_log = task.parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.where('sn like', "%#{x['product']}%", operation_type: type).first
+    products.each do |x|
+      if x['sku'].blank? || x['amount'].blank? || x['type'].blank? || x['shelf'].blank?
+        code = "0010"
+        next
+      end
+
+
+
+      relationship = Relationship.find_by barcode: x['sku']
+
+      if relationship.blank?
+        code = "0010"
+        next
+      end
+
+      shelf = Shelf.find_by(:barcode, x['shelf'])
+
+      if shelf.blank?
+        code = "0010"
+        next
+      end
+
+      amount = x['amount']
+      
+      type = x['type']
+      sn = x['sn']
+
+      stock_log = parent.stock_logs.where(shelf: shelf).waiting.find_by(relationship: relationship, operation_type: type)
+
+      stock_log ||= parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.find_by(relationship: relationship, operation_type: type)
+
+      if stock_log.blank?
+        code = "0010"
+        next
       end
 
       if type.eql? 'in'
-        stock = Stock.get_available_stock_in_shelf(stock_log.specification, stock_log.supplier, stock_log.business, stock_log.batch_no, shelf)
+        stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, nil, shelf)
 
-        new_stock_logs << task.parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type)
+        new_stock_logs << parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
       elsif type.eql 'out'
-        stocks = find_stocks_in_shelf(stock_log.specification, stock_log.supplier, stock_log.business, stock_log.batch_no, shelf)
+        stocks = find_stocks_in_shelf(relationship.specification, relationship.supplier, relationship.business, stock_log.batch_no, shelf)
 
         stocks.each do |stock|
           out_amount = stock.stock_out_amount(amount)
 
           amount -= out_amount
 
-          new_stock_logs << task.parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type)
+          new_stock_logs << parent.stock_logs.create(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
 
           if amount <= 0
             break
           end
         end
+
+        if amount > 0
+          code = "0010"
+        next
+        end
       end
     end
 
-    task.parent.stock_logs.waiting.where.not(id: new_stock_logs).destroy_all
+    parent.stock_logs.waiting.where.not(id: new_stock_logs).destroy_all
 
-    check.check!
+    parent.check!
 
     task.update(status: Task::STATUS[:done])
+
+    success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), msg: code.blank? ? "" : I18n.t("mobile_interface.error.#{code}")})
   end
 
   def query
@@ -127,9 +164,9 @@ class MobileInterfaceController < ApplicationController
     specification = Specification.find_by sixnine_code: barcode
 
     if ! relationship.blank?
-      stocks = Stock.find_stocks_in_storage(relationship.specification, relationship.business, relationship.supplier, storage, nil)
+      stocks = Stock.find_stocks_in_storage(relationship.specification, relationship.business, relationship.supplier, @storage, nil)
     elsif ! specification.blank?
-      stocks = Stock.find_stocks_in_storage(specification, nil, nil, storage, nil)
+      stocks = Stock.find_stocks_in_storage(specification, nil, nil, @storage, nil)
     end
 
     stocks = Stock.includes(:storage).where(storages:{id: @storage}).where('sn like ?', "%#{barcode}%") if stocks.blank?
@@ -143,10 +180,10 @@ class MobileInterfaceController < ApplicationController
 
     if ! stocks.blank?
       stocks.each do |stock|
-        products << {product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, '.'), expiration: stock.expiration_date.strftime('%Y-%m-%d'), amount: stock.actual_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y-%m-%d %H:%M:%S') }
+        products << {product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, Stock::SN_SPLIT), expiration: stock.expiration_date.try(:strftime,'%Y%m%d'), amount: stock.actual_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y%m%d %H:%M:%S') }
       end
 
-      success_builder({time: Time.now.strftime('%Y-%m-%d %H:%M:%S'), products: products})
+      success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), products: products})
     else
       error_builder('0008')
     end
@@ -179,39 +216,47 @@ class MobileInterfaceController < ApplicationController
 
   def verify_sign
     @sign = params[:sign]
-    return error_builder('0001') if !@sign.eql? Digest::MD5.hexdigest(@context)
+    return error_builder('0001') if ! @sign.eql? Digest::MD5.hexdigest(@context)
   end
 
   def verify_user
-    @user = User.find(params[:user]) if !params[:user].blank?
+    @user = User.find(params[:user]) if ! params[:user].blank?
     return error_builder('0005') if @user.blank?
+    return error_builder('0009') if ! @user.sorter?(@storage)
 
-    return error_builder('0006') if !@mobile.user.eql? @user
+    return error_builder('0006') if ! @mobile.user.eql? @user
   end
 
-  def interface_return
-    if !@status.eql? false
-      yield
-    end
-    InterfaceInfo.receive_info(request.url, @return_json, 'auto', @status)
-    # render json: @return_json
-  end
+  # def save_mobile_log
+  #   # if !@status.eql? false
+  #     yield
+  #   # end
+  #   binding.pry
+  #   MobileLog.created_at(request: request.url, response: @return_json, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: @status, operate_type: 'auto')
+  #   # InterfaceInfo.receive_info(request.url, @return_json, 'auto', @status)
+  #   # render json: @return_json
+  # end
 
   def success_builder(info = nil)
     @status = true
-    success = {'flag' => 'success'}
+    success = {flag: 'success'}
     if info.nil?
       @return_json = success
     else
       @return_json = success.merge info
     end
     # @return_json
+
+    MobileLog.create(request_ip: request.ip, request: request.url, response: @return_json.to_s, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: 'success', operate_type: request.method, request_params: request.params.to_s)
+
     render json: @return_json
   end
 
   def error_builder(code, msg = nil)
     @status = false
-    @return_json = {'flag' => 'failure', 'code' => code, 'msg' => msg.nil? ? I18n.t("mobile_interface.error.#{code}") :  msg }.to_json
+    @return_json = {flag: 'failure', code: code, msg: msg.nil? ? I18n.t("mobile_interface.error.#{code}") :  msg }.to_json
+
+    MobileLog.create(request_ip: request.ip, request: request.url, response: @return_json.to_s, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: 'failure', operate_type: request.method, request_params: request.params.to_s)
     # @return_json
     render json: @return_json
   end

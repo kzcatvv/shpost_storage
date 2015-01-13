@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :mobile_logs
+
   resources :tasks
 
   resources :mobiles

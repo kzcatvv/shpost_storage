@@ -1,0 +1,2 @@
+module MobileLogsHelper
+end
