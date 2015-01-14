@@ -1,0 +1,94 @@
+<%- model_class = StockLog -%>
+
+<div>
+  <table id="stock_logs" class="table table-striped">
+    <thead>
+      <tr>
+      <th></th>
+        <th>入库单明细</th>
+        <th>货架</th>
+        <th>库存数量</th>
+        <th>入库数量</th>
+        <th>状态</th>
+        <th>创建时间</th>
+        <th>确认时间</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @stock_logs.each do |stock_log| %>
+      <tr id="stock_logs_id_<%=stock_log.id%>">
+        <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %></td>
+        <td>
+        <% orid = stock_log.parent.id %>
+          <%= select_tag("stock_logs[][orid]", options_for_select(OrderReturnDetail.where(order_return_id: orid).map{|u| ["#{u.order_detail.specification.all_name}",u.id]}, orid), id: "stock_logs_orid_#{stock_log.id}", style: "display: none;") <<
+          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.all_name}", {id: "stock_logs_orid_#{stock_log.id}"}) %>
+        </td>
+        <td>
+        <%= content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_oshelfid_#{stock_log.id}"}) <<
+          text_field_tag("stock_logs[][shelfid]", stock_log.shelf.shelf_code, id: "stock_logs_oshelfid_#{stock_log.id}", style: "display: none; width: 120px;", 'data-autocomplete' => if stock_log.stock.shelf.shelf_type!="broken" then "/shelves/autocomplete_shelf_shelf_code" else "/shelves/autocomplete_bad_shelf_code" end) <<
+          hidden_field_tag("stock_logs[][shelfid]", stock_log.shelf.id, id: "stock_logs_oshelfid_#{stock_log.id}") %>
+        </td>
+        <td>
+          <%= content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})%>
+        </td>
+        <td>
+          <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_oamount_#{stock_log.id}", style: "display: none; width: 40px;") <<
+          if stock_log.amount == 0 || stock_log.amount > stock_log.stock.actual_amount
+            content_tag(:p, stock_log.amount, {id: "stock_logs_oamount_#{stock_log.id}", style: 'background-color: red;'})
+          else
+            content_tag(:p, stock_log.amount, {id: "stock_logs_oamount_#{stock_log.id}"})
+          end %>
+        </td>
+        <td id="stock_logs_status_<%=stock_log.id%>"><%=  StockLog::STATUS_SHOW[stock_log.status.to_sym] %></td>
+        <td>
+          <%= stock_log.created_at.to_s(:db) %>
+        </td>
+        <td>
+          <%= stock_log.checked_at.try :to_s, :db %>
+        </td>
+        <td><%=link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'destroy(this)', id: "stock_logs_deletelink_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log%></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+  <div style="float:right">
+    <% if can? :new, Stock %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                   "javascript:void(0)", onclick: "order_return_add()",
+                    :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+
+
+<div>
+  <% stocklogs = [] %>
+  <p>退货入库清单</p>
+    <% stocklogs = @order_return.stock_logs%>
+    
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>商户</th>
+      <th>产品规格</th>
+      <th>供应商</th>
+      <th>数量</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% stocklogs.each do |stocklog| %>
+      <% if stocklog.amount == 0 %>
+        <% next %>
+      <% end %>
+      <tr>
+        <td><%= stocklog.business.name %></td>
+        <td><%= stocklog.specification.name %></td>
+        <td><%= stocklog.supplier.blank? ? "" : stocklog.supplier.name %></td>
+        <td><%= stocklog.amount %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
