@@ -1,0 +1,25 @@
+<h1>Listing mobile_logs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @mobile_logs.each do |mobile_log| %>
+      <tr>
+        <td><%= link_to 'Show', mobile_log %></td>
+        <td><%= link_to 'Edit', edit_mobile_log_path(mobile_log) %></td>
+        <td><%= link_to 'Destroy', mobile_log, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Mobile log', new_mobile_log_path %>

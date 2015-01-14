@@ -3,6 +3,7 @@ class StandardInterfaceController < ApplicationController
   before_action :verify_params
   # before_action :verify_sign
   around_action :interface_return
+  skip_before_filter :verify_authenticity_token 
   #load_and_authorize_resource
 
   def commodity_enter
