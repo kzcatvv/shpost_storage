@@ -963,7 +963,7 @@ function ajaxmovestock() {
     param = this.id.split('_');
 
     if ( parseInt($(this).val()) > parseInt($("#md_stock_amount_"+param[2]).val()) ) {
-          alert($(this).val());
+          // alert($(this).val());
           $(this).css("color","red");
     }else{
       $(this).css("color","black");
