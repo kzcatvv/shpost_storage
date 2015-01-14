@@ -9,6 +9,9 @@
         <th>货架</th>
         <th>库存数量</th>
         <th>出库数量</th>
+        <% if @keyclientorder.storage.need_pick %>
+        <th>拣货区货架</th>
+        <% end %>
         <th>状态</th>
         <th>创建时间</th>
         <th>确认时间</th>
@@ -43,6 +46,13 @@
             content_tag(:p, stock_log.amount, {id: "stock_logs_kamount_#{stock_log.id}"})
           end %>
         </td>
+        <% if @keyclientorder.storage.need_pick %>
+        <td>
+          <%= text_field_tag( "stock_logs[][pick_shelf]", stock_log.pick_in.shelf.shelf_code, id: "stock_logs_pickshelf_#{stock_log.id}",'data-autocomplete' => "/shelves/autocomplete_pick_shelf_code" ) %>
+          <%= hidden_field_tag("stock_logs[][pick_shelf]", stock_log.pick_in.shelf.id, id: "stock_logs_pickshelf_#{stock_log.id}") %>
+        </td>
+
+        <% end %>
         <td id="stock_logs_status_<%=stock_log.id%>"><%=  StockLog::STATUS_SHOW[stock_log.status.to_sym] %></td>
         <td>
           <%= stock_log.created_at.to_s(:db) %>
@@ -73,7 +83,11 @@
     <% if @manual_stock%>
       <% stocklogs = @manual_stock.stock_logs%>
     <% else %>
-      <% stocklogs = @keyclientorder.stock_logs%>
+      <% if @keyclientorder.storage.need_pick %>
+        <% stocklogs = @keyclientorder.stock_logs.where(" operation_type='out' ")%>
+      <% else %>
+        <% stocklogs = @keyclientorder.stock_logs%>
+      <% end %>
     <% end %>
 <table class="table table-striped">
   <thead>
