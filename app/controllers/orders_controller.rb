@@ -312,9 +312,10 @@ class OrdersController < ApplicationController
   #   Order.transaction do
   #     @keyclientorder = Keyclientorder.find(params[:format])
 
-  #     pickareacnt = Area.where("storage_id = ? and area_type = 'pick' ",current_storage.id).count
-  #     if pickareacnt > 0
-  #       Stock.pick_stock_out(@keyclientorder, current_user)
+      # needpick = current_storage.need_pick
+
+      # if needpick
+      #   Stock.pick_stock_out(@keyclientorder, current_user)
 
   #       @stock_logs = @keyclientorder.stock_logs.where(" operation_type = 'out' ")
   #     else

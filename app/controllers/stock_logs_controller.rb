@@ -105,18 +105,48 @@ class StockLogsController < ApplicationController
       if @stock_log.try :waiting?
         @stock_log.update(parent: @keyclientorder, stock: @stock, operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
       else
-        @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+        if @keyclientorder.storage.need_pick
+          stocks_in_shelf_type = Stock.find_stocks_in_shelf_type(@specification, @supplier, @business, "pick", false)
+            if stocks_in_shelf_type.count > 0
+              in_stock = stocks_in_shelf_type.first
+              in_shelf_code = in_stock.shelf.shelf_code
+            else
+              shelves = Shelf.get_empty_pick_shelf(current_storage)
+                if shelves.count > 0
+                  shelf = shelves.first
+                  in_stock = Stock.create(specification: @specification, business: @business, supplier: @supplier, shelf: shelf, actual_amount: 0)
+                  in_shelf_code = in_stock.shelf.shelf_code
+                else
+                  pick_shelves = Shelf.get_pick_shelf(current_storage).to_ary
+                  shelf = Shelf.where(id: pick_shelves[0]).first
+                  in_stock = Stock.create(specification: @specification, business: @business, supplier: @supplier, shelf: shelf, actual_amount: 0)
+                  in_shelf_code = in_stock.shelf.shelf_code
+                end
+
+            end
+          @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+          @pick_in_stklog = StockLog.create(parent: @keyclientorder, stock: in_stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:in])
+          @stock_log.pick_in = @pick_in_stklog
+          @stock_log.save
+          @pick_in_stklog.update_amount(@amount)
+        else
+          @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
+        end
+        
       end
 
       @stock_log.update_amount(@amount)
 
-      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json, }
+      return render json: {id: @stock_log.id, total_amount: @stock.on_shelf_amount, amount: @stock_log.amount, stocks: stocks_json, pick_shelf: in_shelf_code }
     end
   end
 
   def remove
     if !@stock_log.blank?
       @stock_log.delete
+    end
+    if !@stock_log.pick_in.blank?
+      @stock_log.pick_in.delete
     end
     render text: 'remove'
   end
@@ -153,6 +183,16 @@ class StockLogsController < ApplicationController
       render json: {}
     end
    
+  end
+
+  def mod_stocklog_pickin_shelf
+    if !params[:id].blank?
+      @stock_log = StockLog.find(params[:id])
+      @shelf = Shelf.find(params[:shelfid])
+      @stock_log.pick_in.stock.update(shelf: @shelf)
+      @stock_log.pick_in.update(shelf: @shelf)
+    end
+    render json: {}
   end
 
   def move_stock_remove
