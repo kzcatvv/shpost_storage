@@ -209,6 +209,7 @@ ShpostStorage::Application.routes.draw do
       post 'move_stock_remove'
       post 'manual_stock_modify'
       post 'keyclientorder_stock_modify'
+      post 'order_return_modify'
     end
   end
 
