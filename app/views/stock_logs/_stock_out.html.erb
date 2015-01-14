@@ -26,7 +26,7 @@
         <%= hidden_field_tag("stock_logs[][stock_log.parent.id]", stock_log.parent.id, id: "stock_logs_kcoid_#{stock_log.id}") %></td>
         <td>
         <% ksid = stock_log.specification_id.to_s + "_" + stock_log.business_id.to_s + "_" + stock_log.supplier_id.to_s %>
-        <% somaps = OrderDetail.find_by_sql ["select d.specification_id,o.business_id,d.supplier_id,sum(d.amount) from order_details d,orders o,keyclientorders k,stock_logs s where d.order_id=o.id and s.parent_id=k.id and k.id=o.keyclientorder_id and s.id=? group by d.specification_id,o.business_id,d.supplier_id", stock_log.id] %>
+        <% somaps = OrderDetail.find_by_sql ["select d.specification_id,o.business_id,d.supplier_id,sum(d.amount) from order_details d,orders o,keyclientorders k,stock_logs s where d.order_id=o.id and s.parent_id=k.id and k.id=o.keyclientorder_id and o.status!=? and s.id=? group by d.specification_id,o.business_id,d.supplier_id","checked", stock_log.id] %>
         <%= select_tag("stock_logs[][ksid]", options_for_select(somaps.map{|u| ["#{u.specification.name}_#{u.supplier_id}",u.specification_id.to_s + "_" + u.business_id.to_s + "_" + u.supplier_id.to_s]}, ksid), id: "stock_logs_ksid_#{stock_log.id}", style: "display: none;") <<
           content_tag(:p, "#{stock_log.specification.name}", {id: "stock_logs_ksid_#{stock_log.id}"}) %>
         </td>
@@ -89,6 +89,8 @@
         <% stocklogs = @keyclientorder.stock_logs%>
       <% end %>
     <% end %>
+    <!--<% shelves = Shelf.joins(:areas).where(storage_id: session[:current_storage]).select(:id) %>
+    <% stocklogs = stlogs.where(shelf_id: shelves) %>-->
 <table class="table table-striped">
   <thead>
     <tr>
