@@ -3,7 +3,7 @@ class StockLogsController < ApplicationController
   load_and_authorize_resource
   skip_load_and_authorize_resource only: [:purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove]
 
-  before_filter :load_params, only: [:modify, :purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove, :addtr]
+  before_filter :load_params, only: [:modify, :purchase_modify, :manual_stock_modify, :keyclientorder_stock_modify, :remove, :addtr, :order_return_modify]
 
   # GET /stock_logs
   # GET /stock_logs.json
@@ -204,6 +204,36 @@ class StockLogsController < ApplicationController
     render text: 'remove'
   end
 
+  def order_return_modify
+    if @shelf.blank? || @return.blank?
+      return render json: {}
+    end
+
+    is_bad = @return.is_bad
+
+    stock = Stock.get_available_stock_in_shelf(@return.order_detail.specification, @return.order_detail.supplier, @return.order_detail.order.business, @return.order_return.batch_no, @shelf)
+
+    if @stock_log.try :waiting?
+      if is_bad.eql?"no"
+        @stock_log.update(parent: @return.order_return, stock: stock, operation: StockLog::OPERATION[:order_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: stock.expiration_date)
+      else
+        @stock_log.update(parent: @return.order_return, stock: stock, operation: StockLog::OPERATION[:order_bad_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: stock.expiration_date)
+      end
+    else
+      if is_bad.eql?"no"
+        @stock_log = StockLog.create(parent: @return.order_return, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:order_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: @arrival.expiration_date)   
+      else
+        @stock_log = StockLog.create(parent: @return.order_return, stock: stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:order_bad_return], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: @arrival.expiration_date) 
+      end 
+    end
+
+    @stock_log.update_amount(@amount)
+
+    total_amount = Stock.total_stock_in_shelf(@stock_log.specification, @stock_log.supplier, @stock_log.business, @stock_log.shelf)
+    # binding.pry
+    render json: {id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount}
+  end
+
 
   def load_params
     @stock_log = StockLog.find(params[:id]) if !params[:id].blank?
@@ -221,5 +251,7 @@ class StockLogsController < ApplicationController
       @business = Business.find ary[1]
       @supplier = Supplier.find ary[2] if !ary[2].blank?
     end
+
+    @return = OrderReturnDetail.find(params[:order_return_detail_id]) if !params[:order_return_detail_id].blank?
   end
 end

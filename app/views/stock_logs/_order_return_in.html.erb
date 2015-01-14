@@ -4,11 +4,11 @@
   <table id="stock_logs" class="table table-striped">
     <thead>
       <tr>
-        <th></th>
-        <th>批量出库单明细</th>
+      <th></th>
+        <th>入库单明细</th>
         <th>货架</th>
         <th>库存数量</th>
-        <th>出库数量</th>
+        <th>入库数量</th>
         <th>状态</th>
         <th>创建时间</th>
         <th>确认时间</th>
@@ -20,26 +20,24 @@
       <tr id="stock_logs_id_<%=stock_log.id%>">
         <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %></td>
         <td>
-        <% msid =  stock_log.parent.manual_stock_details.where(supplier: stock_log.supplier, specification: stock_log.specification).first.id %>
-        <% msname =  stock_log.parent.manual_stock_details.where(supplier: stock_log.supplier, specification: stock_log.specification).first.name %>
-          <%= select_tag("stock_logs[][msid]", options_for_select(stock_log.parent.manual_stock_details.where(status: "waiting").map{|u| ["#{u.name}_#{u.specification.name}",u.id]}, msid), id: "stock_logs_msid_#{stock_log.id}", style: "display: none;") <<
-          content_tag(:p, "#{msname}_#{stock_log.specification.name}", {id: "stock_logs_msid_#{stock_log.id}"}) %>
+        <% orid = stock_log.parent.id %>
+          <%= select_tag("stock_logs[][orid]", options_for_select(OrderReturnDetail.where(order_return_id: orid).map{|u| ["#{u.order_detail.specification.all_name}",u.id]}, orid), id: "stock_logs_orid_#{stock_log.id}", style: "display: none;") <<
+          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.all_name}", {id: "stock_logs_orid_#{stock_log.id}"}) %>
         </td>
         <td>
-        
-        <%= hidden_field_tag("stock_logs[][#{stock_log.stock_id}]", stock_log.stock_id, id: "stock_logs_stid_#{stock_log.id}") %>
-        <%= select_tag("stock_logs[][#{stock_log.stock_id}]", "<option value=''>未选择</option>".html_safe,  id: "stock_logs_mshelfid_#{stock_log.id}", style: "display: none;") <<
-        content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_mshelfid_#{stock_log.id}"}) %>
+        <%= content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_oshelfid_#{stock_log.id}"}) <<
+          text_field_tag("stock_logs[][shelfid]", stock_log.shelf.shelf_code, id: "stock_logs_oshelfid_#{stock_log.id}", style: "display: none; width: 120px;", 'data-autocomplete' => if stock_log.stock.shelf.shelf_type!="broken" then "/shelves/autocomplete_shelf_shelf_code" else "/shelves/autocomplete_bad_shelf_code" end) <<
+          hidden_field_tag("stock_logs[][shelfid]", stock_log.shelf.id, id: "stock_logs_oshelfid_#{stock_log.id}") %>
         </td>
         <td>
           <%= content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})%>
         </td>
         <td>
-          <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_mamount_#{stock_log.id}", style: "display: none; width: 40px;") <<
+          <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_oamount_#{stock_log.id}", style: "display: none; width: 40px;") <<
           if stock_log.amount == 0 || stock_log.amount > stock_log.stock.actual_amount
-            content_tag(:p, stock_log.amount, {id: "stock_logs_mamount_#{stock_log.id}", style: 'background-color: red;'})
+            content_tag(:p, stock_log.amount, {id: "stock_logs_oamount_#{stock_log.id}", style: 'background-color: red;'})
           else
-            content_tag(:p, stock_log.amount, {id: "stock_logs_mamount_#{stock_log.id}"})
+            content_tag(:p, stock_log.amount, {id: "stock_logs_oamount_#{stock_log.id}"})
           end %>
         </td>
         <td id="stock_logs_status_<%=stock_log.id%>"><%=  StockLog::STATUS_SHOW[stock_log.status.to_sym] %></td>
@@ -56,11 +54,10 @@
   </table>
 </div>
 
-
   <div style="float:right">
     <% if can? :new, Stock %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
-                   "javascript:void(0)", onclick: "manual_stock_add()",
+                   "javascript:void(0)", onclick: "order_return_add()",
                     :class => 'btn btn-primary' %>
     <% end %>
   </div>
@@ -68,12 +65,9 @@
 
 <div>
   <% stocklogs = [] %>
-  <p>出库货物清单</p>
-    <% if @manual_stock%>
-      <% stocklogs = @manual_stock.stock_logs%>
-    <% else %>
-      <% stocklogs = @keyclientorder.stock_logs%>
-    <% end %>
+  <p>退货入库清单</p>
+    <% stocklogs = @order_return.stock_logs%>
+    
 <table class="table table-striped">
   <thead>
     <tr>
@@ -98,4 +92,3 @@
   </tbody>
 </table>
 </div>
-
