@@ -46,7 +46,7 @@ class SpecificationsController < ApplicationController
   # PATCH/PUT /specifications/1
   # PATCH/PUT /specifications/1.json
   def update
-    @specification.all_name=Commodity.find(@specification.commodity_id).name+@specification.name
+    # @specification.all_name=Commodity.find(@specification.commodity_id).name+@specification.name
     respond_to do |format|
       if @specification.update(specification_params)
         # @specification.update_attribute(:sku,Commodity.find(@specification.commodity_id).goodstype_id.to_s + @specification.commodity_id.to_s + @specification.id.to_s)

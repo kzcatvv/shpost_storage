@@ -28,5 +28,13 @@ class MoveStock < ActiveRecord::Base
     	end
     	return true
     end
-  
+
+  def has_waiting_stock_logs()
+    x = self.stock_logs.where(status: "waiting").size
+    if x == 0
+      return false
+    else
+      return true
+    end
+  end
 end

@@ -736,6 +736,7 @@ function  ajaxstocklogs(){
   }
   );
 
+
   $("input[id^=stock_logs_oshelfid]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
     $("input[id="+this.id+"][type=text]").val(data.item.value);
     $("input[id="+this.id+"][type=hidden]").val(data.item.id);
@@ -793,6 +794,25 @@ function  ajaxstocklogs(){
       $("p#"+this.id).text($(this).val());
     }
     order_return_modify(this);
+
+  $("input[id^=stock_logs_pickshelf]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
+    $("input[id="+this.id+"][type=text]").val(data.item.value);
+    $("input[id="+this.id+"][type=hidden]").val(data.item.id);
+    $("input[id="+this.id+"][type=text]").blur();
+    param = this.id.split('_');
+    id = param[3];
+    sheid = $("input[id="+this.id+"][type=hidden]").val();
+    $.ajax({
+      type: "POST",
+      url: "/stock_logs/mod_stocklog_pickin_shelf",
+      data: "id=" + id + "&shelfid=" + sheid,
+      dataType: "json",
+      complete: function(data) {
+        if (data.success){
+       
+        } 
+      }  
+    });
   });
 
   $("a[id$=assign]").unbind('click').click(
@@ -1144,7 +1164,7 @@ function keyclientorder_stock_add() {
   }
   tr.attr("id","stock_logs_id_"+addid);
   tr.appendTo("table#stock_logs");
-  
+
   tablereplace(addid,"p","id",addid);
   tablereplace(addid,"a","id",addid);
   tablereplace(addid,"a","href",addid);
@@ -1158,6 +1178,7 @@ function keyclientorder_stock_add() {
   tableset(addid,"kshelfid","")
   tableset(addid,"ksid","")
   tableset(addid,"status","处理中")
+  tableset(addid,"pickshelf","")
 
   ajaxstocklogs();
 }
@@ -1239,6 +1260,7 @@ function keyclientorder_stock_modify(current){
   ksid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_ksid_"+id).val();
   kcoid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kcoid_"+id+"][type=hidden]").val();
   kstid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kstid_"+id+"][type=hidden]").val();
+  pshid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_pickshelf_"+id+"][type=hidden]").val();
 
   x = param[3].substring(0,1)
   if (x == "0"){
@@ -1268,11 +1290,15 @@ function keyclientorder_stock_modify(current){
   if (kcoid == null){
     kcoid = ""
   }
+
+  if (pshid == null){
+    pshid = ""
+  }
   // alert(x+" "+stockid+" "+ksid+" "+kcoid);
   $.ajax({
     type: "POST",
     url: "/stock_logs/keyclientorder_stock_modify",
-    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid,
+    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid + "&pickshelfid=" + pshid,
     dataType: "json",
     complete: function(data) {
       if (data.success){
@@ -1287,9 +1313,11 @@ function keyclientorder_stock_modify(current){
           tablereplace(jsonData.id,"select","id",jsonData.id);
           tablereplace(jsonData.id,"td","id",jsonData.id);
 
+
           tableset(jsonData.id,"id",jsonData.id)
           tableset(jsonData.id,"kamount",""+jsonData.amount)
           tableset(jsonData.id,"actamount",""+jsonData.total_amount)
+          tableset(jsonData.id,"pickshelf",""+jsonData.pick_shelf)
 
           if (amount != jsonData.amount){
             alert("该明细最大可出库数量：" + jsonData.amount);
