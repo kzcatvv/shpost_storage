@@ -106,15 +106,15 @@ class RelationshipsController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
             2.upto(instance.last_row) do |line|
-              specification = Specification.accessible_by(current_ability).find_by sku: instance.cell(line,'D').to_s.split('.0')[0]
+              specification = Specification.accessible_by(current_ability).find_by sku: to_string(instance.cell(line,'D'))
               business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'H') 
               supplier = Supplier.accessible_by(current_ability).find_by name: instance.cell(line,'I')
               relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id
 
               if relationship.nil?
-                Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: instance.cell(line,'J').to_s.split('.0')[0], spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
+                Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
               else
-                Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: instance.cell(line,'J').to_s.split('.0')[0], spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
+                Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
               end
             end
             flash[:alert] = "导入成功"
@@ -198,4 +198,12 @@ class RelationshipsController < ApplicationController
       book.write xls_report  
       xls_report.string  
     end
+
+  def to_string(text)
+    if text.is_a? Float
+      return text.to_s.split('.0')[0]
+    else
+      return text
+    end
+  end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150113014706) do
+ActiveRecord::Schema.define(version: 20150113062321) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -164,6 +164,22 @@ ActiveRecord::Schema.define(version: 20150113014706) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "barcode"
+  end
+
+  create_table "mobile_logs", force: true do |t|
+    t.string   "status"
+    t.string   "operate_type"
+    t.string   "request"
+    t.string   "response"
+    t.string   "request_ip"
+    t.string   "response_ip"
+    t.string   "request_params"
+    t.integer  "user_id"
+    t.integer  "storage_id"
+    t.integer  "unit_id"
+    t.integer  "mobile_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "mobiles", force: true do |t|
@@ -331,6 +347,7 @@ ActiveRecord::Schema.define(version: 20150113014706) do
     t.string   "spec_desc"
     t.integer  "warning_amt"
     t.string   "barcode"
+    t.boolean  "piece_to_piece",   default: false
   end
 
   create_table "roles", force: true do |t|

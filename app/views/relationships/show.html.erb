@@ -16,6 +16,10 @@
   <dd><%= @relationship.spec_desc %></dd>
   <dt><strong><%= model_class.human_attribute_name(:warning_amt) %>:</strong></dt>
   <dd><%= @relationship.warning_amt %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:sku) %>:</strong></dt>
+  <dd><%= @relationship.barcode %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:piece_to_piece) %>:</strong></dt>
+  <dd><%= @relationship.piece_to_piece ? '是' : '否' %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

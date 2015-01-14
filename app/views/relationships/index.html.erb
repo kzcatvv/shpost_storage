@@ -36,6 +36,12 @@
 
     g.column name: model_class.human_attribute_name(:warning_amt), attribute: 'warning_amt'
 
+    g.column name: model_class.human_attribute_name(:sku), attribute: 'barcode'
+
+    g.column name: model_class.human_attribute_name(:piece_to_piece), attribute: 'piece_to_piece' do |relationship|
+        relationship.piece_to_piece ? '是' : '否'
+    end
+
     g.column do |relationship|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")),

@@ -11,6 +11,8 @@ class Task < ActiveRecord::Base
   ASSIGN_TYPE = {assigned: 'assigned', joined: 'joined'}
   TASK_TYPE = {in: 'in', out: 'out', reset: 'reset', move: 'move'}
 
+  OPERATE_TYPE = {Purchase: 'in', MoveStock: 'move', ManualStock: 'out', Keyclientorder: 'out', OrderReturn: 'in'}
+
   def done?
     (status.eql? Task::STATUS[:done]) ? true : false
   end

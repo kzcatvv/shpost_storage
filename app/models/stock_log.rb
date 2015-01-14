@@ -65,8 +65,15 @@ class StockLog < ActiveRecord::Base
       elsif self.operation_type.eql? OPERATION_TYPE[:reset]
         self.stock.check_reset_amount self.amount
       end
+
+      if !self.sn.blank?
+        self.stock.update_sn(self.sn, self.operation_type)
+      end
+
       self.status = STATUS[:checked]
       self.checked_at = Time.now
+
+
 
       self.save
     end
@@ -196,9 +203,9 @@ class StockLog < ActiveRecord::Base
       self.supplier_id = stock.supplier_id
       self.specification_id = stock.specification_id
       self.expiration_date = stock.expiration_date if !stock.expiration_date.blank?
-      self.batch_no = stock.batch_no
+      self.batch_no = stock.batch_no if !stock.batch_no.blank?
       self.relationship = stock.relationship
-      self.sn = stock.sn
+      # self.sn = stock.sn
     end
   end
 

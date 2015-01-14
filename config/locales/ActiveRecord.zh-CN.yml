@@ -470,6 +470,8 @@ zh-CN:
         external_code: "第三方商品编码"
         spec_desc: "规格描述"
         warning_amt: "预警数量"
+        sku: "条码"
+        piece_to_piece: "逐件扫描"
       business:
         "no": "商户编号"
         name: "商户名称"
@@ -555,7 +557,8 @@ zh-CN:
         specification_id: "规格"
         expiration_date: "保质期"
         batch_no: "批次号"
-        amount: "数量"
+        amount: "预计数量"
+        checked_amount: "实到数量"
         sum: "金额"
         desc: "备注"
         status: "状态"
@@ -751,6 +754,9 @@ zh-CN:
         shelf:
           name: "货架管理"
           link: "/shelves/"
+        mobile:
+          name: "设备管理"
+          link: "/mobiles/"
           # needrole:
           #   can: :read
           #   role: "shelf"

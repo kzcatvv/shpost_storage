@@ -42,7 +42,9 @@
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount', filter: false
 
-   
+    g.column name: model_class.human_attribute_name(:checked_amount),  filter: false do |purchase_detail|
+      purchase_detail.checked_amount
+    end
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
