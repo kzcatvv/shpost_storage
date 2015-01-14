@@ -10,6 +10,8 @@ ShpostStorage::Application.routes.draw do
     end
     member do
       get 'movedetail'
+      get 'assign'
+      post 'assign_select'
     end
   end
 
