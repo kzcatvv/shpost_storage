@@ -13,6 +13,7 @@ ready = ->
   $('#purchase_detail_supplier_id').change(pdsid)
 
 pdsid = ->
+  
   supplier_id = $('#purchase_detail_supplier_id').val()
   
   surl = $("#pd_specification_name").attr("data-autocomplete");
