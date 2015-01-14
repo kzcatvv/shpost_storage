@@ -142,6 +142,10 @@ class CommoditiesController < ApplicationController
   end
 
   def to_string(text)
-    text.to_s.split('.0')[0]
+    if text.is_a? Float
+      return text.to_s.split('.0')[0]
+    else
+      return text
+    end
   end
 end
