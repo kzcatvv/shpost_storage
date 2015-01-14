@@ -794,6 +794,7 @@ function  ajaxstocklogs(){
       $("p#"+this.id).text($(this).val());
     }
     order_return_modify(this);
+  });
 
   $("input[id^=stock_logs_pickshelf]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
     $("input[id="+this.id+"][type=text]").val(data.item.value);
