@@ -80,7 +80,7 @@ class PrintController < ApplicationController
         end
         # flash[:alert] = "正在打印"
 
-        format.html { redirect_to keyclientorder_orders_path(@keycorder), notice: '正在打印' }
+        format.html { redirect_to keyclientorder_orders_path(@keycorder) }
         format.json { head :no_content }
     end
 

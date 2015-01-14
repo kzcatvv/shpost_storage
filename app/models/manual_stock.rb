@@ -93,4 +93,13 @@ class ManualStock < ActiveRecord::Base
     sum_stock_logs.delete_if {|key, value| value <= 0}
     sum_amount.delete_if {|key, value| value <= 0}
   end
+
+  def has_waiting_stock_logs()
+    x = self.stock_logs.where(status: "waiting").size
+    if x == 0
+      return false
+    else
+      return true
+    end
+  end
 end

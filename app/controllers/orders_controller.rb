@@ -307,36 +307,36 @@ class OrdersController < ApplicationController
 
   # end
 
-  def stockout
-    begin
-    Order.transaction do
-      @keyclientorder = Keyclientorder.find(params[:format])
+  # def stockout
+  #   begin
+  #   Order.transaction do
+  #     @keyclientorder = Keyclientorder.find(params[:format])
 
-      needpick = current_storage.need_pick
+      # needpick = current_storage.need_pick
 
-      if needpick
-        Stock.pick_stock_out(@keyclientorder, current_user)
+      # if needpick
+      #   Stock.pick_stock_out(@keyclientorder, current_user)
 
-        @stock_logs = @keyclientorder.stock_logs.where(" operation_type = 'out' ")
-      else
+  #       @stock_logs = @keyclientorder.stock_logs.where(" operation_type = 'out' ")
+  #     else
 
-        Stock.order_stock_out(@keyclientorder, current_user)
+  #       Stock.order_stock_out(@keyclientorder, current_user)
 
-        @keyclientorder.orders.each do |order|
-          order.set_picking
-        end
+  #       @keyclientorder.orders.each do |order|
+  #         order.set_picking
+  #       end
       
-        @stock_logs = @keyclientorder.stock_logs
-      end
-        @stock_logs_grid = initialize_grid(@stock_logs)
-    end
-    rescue Exception => e
-      Rails.logger.error e.backtrace
-      flash[:alert] = e.message
-      redirect_to :action => 'findprintindex'
-      # raise ActiveRecord::Rollback
-    end
-  end
+  #       @stock_logs = @keyclientorder.stock_logs
+  #     end
+  #       @stock_logs_grid = initialize_grid(@stock_logs)
+  #   end
+  #   rescue Exception => e
+  #     Rails.logger.error e.backtrace
+  #     flash[:alert] = e.message
+  #     redirect_to :action => 'findprintindex'
+  #     # raise ActiveRecord::Rollback
+  #   end
+  # end
 
   # def key_check_out_stocks(keyclientorder)
   #   orderchk = true

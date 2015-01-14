@@ -6,8 +6,12 @@ ShpostStorage::Application.routes.draw do
 
   resources :move_stocks do
     collection do
-      get 'movedetail'
       patch 'check'
+    end
+    member do
+      get 'movedetail'
+      get 'assign'
+      post 'assign_select'
     end
   end
 
@@ -38,6 +42,8 @@ ShpostStorage::Application.routes.draw do
     member do
       patch 'onecheck'
       get 'stock_out'
+      get 'assign'
+      post 'assign_select'
       patch 'check'
       patch 'close'
       get 'scan'
@@ -71,7 +77,7 @@ ShpostStorage::Application.routes.draw do
   resources :orders do
      collection do
         get 'findprint'
-        get 'stockout'
+        # get 'stockout'
         # get 'ordercheck'
         get 'nextbatch'
         get 'packout'
@@ -119,6 +125,9 @@ ShpostStorage::Application.routes.draw do
     resources :keyclientorderdetails
     member do
       post 'pdjs'
+      get 'stockout'
+      get 'assign'
+      post 'assign_select'
     end
   end
 

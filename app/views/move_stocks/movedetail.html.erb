@@ -10,6 +10,7 @@
                   check_move_stocks_url(@movestockid),
                   method: :patch,
                   :class => 'btn btn-primary' %>
+      <a href="javascript:void(0);", id='move_stock_assign', class='btn btn-primary' >移库单分配</a>
   </div>
 </div>
 <%= hidden_field_tag('movestockid',@movestockid )%>
