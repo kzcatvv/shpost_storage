@@ -157,7 +157,7 @@ class StockLogsController < ApplicationController
       # binding.pry
       @orgstock = Stock.find(params[:stock_id])
       @shelf = Shelf.find(params[:shelf_id])
-      stock = Stock.get_available_stock_in_shelf(@orgstock.specification, @orgstock.supplier, @orgstock.business, @orgstock.batch_no, @shelf, false)
+      stock = Stock.get_available_stock_in_shelf(@orgstock.specification, @orgstock.supplier, @orgstock.business, @orgstock.batch_no, @shelf)
 
       if params[:stocklogid].blank?
         @move_stock = MoveStock.find(params[:move_stock_id])

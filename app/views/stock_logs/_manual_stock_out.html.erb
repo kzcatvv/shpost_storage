@@ -29,7 +29,7 @@
         
         <%= hidden_field_tag("stock_logs[][#{stock_log.stock_id}]", stock_log.stock_id, id: "stock_logs_stid_#{stock_log.id}") %>
         <%= select_tag("stock_logs[][#{stock_log.stock_id}]", "<option value=''>未选择</option>".html_safe,  id: "stock_logs_mshelfid_#{stock_log.id}", style: "display: none;") <<
-        content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_mshelfid_#{stock_log.id}"}) %>
+        content_tag(:p, "#{stock_log.shelf.shelf_code}(批次:#{stock_log.stock.batch_no},库存:#{stock_log.stock.actual_amount})", {id: "stock_logs_mshelfid_#{stock_log.id}"}) %>
         </td>
         <td>
           <%= content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})%>
@@ -74,6 +74,7 @@
     <% else %>
       <% stocklogs = @keyclientorder.stock_logs%>
     <% end %>
+    
 <table class="table table-striped">
   <thead>
     <tr>
