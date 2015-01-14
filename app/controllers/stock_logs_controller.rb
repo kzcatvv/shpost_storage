@@ -51,7 +51,7 @@ class StockLogsController < ApplicationController
       return render json: {}
     end
 
-    stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.purchase.business, @arrival.batch_no, @shelf, false)
+    stock = Stock.get_available_stock_in_shelf(@arrival.purchase_detail.specification, @arrival.purchase_detail.supplier, @arrival.purchase_detail.purchase.business, @arrival.batch_no, @shelf)
 
     if @stock_log.try :waiting?
       @stock_log.update(parent: @arrival.purchase_detail.purchase, stock: stock, operation: StockLog::OPERATION[:purchase_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], expiration_date: @arrival.expiration_date)
@@ -157,7 +157,7 @@ class StockLogsController < ApplicationController
       # binding.pry
       @orgstock = Stock.find(params[:stock_id])
       @shelf = Shelf.find(params[:shelf_id])
-      stock = Stock.get_available_stock_in_shelf(@orgstock.specification, @orgstock.supplier, @orgstock.business, @orgstock.batch_no, @shelf, false)
+      stock = Stock.get_available_stock_in_shelf(@orgstock.specification, @orgstock.supplier, @orgstock.business, @orgstock.batch_no, @shelf)
 
       if params[:stocklogid].blank?
         @move_stock = MoveStock.find(params[:move_stock_id])

@@ -30,11 +30,11 @@
           hidden_field_tag("stock_logs[][shelfid]", stock_log.shelf.id, id: "stock_logs_shelfid_#{stock_log.id}") %>
         </td>
         <td>
-          <%= content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})%>
+          <%= content_tag(:p, Stock.total_stock_in_shelf(stock_log.specification, stock_log.supplier, stock_log.business, stock_log.shelf), {id: "stock_logs_actamount_#{stock_log.id}"})%>
         </td>
         <td>
           <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", style: "display: none; width: 40px;") <<
-          if stock_log.amount == 0 || (stock_log.operation_type == "out" && stock_log.amount > stock_log.stock.actual_amount)
+          if stock_log.amount == 0 || (stock_log.operation_type == "out" && stock_log.amount > Stock.total_stock_in_shelf(stock_log.specification, stock_log.supplier, stock_log.business, stock_log.shelf))
             content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", style: 'background-color: red;'})
           else
             content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}"})
