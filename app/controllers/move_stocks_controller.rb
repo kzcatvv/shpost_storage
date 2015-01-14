@@ -54,8 +54,8 @@ class MoveStocksController < ApplicationController
   end
 
   def movedetail
-    @movestock = MoveStock.find(params[:format])
-    @movestockid = MoveStock.find(params[:format]).id
+    @movestock = @move_stock
+    @movestockid = @move_stock.id
 
     qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
     @qr=qrcode.to_img
