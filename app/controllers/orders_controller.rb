@@ -672,9 +672,12 @@ class OrdersController < ApplicationController
               if !external_code.blank?
                 suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{business_id}","#{external_code}").first.supplier_id
                 spid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{business_id}","#{external_code}").first.specification_id
-
-                supplier_no = Supplier.where("id = ?", "#{suid}").first.no
-                sku_id = Specification.where("id = ?","#{spid}").first.sku
+                if !suid.blank?
+                  supplier_no = Supplier.where("id = ?", "#{suid}").first.no
+                end 
+                if !spid.blank?
+                  sku_id = Specification.where("id = ?","#{spid}").first.sku
+                end
                 
               end 
               # binding.pry
@@ -1152,9 +1155,12 @@ class OrdersController < ApplicationController
               if !external_code.blank?
                 suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{dorder_business_id}","#{external_code}").first.supplier_id
                 spid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{dorder_business_id}","#{external_code}").first.specification_id
-
-                supplier_no = Supplier.where("id = ?", "#{suid}").first.no
-                sku_id = Specification.where("id = ?","#{spid}").first.sku
+                if !suid.blank?
+                  supplier_no = Supplier.where("id = ?", "#{suid}").first.no
+                end
+                if !spid.blank?
+                  sku_id = Specification.where("id = ?","#{spid}").first.sku
+                end
                 
               end 
 
