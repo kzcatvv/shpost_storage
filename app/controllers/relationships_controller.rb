@@ -109,7 +109,7 @@ class RelationshipsController < ApplicationController
               specification = Specification.accessible_by(current_ability).find_by sku: to_string(instance.cell(line,'D'))
               business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'H') 
               supplier = Supplier.accessible_by(current_ability).find_by name: instance.cell(line,'I')
-              relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id
+              relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id, supplier_id: supplier.id
 
               if relationship.nil?
                 Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
