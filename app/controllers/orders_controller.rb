@@ -680,7 +680,12 @@ class OrdersController < ApplicationController
                 end
                 
               end 
-              # binding.pry
+              if supplier_no.blank?
+                raise "导入文件第" + dline.to_s + "行数据, 找不到供应商编号，导入失败"
+              end
+              if sku_id.blank?
+                raise "导入文件第" + dline.to_s + "行数据, 找不到sku，导入失败"
+              end
 
               #数量
               amount = instance.cell(dline,'E').to_s.split('.0')[0]
