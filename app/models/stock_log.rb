@@ -176,7 +176,7 @@ class StockLog < ActiveRecord::Base
     elsif operation.eql? OPERATION[:order_return] or operation.eql? OPERATION[:order_bad_return]
       order_details = self.parent.order_return_details.joins(:order_detail).select(:order_detail_id)
 
-      max_amount = OrderDetail.where(id: order_details).sum(:amount)
+      max_amount = OrderDetail.where(id: order_details).sum(:amount) - self.parent.stock_logs.where(batch_no: self.batch_no).where.not(id: self.id).sum(:amount)
 
       if total_amount > max_amount
         total_amount = max_amount

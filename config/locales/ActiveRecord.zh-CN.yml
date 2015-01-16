@@ -436,6 +436,7 @@ zh-CN:
         operation_b2c_stock_out: "电商出库"
         operation_b2b_stock_out: "大客户出库"
         operation_order_return: "退货"
+        operation_order_bad_return: "破损退货"
       supplier:
         "no": "供应商编号"
         name: "名称"

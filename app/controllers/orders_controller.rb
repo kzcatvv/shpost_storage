@@ -1060,7 +1060,7 @@ class OrdersController < ApplicationController
               #business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
               batch_no = instance.cell(line,'N').to_s.split('.0')[0]
               if batch_no.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
+                raise "导入文件第" + line.to_s + "行数据, 缺少订单流水号，导入失败"
               end
 
               order = Order.accessible_by(current_ability).find_by  batch_no: batch_no
@@ -1118,16 +1118,28 @@ class OrdersController < ApplicationController
 
             dline = line+2
             dline.upto(instance.last_row) do |dline|
-              batch_no = instance.cell(dline,'E').to_s.split('.0')[0]
+              batch_no = instance.cell(dline,'F').to_s.split('.0')[0]
               if batch_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
               end
+
+              dorders = Order.accessible_by(current_ability).where batch_no: batch_no
+              dorder = Order.accessible_by(current_ability).find_by batch_no: batch_no
+              
+              if dorders.size == 0
+                raise "导入文件第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
+              end
+
+              dorder_id = dorder.id.to_s
+              dorder_total_amount = dorder.total_amount
+              dorder_business_id = dorder.business_id
+
 
               business_order_id = instance.cell(dline,'A').to_s.split('.0')[0]
               if business_order_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
-
+              
               #第三方编码
               external_code = instance.cell(dline,'B').to_s.split('.0')[0]
               #供应商编号
@@ -1136,10 +1148,10 @@ class OrdersController < ApplicationController
               end
               #sku
               sku_id = instance.cell(dline,'D').to_s.split('.0')[0]
-
+              
               if !external_code.blank?
-                suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{business_id}","#{external_code}").first.supplier_id
-                spid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{business_id}","#{external_code}").first.specification_id
+                suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{dorder_business_id}","#{external_code}").first.supplier_id
+                spid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{dorder_business_id}","#{external_code}").first.specification_id
 
                 supplier_no = Supplier.where("id = ?", "#{suid}").first.no
                 sku_id = Specification.where("id = ?","#{spid}").first.sku
@@ -1166,17 +1178,7 @@ class OrdersController < ApplicationController
                 raise "导入文件第" + dline.to_s + "行数据, 供应商不存在，导入失败"
               end
 
-              dorders = Order.accessible_by(current_ability).where batch_no: batch_no
-              dorder = Order.accessible_by(current_ability).find_by batch_no: batch_no
-
-              if dorders.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
-              end
-
-              dorder_id = dorder.id.to_s
-              dorder_total_amount = dorder.total_amount
-              dorder_business_id = dorder.business_id
-
+              
               relationships = Relationship.accessible_by(current_ability).where("business_id = ? and supplier_id = ? and specification_id = ?", "#{dorder_business_id}","#{supplier_id}","#{specification_id}")
               if relationships.size == 0
                 raise "导入文件第" + dline.to_s + "行数据, 商品对应关系不存在，导入失败"

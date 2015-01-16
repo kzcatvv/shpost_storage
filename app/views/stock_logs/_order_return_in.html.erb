@@ -34,7 +34,7 @@
         </td>
         <td>
           <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_oamount_#{stock_log.id}", style: "display: none; width: 40px;") <<
-          if stock_log.amount == 0 || stock_log.amount > stock_log.stock.actual_amount
+          if stock_log.amount == 0
             content_tag(:p, stock_log.amount, {id: "stock_logs_oamount_#{stock_log.id}", style: 'background-color: red;'})
           else
             content_tag(:p, stock_log.amount, {id: "stock_logs_oamount_#{stock_log.id}"})
