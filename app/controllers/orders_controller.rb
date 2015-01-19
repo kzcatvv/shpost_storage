@@ -615,7 +615,7 @@ class OrdersController < ApplicationController
                 end 
 
                 #物流单号
-                tracking_number = instance.cell(line,'B').to_s.split('.0')[0]
+                tracking_number = to_string(instance.cell(line,'B'))
                 if tracking_number.blank?
                   tracking_number = nil
                 else
@@ -628,7 +628,7 @@ class OrdersController < ApplicationController
                   end
                 end
                 #外部订单号
-                business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
+                business_order_id = to_string(instance.cell(line,'A'))
                 ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id:business_id
 
                 #判断是否已存在该订单
@@ -654,20 +654,20 @@ class OrdersController < ApplicationController
             dline = line+2
             dline.upto(instance.last_row) do |dline|
               #外部订单号
-              business_order_id = instance.cell(dline,'A').to_s.split('.0')[0]
+              business_order_id = to_string(instance.cell(dline,'A'))
               if business_order_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
 
               #第三方编码
-              external_code = instance.cell(dline,'B').to_s.split('.0')[0]
+              external_code = to_string(instance.cell(dline,'B'))
               
               #供应商编号
               if !instance.cell(dline,'C').blank?
                 supplier_no = instance.cell(dline,'C').to_s.split('.0')[0].rjust(10, '0')
               end
               #sku
-              sku_id = instance.cell(dline,'D').to_s.split('.0')[0]
+              sku_id = to_string(instance.cell(dline,'D'))
 
               if !external_code.blank?
                 suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{business_id}","#{external_code}").first.supplier_id
@@ -1066,7 +1066,7 @@ class OrdersController < ApplicationController
             
             until instance.cell(line,'A').blank? do
               #business_order_id = instance.cell(line,'A').to_s.split('.0')[0]
-              batch_no = instance.cell(line,'N').to_s.split('.0')[0]
+              batch_no = to_string(instance.cell(line,'N'))
               if batch_no.blank?
                 raise "导入文件第" + line.to_s + "行数据, 缺少订单流水号，导入失败"
               end
@@ -1078,7 +1078,7 @@ class OrdersController < ApplicationController
                 flash_message << "导入文件第" + line.to_s + "行数据, 订单已处理，无法导入\<br/\>"
                 next
               end
-              tracking_number = instance.cell(line,'B').to_s.split('.0')[0]
+              tracking_number = to_string(instance.cell(line,'B'))
               if tracking_number.blank?
                 next
               end
@@ -1126,7 +1126,7 @@ class OrdersController < ApplicationController
 
             dline = line+2
             dline.upto(instance.last_row) do |dline|
-              batch_no = instance.cell(dline,'F').to_s.split('.0')[0]
+              batch_no = to_string(instance.cell(dline,'F'))
               if batch_no.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少订单流水号，导入失败"
               end
@@ -1143,19 +1143,19 @@ class OrdersController < ApplicationController
               dorder_business_id = dorder.business_id
 
 
-              business_order_id = instance.cell(dline,'A').to_s.split('.0')[0]
+              business_order_id = to_string(instance.cell(dline,'A'))
               if business_order_id.blank?
                 raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
               
               #第三方编码
-              external_code = instance.cell(dline,'B').to_s.split('.0')[0]
+              external_code = to_string(instance.cell(dline,'B'))
               #供应商编号
               if !instance.cell(dline,'C').blank?
                 supplier_no = instance.cell(dline,'C').to_s.split('.0')[0].rjust(10, '0')
               end
               #sku
-              sku_id = instance.cell(dline,'D').to_s.split('.0')[0]
+              sku_id = to_string(instance.cell(dline,'D'))
               
               if !external_code.blank?
                 suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{dorder_business_id}","#{external_code}").first.supplier_id
@@ -1168,6 +1168,12 @@ class OrdersController < ApplicationController
                 end
                 
               end 
+              if supplier_no.blank?
+                raise "导入文件第" + dline.to_s + "行数据, 找不到供应商编号，导入失败"
+              end
+              if sku_id.blank?
+                raise "导入文件第" + dline.to_s + "行数据, 找不到sku，导入失败"
+              end
 
               amount = instance.cell(dline,'E').to_s.split('.0')[0]
               if amount.blank?
@@ -1534,6 +1540,14 @@ def exportorders_xls_content_for(objs)
 
   def add_text(index,content)
     index == 0? content:(","+content)
+  end
+
+  def to_string(text)
+    if text.is_a? Float
+      return text.to_s.split('.0')[0]
+    else
+      return text
+    end
   end
 
 end
