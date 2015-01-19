@@ -12,14 +12,14 @@ tcsd:
         #for test
         uri: 'http://10.126.22.202/tcbd_webs/n_tcbd_webs.asmx?wsdl'
         #for produciton
-        # uri: 'http://10.126.25.25:800/tcbd_webs/n_tcbd_webs.asmx?wsdl'
+        #uri: 'http://10.126.25.25:800/tcbd_webs/n_tcbd_webs.asmx?wsdl'
         method: 'jk_pdjs'
         interval: 43200
     order_query:
         #for test
         uri: 'http://10.126.22.202/tcbd_webs/n_tcbd_webs.asmx?wsdl'
         #for produciton
-        # uri: 'http://10.126.25.25:800/tcbd_webs/n_tcbd_webs.asmx?wsdl'
+        #uri: 'http://10.126.25.25:800/tcbd_webs/n_tcbd_webs.asmx?wsdl'
         method: 'jk_yjrzcx'
         interval: 43200
         length: 10 #单次查询最大个数
@@ -30,10 +30,10 @@ csb_interface:
     update_point_order_status_url: 'http://222.68.185.224:10088/UpdatePointOrderStatus/V1_0'
     point_update_trans_status_url: 'http://222.68.185.224:10088/PointUpdateTransStatus/V1_0'
     # for production
-    #send_point_order_url: 'http://172.16.203.100:3000/SendPointOrder/V1_0'
-    #point_order_status_url: 'http://172.16.203.100:3000/PointOrderStatus/V1_0'
-    #update_point_order_status_url: 'http://172.16.203.100:3000/UpdatePointOrderStatus/V1_0'
-    #point_update_trans_status_url: 'http://172.16.203.100:3000/PointUpdateTransStatus/V1_0'
+    #send_point_order_url: 'http://10.126.40.12:3000/SendPointOrder/V1_0'
+    #point_order_status_url: 'http://10.126.40.12:3000/PointOrderStatus/V1_0'
+    #update_point_order_status_url: 'http://10.126.40.12:3000/UpdatePointOrderStatus/V1_0'
+    #point_update_trans_status_url: 'http://10.126.40.12:3000/PointUpdateTransStatus/V1_0'
     post_name: '闸北邮政' #XX配送商
     bst_name: '积分平台' #积分平台
     return_count: 10 #每次返回订单配送状态的最大条数
