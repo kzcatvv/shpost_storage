@@ -1443,7 +1443,7 @@ def exportorders_xls_content_for(objs)
 
     detail_row = count_row+1
     sheet1.row(detail_row).default_format = blue 
-    sheet1.row(detail_row).concat %w{订单号(外部) 第三方编码  供应商编号 SKU 数量 订单流水号}
+    sheet1.row(detail_row).concat %w{订单号(外部) 第三方编码  供应商编号 SKU 数量 订单流水号 商品名称}
     detail_row = detail_row + 1
     objs.each do |obj|
       obj_id = obj.id
@@ -1455,7 +1455,7 @@ def exportorders_xls_content_for(objs)
         supplier_no = Supplier.accessible_by(current_ability).find_by('id = ?',"#{supplier_id}").no
 
         specification_id = order_detail.specification_id
-        sku = Specification.accessible_by(current_ability).find(specification_id).sku
+        specification = Specification.accessible_by(current_ability).find(specification_id)
 
         external_code = Relationship.find_by(business_id: business_id, supplier_id: supplier_id, specification_id: specification_id).external_code
 
@@ -1463,9 +1463,10 @@ def exportorders_xls_content_for(objs)
         sheet1[detail_row,0]=order_detail.order.business_order_id
         sheet1[detail_row,1]=external_code
         sheet1[detail_row,2]=supplier_no
-        sheet1[detail_row,3]=sku
+        sheet1[detail_row,3]=specification.sku
         sheet1[detail_row,4]=order_detail.amount
         sheet1[detail_row,5]=order_detail.order.batch_no
+        sheet1[detail_row,6]=specification.all_name
 
         detail_row += 1
       end
