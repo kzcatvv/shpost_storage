@@ -15,14 +15,19 @@
 
   	LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
   	LODOP.PRINT_INIT("打印货架条码");
+    start_code=50
+    start_barcode=80
+    i=100
     <% @shelves.each do |shelf| %>
       LODOP.SET_PRINT_STYLE("FontSize",18);
       LODOP.SET_PRINT_STYLE("Bold",1);
       LODOP.SET_PRINT_STYLE("ItemType",4);
-      LODOP.ADD_PRINT_TEXT(50,"35%",260,39,'<%= shelf.shelf_code %>');
+      LODOP.ADD_PRINT_TEXT(start_code,"35%",260,39,'<%= shelf.shelf_code %>');
       LODOP.SET_PRINT_STYLE("FontSize",12);
       LODOP.SET_PRINT_STYLE("Bold",0);
-      LODOP.ADD_PRINT_BARCODE(80,"35%",260,39,'128A','<%= shelf.barcode %>');
+      LODOP.ADD_PRINT_BARCODE(start_barcode,"35%",260,39,'128A','<%= shelf.barcode %>');
+      start_code=start_code+i;
+      start_barcode=start_barcode+i;
     <% end %>
     LODOP.PREVIEW();  
   };
