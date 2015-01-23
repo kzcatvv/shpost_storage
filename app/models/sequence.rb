@@ -1,7 +1,7 @@
 class Sequence < ActiveRecord::Base
   belongs_to :unit
 
-  Barcodes = {Shelf: 'SH', Specification: 'SP', Purchase: 'PUR', ManualStock: 'MS', Business: 'BUS', Supplier: 'SUP', OrderReturn: 'OR', Keyclientorder: 'KCO', Order: 'ORD', Task: 'TAS', Relationship: 'REL', MoveStock: 'MOS'}
+  Barcodes = {Shelf: 'SH', Specification: 'SP', Purchase: 'PUR', ManualStock: 'MS', Business: 'BUS', Supplier: 'SUP', OrderReturn: 'OR', Keyclientorder: 'KCO', Order: 'ORD', Task: 'TAS', Relationship: 'REL', MoveStock: 'MOS', Inventory: 'INV'}
 
 
   Batchs = {PurchaseArrival: 'PA', PurchaseDetail: 'PD', Keyclientorder: 'KCO', Order: 'ORD', OrderReturn: 'OR'}

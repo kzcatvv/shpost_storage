@@ -1,5 +1,17 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :inventories  do
+    collection do
+      get 'find_shelf_stock'
+      get 'find_stamt'
+      patch 'check'
+    end
+
+    member do
+      get 'inventorydetail'
+    end
+  end
+
   resources :mobile_logs
 
   resources :tasks
@@ -220,6 +232,7 @@ ShpostStorage::Application.routes.draw do
       post 'keyclientorder_stock_modify'
       post 'order_return_modify'
       post 'mod_stocklog_pickin_shelf'
+      post 'inventory_modify'
     end
   end
 
