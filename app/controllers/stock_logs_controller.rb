@@ -142,11 +142,16 @@ class StockLogsController < ApplicationController
   end
 
   def remove
-    if !@stock_log.blank?
-      @stock_log.delete
-    end
-    if !@stock_log.pick_in.blank?
-      @stock_log.pick_in.delete
+    # binding.pry
+    if params[:inv_id].blank?
+      if !@stock_log.blank?
+        @stock_log.delete
+      end
+      if !@stock_log.pick_in.blank?
+        @stock_log.pick_in.delete
+      end
+    else
+      @stock_log.update(operation_type: "resetdel")
     end
     render text: 'remove'
   end
@@ -183,6 +188,35 @@ class StockLogsController < ApplicationController
       render json: {}
     end
    
+  end
+
+  def inventory_modify
+    if !params[:amount].blank? && !params[:shelf_id].blank? && !params[:stock_id].blank?
+      # binding.pry
+      @orgstock = Stock.find(params[:stock_id])
+      @shelf = Shelf.find(params[:shelf_id])
+
+      if params[:slid].blank?
+        @inventory = Inventory.find(params[:inv_id])
+        @stock_log = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:reset], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)      
+
+      else
+
+        @stock_log = StockLog.find(params[:slid])
+        @stock_log.update(user: current_user ,stock: @orgstock, batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
+      
+      end
+
+      @stock_log.update_amount(Integer(params[:amount]))
+
+      total_amount = @stock_log.stock.actual_amount
+
+      render json: {stock_log_id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount }
+    
+    else
+      render json: {}
+    end
+
   end
 
   def mod_stocklog_pickin_shelf

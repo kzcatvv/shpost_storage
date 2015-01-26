@@ -491,10 +491,14 @@ function removeTr(current)
   } else {
     x = param[3]
   }
+  var invid = $("#inventoryid").val();
+  if (invid == null){
+    invid=""
+  }
   $.ajax({
     type: "POST",
     url: "/stock_logs/remove",
-    data: "id=" + x,
+    data: "id=" + x +"&inv_id=" + invid,
     dataType: "json",
     complete: function() {
       $("p#"+current.id).css("background-color","transparent");
@@ -1413,3 +1417,130 @@ function order_return_modify(current)
     }
   });
 }
+
+function ajaxinventory() {
+
+  $("select[id^=stock_logs_invshelfid]").unbind('change').change(function(){
+    param = this.id.split('_');
+    rowid = param[3];
+    $.ajax({
+      type : 'GET',
+      url : '/inventories/find_shelf_stock/',
+      data: { shelf_id: $(this).val(),
+              row_id: rowid},
+      dataType : 'script'
+    });
+  });
+
+  $("select[id^=stock_logs_invstockid]").unbind('change').change(function(){
+    param = this.id.split('_');
+    rowid = param[3];
+    stockid = $(this).val();
+    $.ajax({
+      type : 'GET',
+      url : '/inventories/find_stamt/',
+      data: "stock_id=" + stockid + "&row_id=" + rowid,
+      dataType: "json",
+      complete: function(data) {
+        if(data.success){
+        
+          var jsonData = eval("("+data.responseText+")");
+
+          $("#stock_logs_invactamount_"+rowid).val(jsonData.actual_amount);
+
+        }
+      }
+    });
+  });
+
+  $("input[id^=stock_logs_invamount]").unbind('blur').blur(function() {
+    alert(this.id);
+    inventory_modify(this);
+    alert(this.id);
+  });
+
+}
+
+function add_inventory_dtl(){
+  var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
+  var addid = "00";
+  if ($("tr[id^=stock_logs_id]").last().attr("id") != undefined ) {
+    param = $("tr[id^=stock_logs_id]").last().attr("id").split('_');
+    addid = "0"+ (parseInt(param[3])+1);
+  }
+  alert(addid);
+  tr.attr("id","stock_logs_id_"+addid);
+  tr.appendTo("table#stock_logs");
+  // slid=$('table.wice-grid tr:eq(2) input').first().val();
+  // var index=tr.index()+2;
+  // addTr(slid,index);
+  tablereplace(addid,"a","id",addid);
+  tablereplace(addid,"a","href",addid);
+  tablereplace(addid,"input","id",addid);
+  tablereplace(addid,"select","id",addid);
+  tablereplace(addid,"td","id",addid);
+
+  tableset(addid,"id",addid)
+  tableset(addid,"invactamount","0")
+  tableset(addid,"invamount","0")
+  tableset(addid,"invshelfid","0")
+  tableset(addid,"invstockid","0")
+  tableset(addid,"invstatus","处理中")
+  
+  ajaxinventory();
+}
+
+function inventory_modify(current)
+{
+  param = current.id.split('_');
+  id = param[3];
+  shelfid = $("#stock_logs_invshelfid_"+id).val();
+  stockid = $("#stock_logs_invstockid_"+id).val();
+  amount = $("#stock_logs_invamount_"+id).val();
+  invid = $("#inventoryid").val();
+
+  var x = param[3].substring(0,1)
+  if (x == "0") {
+    x = ""
+  } else {
+    x = param[3]
+  }
+  if (shelfid == null) {
+    shelfid = ""
+  }
+  if (stockid == null) {
+    stockid = ""
+  }
+  if (amount == null) {
+    amount = ""
+  }
+  // alert("id"+id+"shelfid"+shelfid+"orid"+orid+"amount"+amount);
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/inventory_modify",
+    data: "slid=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&stock_id=" + stockid + "&inv_id=" + invid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+        // alert(data.responseText);
+        
+        if (jsonData.stock_log_id != undefined) {
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.stock_log_id);
+
+          tablereplace(jsonData.stock_log_id,"a","id",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"a","href",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"input","id",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"select","id",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"td","id",jsonData.stock_log_id);
+
+          tableset(jsonData.stock_log_id,"invamount",jsonData.amount)
+
+        }
+      }
+    }
+  });
+}
+
+

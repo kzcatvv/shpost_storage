@@ -37,6 +37,7 @@ class Ability
         can :new, Relationship
 
         can :manage, MoveStock, unit_id: user.unit_id
+        can :manage, Inventory, unit_id: user.unit_id
 
         can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name,:si_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
 
@@ -170,6 +171,7 @@ class Ability
         can :manage, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :manage, MoveStock, unit_id: user.unit_id
+        can :manage, Inventory, unit_id: user.unit_id
         # can [:read, :getstock, :findstock], Stock, shelf: {area: {storage_id: storage.id}}
 
         # can :new, Stock, shelf: {area: {storage_id: storage.id}}
@@ -292,6 +294,7 @@ class Ability
 
         can :manage, MoveStock, unit_id: user.unit_id
         can :read, StockLog, shelf: {area: {storage_id: storage.id}}
+        can :manage, Inventory, unit_id: user.unit_id
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end

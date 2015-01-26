@@ -61,11 +61,11 @@ class MoveStocksController < ApplicationController
       Task.save_task(@move_stock,@move_stock.storage.id,nil)
     end
     
-    qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
-    @qr=qrcode.to_img
-    direct = "#{Rails.root}/app/assets/images/"
-    fnm = direct + "really_cool_qr_image.png"
-    @qr=@qr.resize(200, 200).save(fnm)
+    # qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
+    # @qr=qrcode.to_img
+    # direct = "#{Rails.root}/app/assets/images/"
+    # fnm = direct + "really_cool_qr_image.png"
+    # @qr=@qr.resize(200, 200).save(fnm)
   end
 
   def assign
