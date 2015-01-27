@@ -35,7 +35,7 @@ class PurchaseDetail < ActiveRecord::Base
   end
 
   def all_checked?
-    self.purchase_arrivals.sum(:arrived_amount).eql? self.checked_amount
+    self.purchase_arrivals.sum(:arrived_amount) >= self.checked_amount
   end
 
   def checked_amount
