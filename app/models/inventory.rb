@@ -4,7 +4,7 @@ class Inventory < ActiveRecord::Base
   	has_many :stock_logs, as: :parent
     has_many :tasks, as: :parent
 
-    STATUS = { opened: 'opened',closed: 'closed'}
+    STATUS = { opened: 'opened',inventoring: 'inventoring',closed: 'closed'}
 
   	def status_name
     	status.blank? ? "" : self.class.human_attribute_name("status_#{status}")

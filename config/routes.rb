@@ -3,7 +3,7 @@ ShpostStorage::Application.routes.draw do
   resources :inventories  do
     collection do
       get 'find_shelf_stock'
-      get 'find_stamt'
+      post 'find_stamt'
       patch 'check'
     end
 
@@ -147,6 +147,7 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :relationships do
+    get :autocomplete_rel_name, :on => :collection
     collection do
         get 'select_commodities'
         get 'select_specifications'

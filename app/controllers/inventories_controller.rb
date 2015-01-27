@@ -60,12 +60,14 @@ class InventoriesController < ApplicationController
   end
 
   def inventorydetail
-    # binding.pry
     @inventoryid = @inventory.id
-    shelves=@inventory.inv_type_dtl.split(",")
-    @stocks = Stock.where("shelf_id in (?)",shelves)
-    @stocks.each do |stock|
-      @inventory.stock_logs.create(user: current_user ,stock: stock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:reset], batch_no: stock.batch_no, expiration_date: stock.expiration_date, amount:stock.actual_amount)
+    if @inventory.status == "opened"
+      shelves=@inventory.inv_type_dtl.split(",")
+      @stocks = Stock.where("shelf_id in (?)",shelves)
+      @stocks.each do |stock|
+        @inventory.stock_logs.create(user: current_user ,stock: stock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:reset], batch_no: stock.batch_no, expiration_date: stock.expiration_date, amount:stock.actual_amount)
+      end
+      @inventory.update(status: "inventoring")
     end
     @stock_logs = @inventory.stock_logs
   end
@@ -81,8 +83,12 @@ class InventoriesController < ApplicationController
   end
 
   def find_stamt
-    @actual_amount = Stock.find(params[:stock_id]).actual_amount
-    
+    stock = Stock.where("shelf_id = ? and relationship_id = ?",params[:shelf_id],params[:rel_id]).first
+    if stock.blank?
+      @actual_amount = 0
+    else
+      @actual_amount = stock.actual_amount
+    end
     render json: { actual_amount: @actual_amount }
   end
 
@@ -91,12 +97,17 @@ class InventoriesController < ApplicationController
     @stock_logs = @inventory.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
 
+    if @inventory.status != "closed"
       if @inventory.check!
         redirect_to inventories_url 
 
       else
         redirect_to inventories_url
       end
+    else
+      flash[:alert] = "该盘点单已完成"
+      redirect_to inventories_url
+    end
   end
 
   private

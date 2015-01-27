@@ -18,6 +18,11 @@
     
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
 
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status' do |inventory| 
+      inventory.status_name
+
+    end
+
 
 
 

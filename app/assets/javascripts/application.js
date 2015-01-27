@@ -1418,49 +1418,6 @@ function order_return_modify(current)
   });
 }
 
-function ajaxinventory() {
-
-  $("select[id^=stock_logs_invshelfid]").unbind('change').change(function(){
-    param = this.id.split('_');
-    rowid = param[3];
-    $.ajax({
-      type : 'GET',
-      url : '/inventories/find_shelf_stock/',
-      data: { shelf_id: $(this).val(),
-              row_id: rowid},
-      dataType : 'script'
-    });
-  });
-
-  $("select[id^=stock_logs_invstockid]").unbind('change').change(function(){
-    param = this.id.split('_');
-    rowid = param[3];
-    stockid = $(this).val();
-    $.ajax({
-      type : 'GET',
-      url : '/inventories/find_stamt/',
-      data: "stock_id=" + stockid + "&row_id=" + rowid,
-      dataType: "json",
-      complete: function(data) {
-        if(data.success){
-        
-          var jsonData = eval("("+data.responseText+")");
-
-          $("#stock_logs_invactamount_"+rowid).val(jsonData.actual_amount);
-
-        }
-      }
-    });
-  });
-
-  $("input[id^=stock_logs_invamount]").unbind('blur').blur(function() {
-    alert(this.id);
-    inventory_modify(this);
-    alert(this.id);
-  });
-
-}
-
 function add_inventory_dtl(){
   var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
   var addid = "00";
@@ -1468,9 +1425,10 @@ function add_inventory_dtl(){
     param = $("tr[id^=stock_logs_id]").last().attr("id").split('_');
     addid = "0"+ (parseInt(param[3])+1);
   }
-  alert(addid);
   tr.attr("id","stock_logs_id_"+addid);
   tr.appendTo("table#stock_logs");
+  var addtd = "<td><a class=\"btn btn-xs btn-danger\" href=\"javascript:void(0);\" id=\"stock_logs_deletelink_"+addid+"\" onclick=\"destroy(this)\">删除</a></td>"
+  tr.append(addtd);
   // slid=$('table.wice-grid tr:eq(2) input').first().val();
   // var index=tr.index()+2;
   // addTr(slid,index);
@@ -1482,9 +1440,9 @@ function add_inventory_dtl(){
 
   tableset(addid,"id",addid)
   tableset(addid,"invactamount","0")
-  tableset(addid,"invamount","0")
+  tableset(addid,"invamount","")
   tableset(addid,"invshelfid","0")
-  tableset(addid,"invstockid","0")
+  tableset(addid,"relationshipid","")
   tableset(addid,"invstatus","处理中")
   
   ajaxinventory();
@@ -1495,10 +1453,9 @@ function inventory_modify(current)
   param = current.id.split('_');
   id = param[3];
   shelfid = $("#stock_logs_invshelfid_"+id).val();
-  stockid = $("#stock_logs_invstockid_"+id).val();
+  relid = $("input[id=stock_logs_relationshipid_"+id+"][type=hidden]").val();
   amount = $("#stock_logs_invamount_"+id).val();
   invid = $("#inventoryid").val();
-
   var x = param[3].substring(0,1)
   if (x == "0") {
     x = ""
@@ -1508,8 +1465,8 @@ function inventory_modify(current)
   if (shelfid == null) {
     shelfid = ""
   }
-  if (stockid == null) {
-    stockid = ""
+  if (relid == null) {
+    relid = ""
   }
   if (amount == null) {
     amount = ""
@@ -1519,7 +1476,7 @@ function inventory_modify(current)
   $.ajax({
     type: "POST",
     url: "/stock_logs/inventory_modify",
-    data: "slid=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&stock_id=" + stockid + "&inv_id=" + invid,
+    data: "slid=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&rel_id=" + relid + "&inv_id=" + invid,
     dataType: "json",
     complete: function(data) {
       if(data.success){
@@ -1541,6 +1498,52 @@ function inventory_modify(current)
       }
     }
   });
+}
+
+function ajaxinventory() {
+
+  $("select[id^=stock_logs_invshelfid]").unbind('blur').blur(function() {
+    inventory_modify(this);
+  });
+
+  $("input[id^=stock_logs_relationshipid]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
+    $("input[id="+this.id+"][type=text]").val(data.item.value);
+    $("input[id="+this.id+"][type=hidden]").val(data.item.id);
+    $("input[id="+this.id+"][type=text]").blur();
+
+    param = this.id.split('_');
+    id = param[3];
+    alert(id);
+    var shelfid = $("#stock_logs_invshelfid_"+id).val();
+    if (shelfid == null) {
+      shelfid = ""
+    }
+
+    $.ajax({
+    type: "POST",
+    url: "/inventories/find_stamt",
+    data: "rel_id=" + data.item.id + "&shelf_id=" + shelfid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+
+          tableset(id,"invactamount",jsonData.actual_amount)
+          tableset(id,"invamount","")
+
+        }
+      }
+    });
+  });
+
+  $("input[id^=stock_logs_relationshipid]").unbind('blur').blur(function() {
+    inventory_modify(this);
+  });
+
+  $("input[id^=stock_logs_invamount]").unbind('blur').blur(function() {
+    inventory_modify(this);
+  });
+
 }
 
 
