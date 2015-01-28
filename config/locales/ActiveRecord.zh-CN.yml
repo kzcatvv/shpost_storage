@@ -186,12 +186,15 @@ zh-CN:
       b2bordersplit: 拆单
       movedetail: 移库明细
       move_stock_check: 移库确认
+      inventorydetail: 盘点明细
+      inventory_check: 盘点确认
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
       stock_in: "%{model}入库单"
       ready2bad: "移入残次品区"
       move_stock: "移库单"
+      inventory: "盘点单"
   number:
     currency:
       format:
@@ -353,6 +356,9 @@ zh-CN:
       move_stock:
         one: 移库单管理
         other: 移库单管理
+      inventory:
+        one: 盘点单管理
+        other: 盘点单管理
     attributes:
       user:
         email: "电子邮件"
@@ -682,6 +688,18 @@ zh-CN:
         status_opened: "开放"
         status_moved: "已移库"
         status_closed: "已关闭"
+      inventory:
+        "no": "编号"
+        name: "名称"
+        unit_id: "所属机构"
+        storage_id: "所属仓库"
+        inv_type: "盘点类型"
+        inv_type_dtl: "盘点类型明细"
+        desc: "备注"
+        status: "状态"
+        status_opened: "开放"
+        status_inventoring: "盘点中"
+        status_closed: "已关闭"
   menu:
     permission:
       name: "权限管理"
@@ -843,6 +861,9 @@ zh-CN:
         movestock:
           name: "移库单管理"
           link: "/move_stocks"
+        inventorybyshelf:
+          name: "按货架盘点"
+          link: "/inventories"
     logs:
       name: "日志查询"
       submenu:

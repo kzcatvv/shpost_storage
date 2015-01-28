@@ -3,18 +3,18 @@
 </object>
 <%- model_class = Inventory -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => [:'helpers.titles.move_stock', '%{model} Inventory '], :model => model_class.model_name.human.titleize %></h1>
+  <h1><%=t '.title', :default => [:'helpers.titles.inventory', '%{model} Inventory '], :model => model_class.model_name.human.titleize %></h1>
   <div style="float:right">   
       <a href="javascript:inventory_preview()" class='btn btn-primary' >打印盘点单</a>
       <%= link_to t('.inventory_check', :default => t("helpers.links.inventory_check")),
                   check_inventories_url(@inventoryid),
                   method: :patch,
                   :class => 'btn btn-primary' %>
-      <a href="javascript:void(0);", id='move_stock_assign', class='btn btn-primary' >移库单分配</a>
+      <a href="javascript:void(0);", id='inventory_assign', class='btn btn-primary' >盘点单分配</a>
   </div>
 </div>
 <%= hidden_field_tag('inventoryid',@inventoryid )%>
-<%= render :partial => 'inventories/move_stock_in' %>
+<%= render :partial => 'inventories/stock_inventory' %>
 
 <script language="javascript" type="text/javascript"> 
 function inventory_preview(){

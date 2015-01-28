@@ -34,7 +34,7 @@ class StockLog < ActiveRecord::Base
   STATUS = {waiting: 'waiting', checked: 'checked'}
   STATUS_SHOW = {waiting: '处理中', checked: '已确认'}
 
-  OPERATION_TYPE = {in: 'in', out: 'out', reset: 'reset', resetdel: 'resetdel'}
+  OPERATION_TYPE = {in: 'in', out: 'out', reset: 'reset'}
 
   
 
@@ -64,8 +64,6 @@ class StockLog < ActiveRecord::Base
         self.stock.check_out_amount self.amount
       elsif self.operation_type.eql? OPERATION_TYPE[:reset]
         self.stock.check_reset_amount self.amount
-      elsif self.operation_type.eql? OPERATION_TYPE[:resetdel]
-        self.stock.delete
       end
 
       if !self.sn.blank?
@@ -187,8 +185,10 @@ class StockLog < ActiveRecord::Base
       max_amount = self.stock.actual_amount
     end
     # binding.pry
-    total_amount = max_amount if total_amount > max_amount
-
+    if self.stock.desc != "inv_ca"
+      total_amount = max_amount if total_amount > max_amount
+    end
+    
     self.update(amount: total_amount)
     self.pick_in.update(amount: total_amount) if !self.pick_in.blank?
   end

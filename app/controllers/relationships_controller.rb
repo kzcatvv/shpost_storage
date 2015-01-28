@@ -2,6 +2,9 @@ class RelationshipsController < ApplicationController
   #before_action :set_relationship, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource
   
+  autocomplete :relationship, :name
+
+
   # GET /relationships
   # GET /relationships.json
   def index
@@ -154,6 +157,14 @@ class RelationshipsController < ApplicationController
        end
        file_path
      end
+  end
+
+  def autocomplete_rel_name
+    term = params[:term]
+    # brand_id = params[:brand_id]
+    # country = params[:country]
+    rels = Relationship.includes(:specification).where("specifications.name LIKE ? ", "%#{term}%")
+    render :json => rels.map { |rel| {:id => rel.id, :label => rel.business.name+rel.supplier.name+rel.specification.name, :value => rel.business.name+rel.supplier.name+rel.specification.name} }
   end
 
   private

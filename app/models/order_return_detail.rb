@@ -10,7 +10,7 @@ class OrderReturnDetail < ActiveRecord::Base
   end
 
   def all_return_checked?
-    OrderDetail.find(self.order_detail_id).amount.eql? self.return_amount
+    OrderDetail.find(self.order_detail_id).amount >= self.return_amount
   end
 
   def return_in
