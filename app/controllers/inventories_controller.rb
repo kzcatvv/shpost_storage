@@ -110,6 +110,19 @@ class InventoriesController < ApplicationController
     end
   end
 
+  def assign
+    @tasker = Task.tasker_in_work(@inventory)
+    @task_finished = !@inventory.has_waiting_stock_logs()
+    @sorters = current_storage.get_sorter()
+  end
+
+  def assign_select
+    if @inventory.has_waiting_stock_logs()
+      Task.save_task(@inventory,current_storage.id,params[:assign_user])
+    end
+    render json: {}
+  end
+
   private
     def set_inventory
       @inventory = Inventory.find(params[:id])

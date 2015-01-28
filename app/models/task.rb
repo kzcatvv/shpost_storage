@@ -11,7 +11,7 @@ class Task < ActiveRecord::Base
   ASSIGN_TYPE = {assigned: 'assigned', joined: 'joined'}
   TASK_TYPE = {in: 'in', out: 'out', reset: 'reset', move: 'move'}
 
-  OPERATE_TYPE = {Purchase: 'in', MoveStock: 'move', ManualStock: 'out', Keyclientorder: 'out', OrderReturn: 'in'}
+  OPERATE_TYPE = {Purchase: 'in', MoveStock: 'move', ManualStock: 'out', Keyclientorder: 'out', OrderReturn: 'in', Inventory: 'reset'}
 
   def done?
     (status.eql? Task::STATUS[:done]) ? true : false
@@ -29,6 +29,8 @@ class Task < ActiveRecord::Base
         type = TASK_TYPE[:out]
       elsif parent.is_a? MoveStock
         type = TASK_TYPE[:move]
+      elsif parent.is_a? Inventory
+        type = TASK_TYPE[:reset]
       end
       title = ""
       if parent.respond_to? :batch_no

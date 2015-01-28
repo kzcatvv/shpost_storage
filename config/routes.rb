@@ -9,6 +9,8 @@ ShpostStorage::Application.routes.draw do
 
     member do
       get 'inventorydetail'
+      get 'assign'
+      post 'assign_select'
     end
   end
 
