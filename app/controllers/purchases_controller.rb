@@ -110,7 +110,8 @@ class PurchasesController < ApplicationController
     @stock_logs = @purchase.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
 
-    StockLog.find(params[:stock_log]).check!
+    @stock_log = StockLog.find(params[:stock_log])
+    @stock_log.check!
     render action: 'stock_in'
   end
 
