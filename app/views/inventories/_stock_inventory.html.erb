@@ -19,10 +19,18 @@
       <tr id="stock_logs_id_<%=stock_log.id%>">
         <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %></td>
         <td>
-          <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.where("id in (?)",stock_log.parent.inv_type_dtl.split(",")).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
+          <% if @inventory.inv_type == "byshelf" %>
+            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.where("id in (?)",stock_log.parent.inv_type_dtl.split(",")).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
+          <% else %>
+            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.includes(:area)where("areas.storage_id = ?",current_storage.id).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
+          <% end -%>
         </td>
         <td>
-          <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name")%>
+          <% if @inventory.inv_type == "byshelf" %>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name")%>
+          <% else %>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name_byrel&inv_type_dtl=#{@inventory.inv_type_dtl}")%>
+          <% end -%>
           <%= hidden_field_tag("stock_logs[][relationship_id]", stock_log.stock.relationship.id, id: "stock_logs_relationshipid_#{stock_log.id}") %>
         </td>
         <td>

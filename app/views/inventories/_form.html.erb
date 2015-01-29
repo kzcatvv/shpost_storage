@@ -6,6 +6,12 @@
       <%= f.text_field :name, :class => 'text_field' %>
     </div>
   </div>
+  <div class="control-group">
+    <%= f.label :inv_type, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:inv_type, Inventory::INV_TYPE.invert,:include_blank => "请选择")%>      
+    </div>
+  </div>
 
  
 
@@ -15,6 +21,8 @@
       <%= f.text_area :desc, :class => 'text_field' %>
     </div>
   </div>
+ <% if @inventory.inv_type.nil? || @inventory.inv_type == "byshelf" %>
+ <div id="grid1">
 
   <%= grid(@shelves_grid) do |g|
     g.action_column 
@@ -23,7 +31,34 @@
       shelf.shelf_code
     end
   end 
+  %>
+</div>
+<% end -%>
+<% if @inventory.inv_type.nil? || @inventory.inv_type == "byrel" %>
+<div id="grid2">
+
+  <%= grid(@relationships_grid) do |g|
+    g.action_column 
+
+    g.column name: 'business' do |relationship|
+      relationship.business.name
+    end
+
+    g.column name: 'supplier' do |relationship|
+      relationship.supplier.name
+    end
+
+    g.column name: 'specification' do |relationship|
+      relationship.specification.name
+    end
+
+    g.column name: 'ext_code' do |relationship|
+      relationship.external_code
+    end
+  end 
  %>
+</div>
+<% end -%>
 
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <% if can? :index, Inventory %>
@@ -31,3 +66,4 @@
               inventories_path, :class => 'btn btn-default' %>
   <% end %>
 <% end %>
+
