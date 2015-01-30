@@ -14,6 +14,10 @@
     g.column name: model_class.human_attribute_name(:no), attribute: 'no'
   
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:inv_type), attribute: 'inv_type',custom_filter: Inventory::INV_TYPE.invert do |inventory| 
+      inventory.inv_type_name
+    end
   
     
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'

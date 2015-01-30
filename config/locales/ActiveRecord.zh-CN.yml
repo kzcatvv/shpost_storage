@@ -862,7 +862,7 @@ zh-CN:
           name: "移库单管理"
           link: "/move_stocks"
         inventorybyshelf:
-          name: "按货架盘点"
+          name: "盘点"
           link: "/inventories"
     logs:
       name: "日志查询"
