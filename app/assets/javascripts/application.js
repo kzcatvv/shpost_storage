@@ -14,8 +14,9 @@
 //= require jquery_ujs
 //= require jquery.ui.all
 //= require wice_grid
-//= require autocomplete-rails
 //= require datepicker
+//= require autocomplete-rails
+
 
 //= require twitter/bootstrap
 //= require turbolinks
@@ -1546,4 +1547,21 @@ function ajaxinventory() {
 
 }
 
+function showgrid() {
+  $("#inventory_inv_type").change(function(){
+    var i = $("#inventory_inv_type").val();
+    var el1 = document.getElementById("grid1")
+    var el2 = document.getElementById("grid2")
+
+    if (i == 'byshelf'){
+      el2.style.display = 'none';
+      el1.style.display = 'block';
+    }else{
+      el1.style.display = 'none';
+      el2.style.display = 'block';
+    }
+   
+  })
+
+}
 

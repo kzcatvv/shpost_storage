@@ -161,9 +161,17 @@ class RelationshipsController < ApplicationController
 
   def autocomplete_rel_name
     term = params[:term]
-    # brand_id = params[:brand_id]
+    
     # country = params[:country]
     rels = Relationship.includes(:specification).where("specifications.name LIKE ? ", "%#{term}%")
+    render :json => rels.map { |rel| {:id => rel.id, :label => rel.business.name+rel.supplier.name+rel.specification.name, :value => rel.business.name+rel.supplier.name+rel.specification.name} }
+  end
+
+  def autocomplete_rel_name_byrel
+    term = params[:term]
+    invdtls = params[:inv_type_dtl].split(",")
+    # country = params[:country]
+    rels = Relationship.includes(:specification).where("specifications.name LIKE ? and relationships.id in (?)", "%#{term}%",invdtls)
     render :json => rels.map { |rel| {:id => rel.id, :label => rel.business.name+rel.supplier.name+rel.specification.name, :value => rel.business.name+rel.supplier.name+rel.specification.name} }
   end
 

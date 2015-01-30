@@ -150,6 +150,7 @@ ShpostStorage::Application.routes.draw do
 
   resources :relationships do
     get :autocomplete_rel_name, :on => :collection
+    get :autocomplete_rel_name_byrel, :on => :collection
     collection do
         get 'select_commodities'
         get 'select_specifications'

@@ -4,6 +4,7 @@ class Inventory < ActiveRecord::Base
   	has_many :stock_logs, as: :parent
     has_many :tasks, as: :parent
 
+    INV_TYPE = {byshelf: '按货架', byrel: '按商品'}
     STATUS = { opened: 'opened',inventoring: 'inventoring',closed: 'closed'}
 
   	def status_name

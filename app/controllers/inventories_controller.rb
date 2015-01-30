@@ -12,17 +12,20 @@ class InventoriesController < ApplicationController
     @shelves_grid = initialize_grid(Shelf,
       :include => [:storage],
       :conditions => {"storages.id" => current_storage.id})
+
+    @relationships_grid = initialize_grid(Relationship)
   end
 
   def edit
     @shelves_grid = initialize_grid(Shelf,
       :include => [:storage],
       :conditions => {"storages.id" => current_storage.id})
+
+    @relationships_grid = initialize_grid(Relationship)
   end
 
   def create
     ds = params[:grid][:selected]
-    @inventory.inv_type = "byshelf"
     @inventory.inv_type_dtl = ds.join(",")
     @inventory.status = "opened"
     respond_to do |format|
@@ -62,11 +65,18 @@ class InventoriesController < ApplicationController
   def inventorydetail
     @inventoryid = @inventory.id
     if @inventory.status == "opened"
-      shelves=@inventory.inv_type_dtl.split(",")
-      @stocks = Stock.where("shelf_id in (?)",shelves)
-      @stocks.each do |stock|
-        @inventory.stock_logs.create(user: current_user ,stock: stock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:reset], batch_no: stock.batch_no, expiration_date: stock.expiration_date, amount:stock.actual_amount)
+      if @inventory.inv_type == "byshelf"
+        shelves=@inventory.inv_type_dtl.split(",")
+        @stocks = Stock.where("shelf_id in (?)",shelves)
+      elsif @inventory.inv_type == "byrel"
+        rels = @inventory.inv_type_dtl.split(",")
+        @stocks = Stock.where("relationship_id in (?)",rels)
       end
+
+      @stocks.each do |stock|
+          @inventory.stock_logs.create(user: current_user ,stock: stock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:reset], batch_no: stock.batch_no, expiration_date: stock.expiration_date, amount:stock.actual_amount)
+      end
+        
       @inventory.update(status: "inventoring")
     end
     @stock_logs = @inventory.stock_logs
