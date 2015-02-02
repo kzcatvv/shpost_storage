@@ -109,15 +109,16 @@ ShpostStorage::Application.routes.draw do
         post 'pingan_b2c_import' => 'orders#pingan_b2c_import'
         get 'orders_b2b_import'
         post 'orders_b2b_import' => 'orders#orders_b2b_import'
-        get 'standard_orders_import'
-        post 'standard_orders_import' => 'orders#standard_orders_import'
+        get 'standard_orders_import1'
+        post 'standard_orders_import2'
+        # post 'standard_orders_import' => 'orders#standard_orders_import'
         get 'pingan_b2c_outport'
         post 'pingan_b2c_xls_outport'
         get 'pingan_b2b_outport'
         post 'pingan_b2b_xls_outport'
         post 'exportorders'
-        get 'importorders'
-        post 'importorders' => 'orders#importorders'
+        get 'importorders1'
+        post 'importorders2'
       end
 
      resources :order_details
@@ -250,7 +251,7 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
-  resources :user_logs, only: [:index, :show]
+  resources :user_logs, only: [:index, :show, :destroy]
 
   root 'welcome#index'
 
