@@ -62,6 +62,15 @@ class Keyclientorder < ActiveRecord::Base
     return true
   end
 
+  def order_checked?
+    self.orders.each do |x|
+      if ! x.checked?
+        return false
+      end
+    end
+    return true
+  end
+
   def check!
     self.stock_logs.each do |x|
       x.check!
@@ -70,6 +79,24 @@ class Keyclientorder < ActiveRecord::Base
       self.orders.each do |order|
         order.stock_out
       end
+    end
+    if self.order_checked?
+      self.update(status: STATUS[:checked])
+    end
+  end
+
+  def pickcheck!
+    self.stock_logs.each do |x|
+      x.check!
+    end
+    if self.pick_waiting_amounts.blank?
+>>>>>>> b929a6f39897d7e66dae26af8c464653395f9848
+      self.orders.each do |order|
+        order.stock_out
+      end
+    end
+    if self.order_checked?
+      self.update(status: STATUS[:checked])
     end
   end
 
@@ -87,6 +114,24 @@ class Keyclientorder < ActiveRecord::Base
       end
       compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
     end
+    return sum_amount
+  end
+
+  def pick_waiting_amounts
+    sum_stock_logs = self.stock_logs.where("operation_type='out'").group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+
+    compare_sum_amount(sum_amount, sum_stock_logs)
+
+    #compare without supplier
+    if ! sum_amount.blank? && ! sum_stock_logs.blank?
+      sum_stock_logs_without_supplier = {}
+      sum_stock_logs.each do |x, amount|
+        sum_stock_logs_without_supplier[[x[0], nil, x[2]]] = amount
+      end
+      compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
+    end
+
     return sum_amount
   end
 

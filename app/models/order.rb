@@ -29,9 +29,9 @@ class Order < ActiveRecord::Base
   STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
 
 
-  TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS', ttkd: '天天快递'}
+  TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS', ttkd: '天天快递', bsht: '百世汇通'}
 
-  TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems', '天天快递'=>'ttkd'}
+  TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems', '天天快递'=>'ttkd', '百世汇通'=>'bsht'}
 
 
   SHORTAGE_TYPE = { yes: '是', no: '否' }
@@ -108,6 +108,10 @@ class Order < ActiveRecord::Base
       end
     end
     return true
+  end
+
+  def checked?
+    self.status.eql? STATUS[:checked]
   end
 
   def stock_out

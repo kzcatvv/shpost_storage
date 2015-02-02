@@ -104,8 +104,11 @@
 
     g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number', filter_type: :range, detach_with_id: :tracking_number_filter
 
-    g.column name: '波次批次号', model: 'Keyclientorder', attribute: 'batch_no' do |order|
-        order.keyclientorder.blank? ? "" : order.keyclientorder.batch_no
+    # g.column name: '波次批次号', model: 'Keyclientorder', attribute: 'batch_no' do |order|
+    #     order.keyclientorder.blank? ? "" : order.keyclientorder.batch_no
+    # end
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', model: 'Keyclientorder' do |order|
+      order.keyclientorder.try :batch_no
     end
 
     g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage', detach_with_id: :is_shortage_filter,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 

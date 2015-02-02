@@ -187,8 +187,14 @@ class KeyclientordersController < ApplicationController
   def ordercheck
 
     @keyclientorder=Keyclientorder.find(params[:format])
-    @keyclientorder.check!
-    
+
+    needpick = current_storage.need_pick
+
+    if needpick
+      @keyclientorder.pickcheck!
+    else
+      @keyclientorder.check!
+    end
 #     @orders=@keyclientorder.orders
 # # b2c
 #     @orders.each do |order|
@@ -218,6 +224,7 @@ class KeyclientordersController < ApplicationController
       # @keyclientorder = Keyclientorder.find(params[:format])
 
       needpick = current_storage.need_pick
+      @keyclientorder.picking_out
 
       if needpick
         Stock.pick_stock_out(@keyclientorder, current_user)
