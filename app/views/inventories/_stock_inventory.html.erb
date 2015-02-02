@@ -22,7 +22,7 @@
           <% if @inventory.inv_type == "byshelf" %>
             <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.where("id in (?)",stock_log.parent.inv_type_dtl.split(",")).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
           <% else %>
-            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.includes(:area)where("areas.storage_id = ?",current_storage.id).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
+            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.includes(:area).where("areas.storage_id = ?",current_storage.id).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
           <% end -%>
         </td>
         <td>
