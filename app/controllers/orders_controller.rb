@@ -1126,6 +1126,8 @@ class OrdersController < ApplicationController
                   tran_type = 'gnxb'  
                 when "EMS","ems"
                   tran_type = 'ems'
+                when "天天快递","ttkd"
+                  tran_type = 'ttkd'
                 else
                   tran_type = nil
               end
@@ -1467,6 +1469,8 @@ def exportorders_xls_content_for(objs)
           tran_type = '国内小包'  
         when "ems"
           tran_type = 'EMS'
+        when "ttkd"
+          tran_type = '天天快递'
       end
 
       if obj.business_trans_no.blank?
