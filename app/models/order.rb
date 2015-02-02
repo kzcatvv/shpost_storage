@@ -8,6 +8,7 @@ class Order < ActiveRecord::Base
   has_many :stock_logs, through: :order_details
   has_many :deliver_notices
   has_many :children, :class_name => 'Order',:foreign_key => 'parent_id',:dependent => :destroy
+  has_and_belongs_to_many :user_logs
 
   # alias :root_order :keyclientorder
   # alias :details :order_details
@@ -36,6 +37,8 @@ class Order < ActiveRecord::Base
   SHORTAGE_TYPE = { yes: '是', no: '否' }
 
   PARENT_TYPE = { true: '否', false: '是'}
+
+  
 
   def type_name
     order_type.blank? ? "" : self.class.human_attribute_name("order_type_#{order_type}")
@@ -223,4 +226,5 @@ class Order < ActiveRecord::Base
     StockLog::OPERATION[:b2c_stock_out]
   end
 
+  
 end

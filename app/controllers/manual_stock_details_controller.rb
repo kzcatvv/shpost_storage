@@ -2,6 +2,7 @@ class ManualStockDetailsController < ApplicationController
   # before_action :set_manual_stock_detail, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource :manual_stock
   load_and_authorize_resource :manual_stock_detail, through: :manual_stock, parent: false
+  # user_logs_filter only:  [:create, :close, :destroy], symbol: :name
 
   # GET /manual_stock_details
   # GET /manual_stock_details.json

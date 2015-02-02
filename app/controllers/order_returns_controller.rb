@@ -1,5 +1,7 @@
 class OrderReturnsController < ApplicationController
   load_and_authorize_resource
+
+  user_logs_filter only: [:return_check], symbol: :desc, operation: '退件入库确认', object: :stock_log
   #before_action :set_order_return, only: [:show, :edit, :update, :destroy]
 
   # GET /order_returns

@@ -7,7 +7,7 @@ class ManualStock < ActiveRecord::Base
   
   has_many :stock_logs, as: :parent
   has_many :tasks, as: :parent
-
+  has_many :user_logs, as: :parent
   # alias :root_order :clone
   # alias :details :manual_stock_details
   # validates_presence_of :no, :name, message: '不能为空'

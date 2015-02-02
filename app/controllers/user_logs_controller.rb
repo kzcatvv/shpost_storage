@@ -15,4 +15,25 @@ class UserLogsController < ApplicationController
   def show
   end
 
+  # DELETE /user_logs/1
+  # DELETE /user_logs/1.json
+  def destroy
+    @user_log.orders do |o|
+      if o.blank?
+        next
+      else
+        if o.status.eql? "waiting"
+          o.destroy
+        end
+      end
+    end
+
+    @user_log.destroy
+    respond_to do |format|
+      format.html { redirect_to user_logs_url }
+      format.json { head :no_content }
+    end
+  end
+
+
 end

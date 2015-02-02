@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150113062321) do
+ActiveRecord::Schema.define(version: 20150121025848) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -296,6 +296,11 @@ ActiveRecord::Schema.define(version: 20150113062321) do
     t.float    "volume"
   end
 
+  create_table "orders_user_logs", id: false, force: true do |t|
+    t.integer "order_id",    null: false
+    t.integer "user_log_id", null: false
+  end
+
   create_table "purchase_arrivals", force: true do |t|
     t.integer  "arrived_amount"
     t.date     "expiration_date"
@@ -538,6 +543,8 @@ ActiveRecord::Schema.define(version: 20150113062321) do
     t.datetime "updated_at"
     t.string   "object_symbol"
     t.string   "desc"
+    t.integer  "parent_id"
+    t.string   "parent_type"
   end
 
   create_table "users", force: true do |t|

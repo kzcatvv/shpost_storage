@@ -3,6 +3,7 @@ class ManualStockDetail < ActiveRecord::Base
   belongs_to :supplier
   belongs_to :manual_stock
   has_many :stock_logs, dependent: :destroy
+  has_many :user_logs
 
   # before_validation :set_batch_no
 

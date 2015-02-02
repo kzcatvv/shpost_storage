@@ -1,9 +1,9 @@
 class PurchasesController < ApplicationController
   load_and_authorize_resource
 
-  user_logs_filter only: [:create, :close, :destroy], symbol: :name#, object: :user, operation: '新增用户'
-  user_logs_filter only: [:check], symbol: :no, operation: '采购单确认入库'#, object: :user, operation: '新增用户'
-  user_logs_filter only: [:onecheck], symbol: :desc, operation: '采购单明细确认入库', object: :stock_log
+  user_logs_filter only: [:create, :close, :destroy], symbol: :name, parent: :purchase#, object: :user, operation: '新增用户'
+  user_logs_filter only: [:check], symbol: :no, operation: '采购单确认入库', parent: :purchase#, object: :user, operation: '新增用户'
+  user_logs_filter only: [:onecheck], symbol: :desc, operation: '采购单明细确认入库', object: :stock_log, parent: :purchase
   # GET /purchasees
   # GET /purchasees.json
   def index

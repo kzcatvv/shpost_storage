@@ -8,6 +8,7 @@ class Keyclientorder < ActiveRecord::Base
   belongs_to :business
   belongs_to :user
   has_many :tasks, as: :parent
+  has_many :user_logs, as: :parent
 
   # before_validation :set_batch_id
 
