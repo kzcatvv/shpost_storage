@@ -427,7 +427,7 @@ class OrdersController < ApplicationController
 
       order = Order.find(params[:orderid])
       @curr_order = order.id
-      curr_dtls = order.order_details.includes(:specification).where("specifications.sixnine_code = ? and order_details.desc != 'haspacked' ",params[:tracking_number]).first
+      curr_dtls = order.order_details.includes(:specification).where("specifications.sixnine_code = ? and ( order_details.desc is null or order_details.desc != 'haspacked' ) ",params[:tracking_number]).first
       if curr_dtls.nil?
         @curr_dtl = -1
       else
