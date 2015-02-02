@@ -67,104 +67,140 @@ class MobileInterfaceController < ApplicationController
   end
 
   def mission_upload
-    mission = @context_hash['mission']
-    products = @context_hash['products']
-
-    task = Task.find mission
-
-    parent = task.try :parent
-
-    error_builder('0007') if task.blank? || task.done? || parent.blank?
-
-
-    new_stock_logs = []
-
-    code = nil
-
     Task.transaction do
-      products.each do |x|
-        if x['sku'].blank? || x['amount'].blank? || x['type'].blank? || x['shelf'].blank?
-          code = "0010"
-          next
-        end
+      mission = @context_hash['mission']
+      products = @context_hash['products']
 
-        relationship = Relationship.find_by barcode: x['sku']
+      task = nil
 
-        if relationship.blank?
-          code = "0010"
-          next
-        end
+      code = nil
 
-        shelf = Shelf.find_by(barcode: x['shelf'])
+      if mission.eql? 'move'
+        move_stock = MoveStock.create!(unit: @unit, status: MoveStock::STATUS[:opened], name: "#{Time.now.strftime('%Y%m%d%H%M%S')}移库单", storage: @storage)
 
-        if shelf.blank?
-          code = "0010"
-          next
-        end
+        task = Task.save_task(move_stock, @storage, @user)
 
-        amount = x['amount'].to_i
-        
-        type = x['type']
-        sn = x['sn']
+        stock = nil
+        shelf = nil
+        amount = nil
 
-        stock_log = parent.stock_logs.where(shelf: shelf).waiting.find_by(relationship: relationship, operation_type: type)
+        products.each do |x|
+          if ! x['stock'].blank?
+            stock = Stock.find(x['stock'])
 
-        stock_log ||= parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.find_by(relationship: relationship, operation_type: type)
+            if stock.blank?
+              code = "0010"
+              next
+            end
 
-        if stock_log.blank? && (! type.eql? 'reset')
-          code = "0010"
-          next
-        end
+            amount = x['amount'].to_i
+          else
+            shelf = Shelf.find_by(barcode: x['shelf'])
 
-        if type.eql? 'in'
-          stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, stock_log.expiration_date.blank? ? nil : stock_log.batch_no, shelf)
-
-          new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT), batch_no: stock_log.batch_no)
-        elsif type.eql? 'out'
-          stocks = Stock.find_stocks_in_shelf(relationship.specification, relationship.supplier, relationship.business, shelf)
-
-          stocks.each do |stock|
-            next if stock.on_shelf_amount <= 0
-
-            out_amount = stock.stock_out_amount(amount)
-
-            amount -= out_amount
-
-            new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
-
-            if amount <= 0
-              break
+            if shelf.blank?
+              code = "0010"
+              next
             end
           end
-
-          if amount > 0
-            code = "0010"
-          end
-        elsif type.eql? 'reset'
-          if ! stock_log.blank?
-            stock_log.update!(user: @user, amount: amount, sn: sn.try(:join, Stock::SN_SPLIT))
-          else
-            stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, nil, shelf)
-
-            new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: StockLog::OPERATION[:inventory], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:reset], sn: sn.try(:join, Stock::SN_SPLIT))
-          end
         end
-      end
 
-      if ! task.task_type.eql? 'reset'
-        parent.stock_logs.waiting.where.not(id: new_stock_logs).destroy_all
+        Stock.move_stock_change(stock, shelf, amount, @user, false)
+
       else
-        parent.stock_logs.waiting.where.not(id: new_stock_logs).each do |x|
-          x.update!(amount: 0)
-        end
-      end
+        task = Task.find mission
+      
 
-      parent.check!
+        parent = task.try :parent
+
+        error_builder('0007') if task.blank? || task.done? || parent.blank?
+
+
+        new_stock_logs = []
+
+        products.each do |x|
+          if x['sku'].blank? || x['amount'].blank? || x['type'].blank? || x['shelf'].blank?
+            code = "0010"
+            next
+          end
+
+          relationship = Relationship.find_by barcode: x['sku']
+
+          if relationship.blank?
+            code = "0010"
+            next
+          end
+
+          shelf = Shelf.find_by(barcode: x['shelf'])
+
+          if shelf.blank?
+            code = "0010"
+            next
+          end
+
+          amount = x['amount'].to_i
+          
+          type = x['type']
+          sn = x['sn']
+
+          stock_log = parent.stock_logs.where(shelf: shelf).waiting.find_by(relationship: relationship, operation_type: type)
+
+          stock_log ||= parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.find_by(relationship: relationship, operation_type: type)
+
+          if stock_log.blank? && (! type.eql? 'reset')
+            code = "0010"
+            next
+          end
+
+          if type.eql? 'in'
+            stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, stock_log.expiration_date.blank? ? nil : stock_log.batch_no, shelf)
+
+            new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT), batch_no: stock_log.batch_no)
+          elsif type.eql? 'out'
+            stocks = Stock.find_stocks_in_shelf(relationship.specification, relationship.supplier, relationship.business, shelf)
+
+            stocks.each do |stock|
+              next if stock.on_shelf_amount <= 0
+
+              out_amount = stock.stock_out_amount(amount)
+
+              amount -= out_amount
+
+              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: stock_log.operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
+
+              if amount <= 0
+                break
+              end
+            end
+
+            if amount > 0
+              code = "0010"
+            end
+          elsif type.eql? 'reset'
+            if ! stock_log.blank?
+              stock_log.update!(user: @user, amount: amount, sn: sn.try(:join, Stock::SN_SPLIT))
+            else
+              stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, nil, shelf)
+
+              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: StockLog::OPERATION[:inventory], status: StockLog::STATUS[:waiting], amount: amount, operation_type: StockLog::OPERATION_TYPE[:reset], sn: sn.try(:join, Stock::SN_SPLIT))
+            end
+          end
+        end
+
+        if ! task.task_type.eql? 'reset'
+          parent.stock_logs.waiting.where.not(id: new_stock_logs).destroy_all
+        else
+          parent.stock_logs.waiting.where.not(id: new_stock_logs).each do |x|
+            x.update!(amount: 0)
+          end
+        end
+
+        parent.check!
+      end
 
       task.update!(status: Task::STATUS[:done])
+      
+      success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), msg: code.blank? ? "" : I18n.t("mobile_interface.error.#{code}")})
     end
-
-    success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), msg: code.blank? ? "" : I18n.t("mobile_interface.error.#{code}")})
   end
 
   def query
@@ -194,7 +230,7 @@ class MobileInterfaceController < ApplicationController
 
     if ! stocks.blank?
       stocks.each do |stock|
-        products << {product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, Stock::SN_SPLIT), expiration: stock.expiration_date.try(:strftime,'%Y%m%d'), amount: stock.actual_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y%m%d %H:%M:%S') }
+        products << {stock: stock.id, product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, Stock::SN_SPLIT), expiration: stock.expiration_date.try(:strftime,'%Y%m%d'), amount: stock.actual_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y%m%d %H:%M:%S') }
       end
 
       success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), products: products})
@@ -213,6 +249,8 @@ class MobileInterfaceController < ApplicationController
     @storage = Storage.find_by(no: params[:storage]) if ! params[:storage].blank?
 
     return error_builder('0003') if @storage.nil?
+
+    @unit = @storage.unit
 
     @mobile = Mobile.find_by(no: params[:mobile], storage: @storage) if ! params[:mobile].blank?
     return error_builder('0004') if @mobile.nil?

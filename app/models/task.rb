@@ -13,40 +13,35 @@ class Task < ActiveRecord::Base
 
   OPERATE_TYPE = {Purchase: 'in', MoveStock: 'move', ManualStock: 'out', Keyclientorder: 'out', OrderReturn: 'in', Inventory: 'reset'}
 
+  OPERATE_TYPE_SHOW = {Purchase: '采购入库', MoveStock: '移库', ManualStock: '批量出库', Keyclientorder: '订单出库', OrderReturn: '退货入库', Inventory: '盘点'}
+
+  STATUS_SHOW = {doing: '未完成', done: '完成'}
+
   def done?
     (status.eql? Task::STATUS[:done]) ? true : false
   end
 
-  def self.save_task(parent,storage_id,user_id=nil)
+  def self.save_task(parent, storage, user_id = nil)
     task = Task.where(parent: parent, status: STATUS[:doing], assign_type: ASSIGN_TYPE[:assigned]).first
     if task.blank?
-      type = ""
-      if parent.is_a? Purchase
-        type = TASK_TYPE[:in]
-      elsif parent.is_a? ManualStock
-        type = TASK_TYPE[:out]
-      elsif parent.is_a? Keyclientorder
-        type = TASK_TYPE[:out]
-      elsif parent.is_a? MoveStock
-        type = TASK_TYPE[:move]
-      elsif parent.is_a? Inventory
-        type = TASK_TYPE[:reset]
-      end
+      type = OPERATE_TYPE[parent.class.name.to_sym]
+
       title = ""
       if parent.respond_to? :batch_no
         if title.blank? && !parent.batch_no.blank?
-          title = parent.batch_no.to_s + "_" + parent.class.name
+          title = "#{parent.batch_no}_#{OPERATE_TYPE_SHOW[parent.class.name.to_sym]}"
         end
       end
       if parent.respond_to? :no
         if title.blank? && !parent.no.blank?
-          title = parent.no.to_s + "_" + parent.class.name
+          title = "#{parent.no}_#{OPERATE_TYPE_SHOW[parent.class.name.to_sym]}"
         end
       end
       if title.blank?
         title = parent.class.name
       end
-      Task.create(parent: parent, code: generate_code(), user_id: user_id, status: STATUS[:doing], storage_id: storage_id, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
+
+      Task.create(parent: parent, code: generate_code(), user_id: user_id, status: STATUS[:doing], storage: storage, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
     else
       if !user_id.blank?
         task.update(user_id: user_id)

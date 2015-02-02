@@ -14,9 +14,9 @@ class Keyclientorder < ActiveRecord::Base
 
   validates_presence_of :keyclient_name, :unit_id, :storage_id, :message => '不能为空'
 
-  STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned' }
+  STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked'}
   
-  STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
+  STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核'}
   # validates_uniqueness_of :batch_id, :message => '该订单批次编号已存在'
 
   # def set_batch_id
@@ -66,7 +66,7 @@ class Keyclientorder < ActiveRecord::Base
     self.stock_logs.each do |x|
       x.check!
     end
-    if ! self.waiting_amounts.blank?
+    if self.waiting_amounts.blank?
       self.orders.each do |order|
         order.stock_out
       end

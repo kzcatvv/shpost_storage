@@ -159,19 +159,17 @@ class PurchasesController < ApplicationController
               supplier=Supplier.accessible_by(current_ability).find_by name:instance.cell(line,'E').to_s
 
               specifications=Specification.accessible_by(current_ability).where(sixnine_code:instance.cell(line,'G').to_s)
+
               specification=nil
+
               if specifications.size > 1
                 specification=specifications.find_by name: instance.cell(line,'F').to_s
               elsif specifications.size == 1
                 specification = specifications.first
               end
 
-           #   purchase_detail = PurchaseDetail.create! name:instance.cell(line,'A'),purchase_id: purchase.id,supplier_id: supplier.id,specification_id: specification.id,qg_period:instance.cell(line,'E'),amount:instance.cell(line,'F').to_i,desc:instance.cell(line,'G'),sum:instance.cell(line,'F').to_f, status:"waiting"
-            purchase_detail = PurchaseDetail.create! name:instance.cell(line,'D'),purchase_id: purchase.id,supplier_id:supplier.id,specification_id: specification.id,expiration_date:instance.cell(line,'H').to_datetime.strftime("%Y-%m-%d %H:%m:%S"),amount:instance.cell(line,'I').to_i,desc:instance.cell(line,'J'), status:"waiting"
-
-             # batch_no= purchase_detail.set_batch_no
-             # puts 
-             #  purchase_detail.update_attribute(:batch_no,batch_no)
+              expiration_date = instance.cell(line, 'H')
+              purchase_detail = PurchaseDetail.create! name: instance.cell(line, 'D'), purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: instance.cell(line,'J'), status: "waiting"
             end
             flash[:alert] = "导入成功"
           rescue Exception => e

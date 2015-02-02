@@ -140,7 +140,7 @@ class StocksController < ApplicationController
         flash[:alert] = "输入的残次品数量大于库存预计数量"
         redirect_to :back
     else
-        Stock.broken_stock_change(@stock, @shelf, amount, current_user)
+        Stock.move_stock_change(@stock, @shelf, amount, current_user, true)
 
         flash[:notice] = "移入残次品区成功"
         redirect_to :action => 'index'
