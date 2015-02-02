@@ -45,11 +45,11 @@ function movestock_preview(){
     LODOP.SET_PRINT_STYLE("Bold",0);
     <% @movestock.stock_logs.where("operation = 'move_stock_out'").each do |j| %>
         h=h+33;
-        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= j.stock.shelf.shelf_code %>');
-        LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= j.stock.specification.sixnine_code %>');
-        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.stock.specification.all_name.gsub(/[\r\n]/,'') %>');
+        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= j.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= j.specification.sixnine_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.specification.all_name.gsub(/[\r\n]/,'') %>');
         LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= j.amount %>');
-        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.pick_in.stock.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.pick_in.shelf.shelf_code %>');
     <% end %>
     LODOP.PREVIEW();
   };

@@ -176,7 +176,7 @@ class StockLogsController < ApplicationController
 
       @stock_log.update_amount(Integer(params[:amount]))
 
-      total_amount = @stock_log.stock.actual_amount
+      total_amount = @stock_log.stock.blank? ? 0 : @stock_log.stock.actual_amount
 
       render json: {stock_log_id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount }
     
@@ -209,7 +209,7 @@ class StockLogsController < ApplicationController
 
       @stock_log.update_amount(Integer(params[:amount]))
 
-      total_amount = @stock_log.stock.actual_amount
+      total_amount = @stock_log.stock.blank? ? 0 : @stock_log.stock.actual_amount
 
       render json: {stock_log_id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount }
     

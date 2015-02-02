@@ -51,8 +51,8 @@ function inventory_preview(){
     <% @inventory.stock_logs.each do |stocklog| %>
     h=h+33;
      LODOP.ADD_PRINT_TEXT(h,"15%",260,25,'<%= stocklog.shelf.shelf_code %>');
-     LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= stocklog.stock.batch_no %>'+' '+'<%= stocklog.stock.specification.name %>');
-     LODOP.ADD_PRINT_TEXT(h,"60%",260,25,'<%= stocklog.stock.actual_amount %>');
+     LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= stocklog.batch_no %>'+' '+'<%= stocklog.specification.name %>');
+     LODOP.ADD_PRINT_TEXT(h,"60%",260,25,'<%= (stocklog.stock.blank? ? 0 : stocklog.stock.actual_amount) %>');
      LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= stocklog.amount %>');
     <% end %>
 

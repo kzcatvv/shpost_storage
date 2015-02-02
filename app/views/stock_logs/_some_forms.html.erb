@@ -47,25 +47,19 @@
     end
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', ordering: false, model: 'Shelf' do |stock_log|
-      # if stock_log.status == 'waiting'
-        # select_tag("stock_logs[][shelfid]", options_for_select(Shelf.accessible_by(current_ability).map{|u| [u.shelf_code,u.id]}, stock_log.stock.shelf.id), id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none;", onblur: 'clickout(this)') <<
-        content_tag(:p, stock_log.stock.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'}) <<
-        text_field_tag("stock_logs[][shelfid]", stock_log.stock.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")
-
-      # else
-      #   stock_log.stock.shelf.shelf_code
-      # end
+        content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_shelfid_#{stock_log.id}", onclick: 'clickin(this);'}) <<
+        text_field_tag("stock_logs[][shelfid]", stock_log.shelf.shelf_code, id: "stock_logs_shelfid_#{stock_log.id}", style: "display: none; width: 120px;", onblur: 'clickout(this)', 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")
     end
 
     g.column name: model_class.human_attribute_name(:stock_amount), attribute: 'actual_amount',  ordering: false, model: 'Stock' do |stock_log|
       # [stock_log.stock.actual_amount,{id: "stock_logs_actamount_#{stock_log.id}"}]
-      content_tag(:p, stock_log.stock.actual_amount, {id: "stock_logs_actamount_#{stock_log.id}"})
+      content_tag(:p, (stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount), {id: "stock_logs_actamount_#{stock_log.id}"})
     end
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount',  ordering: false do |stock_log|
       # if stock_log.status == 'waiting'
         text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_amount_#{stock_log.id}", style: "display: none; width: 40px;", onblur: 'clickout(this)') <<
-        if stock_log.amount == 0 || (stock_log.operation_type == "out" && stock_log.amount > stock_log.stock.actual_amount)
+        if stock_log.amount == 0 || (stock_log.operation_type == "out" && stock_log.amount > (stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount))
           content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);', style: 'background-color: red;'})
         else
           content_tag(:p, stock_log.amount, {id: "stock_logs_amount_#{stock_log.id}", onclick: 'clickin(this);'})
