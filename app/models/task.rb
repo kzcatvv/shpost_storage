@@ -41,7 +41,7 @@ class Task < ActiveRecord::Base
         title = parent.class.name
       end
 
-      Task.create(parent: parent, code: generate_code(), user_id: user_id, status: STATUS[:doing], storage: storage, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
+      Task.create(parent: parent, code: generate_code(), user_id: user_id, status: STATUS[:doing], storage_id: storage, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
     else
       if !user_id.blank?
         task.update(user_id: user_id)
