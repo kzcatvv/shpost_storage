@@ -15,9 +15,6 @@
 </div>
 <%= hidden_field_tag('movestockid',@movestockid )%>
 <%= render :partial => 'move_stocks/move_stock_in' %>
-<div id="img_div">
-  <%= image_tag("really_cool_qr_image.png") %>
-</div>
 
 <script language="javascript" type="text/javascript"> 
 function movestock_preview(){
@@ -50,11 +47,10 @@ function movestock_preview(){
         h=h+33;
         LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= j.stock.shelf.shelf_code %>');
         LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= j.stock.specification.sixnine_code %>');
-        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.stock.specification.all_name %>');
+        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.stock.specification.all_name.gsub(/[\r\n]/,'') %>');
         LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= j.amount %>');
         LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.pick_in.stock.shelf.shelf_code %>');
     <% end %>
-    LODOP.ADD_PRINT_IMAGE(300,"5%",200,200,"<img border='0' src='http://127.0.0.1:3000/assets/really_cool_qr_image.png' />");
     LODOP.PREVIEW();
   };
 </script>

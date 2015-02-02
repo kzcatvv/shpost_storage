@@ -146,6 +146,10 @@ class PrintController < ApplicationController
         @shelf = Shelf.find(params[:sid])
     end
 
+    def areabarcodeprint
+        @shelves = Area.find(params[:sid]).shelves
+    end
+
     def relationbarcodeprint
         @relationship = Relationship.find(params[:rid])
     end

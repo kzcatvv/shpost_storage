@@ -142,12 +142,13 @@ class StockLogsController < ApplicationController
   end
 
   def remove
-    if !@stock_log.blank?
-      @stock_log.delete
-    end
-    if !@stock_log.pick_in.blank?
-      @stock_log.pick_in.delete
-    end
+    # binding.pry
+      if !@stock_log.blank?
+        @stock_log.delete
+      end
+      if !@stock_log.pick_in.blank?
+        @stock_log.pick_in.delete
+      end
     render text: 'remove'
   end
 
@@ -183,6 +184,39 @@ class StockLogsController < ApplicationController
       render json: {}
     end
    
+  end
+
+  def inventory_modify
+    if !params[:amount].blank? && !params[:shelf_id].blank? && !params[:rel_id].blank?
+      # binding.pry
+      @orgstock = Stock.where("shelf_id = ? and relationship_id = ?",params[:shelf_id],params[:rel_id]).first
+      @shelf = Shelf.find(params[:shelf_id])
+      if @orgstock.blank?
+        @relationship = Relationship.find(params[:rel_id])
+        @orgstock = Stock.create(specification: @relationship.specification, business: @relationship.business, supplier: @relationship.supplier, shelf: @shelf, actual_amount: 0, desc: "inv_ca")
+      end
+
+      if params[:slid].blank?
+        @inventory = Inventory.find(params[:inv_id])
+        @stock_log = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:reset], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)      
+
+      else
+
+        @stock_log = StockLog.find(params[:slid])
+        @stock_log.update(user: current_user ,stock: @orgstock, batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
+      
+      end
+
+      @stock_log.update_amount(Integer(params[:amount]))
+
+      total_amount = @stock_log.stock.actual_amount
+
+      render json: {stock_log_id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount }
+    
+    else
+      render json: {}
+    end
+
   end
 
   def mod_stocklog_pickin_shelf

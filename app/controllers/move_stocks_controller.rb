@@ -60,12 +60,18 @@ class MoveStocksController < ApplicationController
     if @move_stock.has_waiting_stock_logs()
       Task.save_task(@move_stock,@move_stock.storage.id,nil)
     end
+
+    if @move_stock.status == "opened"
+      @move_stock.update(status: "moving")
+    end
+
+    @stock_logs=@move_stock.stock_logs.where("operation = 'move_stock_out'")
     
-    qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
-    @qr=qrcode.to_img
-    direct = "#{Rails.root}/app/assets/images/"
-    fnm = direct + "really_cool_qr_image.png"
-    @qr=@qr.resize(200, 200).save(fnm)
+    # qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
+    # @qr=qrcode.to_img
+    # direct = "#{Rails.root}/app/assets/images/"
+    # fnm = direct + "really_cool_qr_image.png"
+    # @qr=@qr.resize(200, 200).save(fnm)
   end
 
   def assign
@@ -86,12 +92,17 @@ class MoveStocksController < ApplicationController
     @stock_logs = @move_stock.stock_logs
     @stock_logs_grid = initialize_grid(@stock_logs)
 
+    if @move_stock.status != "moved"
       if @move_stock.check!
         redirect_to move_stocks_url 
 
       else
         redirect_to move_stocks_url
       end
+    else
+      flash[:alert] = "该移库单已移库"
+      redirect_to move_stocks_url
+    end
 
   end
 

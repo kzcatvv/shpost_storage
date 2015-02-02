@@ -1,0 +1,61 @@
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+  <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
+</object>
+<%- model_class = Inventory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.inventory', '%{model} Inventory '], :model => model_class.model_name.human.titleize %></h1>
+  <div style="float:right">   
+      <a href="javascript:inventory_preview()" class='btn btn-primary' >打印盘点单</a>
+      <%= link_to t('.inventory_check', :default => t("helpers.links.inventory_check")),
+                  check_inventories_url(@inventoryid),
+                  method: :patch,
+                  :class => 'btn btn-primary' %>
+      <a href="javascript:void(0);", id='inventory_assign', class='btn btn-primary' >盘点单分配</a>
+  </div>
+</div>
+<%= hidden_field_tag('inventoryid',@inventoryid )%>
+<%= render :partial => 'inventories/stock_inventory' %>
+
+<script language="javascript" type="text/javascript"> 
+function assign(url) {
+  // alert(1);
+  window.open(url ,'_assign','top=200,left=300,width=500,height=300,menubar=no,toolbar=no,location=no,directories=no,status=no,scrollbars=no,resizable=no');
+}
+
+function inventory_preview(){
+    LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));  
+    LODOP.PRINT_INIT("打印盘点单");
+    LODOP.SET_PRINT_STYLE("FontSize",18);
+    LODOP.SET_PRINT_STYLE("Bold",1);
+    LODOP.SET_PRINT_STYLE("ItemType",4);
+    LODOP.ADD_PRINT_TEXT(50,"45%",260,39,"盘点单");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(50,"75%",260,39,CurentTime(0,0));
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_BARCODE(80,"35%",260,39,'128A','<%= @inventory.barcode %>');
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(150,"43%",260,39,'<%= @inventory.name %>');
+    LODOP.SET_PRINT_STYLE("FontSize",15);
+    LODOP.SET_PRINT_STYLE("Bold",1);
+    h=200;
+    LODOP.ADD_PRINT_TEXT(h,"15%",260,25,"货架");
+    LODOP.ADD_PRINT_TEXT(h,"35%",260,25,"库存");
+    LODOP.ADD_PRINT_TEXT(h,"60%",260,25,"库存数量");
+    LODOP.ADD_PRINT_TEXT(h,"85%",260,25,"盘点数量");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+
+    <% @inventory.stock_logs.each do |stocklog| %>
+    h=h+33;
+     LODOP.ADD_PRINT_TEXT(h,"15%",260,25,'<%= stocklog.shelf.shelf_code %>');
+     LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= stocklog.stock.batch_no %>'+' '+'<%= stocklog.stock.specification.name %>');
+     LODOP.ADD_PRINT_TEXT(h,"60%",260,25,'<%= stocklog.stock.actual_amount %>');
+     LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= stocklog.amount %>');
+    <% end %>
+
+    LODOP.PREVIEW();
+  };
+</script>

@@ -1,0 +1,66 @@
+<%- model_class = StockLog -%>
+
+<div>
+<table id="stock_logs" class="table table-striped">
+  <thead>
+    <tr>
+      <th>  </th>
+      <th>货架</th>
+      <th>商品</th>
+      <th>库存数量</th>
+      <th>盘点数量</th>
+      <th>状态</th>
+      <th>创建时间</th>
+      <th>确认时间</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @stock_logs.each do |stock_log| %>
+      <tr id="stock_logs_id_<%=stock_log.id%>">
+        <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %></td>
+        <td>
+          <% if @inventory.inv_type == "byshelf" %>
+            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.where("id in (?)",stock_log.parent.inv_type_dtl.split(",")).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
+          <% else %>
+            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.includes(:area)where("areas.storage_id = ?",current_storage.id).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
+          <% end -%>
+        </td>
+        <td>
+          <% if @inventory.inv_type == "byshelf" %>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name")%>
+          <% else %>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name_byrel&inv_type_dtl=#{@inventory.inv_type_dtl}")%>
+          <% end -%>
+          <%= hidden_field_tag("stock_logs[][relationship_id]", stock_log.stock.relationship.id, id: "stock_logs_relationshipid_#{stock_log.id}") %>
+        </td>
+        <td>
+          <%= text_field_tag("stock_logs[][inv_act_amount]", stock_log.amount, id: "stock_logs_invactamount_#{stock_log.id}",disabled: true ) %>
+        </td>
+        <td>
+          <%= text_field_tag("stock_logs[][inv_amount]", stock_log.amount, id: "stock_logs_invamount_#{stock_log.id}") %>
+        </td>
+        <td id="stock_logs_invstatus_<%=stock_log.id%>"><%=  StockLog::STATUS_SHOW[stock_log.status.to_sym] %></td>
+        <td>
+          <%= stock_log.created_at.to_s(:db) %>
+        </td>
+        <td>
+          <%= stock_log.checked_at.try :to_s, :db %>
+        </td>
+<!--         <td><%=link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'destroy(this)', id: "stock_logs_deletelink_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log%></td> -->
+
+        
+      </tr>
+
+    <% end %>
+
+  </tbody>
+</table>
+</div>
+
+<div style="float:right">
+    <% if @inventory.status != "closed" %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+                   "javascript:void(0)", onclick: "add_inventory_dtl()",
+                    :class => 'btn btn-primary' %>
+    <% end %>
+</div>

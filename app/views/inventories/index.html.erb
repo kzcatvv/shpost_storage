@@ -1,0 +1,41 @@
+<%- model_class = Inventory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Inventory %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_inventory_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@inventories_grid) do |g|
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
+  
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:inv_type), attribute: 'inv_type',custom_filter: Inventory::INV_TYPE.invert do |inventory| 
+      inventory.inv_type_name
+    end
+  
+    
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status' do |inventory| 
+      inventory.status_name
+
+    end
+
+
+
+
+    g.column do |inventory|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")), edit_inventory_path(inventory), :class => 'btn btn-xs btn-primary' if can? :update, inventory) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), inventory_path(inventory), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, inventory) << ' ' <<
+      (link_to t('.inventorydetail', :default => t("helpers.links.inventorydetail")), inventorydetail_inventory_path(inventory), :class => 'btn btn-xs btn-primary' if can? :inventorydetail, inventory )
+
+    end
+  end 
+%>

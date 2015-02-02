@@ -14,8 +14,9 @@
 //= require jquery_ujs
 //= require jquery.ui.all
 //= require wice_grid
-//= require autocomplete-rails
 //= require datepicker
+//= require autocomplete-rails
+
 
 //= require twitter/bootstrap
 //= require turbolinks
@@ -491,10 +492,14 @@ function removeTr(current)
   } else {
     x = param[3]
   }
+  var invid = $("#inventoryid").val();
+  if (invid == null){
+    invid=""
+  }
   $.ajax({
     type: "POST",
     url: "/stock_logs/remove",
-    data: "id=" + x,
+    data: "id=" + x +"&inv_id=" + invid,
     dataType: "json",
     complete: function() {
       $("p#"+current.id).css("background-color","transparent");
@@ -1413,3 +1418,150 @@ function order_return_modify(current)
     }
   });
 }
+
+function add_inventory_dtl(){
+  var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
+  var addid = "00";
+  if ($("tr[id^=stock_logs_id]").last().attr("id") != undefined ) {
+    param = $("tr[id^=stock_logs_id]").last().attr("id").split('_');
+    addid = "0"+ (parseInt(param[3])+1);
+  }
+  tr.attr("id","stock_logs_id_"+addid);
+  tr.appendTo("table#stock_logs");
+  var addtd = "<td><a class=\"btn btn-xs btn-danger\" href=\"javascript:void(0);\" id=\"stock_logs_deletelink_"+addid+"\" onclick=\"destroy(this)\">删除</a></td>"
+  tr.append(addtd);
+  // slid=$('table.wice-grid tr:eq(2) input').first().val();
+  // var index=tr.index()+2;
+  // addTr(slid,index);
+  tablereplace(addid,"a","id",addid);
+  tablereplace(addid,"a","href",addid);
+  tablereplace(addid,"input","id",addid);
+  tablereplace(addid,"select","id",addid);
+  tablereplace(addid,"td","id",addid);
+
+  tableset(addid,"id",addid)
+  tableset(addid,"invactamount","0")
+  tableset(addid,"invamount","")
+  tableset(addid,"invshelfid","0")
+  tableset(addid,"relationshipid","")
+  tableset(addid,"invstatus","处理中")
+  
+  ajaxinventory();
+}
+
+function inventory_modify(current)
+{
+  param = current.id.split('_');
+  id = param[3];
+  shelfid = $("#stock_logs_invshelfid_"+id).val();
+  relid = $("input[id=stock_logs_relationshipid_"+id+"][type=hidden]").val();
+  amount = $("#stock_logs_invamount_"+id).val();
+  invid = $("#inventoryid").val();
+  var x = param[3].substring(0,1)
+  if (x == "0") {
+    x = ""
+  } else {
+    x = param[3]
+  }
+  if (shelfid == null) {
+    shelfid = ""
+  }
+  if (relid == null) {
+    relid = ""
+  }
+  if (amount == null) {
+    amount = ""
+  }
+  // alert("id"+id+"shelfid"+shelfid+"orid"+orid+"amount"+amount);
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/inventory_modify",
+    data: "slid=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&rel_id=" + relid + "&inv_id=" + invid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+        // alert(data.responseText);
+        
+        if (jsonData.stock_log_id != undefined) {
+          $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.stock_log_id);
+
+          tablereplace(jsonData.stock_log_id,"a","id",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"a","href",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"input","id",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"select","id",jsonData.stock_log_id);
+          tablereplace(jsonData.stock_log_id,"td","id",jsonData.stock_log_id);
+
+          tableset(jsonData.stock_log_id,"invamount",jsonData.amount)
+
+        }
+      }
+    }
+  });
+}
+
+function ajaxinventory() {
+
+  $("select[id^=stock_logs_invshelfid]").unbind('blur').blur(function() {
+    inventory_modify(this);
+  });
+
+  $("input[id^=stock_logs_relationshipid]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
+    $("input[id="+this.id+"][type=text]").val(data.item.value);
+    $("input[id="+this.id+"][type=hidden]").val(data.item.id);
+    $("input[id="+this.id+"][type=text]").blur();
+
+    param = this.id.split('_');
+    id = param[3];
+    alert(id);
+    var shelfid = $("#stock_logs_invshelfid_"+id).val();
+    if (shelfid == null) {
+      shelfid = ""
+    }
+
+    $.ajax({
+    type: "POST",
+    url: "/inventories/find_stamt",
+    data: "rel_id=" + data.item.id + "&shelf_id=" + shelfid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+
+          tableset(id,"invactamount",jsonData.actual_amount)
+          tableset(id,"invamount","")
+
+        }
+      }
+    });
+  });
+
+  $("input[id^=stock_logs_relationshipid]").unbind('blur').blur(function() {
+    inventory_modify(this);
+  });
+
+  $("input[id^=stock_logs_invamount]").unbind('blur').blur(function() {
+    inventory_modify(this);
+  });
+
+}
+
+function showgrid() {
+  $("#inventory_inv_type").change(function(){
+    var i = $("#inventory_inv_type").val();
+    var el1 = document.getElementById("grid1")
+    var el2 = document.getElementById("grid2")
+
+    if (i == 'byshelf'){
+      el2.style.display = 'none';
+      el1.style.display = 'block';
+    }else{
+      el1.style.display = 'none';
+      el2.style.display = 'block';
+    }
+   
+  })
+
+}
+

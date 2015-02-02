@@ -37,6 +37,7 @@ class Ability
         can :new, Relationship
 
         can :manage, MoveStock, unit_id: user.unit_id
+        can :manage, Inventory, unit_id: user.unit_id
 
         can [:autocomplete_specification_name,:pd_autocomplete_specification_name,:br_autocomplete_specification_name,:ko_autocomplete_specification_name,:os_autocomplete_specification_name,:ms_autocomplete_specification_name,:si_autocomplete_specification_name], Specification, commodity: {unit_id: user.unit_id}
 
@@ -171,10 +172,11 @@ class Ability
         can :manage, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :manage, MoveStock, unit_id: user.unit_id
+        can :manage, Inventory, unit_id: user.unit_id
         # can [:read, :getstock, :findstock], Stock, shelf: {area: {storage_id: storage.id}}
 
         # can :new, Stock, shelf: {area: {storage_id: storage.id}}
-        can :manage, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :manage, StockLog, shelf: {area: {storage_id: storage.id}}
         # can :destroy, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}, status: StockLog::STATUS[:waiting]
         # can :modify, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         # can :addtr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
@@ -206,7 +208,7 @@ class Ability
         can :ready2bad, Stock, shelf: {area: {storage_id: storage.id} }
         can :move2bad, Stock, shelf: {area: {storage_id: storage.id} }
 
-        can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :read, StockLog, shelf: {area: {storage_id: storage.id}}
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end
@@ -228,7 +230,7 @@ class Ability
 
         can :read, Stock, shelf: {area: {storage_id: storage.id} }
 
-        can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :read, StockLog, shelf: {area: {storage_id: storage.id}}
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end
@@ -292,7 +294,8 @@ class Ability
         can :move2bad, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :manage, MoveStock, unit_id: user.unit_id
-        can :read, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
+        can :read, StockLog, shelf: {area: {storage_id: storage.id}}
+        can :manage, Inventory, unit_id: user.unit_id
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
     end

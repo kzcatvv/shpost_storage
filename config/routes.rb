@@ -1,5 +1,19 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :inventories  do
+    collection do
+      get 'find_shelf_stock'
+      post 'find_stamt'
+      patch 'check'
+    end
+
+    member do
+      get 'inventorydetail'
+      get 'assign'
+      post 'assign_select'
+    end
+  end
+
   resources :mobile_logs
 
   resources :tasks
@@ -136,6 +150,8 @@ ShpostStorage::Application.routes.draw do
 
 
   resources :relationships do
+    get :autocomplete_rel_name, :on => :collection
+    get :autocomplete_rel_name_byrel, :on => :collection
     collection do
         get 'select_commodities'
         get 'select_specifications'
@@ -221,6 +237,7 @@ ShpostStorage::Application.routes.draw do
       post 'keyclientorder_stock_modify'
       post 'order_return_modify'
       post 'mod_stocklog_pickin_shelf'
+      post 'inventory_modify'
     end
   end
 
@@ -330,6 +347,7 @@ ShpostStorage::Application.routes.draw do
   match "/print/websplitordertracking" => "print#websplitordertracking",via: [:get, :post]
   match "/print/websplitordertrackingnum" => "print#websplitordertrackingnum",via: [:get, :post]
   match "/print/shelfbarcodeprint" => "print#shelfbarcodeprint",via: [:get, :post]
+  match "/print/areabarcodeprint" => "print#areabarcodeprint",via: [:get, :post]
   match "/print/relationbarcodeprint" => "print#relationbarcodeprint",via: [:get, :post]
 
 
