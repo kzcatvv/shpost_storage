@@ -90,7 +90,6 @@ class Keyclientorder < ActiveRecord::Base
       x.check!
     end
     if self.pick_waiting_amounts.blank?
->>>>>>> b929a6f39897d7e66dae26af8c464653395f9848
       self.orders.each do |order|
         order.stock_out
       end
