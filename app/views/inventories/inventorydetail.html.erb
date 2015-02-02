@@ -49,17 +49,10 @@ function inventory_preview(){
     LODOP.SET_PRINT_STYLE("Bold",0);
 
     <% @inventory.stock_logs.each do |stocklog| %>
-<<<<<<< HEAD
     h=h+50;
      LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= stocklog.shelf.shelf_code %>');
-     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= stocklog.stock.batch_no %>'+' '+'<%= stocklog.stock.specification.name %>');
-     LODOP.ADD_PRINT_TEXT(h,"70%",260,25,'<%= stocklog.stock.actual_amount %>');
-=======
-    h=h+33;
-     LODOP.ADD_PRINT_TEXT(h,"15%",260,25,'<%= stocklog.shelf.shelf_code %>');
-     LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= stocklog.batch_no %>'+' '+'<%= stocklog.specification.name %>');
-     LODOP.ADD_PRINT_TEXT(h,"60%",260,25,'<%= (stocklog.stock.blank? ? 0 : stocklog.stock.actual_amount) %>');
->>>>>>> d5dd9b9142bbaccf841d314d52a87d9284cc89fb
+     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= stocklog.batch_no %>'+' '+'<%= stocklog.specification.name %>');
+     LODOP.ADD_PRINT_TEXT(h,"70%",260,25,'<%= (stocklog.stock.blank? ? 0 : stocklog.stock.actual_amount) %>');
      LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= stocklog.amount %>');
     <% end %>
 
