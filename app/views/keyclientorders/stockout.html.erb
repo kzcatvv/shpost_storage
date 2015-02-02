@@ -40,10 +40,10 @@ function CreateStockoutPage(){
     LODOP.SET_PRINT_STYLE("Bold",0);
     <% @stock_logs.map(&:id).each do |j| %>
         h=h+33;
-        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= StockLog.find(j).stock.specification.commodity.name.gsub(/[\r\n]/,'') %>'+' '+'<%= StockLog.find(j).stock.specification.name.gsub(/[\r\n]/,'') %>');
+        LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= StockLog.find(j).specification.commodity.name.gsub(/[\r\n]/,'') %>'+' '+'<%= StockLog.find(j).specification.name.gsub(/[\r\n]/,'') %>');
         LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= StockLog.find(j).amount %>');
-        LODOP.ADD_PRINT_TEXT(h,"45%",260,25,'<%= StockLog.find(j).stock.shelf.shelf_code %>');
-        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= StockLog.find(j).stock.specification.sixnine_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"45%",260,25,'<%= StockLog.find(j).shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= StockLog.find(j).specification.sixnine_code %>');
       <% end %>
       
   };

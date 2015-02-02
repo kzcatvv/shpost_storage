@@ -27,11 +27,11 @@
         </td>
         <td>
           <% if @inventory.inv_type == "byshelf" %>
-            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name")%>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.business.name+stock_log.supplier.name+stock_log.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name")%>
           <% else %>
-            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name_byrel&inv_type_dtl=#{@inventory.inv_type_dtl}")%>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.business.name+stock_log.supplier.name+stock_log.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name_byrel&inv_type_dtl=#{@inventory.inv_type_dtl}")%>
           <% end -%>
-          <%= hidden_field_tag("stock_logs[][relationship_id]", stock_log.stock.relationship.id, id: "stock_logs_relationshipid_#{stock_log.id}") %>
+          <%= hidden_field_tag("stock_logs[][relationship_id]", stock_log.relationship.id, id: "stock_logs_relationshipid_#{stock_log.id}") %>
         </td>
         <td>
           <%= text_field_tag("stock_logs[][inv_act_amount]", stock_log.amount, id: "stock_logs_invactamount_#{stock_log.id}",disabled: true ) %>

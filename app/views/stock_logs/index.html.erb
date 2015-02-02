@@ -23,7 +23,7 @@
     end
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', model: 'Shelf' do |stock_log|
-        stock_log.stock.shelf.try :shelf_code
+        stock_log.shelf.try :shelf_code
     end
 
     #g.column name: model_class.human_attribute_name(:status), attribute: 'status'
