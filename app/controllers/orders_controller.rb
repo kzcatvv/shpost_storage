@@ -432,7 +432,9 @@ class OrdersController < ApplicationController
         @curr_dtl = -1
       else
         @curr_dtl = curr_dtls.id
-        @curod = OrderDetail.find(curr_dtls.id).update(desc: "haspacked")
+        if curr_dtls.amount == 1
+          @curod = OrderDetail.find(curr_dtls.id).update(desc: "haspacked")
+        end
       end 
     else
       order = Order.where(tracking_number: @tracking_number, status: "checked").first
