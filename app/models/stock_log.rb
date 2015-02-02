@@ -34,7 +34,7 @@ class StockLog < ActiveRecord::Base
   STATUS = {waiting: 'waiting', checked: 'checked'}
   STATUS_SHOW = {waiting: '处理中', checked: '已确认'}
 
-  OPERATION_TYPE = {in: 'in', out: 'out', reset: 'reset', resetdel: 'resetdel'}
+  OPERATION_TYPE = {in: 'in', out: 'out', reset: 'reset'}
 
   
 
@@ -64,8 +64,6 @@ class StockLog < ActiveRecord::Base
         self.stock.check_out_amount self.amount
       elsif self.operation_type.eql? OPERATION_TYPE[:reset]
         self.stock.check_reset_amount self.amount
-      elsif self.operation_type.eql? OPERATION_TYPE[:resetdel]
-        self.stock.delete
       end
 
       if !self.sn.blank?
@@ -165,13 +163,13 @@ class StockLog < ActiveRecord::Base
         total_amount = max_amount
       end
     elsif operation.eql? OPERATION[:move_stock_out]
-      max_amount = self.stock.actual_amount
+      max_amount = self.stock.blank? ? 0 : self.stock.actual_amount
     elsif operation.eql? OPERATION[:b2b_stock_out]
-      on_shelf_amount = self.stock.on_shelf_amount
+      on_shelf_amount = self.stock.blank? ? 0 : self.stock.on_shelf_amount
       left_amount = self.parent.manual_stock_details.includes(:manual_stock).where(supplier: self.supplier, specification: self.specification, manual_stocks: {business_id: self.business_id}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
     elsif operation.eql? OPERATION[:b2c_stock_out]
-      on_shelf_amount = self.stock.on_shelf_amount
+      on_shelf_amount = self.stock.blank? ? 0 : self.stock.on_shelf_amount
       left_amount = self.parent.order_details.includes(:order).where(supplier: self.supplier, specification: self.specification, orders: {business_id: self.business_id}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
       
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
@@ -184,11 +182,13 @@ class StockLog < ActiveRecord::Base
         total_amount = max_amount
       end
     elsif operation.eql? OPERATION[:inventory]
-      max_amount = self.stock.actual_amount
+      max_amount = self.stock.blank? ? 0 : self.stock.actual_amount
     end
     # binding.pry
-    total_amount = max_amount if total_amount > max_amount
-
+    if self.stock.desc != "inv_ca"
+      total_amount = max_amount if total_amount > max_amount
+    end
+    
     self.update(amount: total_amount)
     self.pick_in.update(amount: total_amount) if !self.pick_in.blank?
   end

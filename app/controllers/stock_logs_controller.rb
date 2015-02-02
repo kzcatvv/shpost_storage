@@ -143,16 +143,12 @@ class StockLogsController < ApplicationController
 
   def remove
     # binding.pry
-    if params[:inv_id].blank?
       if !@stock_log.blank?
         @stock_log.delete
       end
       if !@stock_log.pick_in.blank?
         @stock_log.pick_in.delete
       end
-    else
-      @stock_log.update(operation_type: "resetdel")
-    end
     render text: 'remove'
   end
 
@@ -180,7 +176,7 @@ class StockLogsController < ApplicationController
 
       @stock_log.update_amount(Integer(params[:amount]))
 
-      total_amount = @stock_log.stock.actual_amount
+      total_amount = @stock_log.stock.blank? ? 0 : @stock_log.stock.actual_amount
 
       render json: {stock_log_id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount }
     
@@ -191,10 +187,14 @@ class StockLogsController < ApplicationController
   end
 
   def inventory_modify
-    if !params[:amount].blank? && !params[:shelf_id].blank? && !params[:stock_id].blank?
+    if !params[:amount].blank? && !params[:shelf_id].blank? && !params[:rel_id].blank?
       # binding.pry
-      @orgstock = Stock.find(params[:stock_id])
+      @orgstock = Stock.where("shelf_id = ? and relationship_id = ?",params[:shelf_id],params[:rel_id]).first
       @shelf = Shelf.find(params[:shelf_id])
+      if @orgstock.blank?
+        @relationship = Relationship.find(params[:rel_id])
+        @orgstock = Stock.create(specification: @relationship.specification, business: @relationship.business, supplier: @relationship.supplier, shelf: @shelf, actual_amount: 0, desc: "inv_ca")
+      end
 
       if params[:slid].blank?
         @inventory = Inventory.find(params[:inv_id])
@@ -209,7 +209,7 @@ class StockLogsController < ApplicationController
 
       @stock_log.update_amount(Integer(params[:amount]))
 
-      total_amount = @stock_log.stock.actual_amount
+      total_amount = @stock_log.stock.blank? ? 0 : @stock_log.stock.actual_amount
 
       render json: {stock_log_id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount }
     

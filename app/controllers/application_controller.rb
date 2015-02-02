@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
 
   def save_user_log *args
     object = eval("@#{args.first[:object].to_s}")
-
+    
     object ||= eval("@#{controller_name.singularize}")
 
     operation = args.first[:operation]
@@ -41,8 +41,17 @@ class ApplicationController < ActionController::Base
     operation ||= I18n.t("action_2_operation.#{action_name}") + object.class.model_name.human.to_s
 
     symbol = args.first[:symbol]
+
+    ids = eval("@#{args.first[:ids].to_s}")
     
-    @user_log = UserLog.new(user: current_user, operation: operation)
+    parent = eval("@#{args.first[:parent].to_s}")
+    
+    if !parent.blank?
+       @user_log = UserLog.new(user: current_user, operation: operation, parent: parent)
+    else
+       @user_log = UserLog.new(user: current_user, operation: operation)
+    end
+    
 
     if object
       if object.errors.blank?
@@ -54,9 +63,23 @@ class ApplicationController < ActionController::Base
         else
           @user_log.object_symbol = object.id
         end
+        # if args.first[:operation].eql? "订单导入"
+        #   @user_log.orders = Order.where(id: ids)
+        # end
+        # if args.first[:operation].eql? "面单信息回馈"  or args.first[:operation].eql? "生成出库单" or args.first[:operation].eql? "电商确认出库"
+        #   @user_log.orders = object.orders
+        # end 
+        # if args.first[:operation].eql? "包装出库"
+        #   @user_log.orders = Order.where(id: object.id)
+        # end
+        
         @user_log.save
       end
     else
+      if args.first[:operation].eql? "订单导入"
+          @user_log.orders = Order.where(id: ids)
+          @user_log.object_symbol = symbol
+      end
       @user_log.save
     end
   end

@@ -50,6 +50,7 @@ class Ability
         can :storage, Unit, id: user.unit_id
 
         can :read, UserLog, user: {unit_id: user.unit_id}
+        can :destroy, UserLog, operation: '订单导入'
 
         can :manage, User, unit_id: user.unit_id
 

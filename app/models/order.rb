@@ -8,6 +8,7 @@ class Order < ActiveRecord::Base
   has_many :stock_logs, through: :order_details
   has_many :deliver_notices
   has_many :children, :class_name => 'Order',:foreign_key => 'parent_id',:dependent => :destroy
+  has_and_belongs_to_many :user_logs
 
   # alias :root_order :keyclientorder
   # alias :details :order_details
@@ -28,14 +29,16 @@ class Order < ActiveRecord::Base
   STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回' }
 
 
-  TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS'}
+  TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS', ttkd: '天天快递'}
 
-  TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems'}
+  TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems', '天天快递'=>'ttkd'}
 
 
   SHORTAGE_TYPE = { yes: '是', no: '否' }
 
   PARENT_TYPE = { true: '否', false: '是'}
+
+  
 
   def type_name
     order_type.blank? ? "" : self.class.human_attribute_name("order_type_#{order_type}")
@@ -223,4 +226,5 @@ class Order < ActiveRecord::Base
     StockLog::OPERATION[:b2c_stock_out]
   end
 
+  
 end

@@ -4,6 +4,9 @@ class ManualStocksController < ApplicationController
 
   # GET /manual_stocks
   # GET /manual_stocks.json
+  user_logs_filter only:  [:create, :close, :destroy], symbol: :name, parent: :manual_stock
+  user_logs_filter only: [:check], symbol: :no, operation: '批量确认出库', parent: :manual_stock
+  
   def index
     # @manual_stocks = ManualStock.all.order(created_at: :desc)
     @manual_stocks_grid = initialize_grid(@manual_stocks, order: 'created_at',order_direction: :desc )

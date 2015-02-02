@@ -9,7 +9,7 @@
     end
 
     g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', ordering: false, model: 'Shelf' do |stock_log|
-      stock_log.stock.shelf.shelf_code
+      stock_log.shelf.shelf_code
     end
 
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount',  ordering: false do |stock_log|
