@@ -198,7 +198,7 @@ class ReportController < ApplicationController
       out_hash_sum = 0
       in_hash_sum = 0
 
-      sllos=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id = ? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,business_id,op_out_type,year.to_s+month.to_s).to_ary
+      sllos=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id = ? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,business_id,op_out_type, ( month.to_s.length == 1 ? year.to_s+"0"+month.to_s : year.to_s+month.to_s)).to_ary
       stock_out_all_summdt_hash = StockLog.where(id: sllos).group("strftime('%Y%m%d',created_at)").sum(:amount)
       
       (summ_start_dt .. summ_end_dt).each do |date|
@@ -206,7 +206,7 @@ class ReportController < ApplicationController
           row1_col_num += 1
       end
       row1_col_num = row1_col_num + 2
-      sllis=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id = ? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,business_id,op_in_type,year.to_s+month.to_s).to_ary
+      sllis=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id = ? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,business_id,op_in_type, ( month.to_s.length == 1 ? year.to_s+"0"+month.to_s : year.to_s+month.to_s)).to_ary
       stock_in_all_summdt_hash = StockLog.where(id: sllis).group("strftime('%Y%m%d',created_at)").sum(:amount)
       
       (summ_start_dt .. summ_end_dt).each do |date|
@@ -223,7 +223,7 @@ class ReportController < ApplicationController
         sheet1[count_row,4]=StockMon.where("summ_date = ? and storage_id = ? and business_id = ? and supplier_id = ? and specification_id = ?",summ_last_month,current_storage.id,key[0],key[1],key[2]).blank? ? 0 : StockMon.where("summ_date = ? and storage_id = ? and business_id = ? and supplier_id = ? and specification_id = ?",summ_last_month,current_storage.id,key[0],key[1],key[2]).first.amount
         sheet1[count_row,5]=value
 
-        slos=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id=? and stock_logs.supplier_id=? and stock_logs.specification_id=? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,key[0],key[1],key[2],op_out_type,year.to_s+month.to_s).to_ary
+        slos=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id=? and stock_logs.supplier_id=? and stock_logs.specification_id=? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,key[0],key[1],key[2],op_out_type,( month.to_s.length == 1 ? year.to_s+"0"+month.to_s : year.to_s+month.to_s)).to_ary
         stock_out_summdt_hash = StockLog.where(id: slos).group("strftime('%Y%m%d',created_at)").sum(:amount)
         if !stock_out_summdt_hash.nil?
           stock_out_summdt_hash.each do |key,value|
@@ -242,7 +242,7 @@ class ReportController < ApplicationController
         sheet1[count_row,col_num]=out_hash_sum
         col_num = col_num + 1
 
-        slis=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id=? and stock_logs.supplier_id=? and stock_logs.specification_id=? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,key[0],key[1],key[2],op_in_type,year.to_s+month.to_s).to_ary
+        slis=StockLog.includes(:storage).where("storages.id=? and stock_logs.business_id=? and stock_logs.supplier_id=? and stock_logs.specification_id=? and stock_logs.operation in (?) and strftime('%Y%m',stock_logs.created_at)=?",current_storage.id,key[0],key[1],key[2],op_in_type,( month.to_s.length == 1 ? year.to_s+"0"+month.to_s : year.to_s+month.to_s)).to_ary
         stock_in_summdt_hash = StockLog.where(id: slis).group("strftime('%Y%m%d',created_at)").sum(:amount)
         if !stock_in_summdt_hash.nil?
           stock_in_summdt_hash.each do |key,value|
