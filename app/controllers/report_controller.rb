@@ -3,12 +3,12 @@ class ReportController < ApplicationController
   def purchase_arrival_report
     unless request.get?
       business_id = params[:business_id]
-      start_date = Date.civil(params[:start_date]["start_date(1i)"].to_i,
-                         params[:start_date]["start_date(2i)"].to_i,
-                         params[:start_date]["start_date(3i)"].to_i)
-      end_date = Date.civil(params[:end_date]["end_date(1i)"].to_i,
-                         params[:end_date]["end_date(2i)"].to_i,
-                         params[:end_date]["end_date(3i)"].to_i)
+      start_date = Date.civil(params[:start_date]["start_date"].split('-')[0].to_i,
+                         params[:start_date]["start_date"].split('-')[1].to_i,
+                         params[:start_date]["start_date"].split('-')[2].to_i)
+      end_date = Date.civil(params[:end_date]["end_date"].split('-')[0].to_i,
+                         params[:end_date]["end_date"].split('-')[1].to_i,
+                         params[:end_date]["end_date"].split('-')[2].to_i)
       if business_id.blank?
         flash[:alert] = "请选择一个商户"
         redirect_to :action => 'purchase_arrival_report'
