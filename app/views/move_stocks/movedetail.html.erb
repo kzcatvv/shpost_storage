@@ -38,7 +38,7 @@ function movestock_preview(){
     h=200;
     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"移出货架");
     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,"69码");
-    LODOP.ADD_PRINT_TEXT(h,"35%",260,25,"商品名");
+    LODOP.ADD_PRINT_TEXT(h,"40%",260,25,"商品名");
     LODOP.ADD_PRINT_TEXT(h,"75%",260,25,"数量");
     LODOP.ADD_PRINT_TEXT(h,"85%",260,25,"移入货架");
     LODOP.SET_PRINT_STYLE("FontSize",12);
@@ -47,9 +47,9 @@ function movestock_preview(){
         h=h+50;
         LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= j.shelf.shelf_code %>');
         LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= j.specification.sixnine_code %>');
-        LODOP.ADD_PRINT_TEXT(h,"35%",260,25,'<%= j.specification.name.gsub(/[\r\n]/,'') %>');
+        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.specification.name.gsub(/[\r\n]/,'') %>');
         LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.amount %>');
-        LODOP.ADD_PRINT_TEXT(h,"80%",260,25,'<%= j.pick_in.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= j.pick_in.shelf.shelf_code %>');
     <% end %>
     LODOP.PREVIEW();
   };
