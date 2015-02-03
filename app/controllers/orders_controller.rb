@@ -461,10 +461,10 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true], :per_page => 15)
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true], :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true])
+    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true])
 
     #some wice_grad lazy do the resultset is [] without once call
     begin
