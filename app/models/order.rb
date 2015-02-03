@@ -110,6 +110,10 @@ class Order < ActiveRecord::Base
     return true
   end
 
+  def checked?
+    self.status.eql? STATUS[:checked]
+  end
+
   def stock_out
     # if self.all_checked?
     if can_update_status(STATUS[:checked])

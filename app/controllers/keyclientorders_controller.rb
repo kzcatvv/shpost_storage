@@ -224,6 +224,7 @@ class KeyclientordersController < ApplicationController
       # @keyclientorder = Keyclientorder.find(params[:format])
 
       needpick = current_storage.need_pick
+      @keyclientorder.picking_out
 
       if needpick
         Stock.pick_stock_out(@keyclientorder, current_user)

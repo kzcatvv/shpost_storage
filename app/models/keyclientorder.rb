@@ -62,14 +62,26 @@ class Keyclientorder < ActiveRecord::Base
     return true
   end
 
+  def order_checked?
+    self.orders.each do |x|
+      if ! x.checked?
+        return false
+      end
+    end
+    return true
+  end
+
   def check!
     self.stock_logs.each do |x|
       x.check!
     end
-    if ! self.waiting_amounts.blank?
+    if self.waiting_amounts.blank?
       self.orders.each do |order|
         order.stock_out
       end
+    end
+    if self.order_checked?
+      self.update(status: STATUS[:checked])
     end
   end
 
@@ -77,10 +89,13 @@ class Keyclientorder < ActiveRecord::Base
     self.stock_logs.each do |x|
       x.check!
     end
-    if ! self.pick_waiting_amounts.blank?
+    if self.pick_waiting_amounts.blank?
       self.orders.each do |order|
         order.stock_out
       end
+    end
+    if self.order_checked?
+      self.update(status: STATUS[:checked])
     end
   end
 
@@ -115,6 +130,7 @@ class Keyclientorder < ActiveRecord::Base
       end
       compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
     end
+
     return sum_amount
   end
 
