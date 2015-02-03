@@ -73,8 +73,36 @@ class Keyclientorder < ActiveRecord::Base
     end
   end
 
+  def pickcheck!
+    self.stock_logs.each do |x|
+      x.check!
+    end
+    if ! self.pick_waiting_amounts.blank?
+      self.orders.each do |order|
+        order.stock_out
+      end
+    end
+  end
+
   def waiting_amounts
     sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+
+    compare_sum_amount(sum_amount, sum_stock_logs)
+
+    #compare without supplier
+    if ! sum_amount.blank? && ! sum_stock_logs.blank?
+      sum_stock_logs_without_supplier = {}
+      sum_stock_logs.each do |x, amount|
+        sum_stock_logs_without_supplier[[x[0], nil, x[2]]] = amount
+      end
+      compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
+    end
+    return sum_amount
+  end
+
+  def pick_waiting_amounts
+    sum_stock_logs = self.stock_logs.where("operation_type='out'").group(:specification_id, :supplier_id, :business_id).sum(:amount)
     sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
 
     compare_sum_amount(sum_amount, sum_stock_logs)
