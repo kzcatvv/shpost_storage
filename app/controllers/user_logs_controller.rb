@@ -18,7 +18,7 @@ class UserLogsController < ApplicationController
   # DELETE /user_logs/1
   # DELETE /user_logs/1.json
   def destroy
-    @user_log.orders do |o|
+    @user_log.orders.each do |o|
       if o.blank?
         next
       else
@@ -27,7 +27,7 @@ class UserLogsController < ApplicationController
         end
       end
     end
-
+    
     @user_log.destroy
     respond_to do |format|
       format.html { redirect_to user_logs_url }

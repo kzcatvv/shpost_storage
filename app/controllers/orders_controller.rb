@@ -1087,7 +1087,7 @@ class OrdersController < ApplicationController
 
             flash_message = "导入成功!!\<br/\>"
             line = 2
-            
+            nkoid = 0
             # until instance.cell(line,'A').blank? do
             line.upto(instance.last_row) do |line|
               batch_no = to_string(instance.cell(line,'O'))
@@ -1145,11 +1145,13 @@ class OrdersController < ApplicationController
               koid = order.keyclientorder_id
             
               if koid.blank?
-                koid = getKeycOrderID()
-                order.keyclientorder_id=koid
+                if line ==2
+                  nkoid = getKeycOrderID()
+                end
+                order.keyclientorder_id=nkoid
               end
-              @keyclientorder = Keyclientorder.find koid
-              
+              @keyclientorder = Keyclientorder.find nkoid
+                            
               order.total_weight = instance.cell(line,'D').to_f
               order.pingan_ordertime = instance.cell(line,'E')
               order.customer_name = instance.cell(line,'F')

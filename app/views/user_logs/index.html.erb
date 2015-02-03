@@ -17,10 +17,14 @@
         user_log.created_at.to_s(:db)
       end
 
-    # g.column do |user_log|
-    #   ActiveSupport::SafeBuffer.new <<
-    #   (link_to t('.destroy', :default => t("helpers.links.destroy")), user_log_path(user_log), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger'if can? :destroy, user_log)                                                          
-    # end
+    g.column name: "订单号段" do |user_log|
+      (user_log.orders.size==0 ? " " : user_log.orders.first.no) + "-" + (user_log.orders.size==0 ? " " : user_log.orders.last.no)
+    end
+
+    g.column do |user_log|
+      ActiveSupport::SafeBuffer.new <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")), user_log_path(user_log), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger'if can? :destroy, user_log)                                                          
+    end
 
   end 
 %>

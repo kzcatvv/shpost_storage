@@ -36,7 +36,7 @@ class MobileInterfaceController < ApplicationController
     missions = []
 
     tasks.each do |x|
-      missions << {mission: x.id, barcode: x.barcode, title: x.title, type: Task::OPERATE_TYPE[x.parent_type.to_s.to_sym], time: x.created_at.strftime('%Y%m%d %H:%M:%S')}
+      missions << {mission: x.id, barcode: x.barcode, title: x.title, type: Task::OPERATE_TYPE[x.parent_type.to_s.to_sym], time: x.created_at.strftime('%Y%m%d %H:%M:%S'), mission_code: x.code}
     end
 
     success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), missions: missions })

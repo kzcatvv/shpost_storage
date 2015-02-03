@@ -149,7 +149,8 @@ class StocksController < ApplicationController
 
   def find_stock_in_shelf
       # binding.pry
-      @stocks = Stock.where(shelf_id: params[:shelf_id]).accessible_by(current_ability).map{|u| [u.batch_no.blank? ? u.specification.name : u.batch_no+u.specification.name,u.id]}.insert(0,"请选择")
+<<<<<<< HEAD
+      @stocks = Stock.where(shelf_id: params[:shelf_id]).accessible_by(current_ability).map{|u| ["#{u.specification.all_name} #{u.batch_no}",u.id]}.insert(0,"请选择")
       @rowid = "md_stock_"+params[:row_id]
       
       respond_to do |format|
