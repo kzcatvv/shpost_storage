@@ -163,13 +163,13 @@ class StockLog < ActiveRecord::Base
         total_amount = max_amount
       end
     elsif operation.eql? OPERATION[:move_stock_out]
-      max_amount = self.stock.actual_amount
+      max_amount = self.stock.blank? ? 0 : self.stock.actual_amount
     elsif operation.eql? OPERATION[:b2b_stock_out]
-      on_shelf_amount = self.stock.on_shelf_amount
+      on_shelf_amount = self.stock.blank? ? 0 : self.stock.on_shelf_amount
       left_amount = self.parent.manual_stock_details.includes(:manual_stock).where(supplier: self.supplier, specification: self.specification, manual_stocks: {business_id: self.business_id}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
     elsif operation.eql? OPERATION[:b2c_stock_out]
-      on_shelf_amount = self.stock.on_shelf_amount
+      on_shelf_amount = self.stock.blank? ? 0 : self.stock.on_shelf_amount
       left_amount = self.parent.order_details.includes(:order).where(supplier: self.supplier, specification: self.specification, orders: {business_id: self.business_id}).sum(:amount) - self.parent.stock_logs.where(supplier: self.supplier, specification: self.specification, business: self.business).where.not(id: self.id).sum(:amount)
       
       max_amount = (on_shelf_amount < left_amount) ? on_shelf_amount : left_amount
@@ -182,7 +182,7 @@ class StockLog < ActiveRecord::Base
         total_amount = max_amount
       end
     elsif operation.eql? OPERATION[:inventory]
-      max_amount = self.stock.actual_amount
+      max_amount = self.stock.blank? ? 0 : self.stock.actual_amount
     end
     # binding.pry
     if self.stock.desc != "inv_ca"

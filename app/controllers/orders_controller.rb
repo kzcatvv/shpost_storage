@@ -427,12 +427,14 @@ class OrdersController < ApplicationController
 
       order = Order.find(params[:orderid])
       @curr_order = order.id
-      curr_dtls = order.order_details.includes(:specification).where("specifications.sixnine_code = ? and order_details.desc != 'haspacked' ",params[:tracking_number]).first
+      curr_dtls = order.order_details.includes(:specification).where("specifications.sixnine_code = ? and ( order_details.desc is null or order_details.desc != 'haspacked' ) ",params[:tracking_number]).first
       if curr_dtls.nil?
         @curr_dtl = -1
       else
         @curr_dtl = curr_dtls.id
-        @curod = OrderDetail.find(curr_dtls.id).update(desc: "haspacked")
+        if curr_dtls.amount == 1
+          @curod = OrderDetail.find(curr_dtls.id).update(desc: "haspacked")
+        end
       end 
     else
       order = Order.where(tracking_number: @tracking_number, status: "checked").first
@@ -1124,6 +1126,8 @@ class OrdersController < ApplicationController
                   tran_type = 'gnxb'  
                 when "EMS","ems"
                   tran_type = 'ems'
+                when "天天快递","ttkd"
+                  tran_type = 'ttkd'
                 else
                   tran_type = nil
               end
@@ -1467,6 +1471,8 @@ def exportorders_xls_content_for(objs)
           tran_type = '国内小包'  
         when "ems"
           tran_type = 'EMS'
+        when "ttkd"
+          tran_type = '天天快递'
       end
 
       if obj.business_trans_no.blank?

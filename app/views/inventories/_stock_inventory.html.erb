@@ -22,16 +22,16 @@
           <% if @inventory.inv_type == "byshelf" %>
             <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.where("id in (?)",stock_log.parent.inv_type_dtl.split(",")).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
           <% else %>
-            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.includes(:area)where("areas.storage_id = ?",current_storage.id).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
+            <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.includes(:area).where("areas.storage_id = ?",stock_log.storage.id).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
           <% end -%>
         </td>
         <td>
           <% if @inventory.inv_type == "byshelf" %>
-            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name")%>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.business.name+stock_log.supplier.name+stock_log.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name")%>
           <% else %>
-            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.stock.business.name+stock_log.stock.supplier.name+stock_log.stock.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name_byrel&inv_type_dtl=#{@inventory.inv_type_dtl}")%>
+            <%= text_field_tag("stock_logs[][relationship_id]", stock_log.business.name+stock_log.supplier.name+stock_log.specification.name, id: "stock_logs_relationshipid_#{stock_log.id}", 'data-autocomplete' => "/relationships/autocomplete_rel_name_byrel&inv_type_dtl=#{@inventory.inv_type_dtl}")%>
           <% end -%>
-          <%= hidden_field_tag("stock_logs[][relationship_id]", stock_log.stock.relationship.id, id: "stock_logs_relationshipid_#{stock_log.id}") %>
+          <%= hidden_field_tag("stock_logs[][relationship_id]", stock_log.relationship.id, id: "stock_logs_relationshipid_#{stock_log.id}") %>
         </td>
         <td>
           <%= text_field_tag("stock_logs[][inv_act_amount]", stock_log.amount, id: "stock_logs_invactamount_#{stock_log.id}",disabled: true ) %>
