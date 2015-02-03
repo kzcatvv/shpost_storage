@@ -689,6 +689,7 @@ zh-CN:
         status_opened: "开放"
         status_moved: "已移库"
         status_closed: "已关闭"
+        status_moving: "移库中"
       inventory:
         "no": "编号"
         name: "名称"
