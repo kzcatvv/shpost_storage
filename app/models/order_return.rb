@@ -27,8 +27,9 @@ class OrderReturn < ActiveRecord::Base
       end
 
       self.update(status: "checked")
+
+      self.order_return_details.first.order.update(status: "returned")
     end
   end
-
 
 end
