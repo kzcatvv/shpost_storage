@@ -90,8 +90,17 @@
                        end
                       raw buffer
                        
+                   end,width: "20%") + 
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"用户日志明细")
+                       order.user_logs.each do |ul|
+                        buffer += content_tag(:p,ul.user.name+"   "+ul.operation+"   "+ul.created_at.strftime('%Y-%m-%d %H:%M:%S').to_s)
+                       end
+                      raw buffer
+                       
                    end,width: "20%") )
-
          end
     end
 
