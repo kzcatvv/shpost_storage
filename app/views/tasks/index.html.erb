@@ -1,25 +1,29 @@
-<h1>Listing tasks</h1>
+<%- model_class = Task -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
+<%= grid(@tasks_grid) do |g|
+    g.column name: model_class.human_attribute_name(:title), attribute: 'title'
 
-  <tbody>
-    <% @tasks.each do |task| %>
-      <tr>
-        <td><%= link_to 'Show', task %></td>
-        <td><%= link_to 'Edit', edit_task_path(task) %></td>
-        <td><%= link_to 'Destroy', task, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    g.column name: model_class.human_attribute_name(:task_type), attribute: 'task_type' do |task|
+      Task::OPERATE_TYPE_SHOW[task.parent_type.to_sym]
+    end
 
-<br>
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status' do |task|
+      Task::STATUS_SHOW[task.status.to_sym]
+    end
 
-<%= link_to 'New Task', new_task_path %>
+    g.column name: model_class.human_attribute_name(:user_id), attribute: 'name', model: 'User' do |task|
+      task.user.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at'
+
+    g.column do |task|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.parent', :default => t("helpers.links.parent")), task.parent, :class => 'btn btn-xs btn-primary' if can? :read, task) #<< ' ' <<
+        #(link_to t('.roles', :default => t("helpers.links.roles")), storage_roles_path(storage), :class => 'btn btn-xs btn-primary' if can? :roles, storage)
+    end
+  end 
+%>
