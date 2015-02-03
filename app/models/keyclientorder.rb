@@ -66,9 +66,10 @@ class Keyclientorder < ActiveRecord::Base
     self.stock_logs.each do |x|
       x.check!
     end
-
-    self.orders.each do |order|
-      order.stock_out
+    if ! self.waiting_amounts.blank?
+      self.orders.each do |order|
+        order.stock_out
+      end
     end
   end
 
