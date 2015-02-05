@@ -147,6 +147,9 @@ class PurchasesController < ApplicationController
             purchase = nil
             2.upto(instance.last_row) do |line|
                #binding.pry
+              if instance.cell(line,'B').blank?
+                raise "导入文件第" + line.to_s + "行数据, 找不到供应商编号，导入失败"
+              end
 
               if !instance.cell(line,'A').to_s.blank?
                 unit = current_user.unit
@@ -154,9 +157,16 @@ class PurchasesController < ApplicationController
                 storage = current_storage
                 business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'B').to_s
 
+                if business.blank?
+                  raise "导入文件第" + line.to_s + "行数据, 找不到商户，导入失败"
+                end
                 purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
               end
               supplier=Supplier.accessible_by(current_ability).find_by name:instance.cell(line,'E').to_s
+
+              if supplier.blank?
+                raise "导入文件第" + line.to_s + "行数据, 找不到供应商，导入失败"
+              end
 
               specifications=Specification.accessible_by(current_ability).where(sixnine_code:instance.cell(line,'G').to_s)
 
@@ -166,6 +176,10 @@ class PurchasesController < ApplicationController
                 specification=specifications.find_by name: instance.cell(line,'F').to_s
               elsif specifications.size == 1
                 specification = specifications.first
+              end
+
+              if specification.blank?
+                raise "导入文件第" + line.to_s + "行数据, 找不到69码或规格名称，导入失败"
               end
 
               expiration_date = instance.cell(line, 'H')
