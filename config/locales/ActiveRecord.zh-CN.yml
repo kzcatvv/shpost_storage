@@ -527,6 +527,7 @@ zh-CN:
         transport_type_ems: "EMS"
         transport_type_ttkd: "天天快递"
         transport_type_bsht: "百世汇通"
+        transport_type_qt: "其他"
         status_waiting: "待处理"
         status_printed: "已打印"
         status_picking: "拣货中"
