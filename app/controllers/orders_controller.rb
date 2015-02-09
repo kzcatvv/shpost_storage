@@ -628,6 +628,8 @@ class OrdersController < ApplicationController
                     tran_type = 'ttkd'
                   when "bsht","百世汇通"
                     tran_type = 'bsht'
+                  when "qt","其他"
+                    tran_type = 'qt'
                   else
                     tran_type = nil
                 end 
@@ -1136,6 +1138,8 @@ class OrdersController < ApplicationController
                   tran_type = 'ttkd'
                 when "百世汇通","bsht"
                   tran_type = 'bsht'
+                when "其他","qt"
+                  tran_type = 'qt'
                 else
                   tran_type = nil
               end
@@ -1483,6 +1487,8 @@ def exportorders_xls_content_for(objs)
           tran_type = '天天快递'
         when "bsht"
           tran_type = '百世汇通'
+        when "qt"
+          tran_type = '其他'
       end
 
       if obj.business_trans_no.blank?
@@ -1616,6 +1622,13 @@ def exportorders_xls_content_for(objs)
         return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
       else
         raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "百世汇通邮件编号格式错误,导入失败"
+      end
+    when "qt"
+      case tracking_number.size
+      when 13
+        return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
+      else
+        raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "其他承运商邮件编号格式错误,导入失败"
       end
     else
       raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "错误的承运商,导入失败"

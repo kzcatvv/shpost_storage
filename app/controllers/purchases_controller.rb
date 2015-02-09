@@ -152,24 +152,35 @@ class PurchasesController < ApplicationController
                 unit = current_user.unit
                 status = Purchase::STATUS[:opened]
                 storage = current_storage
-                business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'B').to_s
+                business = Business.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'B'))
 
-                purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: instance.cell(line,'C').to_s, status: status, storage_id: storage.id, name: instance.cell(line,'A').to_s
+                if business.blank?
+                  raise "导入文件第" + line.to_s + "行数据, 找不到商户，导入失败"
+                end
+                purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: to_string(instance.cell(line,'C')), status: status, storage_id: storage.id, name: to_string(instance.cell(line,'A'))
               end
-              supplier=Supplier.accessible_by(current_ability).find_by name:instance.cell(line,'E').to_s
+              supplier=Supplier.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'E'))
 
-              specifications=Specification.accessible_by(current_ability).where(sixnine_code:instance.cell(line,'G').to_s)
+              if supplier.blank?
+                raise "导入文件第" + line.to_s + "行数据, 找不到供应商，导入失败"
+              end
+
+              specifications=Specification.accessible_by(current_ability).where(sixnine_code: to_string(instance.cell(line,'G')))
 
               specification=nil
 
               if specifications.size > 1
-                specification=specifications.find_by name: instance.cell(line,'F').to_s
+                specification=specifications.find_by name: to_string(instance.cell(line,'F'))
               elsif specifications.size == 1
                 specification = specifications.first
               end
 
-              expiration_date = instance.cell(line, 'H')
-              purchase_detail = PurchaseDetail.create! name: instance.cell(line, 'D'), purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: instance.cell(line,'J'), status: "waiting"
+              if specification.blank?
+                raise "导入文件第" + line.to_s + "行数据, 找不到69码或规格名称，导入失败"
+              end
+
+              expiration_date = to_string(instance.cell(line, 'H'))
+              purchase_detail = PurchaseDetail.create! name: to_string(instance.cell(line, 'D')), purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')), status: "waiting"
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
@@ -204,7 +215,11 @@ class PurchasesController < ApplicationController
 
 
   def to_string(text)
-    text.to_s.split('.0')[0]
+    if text.is_a? Float
+      return text.to_s.split('.0')[0]
+    else
+      return text
+    end
   end
 
     # Use callbacks to share common setup or constraints between actions.
