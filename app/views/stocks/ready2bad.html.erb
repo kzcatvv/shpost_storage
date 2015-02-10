@@ -9,7 +9,7 @@
        <%= label_tag(:lbshelfcode, "货架编号: "+Shelf.find(@stock.shelf_id).shelf_code) %>
        <%= label_tag(:lbspecificationid, "商品规格名称: "+Specification.find(@stock.specification_id).all_name) %>
        <%= label_tag(:lbsupplierid, "供应商: "+Supplier.find(@stock.supplier_id).name) %>
-       <%= label_tag(:lbbatchno, "批次号: "+@stock.batch_no) %>
+       <%= label_tag(:lbbatchno, "批次号: "+@stock.batch_no.to_s) %>
        <%= label_tag(:lbactmnt, "实际库存: "+@stock.actual_amount.to_s) %>
        <%= label_tag(:lbvirmnt, "预计库存: "+@stock.virtual_amount.to_s) %>
        <%= label_tag(:move_amount, "残次品数量:") %>

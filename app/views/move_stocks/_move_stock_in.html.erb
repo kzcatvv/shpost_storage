@@ -18,7 +18,7 @@
           <%= hidden_field_tag("stock_logs[][out_shelf_id]", stock_log.shelf.id, id: "md_out_shelf_#{stock_log.id}") %>
         </td>
         <td>
-          <%= select_tag("stock_logs[][md_stock_id]", options_for_select(Stock.where("shelf_id = ?",stock_log.shelf.id).map{|u| [u.batch_no+u.specification.all_name,u.id]}.insert(0,"请选择"), stock_log.stock.id), id: "md_stock_#{stock_log.id}")%>
+          <%= select_tag("stock_logs[][md_stock_id]", options_for_select(Stock.where("shelf_id = ?",stock_log.shelf.id).map{|u| [u.batch_no.blank? ? u.specification.name : u.batch_no+u.specification.name,u.id]}.insert(0,"请选择"), stock_log.stock.id), id: "md_stock_#{stock_log.id}")%>
         </td>
         <td>
           <%= text_field_tag("stock_logs[][md_stock_amount]", (stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount), id: "md_stock_amount_#{stock_log.id}",disabled: true ) %>

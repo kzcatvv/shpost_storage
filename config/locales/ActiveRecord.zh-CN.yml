@@ -150,6 +150,7 @@ zh-CN:
       storages: 仓库管理
       users: 用户管理
       roles: 角色管理
+      parent: 查看详情
       specifications: 商品规格管理
       pddetails: 商品明细管理
       custorders: 客户明细管理
@@ -359,6 +360,9 @@ zh-CN:
       inventory:
         one: 盘点单管理
         other: 盘点单管理
+      task:
+        one: PDA任务管理
+        other: PDA任务管理
     attributes:
       user:
         email: "电子邮件"
@@ -522,6 +526,8 @@ zh-CN:
         transport_type_gnxb: "国内小包"
         transport_type_ems: "EMS"
         transport_type_ttkd: "天天快递"
+        transport_type_bsht: "百世汇通"
+        transport_type_qt: "其他"
         status_waiting: "待处理"
         status_printed: "已打印"
         status_picking: "拣货中"
@@ -702,6 +708,12 @@ zh-CN:
         status_opened: "开放"
         status_inventoring: "盘点中"
         status_closed: "已关闭"
+      task:
+        title: "任务名"
+        task_type: "任务类型"
+        status: "任务状态"
+        user_id: "分配用户"
+        created_at: "创建时间"
   menu:
     permission:
       name: "权限管理"
@@ -864,7 +876,7 @@ zh-CN:
           name: "移库单管理"
           link: "/move_stocks"
         inventorybyshelf:
-          name: "盘点"
+          name: "盘点单管理"
           link: "/inventories"
     logs:
       name: "日志查询"
@@ -878,6 +890,12 @@ zh-CN:
           needrole:
             can: :read
             role: :InterfaceInfo
+        task:
+          name: "PDA任务查询"
+          link: "/tasks"
+          needrole:
+            can: :read
+            role: :Task
     up_downloads:
       name: "模板管理"
       needrole:

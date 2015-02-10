@@ -39,17 +39,17 @@ function movestock_preview(){
     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"移出货架");
     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,"69码");
     LODOP.ADD_PRINT_TEXT(h,"40%",260,25,"商品名");
-    LODOP.ADD_PRINT_TEXT(h,"55%",260,25,"数量");
-    LODOP.ADD_PRINT_TEXT(h,"75%",260,25,"移入货架");
+    LODOP.ADD_PRINT_TEXT(h,"75%",260,25,"数量");
+    LODOP.ADD_PRINT_TEXT(h,"85%",260,25,"移入货架");
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
     <% @movestock.stock_logs.where("operation = 'move_stock_out'").each do |j| %>
-        h=h+33;
+        h=h+50;
         LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= j.shelf.shelf_code %>');
         LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= j.specification.sixnine_code %>');
-        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.specification.all_name.gsub(/[\r\n]/,'') %>');
-        LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= j.amount %>');
-        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.pick_in.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.specification.name.gsub(/[\r\n]/,'') %>');
+        LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.amount %>');
+        LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= j.pick_in.shelf.shelf_code %>');
     <% end %>
     LODOP.PREVIEW();
   };

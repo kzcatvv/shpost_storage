@@ -427,7 +427,11 @@ class OrdersController < ApplicationController
 
       order = Order.find(params[:orderid])
       @curr_order = order.id
-      curr_dtls = order.order_details.includes(:specification).where("specifications.sixnine_code = ? and ( order_details.desc is null or order_details.desc != 'haspacked' ) ",params[:tracking_number]).first
+      curr_dtls_a = order.order_details.includes(:specification).where("specifications.sixnine_code = ? ",params[:tracking_number]).where(desc:nil)
+      curr_dtls_b = order.order_details.includes(:specification).where("specifications.sixnine_code = ? ",params[:tracking_number]).where.not(desc: "haspacked")
+      curr_dtls_c = curr_dtls_a + curr_dtls_b
+      curr_dtls = curr_dtls_c.first
+      
       if curr_dtls.nil?
         @curr_dtl = -1
       else
@@ -461,10 +465,10 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true], :per_page => 15)
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true], :per_page => 15)
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['order_type = ? and status in (?) and is_split != ?',"b2c",status, true])
+    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true])
 
     #some wice_grad lazy do the resultset is [] without once call
     begin
@@ -621,8 +625,12 @@ class OrdersController < ApplicationController
                     tran_type = 'gnxb'  
                   when "EMS","ems"
                     tran_type = 'ems'
-                  when "ttkd"
+                  when "ttkd","天天快递"
                     tran_type = 'ttkd'
+                  when "bsht","百世汇通"
+                    tran_type = 'bsht'
+                  when "qt","其他"
+                    tran_type = 'qt'
                   else
                     tran_type = nil
                 end 
@@ -1120,6 +1128,10 @@ class OrdersController < ApplicationController
                   tran_type = 'ems'
                 when "天天快递","ttkd"
                   tran_type = 'ttkd'
+                when "百世汇通","bsht"
+                  tran_type = 'bsht'
+                when "其他","qt"
+                  tran_type = 'qt'
                 else
                   tran_type = nil
               end
@@ -1461,6 +1473,10 @@ def exportorders_xls_content_for(objs)
           tran_type = 'EMS'
         when "ttkd"
           tran_type = '天天快递'
+        when "bsht"
+          tran_type = '百世汇通'
+        when "qt"
+          tran_type = '其他'
       end
 
       if obj.business_trans_no.blank?
@@ -1589,6 +1605,20 @@ def exportorders_xls_content_for(objs)
         return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
       else
         raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "天天快递邮件编号格式错误,导入失败"
+      end
+    when "bsht"
+      case tracking_number.size
+      when 13
+        return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
+      else
+        raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "百世汇通邮件编号格式错误,导入失败"
+      end
+    when "qt"
+      case tracking_number.size
+      when 13
+        return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
+      else
+        raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "其他承运商邮件编号格式错误,导入失败"
       end
     else
       raise (line.blank?? "":"导入文件第"+line.to_s+"行,") + "错误的承运商,导入失败"
