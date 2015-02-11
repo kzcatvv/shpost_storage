@@ -121,6 +121,10 @@ ShpostStorage::Application.routes.draw do
         post 'importorders2'
       end
 
+    member do
+      get 'cancel'
+    end
+
      resources :order_details
   end
 

@@ -160,6 +160,7 @@ class Ability
         can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
 
         can :manage, Order, storage_id: storage.id
+        cannot :cancel, Order, status: ['printed','picking']
         can :manage, OrderDetail, order: {storage_id: storage.id}
 
         # can :manage, Role, storage_id: storage.id
