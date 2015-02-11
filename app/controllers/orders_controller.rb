@@ -599,6 +599,7 @@ class OrdersController < ApplicationController
     unless request.get?
       if file = upload_pingan(params[:file]['file'])
         Order.transaction do
+      #商户
           business_id = params[:business_select]
           business = Business.accessible_by(current_ability).find business_id
           Rails.logger.info "*************business_id:" + business_id + "************"
@@ -672,7 +673,7 @@ class OrdersController < ApplicationController
                     order = Order.update(order_id,tracking_number:tracking_number,transport_type:tran_type,total_weight:instance.cell(line,'D').to_f,pingan_ordertime:instance.cell(line,'E'),customer_name:instance.cell(line,'F'),customer_address:instance.cell(line,'G'),customer_postcode:instance.cell(line,'H').to_s.split('.0')[0],province:instance.cell(line,'I'),city:instance.cell(line,'J'),county:instance.cell(line,'K'),customer_tel:instance.cell(line,'L').to_s.split('.0')[0],customer_phone:instance.cell(line,'M').to_s.split('.0')[0])
                     @ids << order_id
                   else
-                    raise "导入文件第" + line.to_s + "行数据, 只有待处理状态的订单才能重复导入，导入失败"
+                    raise "导入文件第一页第" + line.to_s + "行数据, 只有待处理状态的订单才能重复导入，导入失败"
                   end
                   
                   line = line+1
@@ -687,77 +688,68 @@ class OrdersController < ApplicationController
               #外部订单号
               business_order_id = to_string(instance.cell(dline,'A'))
               if business_order_id.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
+                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
 
               #子订单号
               sub_order_id = to_string(instance.cell(dline,'B'))
 
-              #第三方编码
-              external_code = to_string(instance.cell(dline,'C'))
-              
               #供应商编号
               if !instance.cell(dline,'D').blank?
                 supplier_no = instance.cell(dline,'D').to_s.split('.0')[0].rjust(10, '0')
+                supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
               end
-              #sku
-              sku_id = to_string(instance.cell(dline,'E'))
-
-              if !external_code.blank?
-                suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{business_id}","#{external_code}").first.supplier_id
-                spid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{business_id}","#{external_code}").first.specification_id
-                if !suid.blank?
-                  supplier_no = Supplier.where("id = ?", "#{suid}").first.no
-                end 
-                if !spid.blank?
-                  sku_id = Specification.where("id = ?","#{spid}").first.sku
+        
+              #SKU/第三方编码/69码
+              sku_extcode_69code = to_string(instance.cell(dline,'C'))
+              
+              if !sku_extcode_69code.blank?
+                #先考虑为sku
+                specification = Specification.find_by sku: sku_extcode_69code
+                #不是sku，考虑为第三方编码
+                if specification.blank?
+                  relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", "#{business_id}","#{sku_extcode_69code}")
+                  #不是第三方编码，考虑为69码
+                  if relationship.blank?
+                    if !supplier.blank?
+                      relationship = Relationship.includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{business_id}","#{supplier.id}")
+                      
+                    else
+                      raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
+                    end
+                  end
+                  # binding.pry
+                  if !relationship.blank?
+                    specification = relationship.specification
+                    supplier = relationship.supplier
+                  else
+                    raise "导入文件第二页第" + dline.to_s + "行数据, 找不到对应关系，导入失败"
+                  end
+                else
+                  if supplier.blank?
+                    raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
+                  else
+                    relationship = Relationship.find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
+                    if relationship.blank?
+                      raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
+                    end
+                  end
                 end
-                
-              end 
-              if supplier_no.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 找不到供应商编号，导入失败"
-              end
-              if sku_id.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 找不到sku，导入失败"
+              else
+                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少sku/第三方编码/69码，导入失败"
               end
 
               #数量
-              amount = instance.cell(dline,'F').to_s.split('.0')[0]
+              amount = instance.cell(dline,'E').to_s.split('.0')[0]
               if amount.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 缺少数量，导入失败"
-              end
-
-              #判断sku对应商品规格是否存在
-              specifications = Specification.accessible_by(current_ability).where sku: sku_id
-              specification = Specification.accessible_by(current_ability).find_by(sku: sku_id)
-              specification_id = specification.id.to_s
-              
-              if specifications.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 商品缺失，导入失败"
-              end 
-
-              #判断供应商编号对应供应商是否存在
-              suppliers = Supplier.accessible_by(current_ability).where no: supplier_no
-              supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
-              supplier_id = supplier.id.to_s
-             
-              if suppliers.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 供应商不存在，导入失败"
-              end
-
-              #判断供应商，商户，商品对应关系是否存在
-              relationships = Relationship.accessible_by(current_ability).where("business_id = ? and supplier_id = ? and specification_id = ?", "#{business_id}","#{supplier_id}","#{specification_id}")
-              if relationships.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 商品对应关系不存在，导入失败"
+                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少数量，导入失败"
               end
 
               #根据外部订单号找到对应订单
-              dorders = Order.accessible_by(current_ability).where business_order_id: business_order_id, business_id: business_id
+               dorder = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business_id
 
-              dorder = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business_id
-
-              if dorders.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
+              if dorder.blank?
+                raise "导入文件第二页第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
               end
 
               dorder_id = dorder.id.to_s
@@ -770,7 +762,7 @@ class OrdersController < ApplicationController
               dorder_status = dorder.status
               if (dorder_status <=> "waiting")==0
                 #取得原有订单明细记录
-                ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier_id}","#{specification_id}","#{dorder_id}")
+                ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
                 
                 business_deliver_no = ""
                 business_trans_no = ""
@@ -811,11 +803,11 @@ class OrdersController < ApplicationController
                     Order.update(dorder_id,total_amount: dorder_total_amount,business_trans_no: business_trans_no)
                   #数量小于0，报错
                   else
-                    raise "导入文件第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
+                    raise "导入文件第二页第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
                   end
                 end 
               else
-                raise "导入文件第" + dline.to_s + "行数据, 只有待处理状态的订单才能重复导入，导入失败"
+                raise "导入文件第二页第" + dline.to_s + "行数据, 只有待处理状态的订单才能重复导入，导入失败"
               end
             end
 
@@ -1108,11 +1100,11 @@ class OrdersController < ApplicationController
               if batch_no.blank?
                 business_order_id = to_string(instance.cell(line,'A'))
                 if business_order_id.blank?
-                  raise "导入文件第" + line.to_s + "行数据, 缺少外部订单号，导入失败"
+                  raise "导入文件第一页第" + line.to_s + "行数据, 缺少外部订单号，导入失败"
                 end
                 business_name = instance.cell(line,'N')
                 if business_name.blank?
-                  raise "导入文件第" + line.to_s + "行数据, 缺少商户名称，导入失败"
+                  raise "导入文件第一页第" + line.to_s + "行数据, 缺少商户名称，导入失败"
                 end
                 business_id = Business.find_by(name: business_name).id
 
@@ -1122,9 +1114,9 @@ class OrdersController < ApplicationController
               end
 
               if order.blank?
-                raise "导入文件第" + line.to_s + "行数据, 订单不存在，导入失败"
+                raise "导入文件第一页第" + line.to_s + "行数据, 订单不存在，导入失败"
               elsif !order.can_import()
-                flash_message << "导入文件第" + line.to_s + "行数据, 订单已处理，无法导入\<br/\>"
+                flash_message << "导入文件第一页第" + line.to_s + "行数据, 订单已处理，无法导入\<br/\>"
                 next
               end
               tracking_number = to_string(instance.cell(line,'B'))
@@ -1190,14 +1182,14 @@ class OrdersController < ApplicationController
             dline.upto(instance.last_row) do |dline|
               business_order_id = to_string(instance.cell(dline,'A'))
               if business_order_id.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
+                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
               
-              batch_no = to_string(instance.cell(dline,'I'))
+              batch_no = to_string(instance.cell(dline,'H'))
               if batch_no.blank?
-                business_name = instance.cell(dline,'H')
+                business_name = instance.cell(dline,'G')
                 if business_name.blank?
-                  raise "导入文件第" + dline.to_s + "行数据, 缺少商户名称，导入失败"
+                  raise "导入文件第二页第" + dline.to_s + "行数据, 缺少商户名称，导入失败"
                 end
                 business_id = Business.find_by(name: business_name).id
 
@@ -1208,67 +1200,63 @@ class OrdersController < ApplicationController
               end
               
               if dorder.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
+                raise "导入文件第二页第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
               end
 
               dorder_id = dorder.id.to_s
               dorder_total_amount = dorder.total_amount
               dorder_business_id = dorder.business_id
 
-              #第三方编码
-              external_code = to_string(instance.cell(dline,'C'))
               #供应商编号
               if !instance.cell(dline,'D').blank?
                 supplier_no = instance.cell(dline,'D').to_s.split('.0')[0].rjust(10, '0')
+                supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
               end
-              #sku
-              sku_id = to_string(instance.cell(dline,'E'))
-              
-              if !external_code.blank?
-                suid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{dorder_business_id}","#{external_code}").first.supplier_id
-                spid = Relationship.accessible_by(current_ability).where("business_id = ? and external_code = ?", "#{dorder_business_id}","#{external_code}").first.specification_id
-                if !suid.blank?
-                  supplier_no = Supplier.where("id = ?", "#{suid}").first.no
+ 
+              #SKU/第三方编码/69码
+              sku_extcode_69code = to_string(instance.cell(dline,'C'))
+              if !sku_extcode_69code.blank?
+                #先考虑为sku
+                specification = Specification.find_by sku: sku_extcode_69code
+                #不是sku，考虑为第三方编码
+                if specification.blank?
+                  relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", "#{dorder_business_id}","#{sku_extcode_69code}")
+                  #不是第三方编码，考虑为69码
+                  if relationship.blank?
+                    if !supplier.blank?
+                      relationship = Relationship.includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{dorder_business_id}","#{supplier.id}")
+                      
+                    else
+                      raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
+                    end
+                  end
+                  
+                  if !relationship.blank?
+                    specification = relationship.specification
+                    supplier = relationship.supplier
+                  else
+                    raise "导入文件第二页第" + dline.to_s + "行数据, 找不到对应关系，导入失败"
+                  end
+                else
+                  if supplier.blank?
+                    raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
+                  else
+                    relationship = Relationship.find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
+                    if relationship.blank?
+                      raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
+                    end
+                  end
                 end
-                if !spid.blank?
-                  sku_id = Specification.where("id = ?","#{spid}").first.sku
-                end
-                
-              end 
-              if supplier_no.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 找不到供应商编号，导入失败"
-              end
-              if sku_id.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 找不到sku，导入失败"
+              else
+                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少sku/第三方编码/69码，导入失败"
               end
 
-              amount = instance.cell(dline,'F').to_s.split('.0')[0]
+              amount = instance.cell(dline,'E').to_s.split('.0')[0]
               if amount.blank?
-                raise "导入文件第" + dline.to_s + "行数据, 缺少数量，导入失败"
+                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少数量，导入失败"
               end
 
-              specifications = Specification.accessible_by(current_ability).where sku: sku_id
-              specification = Specification.accessible_by(current_ability).find_by(sku: sku_id)
-              specification_id = specification.id.to_s
-              
-              suppliers = Supplier.accessible_by(current_ability).where no: supplier_no
-              supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
-              supplier_id = supplier.id.to_s
-             
-              if specifications.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 商品缺失，导入失败"
-              end 
-              if suppliers.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 供应商不存在，导入失败"
-              end
-
-              
-              relationships = Relationship.accessible_by(current_ability).where("business_id = ? and supplier_id = ? and specification_id = ?", "#{dorder_business_id}","#{supplier_id}","#{specification_id}")
-              if relationships.size == 0
-                raise "导入文件第" + dline.to_s + "行数据, 商品对应关系不存在，导入失败"
-              end
-
-              ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier_id}","#{specification_id}","#{dorder_id}")
+              ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
               if ori_order_detail.blank?
                 next
               else
@@ -1284,7 +1272,7 @@ class OrdersController < ApplicationController
                   dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
                   Order.update(dorder_id,total_amount: dorder_total_amount)
                 else
-                  raise "导入文件第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
+                  raise "导入文件第二页第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
                 end
               end
             end
@@ -1532,7 +1520,7 @@ def exportorders_xls_content_for(objs)
     sheet2 = book.create_worksheet :name => "OrderDetails"
     detail_row = 0
     sheet2.row(detail_row).default_format = blue 
-    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 第三方编码 供应商编号 SKU 数量 商品名称 商户名称 订单流水号}
+    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户名称 订单流水号}
     detail_row = detail_row + 1
     objs.each do |obj|
       obj_id = obj.id
@@ -1564,16 +1552,18 @@ def exportorders_xls_content_for(objs)
           end
         end
 
+        sku_extcode_69code = specification.sku
+        sku_extcode_69code ||= external_code
+        sku_extcode_69code ||= specification.sixnine_code
 
         sheet2[detail_row,0]=business_order_id
         sheet2[detail_row,1]=sub_order_id
-        sheet2[detail_row,2]=external_code
+        sheet2[detail_row,2]=sku_extcode_69code
         sheet2[detail_row,3]=supplier_no
-        sheet2[detail_row,4]=specification.sku
-        sheet2[detail_row,5]=order_detail.amount
-        sheet2[detail_row,6]=specification.all_name
-        sheet2[detail_row,7]=obj.business.name
-        sheet2[detail_row,8]=order_detail.order.batch_no
+        sheet2[detail_row,4]=order_detail.amount
+        sheet2[detail_row,5]=specification.all_name
+        sheet2[detail_row,6]=obj.business.name
+        sheet2[detail_row,7]=order_detail.order.batch_no
         
         detail_row += 1
       end
