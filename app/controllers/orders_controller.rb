@@ -99,6 +99,11 @@ class OrdersController < ApplicationController
     end
   end
 
+  def cancel
+    @order.update(status: 'cancel')
+    redirect_to action: 'findprintindex'
+  end
+
   def findprint
     @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
     if @orders.empty?

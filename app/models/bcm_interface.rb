@@ -1,5 +1,5 @@
 class BcmInterface
-	STATUS_HASH ={'delivering'=>'00','delivered'=>'01','waiting'=>'02','printed'=>'03','checked'=>'04','picking'=>'05','packed'=>'06','declined'=>'07','returned'=>'08'}
+	STATUS_HASH ={'delivering'=>'00','delivered'=>'01','waiting'=>'02','printed'=>'03','checked'=>'04','picking'=>'05','packed'=>'06','declined'=>'07','returned'=>'08','cancel'=>'09'}
 	# def self.notice_array(business,unit)
 	# 	array=[]
 	# 	dn1=Order.where( business_id: business, unit_id: unit, status: "delivering" ).includes(:deliver_notices).where(["deliver_notices.send_type=? and deliver_notices.status!=?","00","success"])
@@ -90,7 +90,7 @@ class BcmInterface
 
 	def self.csb_notice_array()
 		orders_return = []
-		status_keys = ["delivered","declined","returned"]
+		status_keys = ["delivered","declined","returned","cancel"]
 		# puts status_keys
 		status_keys.each do |key|
 			# puts "*************"
