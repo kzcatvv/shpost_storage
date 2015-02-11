@@ -682,7 +682,7 @@ zh-CN:
         version: "版本"
         user: "当前使用人员"
         last_sign_in_time: "最后登入时间"
-        cancel: "允许使用"
+        cancel: "禁用"
       move_stock:
         "no": "编号"
         name: "名称"

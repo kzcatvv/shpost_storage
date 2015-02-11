@@ -27,20 +27,17 @@ class Stock < ActiveRecord::Base
   SN_SPLIT = "."
 
   def self.purchase_stock_in(purchase, operation_user = nil)
-    purchase.purchase_details.each do |x|
-      x.purchase_arrivals.each do |arrival|
+    purchase.purchase_arrivals.each do |arrival|
       # while x.waiting_amount > 0
-        while arrival.waiting_amount > 0
-          stock = Stock.get_available_stock_in_storage(x.specification, x.supplier, purchase.business, arrival.expiration_date.blank? ? nil : arrival.batch_no, purchase.storage, false)
-          
-          stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
-
-          purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in], batch_no: arrival.batch_no)
+      while arrival.waiting_amount > 0
+        stock = Stock.get_available_stock_in_storage(arrival.purchase_detail.specification, arrival.purchase_detail.supplier, purchase.business, arrival.expiration_date.blank? ? nil : arrival.batch_no, purchase.storage, false)
         
-          if !arrival.expiration_date.blank?
-            stock.update(expiration_date: arrival.expiration_date)
-          end
+        stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
 
+        purchase.stock_logs.create(stock: stock, user: operation_user, operation: StockLog::OPERATION[:purchase_stock_in], status: StockLog::STATUS[:waiting], amount: stock_in_amount, operation_type: StockLog::OPERATION_TYPE[:in], batch_no: arrival.batch_no)
+      
+        if !arrival.expiration_date.blank?
+          stock.update(expiration_date: arrival.expiration_date)
         end
       end
     end
