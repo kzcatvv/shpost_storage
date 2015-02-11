@@ -74,17 +74,21 @@ class Stock < ActiveRecord::Base
   # end
 
   def self.move_stock_change(stock, move_shelf, amount, operation_user = nil, is_broken = false)
+    amount = stock.stock_out_amount(amount)
+
+    if amount <= 0
+      return
+    end
+
     move_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, nil, move_shelf)
 
-    amount = stock.stock_out_amount(amount)
-    stock.check_out_amount(amount)
-
-    # broken_stock.stock_in_amount(amount)
     move_stock.check_in_amount(amount)
 
-    StockLog.create(user: operation_user, stock: stock, operation: is_broken ? StockLog::OPERATION[:move_to_bad] : StockLog::OPERATION[:move_stock_out], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now)
+    stock.check_out_amount(amount)
 
-    StockLog.create(user: operation_user, stock: move_stock, operation: is_broken ? StockLog::OPERATION[:bad_stock_in] : StockLog::OPERATION[:move_stock_in], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now)
+    StockLog.create(user: operation_user, stock: stock, operation: is_broken ? StockLog::OPERATION[:move_to_bad] : StockLog::OPERATION[:move_stock_out], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now, batch_no: stock.batch_no)
+
+    StockLog.create(user: operation_user, stock: move_stock, operation: is_broken ? StockLog::OPERATION[:bad_stock_in] : StockLog::OPERATION[:move_stock_in], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now, batch_no: stock.batch_no)
   end
 
   def self.manual_stock_stock_out(manual_stock, operation_user = nil)
@@ -307,7 +311,7 @@ class Stock < ActiveRecord::Base
   end
 
   def stock_out_amount(amount)
-    if on_shelf_amount > amount
+    if on_shelf_amount >= amount
       # virtual_amount -= amount
       return amount
     else

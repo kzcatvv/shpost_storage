@@ -171,7 +171,9 @@ class MobileInterfaceController < ApplicationController
                 in_amount = x.amount
               end
 
-              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: x.operation, status: StockLog::STATUS[:waiting], amount: in_amount , operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT), batch_no: x.batch_no)
+              out_stock_log = new_stock_logs.select{|sl| sl.operation_type.eql?(StockLog::OPERATION_TYPE[:out]) && sl.relationship.eql?(x.relationship) && sl.batch_no.eql?(x.batch_no)}.first
+
+              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: x.operation, status: StockLog::STATUS[:waiting], amount: in_amount , operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT), batch_no: x.batch_no, pick_in: out_stock_log)
 
               break if amount < x.amount
 
@@ -252,7 +254,7 @@ class MobileInterfaceController < ApplicationController
 
     if ! stocks.blank?
       stocks.each do |stock|
-        products << {stock: stock.id, product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, Stock::SN_SPLIT), expiration: stock.expiration_date.try(:strftime,'%Y%m%d'), amount: stock.actual_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y%m%d %H:%M:%S') }
+        products << {stock: stock.id, product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, Stock::SN_SPLIT), expiration: stock.expiration_date.try(:strftime,'%Y%m%d'), amount: stock.on_shelf_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y%m%d %H:%M:%S') }
       end
 
       success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), products: products})
