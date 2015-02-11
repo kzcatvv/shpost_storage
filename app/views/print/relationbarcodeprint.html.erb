@@ -15,12 +15,11 @@
 
   	LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));
   	LODOP.PRINT_INIT("打印条码");
-    LODOP.SET_PRINT_STYLE("FontSize",18);
-    LODOP.SET_PRINT_STYLE("Bold",1);
-    LODOP.SET_PRINT_STYLE("ItemType",4);
-    LODOP.ADD_PRINT_BARCODE(80,"35%",260,39,'128A','<%= @relationship.barcode %>');
+
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_BARCODE(80,"35%",260,39,'128A','<%= @relationship.barcode %>')
+
     LODOP.PREVIEW();  
   };
 
