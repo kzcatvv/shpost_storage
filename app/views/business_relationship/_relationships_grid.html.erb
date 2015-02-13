@@ -1,0 +1,67 @@
+<%- model_class = Relationship -%>
+
+<%= grid(@relationships_grid, upper_pagination_panel: true) do |g|
+
+    g.column name: '商品编号', in_html: false do |relationship|
+      relationship.specification.commodity.no
+    end
+
+    g.column name: '商品名称', in_html: false do |relationship|
+      relationship.specification.commodity.name
+    end
+
+    g.column name: '商品类型', in_html: false do |relationship|
+      relationship.specification.commodity.goodstype.name
+    end
+
+    g.column name: 'SKU', in_html: false do |relationship|
+      relationship.specification.sku
+    end
+
+    g.column name: '69码', in_html: false do |relationship|
+      relationship.specification.sixnine_code
+    end
+
+    g.column name: '规格名称', in_html: false do |relationship|
+      relationship.specification.name
+    end
+
+    g.column name: '规格描述', in_html: false do |relationship|
+      relationship.specification.desc
+    end
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |relationship|
+      relationship.business.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |relationship|
+      relationship.supplier.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name', model: 'Specification', in_csv: false do |relationship|
+      relationship.specification.try :all_name
+    end
+
+    g.column name: model_class.human_attribute_name(:external_code), attribute: 'external_code'
+
+    g.column name: model_class.human_attribute_name(:spec_desc), attribute: 'spec_desc'
+
+    g.column name: model_class.human_attribute_name(:warning_amt), attribute: 'warning_amt'
+
+    g.column name: model_class.human_attribute_name(:sku), attribute: 'barcode', in_csv: false
+
+    g.column name: model_class.human_attribute_name(:piece_to_piece), attribute: 'piece_to_piece', in_csv: false do |relationship|
+        relationship.piece_to_piece ? '是' : '否'
+    end
+
+    g.column in_csv: false do |relationship|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_business_relationship_path(@business,relationship), :class => 'btn btn-xs btn-primary' if can? :update, relationship) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), business_relationship_path(@business,relationship), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, relationship)<< ' ' <<
+        (link_to t('设置联系人'),
+                      relation_contacts_path(:rid=>relationship), :class => 'btn btn-xs btn-primary') << ' ' <<
+        (link_to t('打印条码'), "/print/relationbarcodeprint?rid=#{relationship.id}", target: '_blank',:class => 'btn btn-xs btn-primary')
+    end
+  end 
+%>

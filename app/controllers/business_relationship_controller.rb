@@ -6,7 +6,13 @@ class BusinessRelationshipController < ApplicationController
     @relationships_grid = initialize_grid(@relationships,
       :order => 'relationships.id',
       :order_direction => 'desc',
-      include: [:business, :specification, :supplier])
+      include: [:business, :specification, :supplier],
+      :name => 'g1',
+      :enable_export_to_csv => true,
+      :csv_file_name => 'relationships')
+
+    export_grid_if_requested('g1' => 'relationships_grid')
+    
   end
 
   # GET /relationships/1

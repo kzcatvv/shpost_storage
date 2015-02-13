@@ -470,7 +470,8 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true], :per_page => 15)
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true],:order => 'orders.keyclientorder_id',
+     :order_direction => 'desc', :per_page => 15)
     @allcnt = {}
     @allcnt.clear
     @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true])
@@ -482,7 +483,7 @@ class OrdersController < ApplicationController
 
     end
     
-    @selectorders=Order.where('order_type = ? and status in (?) and is_split != ?',"b2c",status, true)
+    @selectorders=Order.where('order_type = ? and status in (?) and is_split != ? and storage_id = ?',"b2c",status, true, current_storage.id)
     # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
 
     if !params[:grid].nil?
