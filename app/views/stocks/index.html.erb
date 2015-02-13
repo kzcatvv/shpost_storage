@@ -10,50 +10,5 @@
   </div>
 </div>
 
-<%= grid(@stocks_grid) do |g|
+<%= render :partial => 'stocks_grid' %>
 
-    g.column name: model_class.human_attribute_name(:shelf_id), attribute: 'shelf_code', model: 'Shelf' do |stock|
-        stock.shelf.try :shelf_code
-      end
-
-    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name', model: 'Specification' do |stock|
-      stock.specification.try :all_name
-    end
-
-    g.column name:  'sku', attribute: 'sku', model: 'Specification' do |stock|
-      stock.specification.try :sku
-    end
-
-    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
-
-    
-    g.column name: model_class.human_attribute_name(:expiration_date), attribute: 'expiration_date'
-
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |stock|
-      stock.business.try :name
-    end
-
-    g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE.invert do |stock|
-      stock.shelf.shelf_type_name
-    end
-
-    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |stock|
-      stock.supplier.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:actual_amount), attribute: 'actual_amount', filter: false
-
-    g.column name: model_class.human_attribute_name(:virtual_amount), attribute: 'virtual_amount', filter: false
-
-    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc', filter: false
-
-    g.column do |stock|
-      ActiveSupport::SafeBuffer.new << 
-        # (link_to t('.edit', :default => t("helpers.links.edit")), edit_stock_path(stock), :class => 'btn btn-xs btn-primary' if can? :update, stock) << ' ' <<
-        (link_to t('.r2bad', :default => t("helpers.links.r2bad")), ready2bad_stock_path(stock), :class => 'btn btn-xs btn-primary' if stock.shelf.shelf_type != 'broken')
-
-
-
-    end
-  end 
-%>
