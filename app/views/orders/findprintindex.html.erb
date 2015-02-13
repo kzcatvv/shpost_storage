@@ -94,15 +94,15 @@ function pick_preview(){
     h=200;
     LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"商品编号");
     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,"商品名称规格");
-    LODOP.ADD_PRINT_TEXT(h,"65%",260,25,"数量");
+    LODOP.ADD_PRINT_TEXT(h,"85%",260,25,"数量");
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
 
     <% order.order_details.each do |detail| %>
-    h=h+33;
+    h=h+42;
      LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= detail.specification.commodity.no %>');
-     LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= detail.specification.commodity.name %>'+' '+'<%= detail.specification.name %>');
-     LODOP.ADD_PRINT_TEXT(h,"65%",260,25,'<%= detail.amount %>');
+     LODOP.ADD_PRINT_TEXT(h,"25%",380,25,'<%= detail.specification.commodity.name %>'+' '+'<%= (detail.specification.commodity.specifications.size > 1) ? detail.specification.name : "" %>');
+     LODOP.ADD_PRINT_TEXT(h,"85%",60,25,'<%= detail.amount %>');
     <% end %>
 
     LODOP.PREVIEW();  
