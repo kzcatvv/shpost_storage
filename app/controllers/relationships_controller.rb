@@ -118,14 +118,22 @@ class RelationshipsController < ApplicationController
 
             2.upto(instance.last_row) do |line|
               specification = Specification.accessible_by(current_ability).find_by sku: to_string(instance.cell(line,'D'))
-              business = Business.accessible_by(current_ability).find_by name: instance.cell(line,'H') 
-              supplier = Supplier.accessible_by(current_ability).find_by name: instance.cell(line,'I')
+              if specification.blank?
+                raise "导入文件第" + line.to_s + "行数据, 商品规格不存在，导入失败"
+              end
+              business = Business.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'H'))
+              if business.blank?
+                raise "导入文件第" + line.to_s + "行数据, 商户不存在，导入失败"
+              end
+              supplier = Supplier.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'I'))
+              if supplier.blank?
+                raise "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
+              end
               relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id, supplier_id: supplier.id
-
               if relationship.nil?
-                Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
+                Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
               else
-                Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: instance.cell(line,'K'), warning_amt: instance.cell(line,'L').to_i
+                Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
               end
             end
             flash[:alert] = "导入成功"
