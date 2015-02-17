@@ -39,6 +39,8 @@ ShpostStorage::Application.routes.draw do
       get 'to_import'
       get 'org_stocks_import'
       post 'org_stocks_import' => 'up_downloads#org_stocks_import'
+      get 'org_single_stocks_import'
+      post 'org_single_stocks_import' => 'up_downloads#org_single_stocks_import'
       get 'select_unit'
       
     end
