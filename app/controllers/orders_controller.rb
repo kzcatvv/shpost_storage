@@ -12,6 +12,7 @@ class OrdersController < ApplicationController
   def index
     @orders_grid = initialize_grid(@orders,
      :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
+
   end
 
   def order_alert
@@ -499,6 +500,7 @@ class OrdersController < ApplicationController
         product = [o.business_id,d.specification_id,d.supplier_id]
         if @allcnt.has_key?(product)
           @allcnt[product][0]=@allcnt[product][0]+d.amount
+
         else
           @allcnt[product]=[d.amount]
         end
@@ -748,10 +750,10 @@ class OrdersController < ApplicationController
               end
 
               dorder_id = dorder.id.to_s
-              dorder_total_amount = dorder.total_amount
-              if dorder_total_amount.blank?
-                dorder_total_amount = 0
-              end
+              # dorder_total_amount = dorder.order_details.sum(:amount)
+              # if dorder_total_amount.blank?
+              #   dorder_total_amount = 0
+              # end
               
               #只有对应订单状态为待处理，才能更新订单明细
               dorder_status = dorder.status
@@ -774,9 +776,9 @@ class OrdersController < ApplicationController
                   #数量大于0，创建，同时对应订单数量增加
                   else 
                     OrderDetail.create! name: specification.name,batch_no: nil, specification: specification, amount: amount.to_i, supplier: supplier,business_deliver_no: business_deliver_no, order: dorder
-
-                    dorder_total_amount = dorder_total_amount + amount.to_i
-                    Order.update(dorder_id,total_amount: dorder_total_amount,business_trans_no: business_trans_no)
+                    Order.update(dorder_id,business_trans_no: business_trans_no)
+                    # dorder_total_amount = dorder_total_amount + amount.to_i
+                    # Order.update(dorder_id,total_amount: dorder_total_amount,business_trans_no: business_trans_no)
                   end
                 #原来有，更新原记录
                 else
@@ -787,15 +789,15 @@ class OrdersController < ApplicationController
                   if amount.to_i == 0
                     OrderDetail.destroy(order_detail_id)
 
-                    dorder_total_amount = dorder_total_amount - ori_detail_amount
-                    Order.update(dorder_id,total_amount: dorder_total_amount)
+                    # dorder_total_amount = dorder_total_amount - ori_detail_amount
+                    # Order.update(dorder_id,total_amount: dorder_total_amount)
 
                   #数量大于0，更新该订单明细，同时对应订单数量改变
                   elsif amount.to_i > 0
                     OrderDetail.update(order_detail_id,amount: amount.to_i,business_deliver_no: business_deliver_no)
-
-                    dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
-                    Order.update(dorder_id,total_amount: dorder_total_amount,business_trans_no: business_trans_no)
+                    Order.update(dorder_id,business_trans_no: business_trans_no)
+                    # dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
+                    # Order.update(dorder_id,total_amount: dorder_total_amount,business_trans_no: business_trans_no)
                   #数量小于0，报错
                   else
                     raise "导入文件第二页第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
@@ -1086,8 +1088,10 @@ class OrdersController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
             flash_message = "导入成功!!\<br/\>"
+            koid = getKeycOrderID()
+            @keyclientorder = Keyclientorder.find koid
+
             line = 2
-            nkoid = 0
             # until instance.cell(line,'A').blank? do
             line.upto(instance.last_row) do |line|
               batch_no = to_string(instance.cell(line,'O'))
@@ -1097,6 +1101,14 @@ class OrdersController < ApplicationController
                 if business_order_id.blank?
                   raise "导入文件第一页第" + line.to_s + "行数据, 缺少外部订单号，导入失败"
                 end
+
+                business_trans_no = to_string(instance.cell(line,'Q'))
+                if !business_trans_no.blank?
+                  if !business_trans_no.eql?business_order_id
+                    business_order_id = business_trans_no
+                  end 
+                end
+
                 business_name = instance.cell(line,'N')
                 if business_name.blank?
                   raise "导入文件第一页第" + line.to_s + "行数据, 缺少商户名称，导入失败"
@@ -1114,59 +1126,63 @@ class OrdersController < ApplicationController
                 flash_message << "导入文件第一页第" + line.to_s + "行数据, 订单已处理，无法导入\<br/\>"
                 next
               end
-              tracking_number = to_string(instance.cell(line,'B'))
-              if tracking_number.blank?
-                next
-              end
-              transport_type = instance.cell(line,'C')
-              case transport_type
-                when "同城速递","tcsd"
-                  tran_type = 'tcsd'
-                when "国内小包","gnxb"
-                  tran_type = 'gnxb'  
-                when "EMS","ems"
-                  tran_type = 'ems'
-                when "天天快递","ttkd"
-                  tran_type = 'ttkd'
-                when "百世汇通","bsht"
-                  tran_type = 'bsht'
-                when "其他","qt"
-                  tran_type = 'qt'
-                else
-                  tran_type = nil
-              end
-              trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
-              case trackingNumber[1].size
-              when 8
-                order.tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
-              when 11
-                order.tracking_number=trackingNumber[0] + trackingNumber[1]
-              end
-              order.transport_type=tran_type
-              order.set_status('printed')
-              order.user_id=current_user.id
 
-              koid = order.keyclientorder_id
-            
-              if koid.blank?
-                if line ==2
-                  nkoid = getKeycOrderID()
+              if order.status.eql? "waiting" or order.status.eql? "printed"
+                tracking_number = to_string(instance.cell(line,'B'))
+                if tracking_number.blank?
+                  next
                 end
-                order.keyclientorder_id=nkoid
+                transport_type = instance.cell(line,'C')
+                case transport_type
+                  when "同城速递","tcsd"
+                    tran_type = 'tcsd'
+                  when "国内小包","gnxb"
+                    tran_type = 'gnxb'  
+                  when "EMS","ems"
+                    tran_type = 'ems'
+                  when "天天快递","ttkd"
+                    tran_type = 'ttkd'
+                  when "百世汇通","bsht"
+                    tran_type = 'bsht'
+                  when "其他","qt"
+                    tran_type = 'qt'
+                  else
+                    tran_type = nil
+                end
+                trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
+                case trackingNumber[1].size
+                when 8
+                  order.tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
+                when 11
+                  order.tracking_number=trackingNumber[0] + trackingNumber[1]
+                end
+                order.transport_type=tran_type
+                order.set_status('printed')
+                order.user_id=current_user.id
+                order.keyclientorder_id=koid
+                # koid = order.keyclientorder_id
+                # if koid.blank?
+                #   if line ==2
+                #     nkoid = getKeycOrderID()
+                #   end
+                #   order.keyclientorder_id=nkoid
+                #   @keyclientorder = Keyclientorder.find nkoid
+                # else
+                #   @keyclientorder = Keyclientorder.find koid
+                # end
+                                              
+                order.total_weight = instance.cell(line,'D').to_f
+                order.pingan_ordertime = instance.cell(line,'E')
+                order.customer_name = instance.cell(line,'F')
+                order.customer_address = instance.cell(line,'G')
+                order.customer_postcode = instance.cell(line,'H').to_s.split('.0')[0]
+                order.province = instance.cell(line,'I')
+                order.city = instance.cell(line,'J')
+                order.county = instance.cell(line,'K')
+                order.customer_tel = instance.cell(line,'L').to_s.split('.0')[0]
+                order.customer_phone = instance.cell(line,'M').to_s.split('.0')[0]
+                order.save
               end
-              @keyclientorder = Keyclientorder.find nkoid
-                            
-              order.total_weight = instance.cell(line,'D').to_f
-              order.pingan_ordertime = instance.cell(line,'E')
-              order.customer_name = instance.cell(line,'F')
-              order.customer_address = instance.cell(line,'G')
-              order.customer_postcode = instance.cell(line,'H').to_s.split('.0')[0]
-              order.province = instance.cell(line,'I')
-              order.city = instance.cell(line,'J')
-              order.county = instance.cell(line,'K')
-              order.customer_tel = instance.cell(line,'L').to_s.split('.0')[0]
-              order.customer_phone = instance.cell(line,'M').to_s.split('.0')[0]
-              order.save
 
               line = line+1
             end
@@ -1179,6 +1195,13 @@ class OrdersController < ApplicationController
                 raise "导入文件第二页第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
               
+              business_trans_no = to_string(instance.cell(line,'B'))
+              if !business_trans_no.blank?
+                if !business_trans_no.eql?business_order_id
+                  business_order_id = business_trans_no
+                end 
+              end
+
               batch_no = to_string(instance.cell(dline,'H'))
               if batch_no.blank?
                 business_name = instance.cell(dline,'G')
@@ -1198,75 +1221,78 @@ class OrdersController < ApplicationController
               end
 
               dorder_id = dorder.id.to_s
-              dorder_total_amount = dorder.total_amount
+              # dorder_total_amount = dorder.order_details.sum(:amount)
               dorder_business_id = dorder.business_id
 
-              #供应商编号
-              if !instance.cell(dline,'D').blank?
-                supplier_no = instance.cell(dline,'D').to_s.split('.0')[0].rjust(10, '0')
-                supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
-              end
- 
-              #SKU/第三方编码/69码
-              sku_extcode_69code = to_string(instance.cell(dline,'C'))
-              if !sku_extcode_69code.blank?
-                #先考虑为sku
-                specification = Specification.find_by sku: sku_extcode_69code
-                #不是sku，考虑为第三方编码
-                if specification.blank?
-                  relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", "#{dorder_business_id}","#{sku_extcode_69code}")
-                  #不是第三方编码，考虑为69码
-                  if relationship.blank?
-                    if !supplier.blank?
-                      relationship = Relationship.includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{dorder_business_id}","#{supplier.id}")
-                      
-                    else
-                      raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
-                    end
-                  end
-                  
-                  if !relationship.blank?
-                    specification = relationship.specification
-                    supplier = relationship.supplier
-                  else
-                    raise "导入文件第二页第" + dline.to_s + "行数据, 找不到对应关系，导入失败"
-                  end
-                else
-                  if supplier.blank?
-                    raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
-                  else
-                    relationship = Relationship.find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
-                    if relationship.blank?
-                      raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
-                    end
-                  end
+              if dorder.status.eql? "waiting" or dorder.status.eql? "printed"
+
+                #供应商编号
+                if !instance.cell(dline,'D').blank?
+                  supplier_no = instance.cell(dline,'D').to_s.split('.0')[0].rjust(10, '0')
+                  supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
                 end
-              else
-                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少sku/第三方编码/69码，导入失败"
-              end
-
-              amount = instance.cell(dline,'E').to_s.split('.0')[0]
-              if amount.blank?
-                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少数量，导入失败"
-              end
-
-              ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
-              if ori_order_detail.blank?
-                next
-              else
-                order_detail_id = ori_order_detail.id
-                ori_detail_amount = ori_order_detail.amount
-                if amount.to_i == 0
-                  OrderDetail.destroy(order_detail_id)
-                    dorder_total_amount = dorder_total_amount - ori_detail_amount
-                  Order.update(dorder_id,total_amount: dorder_total_amount)
-                elsif amount.to_i > 0
-                  OrderDetail.update(order_detail_id,amount: amount.to_i)
-
-                  dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
-                  Order.update(dorder_id,total_amount: dorder_total_amount)
+   
+                #SKU/第三方编码/69码
+                sku_extcode_69code = to_string(instance.cell(dline,'C'))
+                if !sku_extcode_69code.blank?
+                  #先考虑为sku
+                  specification = Specification.find_by sku: sku_extcode_69code
+                  #不是sku，考虑为第三方编码
+                  if specification.blank?
+                    relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", "#{dorder_business_id}","#{sku_extcode_69code}")
+                    #不是第三方编码，考虑为69码
+                    if relationship.blank?
+                      if !supplier.blank?
+                        relationship = Relationship.includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{dorder_business_id}","#{supplier.id}")
+                        
+                      else
+                        raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
+                      end
+                    end
+                    
+                    if !relationship.blank?
+                      specification = relationship.specification
+                      supplier = relationship.supplier
+                    else
+                      raise "导入文件第二页第" + dline.to_s + "行数据, 找不到对应关系，导入失败"
+                    end
+                  else
+                    if supplier.blank?
+                      raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
+                    else
+                      relationship = Relationship.find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
+                      if relationship.blank?
+                        raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
+                      end
+                    end
+                  end
                 else
-                  raise "导入文件第二页第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
+                  raise "导入文件第二页第" + dline.to_s + "行数据, 缺少sku/第三方编码/69码，导入失败"
+                end
+
+                amount = instance.cell(dline,'E').to_s.split('.0')[0]
+                if amount.blank?
+                  raise "导入文件第二页第" + dline.to_s + "行数据, 缺少数量，导入失败"
+                end
+
+                ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
+                if ori_order_detail.blank?
+                  next
+                else
+                  order_detail_id = ori_order_detail.id
+                  ori_detail_amount = ori_order_detail.amount
+                  if amount.to_i == 0
+                    OrderDetail.destroy(order_detail_id)
+                      dorder_total_amount = dorder_total_amount - ori_detail_amount
+                    # Order.update(dorder_id,total_amount: dorder_total_amount)
+                  elsif amount.to_i > 0
+                    OrderDetail.update(order_detail_id,amount: amount.to_i)
+
+                    # dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
+                    # Order.update(dorder_id,total_amount: dorder_total_amount)
+                  else
+                    raise "导入文件第二页第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
+                  end
                 end
               end
             end
@@ -1292,6 +1318,27 @@ class OrdersController < ApplicationController
     if @orders.nil?
       flash[:alert] = "无订单"
       redirect_to :action => 'findprintindex'
+    else
+      respond_to do |format|
+        format.xls {   
+          send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
+            :type => "text/excel;charset=utf-8; header=present",  
+            :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }  
+      end
+    end
+  end
+
+  def export()
+    x = params[:ids].split(",")
+    @orders = []
+    until x.blank? do
+      @orders += Order.where(id: x.pop(1000))
+    end
+
+    if @orders.nil?
+      flash[:alert] = "无订单"
+      redirect_to :action => 'index'
     else
       respond_to do |format|
         format.xls {   
@@ -1460,7 +1507,7 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号}  
     count_row = 1
     objs.each do |obj|
       transport_type = obj.transport_type
@@ -1482,13 +1529,16 @@ def exportorders_xls_content_for(objs)
       if obj.business_trans_no.blank?
         # 原始订单
         business_order_id = obj.business_order_id
-      else
+        business_trans_no = ""
+      else 
         if obj.business_trans_no.eql? obj.business_order_id
           # 未拆单处理归并订单
           business_order_id = obj.business_order_id
+          business_trans_no = obj.business_trans_no
         else
           # 拆单处理归并订单
           business_order_id = obj.business_trans_no
+          business_trans_no = obj.business_order_id
         end
       end
 
@@ -1507,6 +1557,7 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,12]=obj.customer_phone
       sheet1[count_row,13]=obj.business.name
       sheet1[count_row,14]=obj.batch_no
+      sheet1[count_row,15]=business_trans_no
     
       count_row += 1
     end  

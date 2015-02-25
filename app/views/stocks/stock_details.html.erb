@@ -1,0 +1,46 @@
+<%- model_class = Stock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+  </div>
+</div>
+
+<%= grid(@stock_details_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:shelf_id), attribute: 'shelf_code', filter: false, model: 'Shelf' do |stock|
+        stock.shelf.try :shelf_code
+      end
+
+    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name', filter: false, model: 'Specification' do |stock|
+      stock.specification.try :all_name
+    end
+
+    g.column name:  'sku', attribute: 'sku', filter: false, model: 'Specification' do |stock|
+      stock.specification.try :sku
+    end
+
+    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no', filter: false
+
+    
+    g.column name: model_class.human_attribute_name(:expiration_date), attribute: 'expiration_date', filter: false
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', filter: false, model: 'Business' do |stock|
+      stock.business.try :name
+    end
+
+    g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', filter: false, custom_filter: Shelf::SHELF_TYPE.invert do |stock|
+      stock.shelf.shelf_type_name
+    end
+
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', filter: false, model: 'Supplier' do |stock|
+      stock.supplier.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:actual_amount), attribute: 'actual_amount', filter: false
+
+    g.column name: model_class.human_attribute_name(:virtual_amount), attribute: 'virtual_amount', filter: false
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc', filter: false
+
+  end
+%>

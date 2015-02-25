@@ -1,0 +1,61 @@
+<%- model_class = Stock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} (库存汇总)'], :model => model_class.model_name.human.titleize %></h1>
+
+</div> 
+<div>
+   <%= form_tag("/stocks/querystock", method: "get") do -%>
+    <%= label_tag(:sixnine_code, "69码:") %>
+    <%= text_field_tag(:sixnine_code) %>
+    <%= label_tag(:ex_code, "第三方商品编码:") %>
+    <%= text_field_tag(:ex_code) %>
+    <%= label_tag(:area_code, "区域编码:") %>
+    <%= text_field_tag(:area_code) %>
+    <%= submit_tag("查询") %>
+
+   <% end -%>
+</div>
+<div>
+    <%= form_tag(export_stocks_url(format: "xls")) %>
+    <%= label_tag(:sixnine_code, "69码:") %>
+    <%= text_field_tag(:sixnine_code) %>
+    <%= label_tag(:ex_code, "第三方商品编码:") %>
+    <%= text_field_tag(:ex_code) %>
+    <%= label_tag(:area_code, "区域编码:") %>
+    <%= text_field_tag(:area_code) %>
+    <%= submit_tag "导出",:class => 'btn btn-primary' %>
+</div>
+<div>
+  <table id="stocks" class="table table-striped">
+    <thead>
+      <tr>
+        <th>区域</th>
+        <th>商品规格</th>
+        <th>实际库存</th>
+        <th>预计库存</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @actual_hash.each do |key,value| %>
+    <%  if key[0].blank?
+          key[0]=""
+        end
+        if key[1].blank?
+          key[1]=""
+        end
+    %>
+
+      <tr>
+        <td><%= key[0] %></td>
+        <td>
+        <%= key[1].blank?? "":Relationship.find(key[1]).specification.all_name %>
+        </td>
+        <td><%= @actual_hash[key] %></td>
+        <td><%= @virtual_hash[key] %></td>
+        <td><%=link_to t('详细信息'),"/stocks/stock_details?key0=#{key[0]}&key1=#{key[1]}", target: '_blank', :class => 'btn btn-primary'%>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
