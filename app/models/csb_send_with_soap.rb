@@ -258,11 +258,11 @@ class CSBSendWithSOAP
           giftInfo.add_attribute('ItemNo', relationship.external_code)
           # 原始订单中的listid和orderID数据是原始订单号
           giftInfo.add_attribute('GiftLineId', order.business_order_id)
-          # 4：本人签收，5：他人代收，7：退货
+          # 4：本人签收，5：他人代收，7：退货(订单取消也设7)
           if order.status == Order::STATUS[:delivered]
             orderLabel.add_attribute('OrderStatus','4')
             giftInfo.add_attribute('RealStatus', '4')
-          elsif order.status == Order::STATUS[:declined] or order.status == Order::STATUS[:returned]
+          elsif order.status == Order::STATUS[:declined] or order.status == Order::STATUS[:returned] or order.status == Order::STATUS[:cancel]
             orderLabel.add_attribute('OrderStatus','7')
             giftInfo.add_attribute('RealStatus', '7')
           end

@@ -21,11 +21,6 @@
 <%= grid(@purchase_details_grid) do |g|
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
-    g.column name: model_class.human_attribute_name(:purchase_id), attribute: 'no',
-    model: 'Purchase' do |purchase_detail|
-        purchase_detail.purchase.try :no
-    end
-
     g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name',
      model: 'Supplier' do |purchase_detail|
         purchase_detail.supplier.try :name
@@ -36,11 +31,11 @@
         purchase_detail.specification.try :all_name
     end
 
-    g.column name: model_class.human_attribute_name(:expiration_date), attribute: 'expiration_date'
-
-    g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
-
     g.column name: model_class.human_attribute_name(:amount), attribute: 'amount', filter: false
+
+    g.column name: model_class.human_attribute_name(:arrival_amount),  filter: false do |purchase_detail|
+      purchase_detail.purchase_arrivals.sum(:arrived_amount)
+    end
 
     g.column name: model_class.human_attribute_name(:checked_amount),  filter: false do |purchase_detail|
       purchase_detail.checked_amount

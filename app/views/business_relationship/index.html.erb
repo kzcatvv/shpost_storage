@@ -3,9 +3,9 @@
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
     <% if can? :new, Relationship %>
-      <%= link_to t('.export', :default => t("helpers.links.specification_export")),
+<!--       <%= link_to t('.export', :default => t("helpers.links.specification_export")),
                   specification_export_relationships_url(format: "xls"),
-                  :class => 'btn btn-primary' %>
+                  :class => 'btn btn-primary' %> -->
       <%= link_to t('.import', :default => t("helpers.links.relationship_import")),
                   relationship_import_relationships_path,
                   :class => 'btn btn-primary' %>
@@ -16,34 +16,4 @@
   </div>
 </div>
 
-<%= grid(@relationships_grid) do |g|
-
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |relationship|
-      relationship.business.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |relationship|
-      relationship.supplier.try :name
-    end
-
-    g.column name: model_class.human_attribute_name(:specification_id), attribute: 'all_name', model: 'Specification' do |relationship|
-      relationship.specification.try :all_name
-    end
-
-    g.column name: model_class.human_attribute_name(:external_code), attribute: 'external_code'
-
-    g.column name: model_class.human_attribute_name(:spec_desc), attribute: 'spec_desc'
-
-    g.column name: model_class.human_attribute_name(:warning_amt), attribute: 'warning_amt'
-
-    g.column do |relationship|
-      ActiveSupport::SafeBuffer.new << 
-        (link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_business_relationship_path(@business,relationship), :class => 'btn btn-xs btn-primary' if can? :update, relationship) << ' ' <<
-        (link_to t('.destroy', :default => t("helpers.links.destroy")), business_relationship_path(@business,relationship), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, relationship)<< ' ' <<
-        (link_to t('设置联系人'),
-                      relation_contacts_path(:rid=>relationship), :class => 'btn btn-xs btn-primary') << ' ' <<
-        (link_to t('打印条码'), "/print/relationbarcodeprint?rid=#{relationship.id}", target: '_blank',:class => 'btn btn-xs btn-primary')
-    end
-  end 
-%>
+<%= render :partial => 'relationships_grid' %>

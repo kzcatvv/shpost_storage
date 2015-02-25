@@ -100,6 +100,11 @@ class OrdersController < ApplicationController
     end
   end
 
+  def cancel
+    @order.update(status: 'cancel')
+    redirect_to action: 'findprintindex'
+  end
+
   def findprint
     @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
     if @orders.empty?
@@ -466,7 +471,8 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true], :per_page => 15)
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true],:order => 'orders.keyclientorder_id',
+     :order_direction => 'desc', :per_page => 15)
     @allcnt = {}
     @allcnt.clear
     @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true])
@@ -478,7 +484,7 @@ class OrdersController < ApplicationController
 
     end
     
-    @selectorders=Order.where('order_type = ? and status in (?) and is_split != ?',"b2c",status, true)
+    @selectorders=Order.where('order_type = ? and status in (?) and is_split != ? and storage_id = ?',"b2c",status, true, current_storage.id)
     # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
 
     if !params[:grid].nil?
@@ -641,14 +647,14 @@ class OrdersController < ApplicationController
                 tracking_number = to_string(instance.cell(line,'B'))
                 if tracking_number.blank?
                   tracking_number = nil
-                else
-                  trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
-                  case trackingNumber[1].size
-                  when 8
-                    tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
-                  when 11
-                    tracking_number=trackingNumber[0] + trackingNumber[1]
-                  end
+                # else
+                #   trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
+                #   case trackingNumber[1].size
+                #   when 8
+                #     tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
+                #   when 11
+                #     tracking_number=trackingNumber[0] + trackingNumber[1]
+                #   end
                 end
                 #外部订单号
                 business_order_id = to_string(instance.cell(line,'A'))
@@ -1127,6 +1133,7 @@ class OrdersController < ApplicationController
                 next
               end
 
+
               if order.status.eql? "waiting" or order.status.eql? "printed"
                 tracking_number = to_string(instance.cell(line,'B'))
                 if tracking_number.blank?
@@ -1149,13 +1156,14 @@ class OrdersController < ApplicationController
                   else
                     tran_type = nil
                 end
-                trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
-                case trackingNumber[1].size
-                when 8
-                  order.tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
-                when 11
-                  order.tracking_number=trackingNumber[0] + trackingNumber[1]
-                end
+                # trackingNumber = getTrackingNumber(tran_type, tracking_number, line)
+                # case trackingNumber[1].size
+                # when 8
+                #   order.tracking_number=trackingNumber[0] + trackingNumber[1] + checkTrackingNO(trackingNumber[1]).to_s + trackingNumber[2]
+                # when 11
+                #   order.tracking_number=trackingNumber[0] + trackingNumber[1]
+                # end
+                order.tracking_number = tracking_number
                 order.transport_type=tran_type
                 order.set_status('printed')
                 order.user_id=current_user.id

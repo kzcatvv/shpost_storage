@@ -572,7 +572,8 @@ zh-CN:
         expiration_date: "保质期"
         batch_no: "批次号"
         amount: "预计数量"
-        checked_amount: "实到数量"
+        arrival_amount: "到货数量"
+        checked_amount: "确认数量"
         sum: "金额"
         desc: "备注"
         status: "状态"
@@ -682,7 +683,7 @@ zh-CN:
         version: "版本"
         user: "当前使用人员"
         last_sign_in_time: "最后登入时间"
-        cancel: "允许使用"
+        cancel: "禁用"
       move_stock:
         "no": "编号"
         name: "名称"

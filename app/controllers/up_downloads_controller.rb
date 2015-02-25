@@ -186,6 +186,53 @@ class UpDownloadsController < ApplicationController
     end
   end
 
+  def org_single_stocks_import
+    unless request.get?
+      if file = upload_stock(params[:file])
+        StockLog.transaction do
+
+          begin
+            instance=nil
+            if file.include?('.xlsx')
+              instance= Roo::Excelx.new(file)
+            elsif file.include?('.xls')
+              instance= Roo::Excel.new(file)
+            elsif file.include?('.csv')
+              instance= Roo::CSV.new(file)
+            end
+            instance.default_sheet = instance.sheets.first
+            # binding.pry
+                        
+            1.upto(instance.last_row) do |line|
+              if Integer(instance.cell(line,'E')) > 0
+                @relationship = Relationship.where("external_code = ?",instance.cell(line,'A').to_s).first
+                if @relationship.blank?
+                  @specification = Specification.where("sixnine_code = ?",instance.cell(line,'B').to_s).first
+                  @business = Business.where("name = ?",instance.cell(line,'T').to_s).first
+                  @supplier = Supplier.where("name = ?",instance.cell(line,'U').to_s).first
+                  @relationship = Relationship.where("business_id = ? and supplier_id = ? and specification_id = ?",@business.id,@supplier.id,@specification.id).first
+                end
+                @shelf = Shelf.where("shelf_code = ?",instance.cell(line,'D').to_s).first
+                @stock = Stock.where("relationship_id = ? and shelf_id = ?",@relationship.id,@shelf.id).first
+                if @stock.blank?
+                  @stock = Stock.create(shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification,actual_amount: Integer(instance.cell(line,'E')),virtual_amount: Integer(instance.cell(line,'E')))
+             
+                end
+                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: Integer(instance.cell(line,'E')),checked_at: Time.now,operation_type: 'in',shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification) 
+              end
+            end
+
+            flash[:alert] = "导入成功"
+          rescue Exception => e
+            Rails.logger.error e.backtrace
+            flash[:alert] = e.message
+            raise ActiveRecord::Rollback
+          end
+        end
+      end   
+    end
+  end
+
   def upload_stock(file)
     if !file.original_filename.empty?
       direct = "#{Rails.root}/upload/stocks_import/"

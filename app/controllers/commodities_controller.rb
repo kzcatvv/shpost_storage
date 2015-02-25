@@ -82,26 +82,45 @@ class CommoditiesController < ApplicationController
             instance.default_sheet = instance.sheets.first
 
             2.upto(instance.last_row) do |line|
+
+              commodity_no = to_string(instance.cell(line,'A'))
+              commodity_name = to_string(instance.cell(line,'B'))
+              goodtype_name = to_string(instance.cell(line,'C'))
+              sixnine_code = to_string(instance.cell(line,'E'))
+              specification_name = to_string(instance.cell(line,'F'))
+              desc = to_string(instance.cell(line,'G'))
+
               all_name = ""
-              all_name << instance.cell(line,'B').to_s
-              all_name << instance.cell(line,'F').to_s
+              all_name << commodity_name
+              all_name << specification_name
+
+              long = instance.cell(line,'H').blank? ? 0.0 : instance.cell(line,'H')
+              wide = instance.cell(line,'I').blank? ? 0.0 : instance.cell(line,'I')
+              high = instance.cell(line,'J').blank? ? 0.0 : instance.cell(line,'J')
+              weight = instance.cell(line,'K').blank? ? 0.0 : instance.cell(line,'K')
+              volume = instance.cell(line,'L').blank? ? 0.0 : instance.cell(line,'L')
+
+              if !(long.is_a? Float) || !(wide.is_a? Float) || !(high.is_a? Float) || !(weight.is_a? Float) || !(volume.is_a? Float)
+                raise "导入文件第" + line.to_s + "行数据, 长宽高重量体积非数字，导入失败"
+              end
+
               # binding.pry
-              goodtype= Goodstype.accessible_by(current_ability).where(name: instance.cell(line,'C').to_s).first
+              goodtype= Goodstype.accessible_by(current_ability).where(name: goodtype_name).first
               if goodtype.blank?
                 raise "导入文件第" + line.to_s + "行数据, 商品类型不存在，导入失败"
               end
-              commodity = Commodity.accessible_by(current_ability).find_by no: to_string(instance.cell(line,'A'))
+              commodity = Commodity.accessible_by(current_ability).find_by no: commodity_no
               if commodity.blank?
-                commodity = Commodity.create! no: to_string(instance.cell(line,'A')),name: instance.cell(line,'B'),goodstype_id: goodtype.id,unit_id: current_user.unit.id
+                commodity = Commodity.create! no: commodity_no,name: commodity_name,goodstype_id: goodtype.id,unit_id: current_user.unit.id
               end
               #binding.pry
-              specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:instance.cell(line,'F')
+              specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:specification_name
               if specification.blank?
-                specification=Specification.create! commodity_id:commodity.id,name:instance.cell(line,'F'),sixnine_code: to_string(instance.cell(line,'E')),desc:instance.cell(line,'G'),sku: "",long: instance.cell(line,'H').to_f,wide: instance.cell(line,'I').to_f,high: instance.cell(line,'J').to_f,weight: instance.cell(line,'K').to_f,volume: instance.cell(line,'L').to_f,all_name: all_name
-                sku = goodtype.id.to_s + commodity.id.to_s + specification.id.to_s
-                specification.update_attribute(:sku,sku)
+                specification=Specification.create! commodity_id:commodity.id,name:specification_name,sixnine_code: sixnine_code,desc:desc,long: long,wide: wide,high: high,weight: weight,volume: volume,all_name: all_name
+                # sku = goodtype.id.to_s + commodity.id.to_s + specification.id.to_s
+                # specification.update_attribute(:sku,sku)
               else
-                specification.update(sixnine_code: to_string(instance.cell(line,'E')),desc:instance.cell(line,'G'),long: instance.cell(line,'H').to_f,wide: instance.cell(line,'I').to_f,high: instance.cell(line,'J').to_f,weight: instance.cell(line,'K').to_f,volume: instance.cell(line,'L').to_f,all_name: all_name)
+                specification.update(sixnine_code: sixnine_code,desc:desc,long: long,wide: wide,high: high,weight: weight,volume: volume,all_name: all_name)
               end
             end
             flash[:alert] = "导入成功"
