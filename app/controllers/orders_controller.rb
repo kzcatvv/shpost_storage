@@ -12,7 +12,7 @@ class OrdersController < ApplicationController
   def index
     @orders_grid = initialize_grid(@orders,
      :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
-
+    
   end
 
   def order_alert
@@ -504,11 +504,13 @@ class OrdersController < ApplicationController
     @selectorders.each do |o|
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
+        order_count =  Order.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+
         if @allcnt.has_key?(product)
           @allcnt[product][0]=@allcnt[product][0]+d.amount
 
         else
-          @allcnt[product]=[d.amount]
+          @allcnt[product]=[d.amount,order_count]
         end
       end
     end
@@ -1339,6 +1341,7 @@ class OrdersController < ApplicationController
 
   def export()
     x = params[:ids].split(",")
+    
     @orders = []
     until x.blank? do
       @orders += Order.where(id: x.pop(1000))
@@ -1515,7 +1518,7 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态}  
     count_row = 1
     objs.each do |obj|
       transport_type = obj.transport_type
@@ -1566,6 +1569,7 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,13]=obj.business.name
       sheet1[count_row,14]=obj.batch_no
       sheet1[count_row,15]=business_trans_no
+      sheet1[count_row,16]=obj.status_name
     
       count_row += 1
     end  

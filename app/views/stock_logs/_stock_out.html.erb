@@ -96,6 +96,7 @@
       <th>产品规格</th>
       <th>供应商</th>
       <th>数量</th>
+      <th>订单数量</th>
     </tr>
   </thead>
   <tbody>
@@ -108,6 +109,7 @@
         <td><%= stocklog.specification.name %></td>
         <td><%= stocklog.supplier.blank? ? "" : stocklog.supplier.name %></td>
         <td><%= stocklog.amount %></td>
+        <td><%= stocklog.parent.orders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",stocklog.business_id,stocklog.specification_id,stocklog.supplier_id).count %></td>
       </tr>
     <% end %>
   </tbody>

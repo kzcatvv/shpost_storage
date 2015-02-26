@@ -4,7 +4,7 @@
 
 </div> 
 <div>
-   <%= form_tag("/stocks/querystock", method: "get")%>
+   <%= form_tag("/stocks/querystock", method: "get") do -%>
     <%= label_tag(:sixnine_code, "69码:") %>
     <%= text_field_tag(:sixnine_code) %>
     <%= label_tag(:ex_code, "第三方商品编码:") %>
@@ -13,8 +13,17 @@
     <%= text_field_tag(:area_code) %>
     <%= submit_tag("查询") %>
 
-    <%= link_to t('导出'),"/stocks/export?sixnine_code=#{@sixnine_code}&ex_code=#{@ex_code}&area_code=#{@area_code}" ,:class => 'btn btn-primary', :action => 'export', method: "post", format: "xls" %> 
-   </form>
+   <% end -%>
+</div>
+<div>
+    <%= form_tag(export_stocks_url(format: "xls")) %>
+    <%= label_tag(:sixnine_code, "69码:") %>
+    <%= text_field_tag(:sixnine_code) %>
+    <%= label_tag(:ex_code, "第三方商品编码:") %>
+    <%= text_field_tag(:ex_code) %>
+    <%= label_tag(:area_code, "区域编码:") %>
+    <%= text_field_tag(:area_code) %>
+    <%= submit_tag "导出",:class => 'btn btn-primary' %>
 </div>
 <div>
   <table id="stocks" class="table table-striped">

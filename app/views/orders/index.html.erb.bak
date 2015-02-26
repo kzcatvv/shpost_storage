@@ -1,0 +1,174 @@
+<%- model_class = Order -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+
+  <div style="float:right">
+    <%= form_tag(export_orders_url(format: "xls")) %>
+    <%= hidden_field_tag('ini_ids', "#{@ini_ids}") %>
+    <%= submit_tag "导出",:class => 'btn btn-primary' %>
+    </form>
+  </div>
+</div> 
+  
+<%= grid(@orders_grid) do |g|
+    g.after_row do |order, number_of_columns|
+        content_tag(:tr, class: 'extra-row') do
+              content_tag(:td,
+                   content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"客户单位")
+                        buffer += content_tag(:p,order.customer_unit)
+                      raw buffer
+                       
+                   end +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"客户电话")
+                        buffer += content_tag(:p,order.customer_tel)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"客户地址")
+                        buffer += content_tag(:p,(order.province.nil? ? " " : order.province)+(order.city.nil? ? " " : order.city)+(order.county.nil? ? " " : order.county)+(order.customer_address.nil? ? " " : order.customer_address))
+                      raw buffer
+                       
+                   end,width: "20%")+
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"邮编")
+                        buffer += content_tag(:p,order.customer_postcode)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"商品重量")
+                        buffer += content_tag(:p,order.total_weight)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"商品总数")
+                        buffer += content_tag(:p,order.total_amount)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"所属仓库")
+                        buffer += content_tag(:p,Storage.find(order.storage_id).name)
+                      raw buffer
+                       
+                   end) +
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"所属单位")
+                        buffer += content_tag(:p,Unit.find(order.unit_id).name)
+                      raw buffer
+                       
+                   end)+ 
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"订单商品明细")
+                       order.order_details.each do |odl|
+                        buffer += content_tag(:p,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s)
+                       end
+                      raw buffer
+                       
+                   end,width: "20%") + 
+                   content_tag(:td,
+                      content_tag(:div) do
+                       # without buffer only the last tag will appear
+                       buffer = content_tag(:b,"用户日志明细")
+                       order.user_logs.each do |ul|
+                        buffer += content_tag(:p,ul.user.name+"   "+ul.operation+"   "+ul.created_at.strftime('%Y-%m-%d %H:%M:%S').to_s)
+                       end
+                      raw buffer
+                       
+                   end,width: "20%") )
+
+         end
+    end
+
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
+
+    g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name'
+
+    g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone'
+
+    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type',custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
+      order.transport_type_name
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: Order::STATUS_SHOW.invert do |order| 
+      order.status_name
+    end
+
+    g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number'
+
+    g.column name: "备注" do |order|
+      (order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc)
+    end
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |order|
+      order.business.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', model: 'Keyclientorder' do |order|
+      order.keyclientorder.try :batch_no
+    end
+
+    g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage',custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
+      order.shortage_type_name
+    end
+
+    g.column name: model_class.human_attribute_name(:is_split), attribute: 'is_split', filter_type: :boolean do |order| 
+      order.parent_type_name
+    end
+   
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |order|
+        order.created_at.to_s(:db)
+    end
+
+    g.column do |order|
+      ActiveSupport::SafeBuffer.new << 
+
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_order_path(order), :class => 'btn btn-xs btn-primary' if can? :update, order) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      order_path(order),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, order) << ' ' <<
+      (link_to t('.order_details', :default => t("helpers.links.order_details")),
+                      order_order_details_path(order), :class => 'btn btn-xs btn-primary' if can? :order_detail, order) << ' ' <<
+      button_tag("详细信息", class: "btn btn-xs btn-primary")
+      end
+  end 
+
+  
+%>
+
+<%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
+
+    
+<script language="javascript" type="text/javascript"> 
+
+
+$(document).on("page:load ready", function(){
+    $("button").click(function(){
+        $(this).parents('tr').next('.extra-row').slideToggle("fast");
+        return false;
+    });
+});
+
+</script>
