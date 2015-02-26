@@ -154,7 +154,7 @@ class StocksController < ApplicationController
 
   def find_stock_in_shelf
       # binding.pry
-      @stocks = Stock.where(shelf_id: params[:shelf_id]).accessible_by(current_ability).map{|u| ["#{u.specification.all_name} #{u.batch_no}",u.id]}.insert(0,"请选择")
+      @stocks = Stock.where(shelf_id: params[:shelf_id]).accessible_by(current_ability).map{|u| ["#{u.specification.name} #{u.batch_no}",u.id]}.insert(0,"请选择")
       @rowid = "md_stock_"+params[:row_id]
       
       respond_to do |format|
@@ -170,7 +170,139 @@ class StocksController < ApplicationController
     end
   end
 
+  # GET /stocks
+  # GET /stocks.json
+  def querystock
+    @actual_hash = {}
+    @virtual_hash = {}
+    @stocks=[]
+
+    if !params[:ex_code].blank?
+      @relationship=Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
+      if !@relationship.blank?
+        @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
+      end
+    end
+    if !params[:sixnine_code].blank?
+      @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).accessible_by(current_ability).first
+      if !@specification.blank?
+        if @stocks.blank?
+          @stocks=Stock.where(specification_id: @specification)
+        else 
+          @stocks=@stocks.where(specification_id: @specification)
+        end
+          
+      end
+    end
+    if !params[:area_code].blank?
+      @area=Area.where("area_code=?",params[:area_code]).accessible_by(current_ability).first
+      if !@area.blank?
+        if @stocks.blank?
+          @stocks=Stock.where("stocks.shelf_id in (?)",@area.shelves.ids)
+        else 
+          @stocks=@stocks.where("stocks.shelf_id in (?)",@area.shelves.ids)
+        end
+          
+      end
+    end
+
+    if @stocks.blank?
+      @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
+      @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+    else
+      @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
+      @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+    end
+    
+    # binding.pry    
+
+  end
+
+  def export()
+    @stocks=[]
+
+    if !params[:ex_code].blank?
+      @relationship=Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
+      if !@relationship.blank?
+        @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
+      end
+    end
+    if !params[:sixnine_code].blank?
+      @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).accessible_by(current_ability).first
+      if !@specification.blank?
+        if @stocks.blank?
+          @stocks=Stock.where(specification_id: @specification)
+        else 
+          @stocks=@stocks.where(specification_id: @specification)
+        end
+          
+      end
+    end
+    if !params[:area_code].blank?
+      @area=Area.where("area_code=?",params[:area_code]).accessible_by(current_ability).first
+      if !@area.blank?
+        if @stocks.blank?
+          @stocks=Stock.where("stocks.shelf_id in (?)",@area.shelves.ids)
+        else 
+          @stocks=@stocks.where("stocks.shelf_id in (?)",@area.shelves.ids)
+        end
+          
+      end
+    end
+
+    if @stocks.blank?
+      @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
+      @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+    else
+      @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
+      @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+    end
+
+    respond_to do |format|
+      format.xls {   
+        send_data(exportstocks_xls_content_for(@actual_hash,@virtual_hash), :type => "text/excel;charset=utf-8; header=present", :filename => "Stocks_#{Time.now.strftime("%Y%m%d")}.xls")  
+      }  
+    end
+    
+  end
+
+
+  def exportstocks_xls_content_for(actual_hash,virtual_hash)  
+    
+    xls_report = StringIO.new  
+    book = Spreadsheet::Workbook.new  
+    sheet1 = book.create_worksheet :name => "Stocks"  
+
+    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+    sheet1.row(0).default_format = blue  
+
+    sheet1.row(0).concat %w{区域 商品规格 实际库存 预计库存}  
+    count_row = 1
+
+    actual_hash.each do |key,value| 
+      sheet1[count_row,0] = key[0]
+      sheet1[count_row,1] = key[1].blank?? "":Relationship.find(key[1]).specification.all_name
+      sheet1[count_row,2] = actual_hash[key]
+      sheet1[count_row,3] = virtual_hash[key]
+
+    count_row += 1
+    end
+
+    book.write xls_report  
+      xls_report.string  
+  end
   
+  def stock_details
+    key0=params[:key0]
+    key1=params[:key1]
+    
+    @area = Area.find_by name:key0
+    @stocks = Stock.where("stocks.relationship_id=? and stocks.shelf_id in (?)",key1,@area.shelves.ids)
+    @stock_details_grid = initialize_grid(@stocks,
+      :order => 'stocks.id',
+      :order_direction => 'desc',
+      include: [:shelf, :specification, :business, :supplier])
+  end
 
 
   private

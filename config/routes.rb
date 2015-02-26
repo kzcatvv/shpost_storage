@@ -121,6 +121,7 @@ ShpostStorage::Application.routes.draw do
         post 'exportorders'
         get 'importorders1'
         post 'importorders2'
+        post 'export'
       end
 
     member do
@@ -212,6 +213,9 @@ ShpostStorage::Application.routes.draw do
       get 'getstock'
       get 'find_stock_in_shelf'
       get 'find_stock_amount'
+      get 'querystock'
+      get 'stock_details'
+      post 'export'
     end
 
     member do

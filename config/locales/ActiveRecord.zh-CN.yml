@@ -879,6 +879,9 @@ zh-CN:
         inventorybyshelf:
           name: "盘点单管理"
           link: "/inventories"
+        querystock:
+          name: "库存汇总"
+          link: "/stocks/querystock"
     logs:
       name: "日志查询"
       submenu:

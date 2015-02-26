@@ -1,20 +1,14 @@
 <%- model_class = Order -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+
   <div style="float:right">
-<!--     <% if can? :new, Order %>
-      <%= link_to t('.new', :default => t("helpers.links.new")),
-                  new_order_path,
-                  :class => 'btn btn-primary' %>
-    <% end %> -->
+    <%= form_tag(export_orders_url(format: "xls")) %>
+    <%= submit_tag "导出",:class => 'btn btn-primary' %>
   </div>
-</div>
-
-
-
-
+</div> 
+  
 <%= grid(@orders_grid) do |g|
-
     g.after_row do |order, number_of_columns|
         content_tag(:tr, class: 'extra-row') do
               content_tag(:td,
@@ -101,6 +95,7 @@
                       raw buffer
                        
                    end,width: "20%") )
+
          end
     end
 
@@ -157,8 +152,12 @@
       button_tag("详细信息", class: "btn btn-xs btn-primary")
       end
   end 
-%>
 
+  
+%>
+<%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
+
+    
 <script language="javascript" type="text/javascript"> 
 
 

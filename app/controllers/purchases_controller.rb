@@ -157,7 +157,16 @@ class PurchasesController < ApplicationController
                 if business.blank?
                   raise "导入文件第" + line.to_s + "行数据, 找不到商户，导入失败"
                 end
-                purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: to_string(instance.cell(line,'C')), status: status, storage_id: storage.id, name: to_string(instance.cell(line,'A'))
+                purchase = Purchase.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'A'))
+                if purchase.blank?
+                  purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: to_string(instance.cell(line,'C')), status: status, storage_id: storage.id, name: to_string(instance.cell(line,'A'))
+                else
+                  if purchase.status.eql? Purchase::STATUS[:opened]
+                    purchase.update(business_id: business.id, desc: to_string(instance.cell(line,'C')))
+                  else
+                    raise "导入文件第" + line.to_s + "行数据, 同名采购单已关闭，导入失败"
+                  end
+                end
               end
               supplier=Supplier.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'E'))
 
@@ -180,7 +189,16 @@ class PurchasesController < ApplicationController
               end
 
               expiration_date = to_string(instance.cell(line, 'H'))
-              purchase_detail = PurchaseDetail.create! name: to_string(instance.cell(line, 'D')), purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')), status: "waiting"
+              purchase_detail = purchase.purchase_details.find_by(supplier_id: supplier.id, specification_id: specification.id)
+              if purchase_detail.blank?
+                purchase_detail = PurchaseDetail.create! name: to_string(instance.cell(line, 'D')), purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')), status: "waiting"
+              else
+                if purchase_detail.status.eql? PurchaseDetail::STATUS[:waiting]
+                  purchase_detail.update(name: to_string(instance.cell(line, 'D')), expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')))
+                else
+                  raise "导入文件第" + line.to_s + "行数据, 同商品规格采购明细已处理，导入失败"
+                end
+              end
             end
             flash[:alert] = "导入成功"
           rescue Exception => e
