@@ -209,8 +209,8 @@ class UpDownloadsController < ApplicationController
                 @relationship = Relationship.where("external_code = ?",instance.cell(line,'A').to_s).first
                 if @relationship.blank?
                   @specification = Specification.where("sixnine_code = ?",instance.cell(line,'B').to_s).first
-                  @business = Business.where("name = ?",instance.cell(line,'T').to_s).first
-                  @supplier = Supplier.where("name = ?",instance.cell(line,'U').to_s).first
+                  @business = Business.where("no = ?",instance.cell(line,'G').to_s).first
+                  @supplier = Supplier.where("no = ?",instance.cell(line,'I').to_s).first
                   @relationship = Relationship.where("business_id = ? and supplier_id = ? and specification_id = ?",@business.id,@supplier.id,@specification.id).first
                 end
                 @shelf = Shelf.where("shelf_code = ?",instance.cell(line,'D').to_s).first
