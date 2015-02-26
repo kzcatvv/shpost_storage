@@ -193,11 +193,41 @@ class PurchasesController < ApplicationController
               if purchase_detail.blank?
                 purchase_detail = PurchaseDetail.create! name: to_string(instance.cell(line, 'D')), purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')), status: "waiting"
               else
-                if purchase_detail.status.eql? PurchaseDetail::STATUS[:waiting]
+                # if purchase_detail.status.eql? PurchaseDetail::STATUS[:waiting]
                   purchase_detail.update(name: to_string(instance.cell(line, 'D')), expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')))
-                else
-                  raise "导入文件第" + line.to_s + "行数据, 同商品规格采购明细已处理，导入失败"
+                # else
+                #   raise "导入文件第" + line.to_s + "行数据, 同商品规格采购明细已处理，导入失败"
+                # end
+              end
+              arrival_start = 11
+              arrival_length = 3
+              while true
+                arrival_amount = instance.cell(line,arrival_start)
+                arrival_expiration = to_string(instance.cell(line,arrival_start+1))
+                arrival_at = to_string(instance.cell(line,arrival_start+2))
+
+                if arrival_amount.blank? && arrival_expiration.blank? && arrival_at.blank?
+                  break
                 end
+                if !arrival_amount.is_a? Float
+                  raise "导入文件第" + line.to_s + "行数据, 到货数量非数字，导入失败"
+                end
+
+                if arrival_at.blank?
+                  raise "导入文件第" + line.to_s + "行数据, 缺少到达日期，导入失败"
+                end
+
+                purchase_arrival = purchase_detail.purchase_arrivals.find_by(arrived_at: arrival_at.blank? ? nil : arrival_at.to_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+                if purchase_arrival.blank?
+                  PurchaseArrival.create! arrived_amount: arrival_amount, expiration_date: arrival_expiration.blank? ? nil : arrival_expiration.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), arrived_at: arrival_at.blank? ? nil : arrival_at.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), purchase_detail_id: purchase_detail.id, status: 'waiting'
+                else
+                  if purchase_arrival.status.eql? 'waiting'
+                    purchase_arrival.update(arrived_amount: arrival_amount, expiration_date: arrival_expiration.blank? ? nil : arrival_expiration.to_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+                  else
+                    raise "导入文件第" + line.to_s + "行数据, " + arrival_at + "到达明细已处理，导入失败"
+                  end
+                end
+                arrival_start = arrival_start + arrival_length
               end
             end
             flash[:alert] = "导入成功"
