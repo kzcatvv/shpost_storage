@@ -59,7 +59,7 @@ class Ability
         cannot :role, User, role: 'superadmin'
         can :role, :unitadmin
         can :role, :user
-        can [:read, :up_download_export], UpDownload
+        can [:read, :up_download_export, :org_stocks_import, :org_single_stocks_import], UpDownload
         cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
         
         # cannot :role, User, role: 'unitadmin'

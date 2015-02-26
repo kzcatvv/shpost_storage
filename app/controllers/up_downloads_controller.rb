@@ -203,7 +203,8 @@ class UpDownloadsController < ApplicationController
             instance.default_sheet = instance.sheets.first
             # binding.pry
                         
-            1.upto(instance.last_row) do |line|
+            2.upto(instance.last_row) do |line|
+              # binding.pry
               if Integer(instance.cell(line,'E')) > 0
                 @relationship = Relationship.where("external_code = ?",instance.cell(line,'A').to_s).first
                 if @relationship.blank?
