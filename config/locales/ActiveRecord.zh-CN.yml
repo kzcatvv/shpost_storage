@@ -912,6 +912,9 @@ zh-CN:
         org_stocks_import:
           name: "原始库存导入"
           link: "/up_downloads/org_stocks_import"
+        org_single_stocks_import:
+          name: "原始基础库存导入"
+          link: "/up_downloads/org_single_stocks_import"
     reports:
       name: "报表汇总"
       submenu:

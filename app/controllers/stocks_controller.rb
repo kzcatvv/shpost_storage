@@ -176,6 +176,9 @@ class StocksController < ApplicationController
     @actual_hash = {}
     @virtual_hash = {}
     @stocks=[]
+    @ex_code=params[:ex_code]
+    @sixnine_code=params[:sixnine_code]
+    @area_code=params[:area_code]
 
     if !params[:ex_code].blank?
       @relationship=Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
@@ -258,11 +261,11 @@ class StocksController < ApplicationController
       @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
     end
 
-    respond_to do |format|
-      format.xls {   
+    # respond_to do |format|
+    #   format.xls {   
         send_data(exportstocks_xls_content_for(@actual_hash,@virtual_hash), :type => "text/excel;charset=utf-8; header=present", :filename => "Stocks_#{Time.now.strftime("%Y%m%d")}.xls")  
-      }  
-    end
+    #   }  
+    # end
     
   end
 
