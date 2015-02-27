@@ -70,6 +70,7 @@
         <td><%= Specification.find(key[1]).name %></td>
         <td><%= key[2].blank?? "":Supplier.find(key[2]).name %></td>
         <td><%= value[0] %></td>
+        <td><%= value[1] %></td>
       </tr>
     <% end %>
   </tbody>
