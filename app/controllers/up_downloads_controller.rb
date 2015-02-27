@@ -213,7 +213,13 @@ class UpDownloadsController < ApplicationController
                   @supplier = Supplier.where("no = ?",instance.cell(line,'I').to_s).first
                   @relationship = Relationship.where("business_id = ? and supplier_id = ? and specification_id = ?",@business.id,@supplier.id,@specification.id).first
                 end
+                if @relationship.blank?
+                  raise "导入文件第" + line.to_s + "行数据, 未找到该商品信息，导入失败"
+                end
                 @shelf = Shelf.where("shelf_code = ?",instance.cell(line,'D').to_s).first
+                if @shelf.blank?
+                  raise "导入文件第" + line.to_s + "行数据, 未找到该货架信息，导入失败"
+                end
                 @stock = Stock.where("relationship_id = ? and shelf_id = ?",@relationship.id,@shelf.id).first
                 if @stock.blank?
                   @stock = Stock.create(shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification,actual_amount: Integer(instance.cell(line,'E')),virtual_amount: Integer(instance.cell(line,'E')))
