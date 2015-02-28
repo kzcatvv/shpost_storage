@@ -26,6 +26,11 @@
       shelf.shelf_type_name
     end
 
+    g.column name: model_class.human_attribute_name(:priority_level), attribute: 'priority_level',custom_filter: Shelf::PRIORITY_LEVEL.invert do |shelf| 
+      shelf.priority_level
+    end
+
+
     g.column do |shelf|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_area_shelf_path(@area,shelf), :class => 'btn btn-xs btn-primary' if can? :update, shelf) << ' ' <<

@@ -23,6 +23,8 @@ class Shelf < ActiveRecord::Base
 
   #BAD_TYPE = { yes: '是', no: '否' }
   SHELF_TYPE = {normal: '普通区', broken: '破损区', pick: '拣货区'}
+
+  PRIORITY_LEVEL = {1=>'1',2=>'2',3=>'3',4=>'4',5=>'5',6=>'6',7=>'7',8=>'8',9=>'9',10=>'10'}
   # def self.min_abs_pl(priority_level)
   #   condition = "abs(#{priority_level} - priority_level) "
 

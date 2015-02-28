@@ -1346,16 +1346,14 @@ class OrdersController < ApplicationController
     until x.blank? do
       @orders += Order.where(id: x.pop(1000))
     end
-
+    
     if @orders.nil?
       flash[:alert] = "无订单"
       redirect_to :action => 'index'
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
-            :type => "text/excel;charset=utf-8; header=present",  
-            :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          send_data(exportorders_xls_content_for(@orders), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
         }  
       end
     end
