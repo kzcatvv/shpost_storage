@@ -8,7 +8,7 @@ class GnxbSoap
         
       yjbhs = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"}).map!{|x| x.tracking_number}
 
-      #yjbh = "9900162517212"
+      #yjbh = "9976613107785"
       #puts yjbhs
 
       yjbhs.each do |yjbh|
@@ -58,12 +58,10 @@ class GnxbSoap
     end
   end
 
-  def self.gnxb_post(uri,body)
+  def self.gnxb_post(uri,params)
     url = URI.parse(uri)
-    request = Net::HTTP::Post.new(url.path)
-    request.content_type = 'text/xml'
-    request.body = body
-    response = Net::HTTP.start(url.host, url.port) {|http| http.request(request)}
+    res = Net::HTTP.post_form(uri, params)
+    return res
   end
   
   def self.updateOrder(yjbh,tdxq,td_status)
@@ -81,7 +79,7 @@ class GnxbSoap
   
   def returnStatus(tdxq)
     if !tdxq.blank?
-      if tdxq.start_with? '已签收'
+      if tdxq.start_with? '已签收' || tdxq.start_with? '已妥投'
         return Order::STATUS[:delivered]
       end
     end
