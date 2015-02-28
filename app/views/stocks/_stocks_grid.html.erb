@@ -1,4 +1,6 @@
 <%- model_class = Stock -%>
+
+
 <%= grid(@stocks_grid, upper_pagination_panel: true) do |g|
 
     g.column name: model_class.human_attribute_name(:shelf_id), attribute: 'shelf_code', model: 'Shelf' do |stock|

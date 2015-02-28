@@ -7,11 +7,11 @@ class BusinessRelationshipController < ApplicationController
       :order => 'relationships.id',
       :order_direction => 'desc',
       include: [:business, :specification, :supplier],
-      :name => 'g1',
+      :name => 'relationships',
       :enable_export_to_csv => true,
       :csv_file_name => 'relationships')
 
-    export_grid_if_requested('g1' => 'relationships_grid')
+    export_grid_if_requested
     
   end
 

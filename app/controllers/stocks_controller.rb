@@ -8,11 +8,11 @@ class StocksController < ApplicationController
       :order => 'stocks.id',
       :order_direction => 'desc',
       include: [:shelf, :specification, :business, :supplier],
-      :name => 'g1',
+      :name => 'stocks',
       :enable_export_to_csv => true,
       :csv_file_name => 'stocks')
     
-    export_grid_if_requested('g1' => 'stocks_grid')
+    export_grid_if_requested
   end
 
   # GET /stocks/1
