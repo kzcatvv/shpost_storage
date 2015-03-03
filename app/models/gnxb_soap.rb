@@ -1,10 +1,10 @@
 class GnxbSoap
   require "rexml/document"
 
-  def order_query(uri, mehod)
+  def order_query(uri,method)
     @interface_status = '0'
     begin
-      client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
+      # client = Savon.client(wsdl: uri, ssl_verify_mode: :none)
         
       # yjbhs = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"}).map!{|x| x.tracking_number}
       orders = Order.where({status: [Order::STATUS[:delivering], Order::STATUS[:packed]], transport_type: "gnxb"})
@@ -40,7 +40,6 @@ class GnxbSoap
           data = body['data']
           mailTypeName = body['mailTypeName']
           mailNumber = body['mailNumber']
-
           if !code.eql? '-1'
             gnxb_info = ""
 
@@ -52,6 +51,9 @@ class GnxbSoap
             end
             updateOrder(yjbh,gnxb_info,gnxb_status)
           end
+        else
+          @interface_status = '1'
+          break
         end
         # sleep 5
       end
@@ -82,13 +84,13 @@ class GnxbSoap
     end
   end
 
-  def self.gnxb_post(uri,params)
+  def gnxb_post(uri,params)
     url = URI.parse(uri)
-    res = Net::HTTP.post_form(uri, params)
+    res = Net::HTTP.post_form(url, params)
     return res
   end
   
-  def self.updateOrder(yjbh,tdxq,td_status)
+  def updateOrder(yjbh,tdxq,td_status)
     order = Order.find_by_tracking_number yjbh
     order.update status: td_status, tracking_info: tdxq
   end
@@ -103,7 +105,7 @@ class GnxbSoap
   
   def returnStatus(tdxq)
     if !tdxq.blank?
-      if tdxq.end_with? '已签收' || tdxq.end_with? '已妥投'
+      if tdxq.end_with?('已签收') || tdxq.end_with?('已妥投')
         return Order::STATUS[:delivered]
       end
     end
