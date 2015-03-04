@@ -28,12 +28,12 @@
         <% ksid = stock_log.specification_id.to_s + "_" + stock_log.business_id.to_s + "_" + stock_log.supplier_id.to_s %>
         <% somaps = OrderDetail.find_by_sql ["select d.specification_id,o.business_id,d.supplier_id,sum(d.amount) from order_details d,orders o,keyclientorders k,stock_logs s where d.order_id=o.id and s.parent_id=k.id and k.id=o.keyclientorder_id and o.status!=? and s.id=? group by d.specification_id,o.business_id,d.supplier_id","checked", stock_log.id] %>
         <%= select_tag("stock_logs[][ksid]", options_for_select(somaps.map{|u| ["#{u.specification.name}_#{u.supplier_id}",u.specification_id.to_s + "_" + u.business_id.to_s + "_" + u.supplier_id.to_s]}, ksid), id: "stock_logs_ksid_#{stock_log.id}", style: "display: none;") <<
-          content_tag(:p, "#{stock_log.specification.name}", {id: "stock_logs_ksid_#{stock_log.id}"}) %>
+          content_tag(:p, "#{stock_log.specification.name}_#{stock_log.supplier_id}", {id: "stock_logs_ksid_#{stock_log.id}"}) %>
         </td>
         <td>
         <%= hidden_field_tag("stock_logs[][#{stock_log.stock_id}]", stock_log.stock_id, id: "stock_logs_kstid_#{stock_log.id}") %>
         <%= select_tag("stock_logs[][stock_log.stock_id]", "<option value=''>未选择</option>".html_safe, id: "stock_logs_kshelfid_#{stock_log.id}", style: "display: none;") <<
-        content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_kshelfid_#{stock_log.id}"}) %>
+        content_tag(:p, "#{stock_log.shelf.shelf_code}(批次:#{stock_log.batch_no},库存:#{(stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount)})", {id: "stock_logs_kshelfid_#{stock_log.id}"}) %>
         </td>
         <td>
           <%= content_tag(:p, (stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount), {id: "stock_logs_actamount_#{stock_log.id}"})%>
