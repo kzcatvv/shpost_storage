@@ -260,6 +260,7 @@ function add() {
     param = $("tr[id^=stock_logs_id_0]").last().attr("id").split('_');
     addid = "0"+ (parseInt(param[3])+1);
   }
+  alert(addid);
   tr.attr("id","stock_logs_id_"+addid);
   tr.appendTo("table#stock_logs");
   // slid=$('table.wice-grid tr:eq(2) input').first().val();
@@ -364,6 +365,7 @@ function purchase_modify(current)
 {
   param = current.id.split('_');
   id = param[3];
+  // alert("purchase modified");
   amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_amount_"+id).val();
   shelfid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_shelfid_"+id+"][type=hidden]").val();
   arrivalid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_paid_"+id).val();
@@ -396,6 +398,11 @@ function purchase_modify(current)
 
         // 20141219
         if (jsonData.id != undefined) {
+          // f = (param[3] == (jsonData.id+""));
+          // alert(param[3]);
+          // alert(jsonData.id);
+          // alert(f);
+          if ((param[3] != (jsonData.id+"")) && (param[3].substring(0,1) == "0")) {
           $("tr#stock_logs_id_"+param[3]).attr("id","stock_logs_id_"+jsonData.id);
           tablereplace(jsonData.id,"p","id",jsonData.id);
           tablereplace(jsonData.id,"a","id",jsonData.id);
@@ -403,6 +410,7 @@ function purchase_modify(current)
           tablereplace(jsonData.id,"input","id",jsonData.id);
           tablereplace(jsonData.id,"select","id",jsonData.id);
           tablereplace(jsonData.id,"td","id",jsonData.id);
+          }
 
           tableset(jsonData.id,"id",jsonData.id)
           tableset(jsonData.id,"amount",""+jsonData.amount)
@@ -542,6 +550,7 @@ function  ajaxstocklogs(){
   });
 
   $("p[id^=stock_logs_amount]").unbind('click').click(function() {
+    // alert("amount click");
     if (iswaiting(this)) {
       $(this).toggle();
       $("input#"+this.id).toggle();
@@ -568,6 +577,7 @@ function  ajaxstocklogs(){
   });
 
   $("input[id^=stock_logs_amount]").unbind('blur').blur(function() {
+    // alert("amount blur");
     $(this).toggle();
     $("p#"+this.id).toggle();
     if ($(this).val() == "") {
