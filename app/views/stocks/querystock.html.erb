@@ -39,7 +39,11 @@
       <tr>
         <td><%= key[0] %></td>
         <td>
-        <%= key[1].blank?? "":Relationship.find(key[1]).specification.all_name %>
+        <% if !key[1].blank?
+             relationship = Relationship.find(key[1]) 
+           end
+        %>
+        <%= relationship.blank?? "":Relationship.find(key[1]).specification.all_name %>
         </td>
         <td><%= @actual_hash[key] %></td>
         <td><%= @virtual_hash[key] %></td>
