@@ -1,0 +1,21 @@
+<%- model_class = ConsumableStock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:consumable_id) %>:</strong></dt>
+  <dd><%= Consumable.find(@consumable_stock.consumable_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:shelf_name) %>:</strong></dt>
+  <dd><%= @consumable_stock.shelf_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:amount) %>:</strong></dt>
+  <dd><%= @consumable_stock.amount %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              consumable_stocks_path, :class => 'btn btn-default'  %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              consumable_stock_path(@consumable_stock),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => '确定删除?')) },
+              :class => 'btn btn-danger' %>

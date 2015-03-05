@@ -1,0 +1,46 @@
+<%- model_class = Consumable -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Consumable %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_consumable_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@consumables_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', model: 'Business' do |consumable|
+      consumable.business.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |consumable|
+      consumable.supplier.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:spec_desc), attribute: 'spec_desc'
+
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'name', model: 'Unit' do |consumable|
+      consumable.unit.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'name', model: 'Storage' do |consumable|
+      consumable.storage.try :name
+    end
+ 
+    
+
+    g.column do |consumable|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_consumable_path(consumable), :class => 'btn btn-xs btn-primary' if can? :update, consumable) << ' ' <<
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      consumable_path(consumable),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, consumable)
+      end
+  end 
+%>

@@ -201,31 +201,39 @@ class UpDownloadsController < ApplicationController
               instance= Roo::CSV.new(file)
             end
             instance.default_sheet = instance.sheets.first
-            # binding.pry
                         
             2.upto(instance.last_row) do |line|
               # binding.pry
               if Integer(instance.cell(line,'E')) > 0
-                @relationship = Relationship.where("external_code = ?",instance.cell(line,'A').to_s).first
-                if @relationship.blank?
-                  @specification = Specification.where("sixnine_code = ?",instance.cell(line,'B').to_s).first
-                  @business = Business.where("no = ?",instance.cell(line,'G').to_s).first
-                  @supplier = Supplier.where("no = ?",instance.cell(line,'I').to_s).first
-                  @relationship = Relationship.where("business_id = ? and supplier_id = ? and specification_id = ?",@business.id,@supplier.id,@specification.id).first
+                if instance.cell(line,'A').to_s.blank?
+                  raise "导入文件第" + line.to_s + "行数据, 商品编码为空，导入失败"
+                else
+                  @relationship = Relationship.where("external_code = ?",instance.cell(line,'A').to_s).first
+                  if @relationship.blank?
+                    if instance.cell(line,'B').to_s.blank? || instance.cell(line,'G').to_s.blank? || instance.cell(line,'I').to_s.blank?
+                      raise "导入文件第" + line.to_s + "行数据, 69码或商品编号或供应商编号为空，导入失败"
+                    else
+                      @specification = Specification.where("sixnine_code = ?",Integer(instance.cell(line,'B')).to_s).first
+                      @business = Business.where("no = ?",Integer(instance.cell(line,'G')).to_s).first
+                      @supplier = Supplier.where("no = ?",Integer(instance.cell(line,'I')).to_s).first
+                      @relationship = Relationship.where("business_id = ? and supplier_id = ? and specification_id = ?",@business.id,@supplier.id,@specification.id).first
+                    end
+                  end
+                  if @relationship.blank?
+                    raise "导入文件第" + line.to_s + "行数据, 未找到该商品信息，导入失败"
+                  end
+                  @shelf = Shelf.where("shelf_code = ?",instance.cell(line,'D').to_s).first
+                  if @shelf.blank?
+                    raise "导入文件第" + line.to_s + "行数据, 未找到该货架信息，导入失败"
+                  end
+                  @stock = Stock.where("relationship_id = ? and shelf_id = ?",@relationship.id,@shelf.id).first
+                  if @stock.blank?
+                    @stock = Stock.create(shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification,actual_amount: Integer(instance.cell(line,'E')),virtual_amount: Integer(instance.cell(line,'E')))
+                  else
+                    @stock.update(actual_amount: @stock.actual_amount + Integer(instance.cell(line,'E')),virtual_amount: @stock.virtual_amount + Integer(instance.cell(line,'E')) )
+                  end
+                  @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: Integer(instance.cell(line,'E')),checked_at: Time.now,operation_type: 'in',shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification) 
                 end
-                if @relationship.blank?
-                  raise "导入文件第" + line.to_s + "行数据, 未找到该商品信息，导入失败"
-                end
-                @shelf = Shelf.where("shelf_code = ?",instance.cell(line,'D').to_s).first
-                if @shelf.blank?
-                  raise "导入文件第" + line.to_s + "行数据, 未找到该货架信息，导入失败"
-                end
-                @stock = Stock.where("relationship_id = ? and shelf_id = ?",@relationship.id,@shelf.id).first
-                if @stock.blank?
-                  @stock = Stock.create(shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification,actual_amount: Integer(instance.cell(line,'E')),virtual_amount: Integer(instance.cell(line,'E')))
-             
-                end
-                @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: Integer(instance.cell(line,'E')),checked_at: Time.now,operation_type: 'in',shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification) 
               end
             end
 

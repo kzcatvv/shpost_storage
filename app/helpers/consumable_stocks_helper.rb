@@ -1,0 +1,2 @@
+module ConsumableStocksHelper
+end

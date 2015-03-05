@@ -1,0 +1,25 @@
+<%- model_class = Consumable -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
+  <dd><%= Business.find(@consumable.business_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:supplier_id) %>:</strong></dt>
+  <dd><%= Supplier.find(@consumable.supplier_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
+  <dd><%= @consumable.name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:spec_desc) %>:</strong></dt>
+  <dd><%= @consumable.spec_desc %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              consumables_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_consumable_path(@consumable), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              consumable_path(@consumable),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => '确定删除?')) },
+              :class => 'btn btn-danger' %>

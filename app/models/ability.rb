@@ -35,6 +35,8 @@ class Ability
         can :manage, Commodity, unit_id: user.unit_id
         can :manage, Specification, commodity: {unit_id: user.unit_id}
         can :new, Relationship
+        can :manage, Consumable, unit_id: user.unit_id
+        can :manage, ConsumableStock, unit_id: user.unit_id
 
             # can :manage, MoveStock, unit_id: user.unit_id
             # can :manage, Inventory, unit_id: user.unit_id

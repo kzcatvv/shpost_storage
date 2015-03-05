@@ -1,0 +1,33 @@
+<%= form_for @consumable, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :business_id, :class => 'control-label' %>
+    <div class="controls">
+    <%= f.select(:business_id, Business.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :supplier_id, :class => 'control-label' %>
+    <div class="controls">
+    <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :spec_desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :spec_desc, :class => 'text_field' %>
+    </div>
+  </div>
+   
+  
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <% if can? :index, Consumable %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+              consumables_path, :class => 'btn btn-default' %>
+  <% end %>
+<% end %>

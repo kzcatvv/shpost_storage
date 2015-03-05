@@ -1,0 +1,18 @@
+<%- model_class = ConsumableStock -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} (修改耗材库存)'], :model => model_class.model_name.human.titleize %></h1>
+
+</div> 
+<div>
+   <%= form_tag("/consumable_stocks/modconsumablestocks", method: "post")%>
+    <%= label_tag(:in_amt, "入库数量:") %>
+    <%= text_field_tag(:in_amt) %>
+    <%= label_tag(:out_amt, "消耗数量:") %>
+    <%= text_field_tag(:out_amt) %>
+    <%= hidden_field_tag('format',@con_id) %>
+    </br>
+    </br>
+    <%= submit_tag("确认") %>
+
+   </form>
+</div>
