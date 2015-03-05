@@ -363,6 +363,9 @@ zh-CN:
       task:
         one: PDA任务管理
         other: PDA任务管理
+      consumable:
+        one: 耗材管理
+        other: 耗材管理
     attributes:
       user:
         email: "电子邮件"
@@ -715,6 +718,16 @@ zh-CN:
         status: "任务状态"
         user_id: "分配用户"
         created_at: "创建时间"
+      consumable:
+        business_id: "所属商户"
+        supplier_id: "供应商"
+        name: "耗材名称"
+        spec_desc: "备注"
+        unit_id: "所属机构"
+        storage_id: "所属仓库"
+      consumable_stocks:
+
+
   menu:
     permission:
       name: "权限管理"
@@ -924,6 +937,18 @@ zh-CN:
         stock_stat_report:
           name: "库存状态报表下载"
           link: "/shpost_storage/report/stock_stat_report"
+    consumables:
+      name: "耗材管理"
+      needrole:
+        can: :read
+        role: :Consumable
+      submenu:
+        consumable:
+          name: "耗材管理"
+          link: "/consumables"
+        org_stocks_import:
+          name: "耗材库存管理"
+          link: "/consumable_stocks"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 
