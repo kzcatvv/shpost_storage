@@ -28,9 +28,9 @@ class MobileInterfaceController < ApplicationController
     all = @context_hash['all']
 
     if ! all.blank? && all.eql?("Y")
-      shelves = Shelf.joins(:area).where(areas: {storage_id: @storage})
+      shelves = Shelf.includes(:area).where(areas: {storage_id: @storage})
     else
-      shelves = Shelf.joins(:area).where(areas: {storage_id: @storage}).where("shelves.updated_at > ?", Mobile.last.last_sign_in_time)
+      shelves = Shelf.includes(:area).where(areas: {storage_id: @storage}).where("shelves.updated_at > ?", @mobile.last_sign_in_time)
 
     end
 
@@ -88,7 +88,7 @@ class MobileInterfaceController < ApplicationController
       shelf = Shelf.find x[1]
       stock_logs = parent.stock_logs.where(relationship_id: x[0], shelf_id: x[1], operation_type: x[2])
       batch_no = stock_logs.reject{|stock_log| stock_log.batch_no.blank?}.map{|stock_log| stock_log.batch_no}.join("_")
-      sn = stock_logs.reject{|stock_log| stock_log.sn.blank?}.map{|stock_log| stock_log.batch_no}.join(Stock::SN_SPLIT)
+      sn = stock_logs.reject{|stock_log| stock_log.sn.blank?}.map{|stock_log| stock_log.sn}.join(Stock::SN_SPLIT)
 
       products << {sku: relationship.barcode, product: relationship.specification.full_title, business: relationship.business.name, supplier: relationship.supplier.name, batch: batch_no, product_barcode: relationship.try(:barcode), product_sixnine: relationship.specification.sixnine_code, product_sn: sn.blank? ? nil : sn.try(:split, Stock::SN_SPLIT), amount: y, scan: relationship.piece_to_piece ? "Y" : "N", shelf: shelf.shelf_code, shelf_barcode: shelf.barcode, type: x[2] }
     end
