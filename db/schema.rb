@@ -232,7 +232,7 @@ ActiveRecord::Schema.define(version: 20150303022949) do
     t.string   "version"
     t.integer  "user_id"
     t.integer  "storage_id"
-    t.time     "last_sign_in_time"
+    t.datetime "last_sign_in_time"
     t.boolean  "cancel"
     t.datetime "created_at"
     t.datetime "updated_at"

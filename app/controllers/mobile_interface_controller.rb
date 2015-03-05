@@ -1,7 +1,7 @@
 class MobileInterfaceController < ApplicationController
   skip_before_filter :authenticate_user!
   before_action :verify_params
-  # before_action :verify_sign
+  before_action :verify_sign
   before_action :verify_user, except: [:login, :logout]
   # around_action :save_mobile_log
   skip_before_filter :verify_authenticity_token 
@@ -19,11 +19,31 @@ class MobileInterfaceController < ApplicationController
 
     Mobile.where(user_id: @user).update_all(user_id: nil)
 
-    @mobile.update(version: @version, user: @user, last_sign_in_time: Time.now)
+    @mobile.update(version: @version, user: @user)
 
     success_builder({id: @user.id, time: Time.now.strftime('%Y%m%d %H:%M:%S'), version: I18n.t("mobile_interface.version"), url: "http://#{request.host}:#{request.port}#{I18n.t('mobile_interface.url')}", update: I18n.t("mobile_interface.update"), shelfcode: Sequence.generate_initial(@storage.unit, Shelf)})
   end
 
+  def shelves
+    all = @context_hash['all']
+
+    if ! all.blank? && all.eql?("Y")
+      shelves = Shelf.includes(:area).where(areas: {storage_id: @storage})
+    else
+      shelves = Shelf.includes(:area).where(areas: {storage_id: @storage}).where("shelves.updated_at > ?", @mobile.last_sign_in_time)
+
+    end
+
+    shelves_arry = []
+
+    shelves.each do |x|
+      shelves_arry << {shelf: x.shelf_code, shelf_barcode: x.barcode, type: Shelf::SHELF_TYPE[x.shelf_type.to_sym], area: x.area.name}
+    end
+
+    @mobile.update(last_sign_in_time: Time.now)
+
+    success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), shelves: shelves_arry})
+  end
 
   def logout
     username = @context_hash['username']
@@ -68,9 +88,9 @@ class MobileInterfaceController < ApplicationController
       shelf = Shelf.find x[1]
       stock_logs = parent.stock_logs.where(relationship_id: x[0], shelf_id: x[1], operation_type: x[2])
       batch_no = stock_logs.reject{|stock_log| stock_log.batch_no.blank?}.map{|stock_log| stock_log.batch_no}.join("_")
-      sn = stock_logs.reject{|stock_log| stock_log.sn.blank?}.map{|stock_log| stock_log.batch_no}.join(Stock::SN_SPLIT)
+      sn = stock_logs.reject{|stock_log| stock_log.sn.blank?}.map{|stock_log| stock_log.sn}.join(Stock::SN_SPLIT)
 
-      products << {sku: relationship.barcode, product: relationship.specification.full_title, business: relationship.business.name, supplier: relationship.supplier.name, batch: batch_no, product_barcode: relationship.try(:barcode), product_sixnine: relationship.specification.sixnine_code, product_sn: sn.blank? ? nil : sn.try(:split, Stock::SN_SPLIT), amount: y, scan: relationship.piece_to_piece, shelf: shelf.shelf_code, shelf_barcode: shelf.barcode, type: x[2] }
+      products << {sku: relationship.barcode, product: relationship.specification.full_title, business: relationship.business.name, supplier: relationship.supplier.name, batch: batch_no, product_barcode: relationship.try(:barcode), product_sixnine: relationship.specification.sixnine_code, product_sn: sn.blank? ? nil : sn.try(:split, Stock::SN_SPLIT), amount: y, scan: relationship.piece_to_piece ? "Y" : "N", shelf: shelf.shelf_code, shelf_barcode: shelf.barcode, type: x[2] }
     end
 
     success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), mission: task.id, barcode: task.barcode, title: task.title, type: task.task_type, mission_time: task.created_at.strftime('%Y%m%d %H:%M:%S'), products: products})
@@ -220,7 +240,7 @@ class MobileInterfaceController < ApplicationController
 
         parent.check!
       end
-
+      
       task.update!(status: Task::STATUS[:done])
       
       success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), msg: code.blank? ? "" : I18n.t("mobile_interface.error.#{code}")})
@@ -292,7 +312,7 @@ class MobileInterfaceController < ApplicationController
 
   def verify_sign
     @sign = params[:sign]
-    return error_builder('0001') if ! @sign.eql? Digest::MD5.hexdigest(@context)
+    return error_builder('0001') if ! @sign.eql?(Digest::MD5.hexdigest(@context))
   end
 
   def verify_user

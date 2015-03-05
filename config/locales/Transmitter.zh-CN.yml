@@ -22,8 +22,8 @@ zh-CN:
     gnxb:
       order_query:
         #for test
-        uri: 'http://211.156.220.124:7700/ECWS/xfire/services/MailTtService?wsdl'
+        uri: 'http://180.166.203.241/shpost/touch/shpost/postmail/list'
         #fot production
-        #uri: 'http://10.126.40.12:3000/ECWS/xfire/services/MailTtService?wsdl'
-        method: 'get_mails'
+        #uri: 'http://180.166.203.241/shpost/touch/shpost/postmail/list'
+        # method: 'get_mails'
         interval: 43200

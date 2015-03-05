@@ -75,7 +75,7 @@ class StockLogsController < ApplicationController
     stocks_b = Stock.find_stocks_in_storage(@manual_stock_detail.specification, @manual_stock_detail.supplier, @manual_stock_detail.manual_stock.business, current_storage, true)
 
     stocks = stocks_n + stocks_b
-    stocks_json = stocks.map {|x| {name: "#{x.shelf.shelf_code}(批次:#{x.batch_no},库存:#{x.actual_amount})#{x.shelf.shelf_type.eql?('normal') ? '' : '*'}", id: x.id}}.to_json
+    stocks_json = stocks.map {|x| {name: "#{x.shelf.shelf_code}(批次:#{x.batch_no},库存:#{x.actual_amount})#{x.shelf.shelf_type.eql?('normal') ? '' : '*'}", id: x.id, msid: @manual_stock_detail.id}}.to_json
 
     if @stock.blank?
       return render json: {stocks: stocks_json}

@@ -630,7 +630,7 @@ zh-CN:
         is_bad: "残次品货架"
         area_type: "区域类型"
         shelf_type: "货架类型"
-
+        priority_level: "货架优先级"
       keyclientorder:
         keyclient_name: 大客户名称
         keyclient_addr: 大客户地址

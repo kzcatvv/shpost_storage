@@ -49,6 +49,13 @@
       <%= f.text_field :desc, :class => 'text_field' %>
     </div>
   </div>
+  <div class="control-group">
+    <%= f.label :priority_level, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:priority_level, Shelf::PRIORITY_LEVEL.invert) %>
+    </div>
+  </div>
+
   
   
   <%= f.submit nil, :class => 'btn btn-primary' %>

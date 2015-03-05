@@ -660,7 +660,11 @@ class OrdersController < ApplicationController
                 end
                 #外部订单号
                 business_order_id = to_string(instance.cell(line,'A'))
-                ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id:business_id
+                if !business_order_id.blank?
+                  ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id:business_id
+                else
+                  raise "导入文件第一页第" + line.to_s + "行数据,缺少外部订单号，导入失败"
+                end
 
                 #判断是否已存在该订单
                 if ori_order.blank?
@@ -1293,7 +1297,7 @@ class OrdersController < ApplicationController
                   ori_detail_amount = ori_order_detail.amount
                   if amount.to_i == 0
                     OrderDetail.destroy(order_detail_id)
-                      dorder_total_amount = dorder_total_amount - ori_detail_amount
+                      # dorder_total_amount = dorder_total_amount - ori_detail_amount
                     # Order.update(dorder_id,total_amount: dorder_total_amount)
                   elsif amount.to_i > 0
                     OrderDetail.update(order_detail_id,amount: amount.to_i)
@@ -1339,6 +1343,7 @@ class OrdersController < ApplicationController
     end
   end
 
+  # 订单查询导出
   def export()
     x = params[:ids].split(",")
     
@@ -1346,16 +1351,14 @@ class OrdersController < ApplicationController
     until x.blank? do
       @orders += Order.where(id: x.pop(1000))
     end
-
+    
     if @orders.nil?
       flash[:alert] = "无订单"
       redirect_to :action => 'index'
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
-            :type => "text/excel;charset=utf-8; header=present",  
-            :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          send_data(exportorders_xls_content_for(@orders), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
         }  
       end
     end

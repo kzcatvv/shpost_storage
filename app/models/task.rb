@@ -4,7 +4,7 @@ class Task < ActiveRecord::Base
   belongs_to :storage
   has_one :unit, through: :storage
 
-  validates_uniqueness_of :barcode, :code
+  # validates_uniqueness_of :barcode, :code
 
   STATUS = {doing: 'doing', done: 'done'}
 
@@ -17,11 +17,13 @@ class Task < ActiveRecord::Base
 
   STATUS_SHOW = {doing: '未完成', done: '完成'}
 
+  before_create :set_code
+
   def done?
     (status.eql? Task::STATUS[:done]) ? true : false
   end
 
-  def self.save_task(parent, storage, user_id = nil)
+  def self.save_task(parent, storage_id, user_id = nil)
     task = Task.where(parent: parent, status: STATUS[:doing], assign_type: ASSIGN_TYPE[:assigned]).first
     if task.blank?
       type = OPERATE_TYPE[parent.class.name.to_sym]
@@ -40,7 +42,7 @@ class Task < ActiveRecord::Base
       if title.blank?
         title = parent.class.name
       end
-      Task.create(parent: parent, code: generate_code(), user_id: user_id, status: STATUS[:doing], storage_id: storage, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
+      Task.create!(parent: parent, user_id: user_id, status: STATUS[:doing], storage_id: storage_id, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
     else
       if !user_id.blank?
         task.update(user_id: user_id)
@@ -71,5 +73,11 @@ class Task < ActiveRecord::Base
   def self.rand_code()
     # 123 -> "0123"
     return "%04d" % rand(9999)
+  end
+
+  def set_code()
+    if self.code.blank?
+      self.code = Task.generate_code()
+    end
   end
 end

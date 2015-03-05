@@ -373,6 +373,8 @@ ShpostStorage::Application.routes.draw do
   match "/contact/add" => "contacts#add",via: [:get, :post]
   match "/contact/confirmadd" => "contacts#confirmadd",via: [:get, :post]
 
+  match "/shpost_storage/mobile_interface/shelves" => "mobile_interface#shelves", via: [:get, :post]
+
   match "/shpost_storage/mobile_interface/login" => "mobile_interface#login", via: [:get, :post]
   match "/shpost_storage/mobile_interface/logout" => "mobile_interface#logout", via: [:get, :post]
   match "/shpost_storage/mobile_interface/mission" => "mobile_interface#mission", via: [:get, :post]

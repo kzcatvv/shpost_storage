@@ -73,7 +73,7 @@ class AreaShelfController < ApplicationController
     @shelf.shelf_code = setShelfCode(shelf_params)
 
     #@shelf.is_bad = Area.find(params[:shelf][:area_id]).is_bad
-    @shelf.shelf_type = Area.find(params[:shelf][:area_id]).area_type
+    @shelf.shelf_type = Area.find(@shelf.area_id).area_type
     
     # @shelf.shelf_code = @areas.find(shelf_params[:area_id]).area_code
     # @shelf.shelf_code << "-" << change(shelf_params[:area_length])
@@ -111,7 +111,7 @@ class AreaShelfController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shelf_params
-      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume, :shelf_type)
+      params.require(:shelf).permit(:area_id, :shelf_code, :desc, :area_length, :area_width, :area_height, :shelf_row, :shelf_column, :max_weight, :max_volume, :shelf_type, :priority_level)
     end
 
     def change(text)
