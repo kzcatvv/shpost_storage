@@ -1,5 +1,14 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :consumable_stocks do
+    collection do
+      get 'modconsumablestocks'
+      post 'modconsumablestocks' => 'consumable_stocks#modconsumablestocks'
+    end
+  end
+
+  resources :consumables
+
   resources :inventories  do
     collection do
       get 'find_shelf_stock'
