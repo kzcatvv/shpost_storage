@@ -1593,8 +1593,14 @@ def exportorders_xls_content_for(objs)
 
         specification_id = order_detail.specification_id
         specification = Specification.accessible_by(current_ability).find(specification_id)
+        
+        relationship = Relationship.find_by(business_id: business_id, supplier_id: supplier_id, specification_id: specification_id)
 
-        external_code = Relationship.find_by(business_id: business_id, supplier_id: supplier_id, specification_id: specification_id).external_code
+        if relationship.blank?
+          external_code = ""
+        else
+          external_code = relationship.external_code
+        end
 
         if obj.business_trans_no.blank?
           # 原始订单

@@ -217,8 +217,6 @@ class StocksController < ApplicationController
       @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
     end
     
-    # binding.pry    
-
   end
 
   def export()
@@ -284,7 +282,10 @@ class StocksController < ApplicationController
 
     actual_hash.each do |key,value| 
       sheet1[count_row,0] = key[0]
-      sheet1[count_row,1] = key[1].blank?? "":Relationship.find(key[1]).specification.all_name
+      if !key[1].blank?
+        relationship = Relationship.find(key[1]) 
+      end
+      sheet1[count_row,1] = relationship.blank?? "":Relationship.find(key[1]).specification.all_name
       sheet1[count_row,2] = actual_hash[key]
       sheet1[count_row,3] = virtual_hash[key]
 
