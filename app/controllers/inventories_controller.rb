@@ -13,7 +13,10 @@ class InventoriesController < ApplicationController
       :include => [:storage],
       :conditions => {"storages.id" => current_storage.id})
 
-    @relationships_grid = initialize_grid(Relationship)
+    @relationships_grid = initialize_grid(Relationship,
+      :include => [:business,:supplier],
+      :conditions => {"businesses.unit_id" => current_storage.unit.id,
+                      "suppliers.unit_id" => current_storage.unit.id})
   end
 
   def edit
@@ -21,7 +24,10 @@ class InventoriesController < ApplicationController
       :include => [:storage],
       :conditions => {"storages.id" => current_storage.id})
 
-    @relationships_grid = initialize_grid(Relationship)
+    @relationships_grid = initialize_grid(Relationship,
+      :include => [:business,:supplier],
+      :conditions => {"businesses.unit_id" => current_storage.unit.id,
+                      "suppliers.unit_id" => current_storage.unit.id})
   end
 
   def create
