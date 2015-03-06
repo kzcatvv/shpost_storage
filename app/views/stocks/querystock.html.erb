@@ -34,20 +34,26 @@
         if key[1].blank?
           key[1]=""
         end
+        if key[2].blank?
+          key[2]=""
+        end
+        if key[3].blank?
+          key[3]=""
+        end
     %>
 
       <tr>
         <td><%= key[0] %></td>
         <td>
-        <% if !key[1].blank?
-             relationship = Relationship.find_by(id: key[1]) 
-           end
+        <%  if !key[3].blank?
+              specification = Specification.find_by id:key[3]
+            end
         %>
-        <%= relationship.blank?? "":Relationship.find_by(id: key[1]).specification.all_name %>
+        <%= specification.blank?? "":specification.all_name %>
         </td>
         <td><%= @actual_hash[key] %></td>
         <td><%= @virtual_hash[key] %></td>
-        <td><%=link_to t('详细信息'),"/stocks/stock_details?key0=#{key[0]}&key1=#{key[1]}", target: '_blank', :class => 'btn btn-primary'%>
+        <td><%=link_to t('详细信息'),"/stocks/stock_details?key0=#{key[0]}&key1=#{key[1]}&key2=#{key[2]}&key3=#{key[3]}", target: '_blank', :class => 'btn btn-primary'%>
         </td>
       </tr>
     <% end %>
