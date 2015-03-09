@@ -205,9 +205,6 @@ class UpDownloadsController < ApplicationController
             2.upto(instance.last_row) do |line|
               # binding.pry
               if Integer(instance.cell(line,'E')) > 0
-                if instance.cell(line,'A').to_s.blank?
-                  raise "导入文件第" + line.to_s + "行数据, 商品编码为空，导入失败"
-                else
                   @relationship = Relationship.where("external_code = ?",instance.cell(line,'A').to_s).first
                   if @relationship.blank?
                     if instance.cell(line,'B').to_s.blank? || instance.cell(line,'G').to_s.blank? || instance.cell(line,'I').to_s.blank?
@@ -233,7 +230,7 @@ class UpDownloadsController < ApplicationController
                     @stock.update(actual_amount: @stock.actual_amount + Integer(instance.cell(line,'E')),virtual_amount: @stock.virtual_amount + Integer(instance.cell(line,'E')) )
                   end
                   @stocklog = StockLog.create(user_id: current_user.id,stock: @stock,operation: 'purchase_stock_in',status: 'checked',amount: Integer(instance.cell(line,'E')),checked_at: Time.now,operation_type: 'in',shelf: @shelf,business: @relationship.business,supplier: @relationship.supplier,specification: @relationship.specification) 
-                end
+                
               end
             end
 
