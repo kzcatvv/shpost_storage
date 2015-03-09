@@ -210,16 +210,37 @@ class StocksController < ApplicationController
     end
 
     if @stocks.blank?
-      @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
-      @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+      @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
+      # @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
+      vstocks = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id")
+      vstocks.each do |s|
+        gb = [s.shelf.area.name,s.business_id,s.supplier_id,s.specification_id]
+        if @virtual_hash.has_key?(gb)
+          @virtual_hash[gb]=@virtual_hash[gb]+s.virtual_amount
+        else
+          @virtual_hash[gb]=s.virtual_amount
+        end
+      end
+
     else
-      @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
-      @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+      @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
+      # @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
+      vstocks = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id")
+      vstocks.each do |s|
+        gb = [s.shelf.area.name,s.business_id,s.supplier_id,s.specification_id]
+        if @virtual_hash.has_key?(gb)
+          @virtual_hash[gb]=@virtual_hash[gb]+s.virtual_amount
+        else
+          @virtual_hash[gb]=s.virtual_amount
+        end
+      end
     end
     
   end
 
   def export()
+    @actual_hash = {}
+    @virtual_hash = {}
     @stocks=[]
 
     if !params[:ex_code].blank?
@@ -252,11 +273,29 @@ class StocksController < ApplicationController
     end
 
     if @stocks.blank?
-      @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
-      @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+      @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
+      # @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
+      vstocks = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id")
+      vstocks.each do |s|
+        gb = [s.shelf.area.name,s.business_id,s.supplier_id,s.specification_id]
+        if @virtual_hash.has_key?(gb)
+          @virtual_hash[gb]=@virtual_hash[gb]+s.virtual_amount
+        else
+          @virtual_hash[gb]=s.virtual_amount
+        end
+      end
     else
-      @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:actual_amount)
-      @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:relationship_id).order("areas.name,stocks.relationship_id").sum(:virtual_amount)
+      @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
+      # @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
+      vstocks = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id")
+      vstocks.each do |s|
+        gb = [s.shelf.area.name,s.business_id,s.supplier_id,s.specification_id]
+        if @virtual_hash.has_key?(gb)
+          @virtual_hash[gb]=@virtual_hash[gb]+s.virtual_amount
+        else
+          @virtual_hash[gb]=s.virtual_amount
+        end
+      end
     end
 
     # respond_to do |format|
@@ -282,10 +321,10 @@ class StocksController < ApplicationController
 
     actual_hash.each do |key,value| 
       sheet1[count_row,0] = key[0]
-      if !key[1].blank?
-        relationship = Relationship.find(key[1]) 
+      if !key[3].blank?
+        specification = Specification.find_by id:key[3]
       end
-      sheet1[count_row,1] = relationship.blank?? "":Relationship.find(key[1]).specification.all_name
+      sheet1[count_row,1] = specification.blank?? "":specification.all_name
       sheet1[count_row,2] = actual_hash[key]
       sheet1[count_row,3] = virtual_hash[key]
 
@@ -299,9 +338,12 @@ class StocksController < ApplicationController
   def stock_details
     key0=params[:key0]
     key1=params[:key1]
+    key2=params[:key2]
+    key3=params[:key3]
     
-    @area = Area.find_by name:key0
-    @stocks = Stock.where("stocks.relationship_id=? and stocks.shelf_id in (?)",key1,@area.shelves.ids)
+    @area = Area.where("areas.storage_id = ? and areas.name = ?",current_storage.id,key0).accessible_by(current_ability).first
+    @stocks = Stock.where("stocks.business_id=? and stocks.supplier_id=? and stocks.specification_id=? and stocks.shelf_id in (?)",key1,key2,key3,@area.shelves.ids)
+
     @stock_details_grid = initialize_grid(@stocks,
       :order => 'stocks.id',
       :order_direction => 'desc',
