@@ -37,6 +37,7 @@ class Ability
         can :new, Relationship
         can :manage, Consumable, unit_id: user.unit_id
         can :manage, ConsumableStock, unit_id: user.unit_id
+        can :read, ConstockLog
 
             # can :manage, MoveStock, unit_id: user.unit_id
             # can :manage, Inventory, unit_id: user.unit_id
