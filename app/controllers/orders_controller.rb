@@ -1326,7 +1326,7 @@ class OrdersController < ApplicationController
     x = params[:ids].split(",")
     @orders = []
     until x.blank? do
-      @orders += Order.where(id: x.pop(1000), status: "waiting")
+      @orders += Order.where(id: x.pop(1000), status: ["waiting","printed"])
     end
 
     if @orders.nil?
