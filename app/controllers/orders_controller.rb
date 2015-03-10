@@ -1521,7 +1521,7 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
     count_row = 1
     objs.each do |obj|
       transport_type = obj.transport_type
@@ -1556,6 +1556,14 @@ def exportorders_xls_content_for(objs)
         end
       end
 
+      all_name = ""
+      order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj.id}")
+      order_details.each do |order_detail|
+        if !order_detail.specification.blank?
+          all_name = all_name + order_detail.specification.all_name + ","
+        end
+      end
+
       sheet1[count_row,0]=business_order_id
       sheet1[count_row,1]=obj.tracking_number.to_s
       sheet1[count_row,2]=tran_type
@@ -1573,6 +1581,7 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,14]=obj.batch_no
       sheet1[count_row,15]=business_trans_no
       sheet1[count_row,16]=obj.status_name
+      sheet1[count_row,17]=all_name[0,all_name.size-1]
     
       count_row += 1
     end  
