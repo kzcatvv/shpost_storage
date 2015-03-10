@@ -711,17 +711,17 @@ class OrdersController < ApplicationController
         
               #SKU/第三方编码/69码
               sku_extcode_69code = to_string(instance.cell(dline,'C'))
-              
+              binding.pry
               if !sku_extcode_69code.blank?
                 #先考虑为sku
-                specification = Specification.find_by sku: sku_extcode_69code
+                specification = Specification.accessible_by(current_ability).find_by sku: sku_extcode_69code
                 #不是sku，考虑为第三方编码
                 if specification.blank?
                   relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", "#{business_id}","#{sku_extcode_69code}")
                   #不是第三方编码，考虑为69码
                   if relationship.blank?
                     if !supplier.blank?
-                      relationship = Relationship.includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{business_id}","#{supplier.id}")
+                      relationship = Relationship.includes(:specification).accessible_by(current_ability).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{business_id}","#{supplier.id}")
                       
                     else
                       raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
@@ -738,7 +738,7 @@ class OrdersController < ApplicationController
                   if supplier.blank?
                     raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
                   else
-                    relationship = Relationship.find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
+                    relationship = Relationship.accessible_by(current_ability).find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
                     if relationship.blank?
                       raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
                     end
@@ -931,7 +931,7 @@ class OrdersController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
-            specification = Specification.find_by sku: instance.cell(2,'A')
+            specification = Specification.accessible_by(current_ability).find_by sku: instance.cell(2,'A')
 
             if !specification.nil?
               keyclientorder=Keyclientorder.create! keyclient_name: "标准线下 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: business.id, unit_id: current_user.unit.id, storage_id: current_storage.id
@@ -1099,7 +1099,7 @@ class OrdersController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
-            flash_message = "导入成功!!\<br/\>"
+            flash_message = "导入成功"
             koid = getKeycOrderID()
             @keyclientorder = Keyclientorder.find koid
 
@@ -1125,7 +1125,7 @@ class OrdersController < ApplicationController
                 if business_name.blank?
                   raise "导入文件第一页第" + line.to_s + "行数据, 缺少商户名称，导入失败"
                 end
-                business_id = Business.find_by(name: business_name).id
+                business_id = Business.accessible_by(current_ability).find_by(name: business_name).id
 
                 order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id: business_id
               else
@@ -1135,7 +1135,7 @@ class OrdersController < ApplicationController
               if order.blank?
                 raise "导入文件第一页第" + line.to_s + "行数据, 订单不存在，导入失败"
               elsif !order.can_import()
-                flash_message << "导入文件第一页第" + line.to_s + "行数据, 订单已处理，无法导入\<br/\>"
+                flash_message << "导入文件第一页第" + line.to_s + "行数据, 订单已处理，无法导入"
                 next
               end
 
@@ -1222,7 +1222,7 @@ class OrdersController < ApplicationController
                 if business_name.blank?
                   raise "导入文件第二页第" + dline.to_s + "行数据, 缺少商户名称，导入失败"
                 end
-                business_id = Business.find_by(name: business_name).id
+                business_id = Business.accessible_by(current_ability).find_by(name: business_name).id
 
                 dorder = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id: business_id 
               else
@@ -1257,7 +1257,7 @@ class OrdersController < ApplicationController
                     #不是第三方编码，考虑为69码
                     if relationship.blank?
                       if !supplier.blank?
-                        relationship = Relationship.includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{dorder_business_id}","#{supplier.id}")
+                        relationship = Relationship.accessible_by(current_ability).includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{dorder_business_id}","#{supplier.id}")
                         
                       else
                         raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
@@ -1603,7 +1603,7 @@ def exportorders_xls_content_for(objs)
         specification_id = order_detail.specification_id
         specification = Specification.accessible_by(current_ability).find(specification_id)
         
-        relationship = Relationship.find_by(business_id: business_id, supplier_id: supplier_id, specification_id: specification_id)
+        relationship = Relationship.accessible_by(current_ability).find_by(business_id: business_id, supplier_id: supplier_id, specification_id: specification_id)
 
         if relationship.blank?
           external_code = ""
