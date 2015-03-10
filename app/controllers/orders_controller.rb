@@ -1250,7 +1250,7 @@ class OrdersController < ApplicationController
                 sku_extcode_69code = to_string(instance.cell(dline,'C'))
                 if !sku_extcode_69code.blank?
                   #先考虑为sku
-                  specification = Specification.find_by sku: sku_extcode_69code
+                  specification = Specification.accessible_by(current_ability).find_by sku: sku_extcode_69code
                   #不是sku，考虑为第三方编码
                   if specification.blank?
                     relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", "#{dorder_business_id}","#{sku_extcode_69code}")
@@ -1274,7 +1274,7 @@ class OrdersController < ApplicationController
                     if supplier.blank?
                       raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
                     else
-                      relationship = Relationship.find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
+                      relationship = Relationship.accessible_by(current_ability).find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
                       if relationship.blank?
                         raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
                       end
