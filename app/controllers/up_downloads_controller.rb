@@ -215,8 +215,8 @@ class UpDownloadsController < ApplicationController
                       raise "导入文件第" + line.to_s + "行数据, 69码或商品编号或供应商编号为空，导入失败"
                     else
                       @specification = Specification.where("sixnine_code = ?",instance.cell(line,'B').to_s).first
-                      @business = Business.where("no = ?",instance.cell(line,'G').to_s).first
-                      @supplier = Supplier.where("no = ?",instance.cell(line,'I').to_s).first
+                      @business = Business.where("no = ? and unit_id = ?",instance.cell(line,'G').to_s,current_storage.unit.id).first
+                      @supplier = Supplier.where("no = ? and unit_id = ?",instance.cell(line,'I').to_s,current_storage.unit.id).first
                       @relationship = Relationship.where("business_id = ? and supplier_id = ? and specification_id = ?",@business.id,@supplier.id,@specification.id).first
                     end
                   end
