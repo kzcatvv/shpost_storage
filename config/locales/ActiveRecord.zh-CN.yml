@@ -189,6 +189,7 @@ zh-CN:
       move_stock_check: 移库确认
       inventorydetail: 盘点明细
       inventory_check: 盘点确认
+      modconsumablestocks: 修改耗材库存
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -366,6 +367,12 @@ zh-CN:
       consumable:
         one: 耗材管理
         other: 耗材管理
+      consumable_stock:
+        one: 耗材库存管理
+        other: 耗材库存管理
+      constock_log:
+        one: 耗材库存日志
+        other: 耗材库存日志
     attributes:
       user:
         email: "电子邮件"
@@ -725,8 +732,18 @@ zh-CN:
         spec_desc: "备注"
         unit_id: "所属机构"
         storage_id: "所属仓库"
-      consumable_stocks:
-
+      consumable_stock:
+        consumable_id: "耗材"
+        shelf_name: "货架"
+        amount: "数量"
+        unit_id: "所属机构"
+        storage_id: "所属仓库"
+      constock_log:
+        user_id: "用户"
+        consumable_stock_id: "耗材"
+        amount: "数量"
+        operation_type: "出入库"
+        created_at: "创建时间"
 
   menu:
     permission:
@@ -949,6 +966,9 @@ zh-CN:
         org_stocks_import:
           name: "耗材库存管理"
           link: "/consumable_stocks"
+        constock_log:
+          name: "耗材库存日志"
+          link: "/constock_logs"
     # filetemp:
     #   name: "模板管理"
     #   needrole: 
