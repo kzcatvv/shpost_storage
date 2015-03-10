@@ -205,7 +205,11 @@ class UpDownloadsController < ApplicationController
             2.upto(instance.last_row) do |line|
               # binding.pry
               if Integer(instance.cell(line,'E')) > 0
+                if !instance.cell(line,'A').to_s.blank?
                   @relationship = Relationship.where("external_code = ?",instance.cell(line,'A').to_s).first
+                else
+                  @relationship = nil
+                end
                   if @relationship.blank?
                     if instance.cell(line,'B').to_s.blank? || instance.cell(line,'G').to_s.blank? || instance.cell(line,'I').to_s.blank?
                       raise "导入文件第" + line.to_s + "行数据, 69码或商品编号或供应商编号为空，导入失败"

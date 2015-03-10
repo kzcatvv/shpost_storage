@@ -9,6 +9,7 @@ class InventoriesController < ApplicationController
   end
 
   def new
+    @area = Area.where("storage_id = ?",current_storage.id)
     @shelves_grid = initialize_grid(Shelf,
       :include => [:storage],
       :conditions => {"storages.id" => current_storage.id})
@@ -20,6 +21,7 @@ class InventoriesController < ApplicationController
   end
 
   def edit
+    @area = Area.where("storage_id = ?",current_storage.id)
     @shelves_grid = initialize_grid(Shelf,
       :include => [:storage],
       :conditions => {"storages.id" => current_storage.id})
