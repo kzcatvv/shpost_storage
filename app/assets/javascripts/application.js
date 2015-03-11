@@ -1566,14 +1566,28 @@ function showgrid() {
     var i = $("#inventory_inv_type").val();
     var el1 = document.getElementById("grid1")
     var el2 = document.getElementById("grid2")
+    var area = document.getElementById("areaselect")
 
     if (i == 'byshelf'){
       el2.style.display = 'none';
       el1.style.display = 'block';
+      area.style.display = 'block';
     }else{
       el1.style.display = 'none';
       el2.style.display = 'block';
+      area.style.display = 'none';
     }
+   
+  })
+
+  $("#area_sel").change(function(){
+    $.ajax({
+      type : 'GET',
+      url : '/relationships/select_commodities/',
+      data: { goodstype_id: $('#goodstype_id').val(),
+              object_id: $('#ajax_object_id').val()},
+      dataType : 'script'
+    });
    
   })
 

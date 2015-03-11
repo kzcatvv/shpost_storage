@@ -1,0 +1,35 @@
+<%- model_class = ConstockLog -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
+
+<%= grid(@constock_logs_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name', model: 'User' do |constock_log|
+        constock_log.user.try :name
+      end
+
+    #g.column name: model_class.human_attribute_name(:operation), attribute: 'operation'
+    
+
+    g.column name: '耗材' do |constock_log|
+        constock_log.consumable_stock.consumable.name
+    end
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'
+
+    g.column name: model_class.human_attribute_name(:operation_type), attribute: 'operation_type',custom_filter: ConstockLog::OPERATION_TYPE_SHOW.invert do |constock_log| 
+      ConstockLog::OPERATION_TYPE_SHOW[constock_log.operation_type.to_sym]
+    end
+    # g.column name: model_class.human_attribute_name(:object_symbol), attribute: 'object_symbol'
+
+    
+
+  
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |stock_log|
+        stock_log.created_at.to_s(:db)
+    end
+
+  end 
+%>

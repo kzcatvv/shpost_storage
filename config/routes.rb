@@ -7,6 +7,8 @@ ShpostStorage::Application.routes.draw do
     end
   end
 
+  resources :constock_logs, only: [:index, :show]
+
   resources :consumables
 
   resources :inventories  do
