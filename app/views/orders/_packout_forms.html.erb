@@ -21,7 +21,7 @@
         content_tag(:td, Specification.find(orderdtl.specification_id).name )+
         content_tag(:td, Specification.find(orderdtl.specification_id).sixnine_code )+
         content_tag(:td, text_field_tag("dbam_#{orderdtl.id}", orderdtl.amount, disabled: true) )+
-        content_tag(:td, text_field_tag("realam_#{orderdtl.id}", "0", disabled: true) ),id: "tr_#{orderdtl.id}" ) %>
+        content_tag(:td, text_field_tag("realam_#{orderdtl.id}", orderdtl.desc == 'haspacked' ? "1" : "0", disabled: true) ),id: "tr_#{orderdtl.id}" ) %>
 
     <% end %>
   <% end %>
