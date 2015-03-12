@@ -4,10 +4,20 @@ class CommoditiesController < ApplicationController
   # GET /commodities
   # GET /commodities.json
   def index
+    puts "----------------------------------------"
+    puts params
+    puts "----------------------------------------"
+    if !params[:code].blank?
+      specifications = Specification.accessible_by(current_ability).where(["sixnine_code = ? or sku = ?", params[:code], params[:code]])
+      cid = []
+      specifications.each do |s|
+        cid << s.commodity.id
+      end
+      @commodities = Commodity.where(id: cid)
+    end
     @commodities = initialize_grid(@commodities,
                    :order => 'commodities.id',
-                   :order_direction => 'desc'
-                  
+                   :order_direction => 'desc'    
 )
   end
 

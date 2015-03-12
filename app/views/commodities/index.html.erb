@@ -13,6 +13,14 @@
   </div>
 </div>
 
+
+<%= form_tag("/commodities", :method => "get") do %>
+  <div><%= label_tag(:code, "69码或sku:") %></div>
+  <div><%= text_field_tag(:code) %></div>
+  <div><%= submit_tag '检索' %></div>
+<% end %>
+
+
 <%= grid(@commodities, :show_filters => :always) do |g|
 
     #g.column name: model_class.human_attribute_name(:id), attribute: 'id', filter_type: :range
