@@ -12,6 +12,7 @@
   <div style="float:right">
     <%= form_tag(exportorders_orders_url(format: "xls")) %>
     <%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
+    <%@ods = @orders_grid.all_pages_records %>
     <%=link_to t('订单导入'), "/orders/standard_orders_import1", target: '_blank',:class => 'btn btn-primary' %>
     <%= submit_tag "订单导出",:class => 'btn btn-primary' %>
     <%=link_to t('面单信息回馈'), "/orders/importorders1", target: '_blank',:class => 'btn btn-primary' %>

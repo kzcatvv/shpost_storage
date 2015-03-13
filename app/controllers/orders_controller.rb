@@ -475,6 +475,7 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
+    @@orders = []
     @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true],:order => 'orders.keyclientorder_id',
      :order_direction => 'desc', :per_page => 15)
     @allcnt = {}
@@ -1328,45 +1329,85 @@ class OrdersController < ApplicationController
   end
 
   def exportorders()
-    x = params[:ids].split(",")
-    @orders = []
-    until x.blank? do
-      @orders += Order.where(id: x.pop(1000), status: ["waiting","printed"])
-    end
+    # x = params[:ids].split(",")
+    # @orders = []
+    # until x.blank? do
+    #   @orders += Order.where(id: x.pop(1000), status: ["waiting","printed"])
+    # end
 
-    if @orders.nil?
-      flash[:alert] = "无订单"
-      redirect_to :action => 'findprintindex'
-    else
-      respond_to do |format|
-        format.xls {   
-          send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
-            :type => "text/excel;charset=utf-8; header=present",  
-            :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
-        }  
+    # if @orders.nil?
+    #   flash[:alert] = "无订单"
+    #   redirect_to :action => 'findprintindex'
+    # else
+    #   respond_to do |format|
+    #     format.xls {   
+    #       send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
+    #         :type => "text/excel;charset=utf-8; header=present",  
+    #         :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+    #     }  
+    #   end
+    # end
+
+    @orders_grid.with_resultset do |orders|
+      ords = orders.where status: ["waiting","printed"]
+      
+      if ords.nil?
+        flash[:alert] = "无订单"
+        redirect_to :action => 'findprintindex'
+      else
+        respond_to do |format|
+          format.xls {   
+            send_data(exportorders_xls_content_for(find_has_stock(ords,false)),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          }  
+        end
       end
     end
+
+    
   end
+
+
+
+
+    
 
   # 订单查询导出
   def export()
-    x = params[:ids].split(",")
+    # x = params[:ids].split(",")
     
-    @orders = []
-    until x.blank? do
-      @orders += Order.where(id: x.pop(1000))
-    end
+    # @orders = []
+    # until x.blank? do
+    #   @orders += Order.where(id: x.pop(1000))
+    # end
     
-    if @orders.nil?
-      flash[:alert] = "无订单"
-      redirect_to :action => 'index'
-    else
-      respond_to do |format|
-        format.xls {   
-          send_data(exportorders_xls_content_for(@orders), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
-        }  
+    # if @orders.nil?
+    #   flash[:alert] = "无订单"
+    #   redirect_to :action => 'index'
+    # else
+    #   respond_to do |format|
+    #     format.xls {   
+    #       send_data(exportorders_xls_content_for(@orders), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+    #     }  
+    #   end
+    # end
+    
+    @orders_grid.with_resultset do |ords|
+      if ords.nil?
+        flash[:alert] = "无订单"
+        redirect_to :action => 'index'
+      else
+        respond_to do |format|
+          format.xls {   
+            send_data(exportorders_xls_content_for(ords),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          }  
+        end
       end
     end
+
   end
 
   private
@@ -1749,4 +1790,5 @@ def exportorders_xls_content_for(objs)
     end
   end
 
+  
 end
