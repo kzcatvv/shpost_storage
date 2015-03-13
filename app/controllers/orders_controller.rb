@@ -716,7 +716,6 @@ class OrdersController < ApplicationController
         
               #SKU/第三方编码/69码
               sku_extcode_69code = to_string(instance.cell(dline,'C'))
-              
               if !sku_extcode_69code.blank?
                 #先考虑为sku
                 specification = Specification.accessible_by(current_ability).find_by sku: sku_extcode_69code
