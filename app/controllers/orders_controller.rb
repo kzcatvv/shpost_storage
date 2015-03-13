@@ -6,13 +6,18 @@ class OrdersController < ApplicationController
   user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder
   user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '确认出库', object: :keyclientorder
   user_logs_filter only: [:setoutstatus], symbol: :batch_no, operation: '包装出库', object: :order
+
+  @@orders_export = []
+  @@orders_query_export = []
   
   # GET /orderes
   # GET /orderes.json
   def index
     @orders_grid = initialize_grid(@orders,
      :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
-    
+    @orders_grid.with_resultset do |orders|
+      @@orders_query_export = orders
+    end
   end
 
   def order_alert
@@ -475,8 +480,14 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
+    
     @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true],:order => 'orders.keyclientorder_id',
      :order_direction => 'desc', :per_page => 15)
+
+    @orders_grid.with_resultset do |orders|
+      @@orders_export = orders
+    end
+
     @allcnt = {}
     @allcnt.clear
     @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true])
@@ -1327,21 +1338,24 @@ class OrdersController < ApplicationController
   end
 
   def exportorders()
-    x = params[:ids].split(",")
-    @orders = []
-    until x.blank? do
-      @orders += Order.where(id: x.pop(1000), status: ["waiting","printed"])
+    # x = params[:ids].split(",")
+    # @orders = []
+    # until x.blank? do
+    #   @orders += Order.where(id: x.pop(1000), status: ["waiting","printed"])
+    # end
+    if !@@orders_export.blank?
+      orders = @@orders_export.where status: ["waiting","printed"]
     end
-
-    if @orders.nil?
+      
+    if orders.nil?
       flash[:alert] = "无订单"
       redirect_to :action => 'findprintindex'
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
-            :type => "text/excel;charset=utf-8; header=present",  
-            :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          send_data(exportorders_xls_content_for(find_has_stock(orders,false)),  
+              :type => "text/excel;charset=utf-8; header=present",  
+              :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
         }  
       end
     end
@@ -1349,23 +1363,24 @@ class OrdersController < ApplicationController
 
   # 订单查询导出
   def export()
-    x = params[:ids].split(",")
+    # x = params[:ids].split(",")
     
-    @orders = []
-    until x.blank? do
-      @orders += Order.where(id: x.pop(1000))
-    end
+    # @orders = []
+    # until x.blank? do
+    #   @orders += Order.where(id: x.pop(1000))
+    # end
     
-    if @orders.nil?
+    if @@orders_query_export.nil?
       flash[:alert] = "无订单"
       redirect_to :action => 'index'
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(@orders), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          send_data(exportorders_xls_content_for(@@orders_query_export), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
         }  
       end
     end
+
   end
 
   private
@@ -1748,4 +1763,5 @@ def exportorders_xls_content_for(objs)
     end
   end
 
+  
 end
