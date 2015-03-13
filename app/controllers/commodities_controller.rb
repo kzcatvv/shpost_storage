@@ -1,12 +1,10 @@
 class CommoditiesController < ApplicationController
   load_and_authorize_resource
 
+  @@comm_export = []
   # GET /commodities
   # GET /commodities.json
   def index
-    puts "----------------------------------------"
-    puts params
-    puts "----------------------------------------"
     if !params[:code].blank?
       specifications = Specification.accessible_by(current_ability).where(["sixnine_code = ? or sku = ?", params[:code], params[:code]])
       cid = []
@@ -17,8 +15,10 @@ class CommoditiesController < ApplicationController
     end
     @commodities = initialize_grid(@commodities,
                    :order => 'commodities.id',
-                   :order_direction => 'desc'    
-)
+                   :order_direction => 'desc')
+    @commodities.with_resultset do |comm|
+      @@comm_export = comm
+    end
   end
 
   # GET /commodities/1
@@ -143,6 +143,25 @@ class CommoditiesController < ApplicationController
     end
   end
 
+  def specification_export
+      @specifications = []
+      @@comm_export.each do |x|
+        @specifications += x.specifications
+      end
+      if @specifications.blank?
+         flash[:alert] = "无商品规格数据"
+         redirect_to :action => 'index'
+      else
+        respond_to do |format|  
+          format.xls {   
+            send_data(specification_xls_content_for(@specifications),  
+                  :type => "text/excel;charset=utf-8; header=present",  
+                  :filename => "Specifications_#{Time.now.strftime("%Y%m%d")}.xls")  
+          }
+        end
+      end
+    # end
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -177,4 +196,34 @@ class CommoditiesController < ApplicationController
       return text
     end
   end
+
+    def specification_xls_content_for(objs)  
+      xls_report = StringIO.new  
+      book = Spreadsheet::Workbook.new  
+      sheet1 = book.create_worksheet :name => "Orders"  
+    
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet1.row(0).default_format = blue  
+  
+      sheet1.row(0).concat %w{商品编号 商品名称 商品类型 SKU 69码 规格名称 规格描述 商户 供应商 第三方商品编码 规格描述 预警数量}  
+      count_row = 1
+      objs.each do |obj|  
+        sheet1[count_row,0]=obj.commodity.no
+        sheet1[count_row,1]=obj.commodity.name
+        sheet1[count_row,2]=obj.commodity.goodstype.name
+        sheet1[count_row,3]=obj.sku
+        sheet1[count_row,4]=obj.sixnine_code
+        sheet1[count_row,5]=obj.name
+        sheet1[count_row,6]=obj.desc
+        sheet1[count_row,7]=""
+        sheet1[count_row,8]=""
+        sheet1[count_row,9]=""
+        sheet1[count_row,10]=""
+        sheet1[count_row,11]=""
+       count_row += 1
+      end  
+  
+      book.write xls_report  
+      xls_report.string  
+    end
 end
