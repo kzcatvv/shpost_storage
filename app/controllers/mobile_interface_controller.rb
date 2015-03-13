@@ -17,7 +17,7 @@ class MobileInterfaceController < ApplicationController
 
     return error_builder('0009') if ! @user.sorter?(@storage)
 
-    Mobile.where(user_id: @user).update_all(user_id: nil)
+    Mobile.where(user_id: @user).where.not(id: @mobile).update_all(user_id: nil)
 
     @mobile.update(version: @version, user: @user)
 
@@ -106,10 +106,7 @@ class MobileInterfaceController < ApplicationController
       code = nil
 
       if mission.eql? 'move'
-        move_stock = MoveStock.create!(unit: @unit, status: MoveStock::STATUS[:opened], name: "#{Time.now.strftime('%Y%m%d%H%M%S')}移库单", storage: @storage)
-
-        task = Task.save_task(move_stock, @storage, @user)
-
+        # move_stock = MoveStock.create!(unit: @unit, status: MoveStock::STATUS[:opened], name: "#{Time.now.strftime('%Y%m%d%H%M%S')}移库单", storage: @storage)
         stock = nil
         shelf = nil
         amount = nil
@@ -134,7 +131,9 @@ class MobileInterfaceController < ApplicationController
           end
         end
 
-        Stock.move_stock_change(stock, shelf, amount, @user, false)
+        move_stock = Stock.move_stock_change(stock, shelf, amount, @user, false)
+
+        task = Task.save_task(move_stock, @storage, @user)
 
       else
         task = Task.find mission
@@ -174,7 +173,9 @@ class MobileInterfaceController < ApplicationController
 
           stock_logs = parent.stock_logs.waiting.where(relationship: relationship, operation_type: type, shelf: shelf)
 
-          stock_logs ||= parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.where(relationship: relationship, operation_type: type)
+          if stock_logs.blank?
+            stock_logs = parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.where(relationship: relationship, operation_type: type)
+          end
 
           if stock_logs.blank? && (! type.eql? 'reset')
             code = "0010"
@@ -193,7 +194,9 @@ class MobileInterfaceController < ApplicationController
 
               out_stock_log = new_stock_logs.select{|sl| sl.operation_type.eql?(StockLog::OPERATION_TYPE[:out]) && sl.relationship.eql?(x.relationship) && sl.batch_no.eql?(x.batch_no)}.first
 
-              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: x.operation, status: StockLog::STATUS[:waiting], amount: in_amount , operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT), batch_no: x.batch_no, pick_in: out_stock_log)
+              out_stock_log ||= new_stock_logs.select{|sl| sl.operation_type.eql?(StockLog::OPERATION_TYPE[:out]) && sl.relationship.eql?(x.relationship)}.first
+
+              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: x.operation, status: StockLog::STATUS[:waiting], amount: in_amount , operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT), batch_no: x.batch_no, pick_out: out_stock_log)
 
               break if amount < x.amount
 
@@ -222,6 +225,7 @@ class MobileInterfaceController < ApplicationController
           elsif type.eql? 'reset'
             if ! stock_logs.first.blank?
               stock_logs.first.update!(user: @user, amount: amount, sn: sn.try(:join, Stock::SN_SPLIT))
+              new_stock_logs << stock_logs.first
             else
               stock = Stock.get_available_stock_in_shelf(relationship.specification, relationship.supplier, relationship.business, nil, shelf)
 
@@ -231,12 +235,14 @@ class MobileInterfaceController < ApplicationController
         end
 
         if ! task.task_type.eql? 'reset'
-          parent.stock_logs.waiting.where.not(id: new_stock_logs).destroy_all
+          parent.stock_logs.waiting.where.not(id: new_stock_logs).delete_all
         else
           parent.stock_logs.waiting.where.not(id: new_stock_logs).each do |x|
             x.update!(amount: 0)
           end
         end
+
+        # binding.pry
 
         parent.check!
       end
@@ -319,7 +325,6 @@ class MobileInterfaceController < ApplicationController
     @user = User.find(params[:user]) if ! params[:user].blank?
     return error_builder('0005') if @user.blank?
     return error_builder('0009') if ! @user.sorter?(@storage)
-
     return error_builder('0006') if ! @mobile.user.eql? @user
   end
 

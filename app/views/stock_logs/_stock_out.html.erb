@@ -48,8 +48,8 @@
         </td>
         <% if @keyclientorder.storage.need_pick %>
         <td>
-          <%= text_field_tag( "stock_logs[][pick_shelf]", stock_log.pick_in.shelf.shelf_code, id: "stock_logs_pickshelf_#{stock_log.id}",'data-autocomplete' => "/shelves/autocomplete_pick_shelf_code" ) %>
-          <%= hidden_field_tag("stock_logs[][pick_shelf]", stock_log.pick_in.shelf.id, id: "stock_logs_pickshelf_#{stock_log.id}") %>
+          <%= text_field_tag( "stock_logs[][pick_shelf]", stock_log.pick.shelf.shelf_code, id: "stock_logs_pickshelf_#{stock_log.id}",'data-autocomplete' => "/shelves/autocomplete_pick_shelf_code" ) %>
+          <%= hidden_field_tag("stock_logs[][pick_shelf]", stock_log.pick.shelf.id, id: "stock_logs_pickshelf_#{stock_log.id}") %>
         </td>
 
         <% end %>
