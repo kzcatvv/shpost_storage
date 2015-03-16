@@ -49,7 +49,7 @@ function movestock_preview(){
         LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= j.specification.sixnine_code %>');
         LODOP.ADD_PRINT_TEXT(h,"40%",260,25,'<%= j.specification.name.gsub(/[\r\n]/,'') %>');
         LODOP.ADD_PRINT_TEXT(h,"75%",260,25,'<%= j.amount %>');
-        LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= j.pick_in.shelf.shelf_code %>');
+        LODOP.ADD_PRINT_TEXT(h,"85%",260,25,'<%= j.pick.shelf.shelf_code %>');
     <% end %>
     LODOP.PREVIEW();
   };

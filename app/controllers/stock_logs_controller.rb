@@ -127,9 +127,9 @@ class StockLogsController < ApplicationController
 
             end
           @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
-          @pick_in_stklog = StockLog.create(parent: @keyclientorder, stock: in_stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:in])
-          @stock_log.pick_in = @pick_in_stklog
-          @stock_log.save
+          @pick_in_stklog = StockLog.create(parent: @keyclientorder, stock: in_stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], pick_out: @stock_log)
+          # @stock_log.pick_in = @pick_in_stklog
+          # @stock_log.save
           @pick_in_stklog.update_amount(@amount)
         else
           @stock_log = StockLog.create(parent: @keyclientorder, stock: @stock, status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:b2c_stock_out], operation_type: StockLog::OPERATION_TYPE[:out])
@@ -148,8 +148,8 @@ class StockLogsController < ApplicationController
       if !@stock_log.blank?
         @stock_log.delete
       end
-      if !@stock_log.pick_in.blank?
-        @stock_log.pick_in.delete
+      if !@stock_log.pick_out.blank?
+        @stock_log.pick_out.delete
       end
     render text: 'remove'
   end
@@ -165,14 +165,14 @@ class StockLogsController < ApplicationController
       if params[:stocklogid].blank?
         @move_stock = MoveStock.find(params[:move_stock_id])
         @stock_log = @move_stock.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:move_stock_out], operation_type: StockLog::OPERATION_TYPE[:out], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)      
-        @pick_stock_log = @move_stock.stock_logs.create(user: current_user ,stock: stock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:move_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
-        @stock_log.pick_in = @pick_stock_log
-        @stock_log.save
+        @pick_stock_log = @move_stock.stock_logs.create(user: current_user ,stock: stock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:move_stock_in], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, pick_out: @stock_log)
+        # @stock_log.pick_in = @pick_stock_log
+        # @stock_log.save
       else
 
         @stock_log = StockLog.find(params[:stocklogid])
         @stock_log.update(user: current_user ,stock: @orgstock, batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
-        @stock_log.pick_in.update(user: current_user ,stock: stock, batch_no: stock.batch_no, expiration_date: stock.expiration_date)
+        @stock_log.pick.update(user: current_user ,stock: stock, batch_no: stock.batch_no, expiration_date: stock.expiration_date)
       
       end
 
@@ -225,8 +225,8 @@ class StockLogsController < ApplicationController
     if !params[:id].blank?
       @stock_log = StockLog.find(params[:id])
       @shelf = Shelf.find(params[:shelfid])
-      @stock_log.pick_in.stock.update(shelf: @shelf)
-      @stock_log.pick_in.update(shelf: @shelf)
+      @stock_log.pick.stock.update(shelf: @shelf)
+      @stock_log.pick.update(shelf: @shelf)
     end
     render json: {}
   end
@@ -234,7 +234,7 @@ class StockLogsController < ApplicationController
   def move_stock_remove
     if !params[:stock_log_id].blank?
       @stock_log=StockLog.find(params[:stock_log_id])
-      @stock_log.pick_in.delete
+      @stock_log.pick.delete
       @stock_log.delete
     end
     render text: 'remove'
