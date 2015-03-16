@@ -43,6 +43,8 @@
      <div>面单号:</div>
      <div><%= grid_filter(@orders_grid, :tracking_number_filter)%></div>
 
+     <div>大客户订单编号:</div>
+     <div style="width:150px"><%= grid_filter(@orders_grid, :keyclientorder_filter)%></div>
 
        <td><button class="wg-external-submit-button" data-grid-name="grid">递交</button></td>
        <td><button class="wg-external-reset-button" data-grid-name="grid">重置</button></td>
