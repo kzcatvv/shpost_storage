@@ -65,7 +65,10 @@ class MoveStocksController < ApplicationController
       @move_stock.update(status: "moving")
     end
 
-    @stock_logs=@move_stock.stock_logs.where("operation = 'move_stock_out'")
+    @stock_logs = @move_stock.stock_logs.where(operation: StockLog::OPERATION[:move_stock_out])
+    if @stock_logs.blank?
+      @stock_logs = @move_stock.stock_logs.where(operation: StockLog::OPERATION[:move_to_bad])
+    end
     
     # qrcode = RQRCode::QRCode.new('http://www.baidu.com/', :size => 4, :level => :h )
     # @qr=qrcode.to_img

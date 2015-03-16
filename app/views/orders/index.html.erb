@@ -9,6 +9,7 @@
   <div style="float:right">
     <%= form_tag(export_orders_url(format: "xls")) %>
     <%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
+    <%@ods = @orders_grid.all_pages_records %>
     <%= submit_tag "导出",:class => 'btn btn-primary' %>
     </form>
   </div>

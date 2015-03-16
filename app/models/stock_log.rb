@@ -20,7 +20,7 @@ class StockLog < ActiveRecord::Base
   belongs_to :relationship
 
   belongs_to :pick, :class_name => 'StockLog'
-  has_one :pick_in, :class_name => 'StockLog',:foreign_key => 'pick_id'#,:dependent => :destroy
+  has_one :pick_out, :class_name => 'StockLog',:foreign_key => 'pick_id'#,:dependent => :destroy
 
   validates_presence_of :operation, :amount
 
@@ -58,6 +58,9 @@ class StockLog < ActiveRecord::Base
 
   def check!
     if self.waiting?
+      if self.stock.blank?
+       self.stock = Stock.get_available_stock_in_shelf(self.specification, self.supplier, self.business, self.batch_no, self.shelf)
+      end
       if self.operation_type.eql? OPERATION_TYPE[:in]
         self.stock.check_in_amount self.amount
       elsif self.operation_type.eql? OPERATION_TYPE[:out]
@@ -190,7 +193,7 @@ class StockLog < ActiveRecord::Base
     end
     
     self.update(amount: total_amount)
-    self.pick_in.update(amount: total_amount) if !self.pick_in.blank?
+    self.pick.update(amount: total_amount) if !self.pick.blank?
   end
 
   private

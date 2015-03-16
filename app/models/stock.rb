@@ -74,21 +74,26 @@ class Stock < ActiveRecord::Base
   # end
 
   def self.move_stock_change(stock, move_shelf, amount, operation_user = nil, is_broken = false)
+    move_stock = MoveStock.create!(unit: stock.unit, status: MoveStock::STATUS[:closed], name: "#{Time.now.strftime('%Y%m%d%H%M%S')}移库单", storage: stock.storage)
+
+
     amount = stock.stock_out_amount(amount)
 
     if amount <= 0
       return
     end
 
-    move_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, nil, move_shelf)
+    in_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, nil, move_shelf)
 
-    StockLog.create(user: operation_user, stock: stock, operation: is_broken ? StockLog::OPERATION[:move_to_bad] : StockLog::OPERATION[:move_stock_out], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now, batch_no: stock.batch_no)
+    out_stock_log = StockLog.create(user: operation_user, stock: stock, operation: is_broken ? StockLog::OPERATION[:move_to_bad] : StockLog::OPERATION[:move_stock_out], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now, batch_no: stock.batch_no, parent: move_stock)
 
     stock.check_out_amount(amount)
 
-    move_stock.check_in_amount(amount)
+    in_stock.check_in_amount(amount)
 
-    StockLog.create(user: operation_user, stock: move_stock, operation: is_broken ? StockLog::OPERATION[:bad_stock_in] : StockLog::OPERATION[:move_stock_in], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now, batch_no: stock.batch_no)
+    in_stock_log = StockLog.create(user: operation_user, stock: in_stock, operation: is_broken ? StockLog::OPERATION[:bad_stock_in] : StockLog::OPERATION[:move_stock_in], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now, batch_no: stock.batch_no, pick_out: out_stock_log, parent: move_stock)
+
+    move_stock
   end
 
   def self.manual_stock_stock_out(manual_stock, operation_user = nil)
@@ -177,8 +182,8 @@ class Stock < ActiveRecord::Base
 
           outpick_sl = order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])          
           inpick_sl = order.stock_logs.create(stock: in_stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:in]) 
-          outpick_sl.pick_in = inpick_sl
-          outpick_sl.save
+          inpick_sl.pick_out = inpick_sl
+          inpick_sl.save
 
           if amount <= 0
             break

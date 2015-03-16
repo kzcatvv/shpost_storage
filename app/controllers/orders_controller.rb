@@ -6,13 +6,18 @@ class OrdersController < ApplicationController
   user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder
   user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '确认出库', object: :keyclientorder
   user_logs_filter only: [:setoutstatus], symbol: :batch_no, operation: '包装出库', object: :order
+
+  @@orders_export = []
+  @@orders_query_export = []
   
   # GET /orderes
   # GET /orderes.json
   def index
     @orders_grid = initialize_grid(@orders,
      :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
-    
+    @orders_grid.with_resultset do |orders|
+      @@orders_query_export = orders
+    end
   end
 
   def order_alert
@@ -475,8 +480,14 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","printed","picking"]
+    
     @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true],:order => 'orders.keyclientorder_id',
      :order_direction => 'desc', :per_page => 15)
+
+    @orders_grid.with_resultset do |orders|
+      @@orders_export = orders
+    end
+
     @allcnt = {}
     @allcnt.clear
     @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true])
@@ -633,17 +644,17 @@ class OrdersController < ApplicationController
                 #物流供应商
                 transport_type = instance.cell(line,'C')
                 case transport_type
-                  when "同城速递","tcsd"
+                  when "同城速递","tcsd","TCSD"
                     tran_type = 'tcsd'
-                  when "国内小包","gnxb"
+                  when "国内小包","gnxb","GNXB"
                     tran_type = 'gnxb'  
                   when "EMS","ems"
                     tran_type = 'ems'
-                  when "ttkd","天天快递"
+                  when "ttkd","天天快递","TTKD"
                     tran_type = 'ttkd'
-                  when "bsht","百世汇通"
+                  when "bsht","百世汇通","BSHT"
                     tran_type = 'bsht'
-                  when "qt","其他"
+                  when "qt","其他","QT"
                     tran_type = 'qt'
                   else
                     tran_type = nil
@@ -674,7 +685,7 @@ class OrdersController < ApplicationController
                 if ori_order.blank?
                   #不存在创建
                   order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_name: instance.cell(line,'F'), customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'H').to_s.split('.0')[0], province: instance.cell(line,'I'), city: instance.cell(line,'J'), county: instance.cell(line,'K'), customer_tel: instance.cell(line,'L').to_s.split('.0')[0],customer_phone: instance.cell(line,'M').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_storage.id, status: 'waiting'
-                    # binding.pry
+                    
                     @ids << order.id
                     
                 else
@@ -715,13 +726,13 @@ class OrdersController < ApplicationController
         
               #SKU/第三方编码/69码
               sku_extcode_69code = to_string(instance.cell(dline,'C'))
-              binding.pry
               if !sku_extcode_69code.blank?
                 #先考虑为sku
                 specification = Specification.accessible_by(current_ability).find_by sku: sku_extcode_69code
                 #不是sku，考虑为第三方编码
                 if specification.blank?
                   relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", "#{business_id}","#{sku_extcode_69code}")
+
                   #不是第三方编码，考虑为69码
                   if relationship.blank?
                     if !supplier.blank?
@@ -731,7 +742,7 @@ class OrdersController < ApplicationController
                       raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
                     end
                   end
-                  # binding.pry
+                  
                   if !relationship.blank?
                     specification = relationship.specification
                     supplier = relationship.supplier
@@ -751,7 +762,7 @@ class OrdersController < ApplicationController
               else
                 raise "导入文件第二页第" + dline.to_s + "行数据, 缺少sku/第三方编码/69码，导入失败"
               end
-
+              
               #数量
               amount = instance.cell(dline,'E').to_s.split('.0')[0]
               if amount.blank?
@@ -1103,7 +1114,7 @@ class OrdersController < ApplicationController
             end
             instance.default_sheet = instance.sheets.first
 
-            flash_message = "导入成功"
+            flash_message = "导入成功!"
             koid = getKeycOrderID()
             @keyclientorder = Keyclientorder.find koid
 
@@ -1151,17 +1162,17 @@ class OrdersController < ApplicationController
                 end
                 transport_type = instance.cell(line,'C')
                 case transport_type
-                  when "同城速递","tcsd"
+                  when "同城速递","tcsd","TCSD"
                     tran_type = 'tcsd'
-                  when "国内小包","gnxb"
+                  when "国内小包","gnxb","GNXB"
                     tran_type = 'gnxb'  
                   when "EMS","ems"
                     tran_type = 'ems'
-                  when "天天快递","ttkd"
+                  when "天天快递","ttkd","TTKD"
                     tran_type = 'ttkd'
-                  when "百世汇通","bsht"
+                  when "百世汇通","bsht","BSHT"
                     tran_type = 'bsht'
-                  when "其他","qt"
+                  when "其他","qt","QT"
                     tran_type = 'qt'
                   else
                     tran_type = nil
@@ -1327,21 +1338,24 @@ class OrdersController < ApplicationController
   end
 
   def exportorders()
-    x = params[:ids].split(",")
-    @orders = []
-    until x.blank? do
-      @orders += Order.where(id: x.pop(1000), status: ["waiting","printed"])
+    # x = params[:ids].split(",")
+    # @orders = []
+    # until x.blank? do
+    #   @orders += Order.where(id: x.pop(1000), status: ["waiting","printed"])
+    # end
+    if !@@orders_export.blank?
+      orders = @@orders_export.where status: ["waiting","printed"]
     end
-
-    if @orders.nil?
+      
+    if orders.nil?
       flash[:alert] = "无订单"
       redirect_to :action => 'findprintindex'
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(find_has_stock(@orders,false)),  
-            :type => "text/excel;charset=utf-8; header=present",  
-            :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          send_data(exportorders_xls_content_for(find_has_stock(orders,false)),  
+              :type => "text/excel;charset=utf-8; header=present",  
+              :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
         }  
       end
     end
@@ -1349,23 +1363,24 @@ class OrdersController < ApplicationController
 
   # 订单查询导出
   def export()
-    x = params[:ids].split(",")
+    # x = params[:ids].split(",")
     
-    @orders = []
-    until x.blank? do
-      @orders += Order.where(id: x.pop(1000))
-    end
+    # @orders = []
+    # until x.blank? do
+    #   @orders += Order.where(id: x.pop(1000))
+    # end
     
-    if @orders.nil?
+    if @@orders_query_export.nil?
       flash[:alert] = "无订单"
       redirect_to :action => 'index'
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(@orders), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          send_data(exportorders_xls_content_for(@@orders_query_export), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
         }  
       end
     end
+
   end
 
   private
@@ -1564,7 +1579,7 @@ def exportorders_xls_content_for(objs)
       order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj.id}")
       order_details.each do |order_detail|
         if !order_detail.specification.blank?
-          all_name = all_name + order_detail.specification.all_name + ","
+          all_name = all_name + order_detail.specification.all_name + "*" + order_detail.amount.to_s + ","
         end
       end
 
@@ -1748,4 +1763,5 @@ def exportorders_xls_content_for(objs)
     end
   end
 
+  
 end

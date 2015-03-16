@@ -7,6 +7,7 @@ class OrderDetail < ActiveRecord::Base
 	has_and_belongs_to_many :stock_logs
 
   after_save :change_order_total_amount
+  after_save :change_order_total_weight
 
 	# validates_presence_of :name, :message => '不能为空'
 
@@ -23,4 +24,20 @@ class OrderDetail < ActiveRecord::Base
     self.order.total_amount = OrderDetail.where(order_id: self.order.id).sum(:amount)
     self.order.save
   end
+
+  def change_order_total_weight
+    order_details = OrderDetail.where(order_id: self.order.id)
+    total_weight = 0
+    order_details.each do |d|
+      if !d.specification.blank?
+        if (!d.specification.weight.blank?) && (!d.amount.blank?)
+          total_weight += d.specification.weight * d.amount
+        end 
+      end
+    end
+    
+    self.order.total_weight = total_weight
+    self.order.save
+  end
+
 end
