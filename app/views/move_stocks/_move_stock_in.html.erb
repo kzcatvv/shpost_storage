@@ -13,6 +13,7 @@
     <% if !@stock_logs.blank? %>
      <% @stock_logs.each do |stock_log| %>
       <tr id="md_<%=stock_log.id%>">
+        <% if stock_log.status != "checked" %>
         <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "md_stock_log_#{stock_log.id}") %>
           <%= text_field_tag("stock_logs[][out_shelf_id]", stock_log.shelf.shelf_code, id: "md_out_shelf_#{stock_log.id}", 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")%>
           <%= hidden_field_tag("stock_logs[][out_shelf_id]", stock_log.shelf.id, id: "md_out_shelf_#{stock_log.id}") %>
@@ -30,6 +31,25 @@
           <%= text_field_tag("stock_logs[][md_shelf_id]", stock_log.pick.shelf.shelf_code, id: "md_shelf_#{stock_log.id}", 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code")%>
           <%= hidden_field_tag("stock_logs[][md_shelf_id]", stock_log.pick.shelf.id, id: "md_shelf_#{stock_log.id}") %>
         </td>
+        <% else %>
+        <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "md_stock_log_#{stock_log.id}") %>
+          <%= text_field_tag("stock_logs[][out_shelf_id]", stock_log.shelf.shelf_code, id: "md_out_shelf_#{stock_log.id}", 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code",disabled: true)%>
+          <%= hidden_field_tag("stock_logs[][out_shelf_id]", stock_log.shelf.id, id: "md_out_shelf_#{stock_log.id}") %>
+        </td>
+        <td>
+          <%= select_tag("stock_logs[][md_stock_id]", options_for_select(Stock.where("shelf_id = ?",stock_log.shelf.id).map{|u| [u.batch_no.blank? ? u.specification.name : u.batch_no+u.specification.name,u.id]}.insert(0,"请选择"), stock_log.stock.id), id: "md_stock_#{stock_log.id}",disabled: true)%>
+        </td>
+        <td>
+          <%= text_field_tag("stock_logs[][md_stock_amount]", (stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount), id: "md_stock_amount_#{stock_log.id}",disabled: true ) %>
+        </td>
+        <td>
+          <%= text_field_tag("stock_logs[][md_amount]", stock_log.amount, id: "md_amount_#{stock_log.id}",disabled: true) %>
+        </td>
+        <td>
+          <%= text_field_tag("stock_logs[][md_shelf_id]", stock_log.pick_in.stock.shelf.shelf_code, id: "md_shelf_#{stock_log.id}", 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code",disabled: true)%>
+          <%= hidden_field_tag("stock_logs[][md_shelf_id]", stock_log.pick_in.stock.shelf.id, id: "md_shelf_#{stock_log.id}") %>
+        </td>
+        <% end -%>
         <% if @move_stock.status != "moved" %>
         <td>
           <%=link_to t('.destroy', :default => t("helpers.links.destroy")), "javascript:void(0);", onclick: 'del_move_stock_dtl(this)', id: "md_del_#{stock_log.id}", :class => 'btn btn-xs btn-danger' if can? :destroy, stock_log%>

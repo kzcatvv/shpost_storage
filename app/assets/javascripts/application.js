@@ -1086,7 +1086,7 @@ function manual_stock_modify(current){
   amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
   stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
   stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
-  // alert("id"+id+"stockid"+stockid+"stid"+stid);
+  // alert("id"+id+"stsockid"+stockid+"stid"+stid);
   manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
   
   x = param[3].substring(0,1)
