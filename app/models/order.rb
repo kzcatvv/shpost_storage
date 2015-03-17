@@ -34,7 +34,7 @@ class Order < ActiveRecord::Base
   TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', 'EMS'=>'ems', '天天快递'=>'ttkd', '百世汇通'=>'bsht', '其他'=>'qt'}
 
 
-  SHORTAGE_TYPE = { yes: '是', no: '否' }
+  SHORTAGE_TYPE = { yes: '可能缺货', no: '可能有货' }
 
   PARENT_TYPE = { true: '否', false: '是'}
 
