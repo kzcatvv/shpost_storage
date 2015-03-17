@@ -107,7 +107,7 @@
     # g.column name: '波次批次号', model: 'Keyclientorder', attribute: 'batch_no' do |order|
     #     order.keyclientorder.blank? ? "" : order.keyclientorder.batch_no
     # end
-    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', model: 'Keyclientorder' do |order|
+    g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', detach_with_id: :keyclientorder_filter, model: 'Keyclientorder' do |order|
       order.keyclientorder.try :batch_no
     end
 

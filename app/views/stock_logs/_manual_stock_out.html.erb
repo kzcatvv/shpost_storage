@@ -29,10 +29,10 @@
         
         <%= hidden_field_tag("stock_logs[][#{stock_log.stock_id}]", stock_log.stock_id, id: "stock_logs_stid_#{stock_log.id}") %>
         <%= select_tag("stock_logs[][#{stock_log.stock_id}]", "<option value=''>未选择</option>".html_safe,  id: "stock_logs_mshelfid_#{stock_log.id}", style: "display: none;") <<
-        content_tag(:p, "#{stock_log.shelf.shelf_code}(批次:#{stock_log.batch_no},库存:#{(stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount)})", {id: "stock_logs_mshelfid_#{stock_log.id}"}) %>
+        content_tag(:p, "#{stock_log.shelf.shelf_code}(批次:#{stock_log.batch_no},库存:#{(stock_log.stock.blank? ? 0 : stock_log.stock.on_shelf_amount)})", {id: "stock_logs_mshelfid_#{stock_log.id}"}) %>
         </td>
         <td>
-          <%= content_tag(:p, (stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount), {id: "stock_logs_actamount_#{stock_log.id}"})%>
+          <%= content_tag(:p, (stock_log.stock.blank? ? 0 : stock_log.stock.on_shelf_amount), {id: "stock_logs_actamount_#{stock_log.id}"})%>
         </td>
         <td>
           <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_mamount_#{stock_log.id}", style: "display: none; width: 40px;") <<

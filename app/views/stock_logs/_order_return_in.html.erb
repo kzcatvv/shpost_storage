@@ -30,7 +30,7 @@
           hidden_field_tag("stock_logs[][shelfid]", stock_log.shelf.id, id: "stock_logs_oshelfid_#{stock_log.id}") %>
         </td>
         <td>
-          <%= content_tag(:p, (stock_log.stock.blank? ? 0 : stock_log.stock.actual_amount), {id: "stock_logs_actamount_#{stock_log.id}"})%>
+          <%= content_tag(:p, (stock_log.stock.blank? ? 0 : stock_log.stock.on_shelf_amount), {id: "stock_logs_actamount_#{stock_log.id}"})%>
         </td>
         <td>
           <%= text_field_tag("stock_logs[][amount]", stock_log.amount, id: "stock_logs_oamount_#{stock_log.id}", style: "display: none; width: 40px;") <<

@@ -1,5 +1,5 @@
 <%- model_class = Order -%>
-<%= define_grid(@orders_grid, hide_submit_button: true, hide_reset_button: true) do |g|
+<%= define_grid(@orders_grid, hide_submit_button: false, hide_reset_button: false) do |g|
   g.after_row do |order, number_of_columns|
         content_tag(:tr, class: 'extra-row') do
               content_tag(:td,

@@ -636,9 +636,10 @@ class OrdersController < ApplicationController
 
             # @keyclientorder=Keyclientorder.create! keyclient_name: "标准导入订单 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: business.id, unit_id: current_user.unit.id, storage_id: current_storage.id
             
+            is_shortage = ""
+            ords = []
             #从第二行开始一直读取，直到空行 
             line = 2
-            
             # until instance.cell(line,'A').blank? do 
             line.upto(instance.last_row) do |line|
                 #物流供应商
@@ -685,8 +686,16 @@ class OrdersController < ApplicationController
                 if ori_order.blank?
                   #不存在创建
                   order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_name: instance.cell(line,'F'), customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'H').to_s.split('.0')[0], province: instance.cell(line,'I'), city: instance.cell(line,'J'), county: instance.cell(line,'K'), customer_tel: instance.cell(line,'L').to_s.split('.0')[0],customer_phone: instance.cell(line,'M').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_storage.id, status: 'waiting'
+
+                  ords[0] = order
+                  if find_has_stock(ords,false).blank?
+                    is_shortage = "yes"
+                  else
+                    is_shortage = "no"
+                  end
+                  Order.update(order.id,is_shortage: is_shortage)
                     
-                    @ids << order.id
+                  @ids << order.id
                     
                 else
                   #待处理状态才能更新
@@ -695,6 +704,15 @@ class OrdersController < ApplicationController
                     order_id = ori_order.id.to_s
 
                     order = Order.update(order_id,tracking_number:tracking_number,transport_type:tran_type,total_weight:instance.cell(line,'D').to_f,pingan_ordertime:instance.cell(line,'E'),customer_name:instance.cell(line,'F'),customer_address:instance.cell(line,'G'),customer_postcode:instance.cell(line,'H').to_s.split('.0')[0],province:instance.cell(line,'I'),city:instance.cell(line,'J'),county:instance.cell(line,'K'),customer_tel:instance.cell(line,'L').to_s.split('.0')[0],customer_phone:instance.cell(line,'M').to_s.split('.0')[0])
+
+                    ords[0] = order
+                    if find_has_stock(ords,false).blank?
+                      is_shortage = "yes"
+                    else
+                      is_shortage = "no"
+                    end
+                    Order.update(order.id,is_shortage: is_shortage)
+                    
                     @ids << order_id
                   else
                     raise "导入文件第一页第" + line.to_s + "行数据, 只有待处理状态的订单才能重复导入，导入失败"
