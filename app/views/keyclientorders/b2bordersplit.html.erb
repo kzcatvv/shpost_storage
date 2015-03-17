@@ -3,7 +3,7 @@
 </object>
 <%- model_class = OrderDetail -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} (包装出库)'], :model => model_class.model_name.human.titleize %></h1>
+  <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} (B2B拆单)'], :model => model_class.model_name.human.titleize %></h1>
   <div style="float:right">   
   </div>
 
@@ -52,8 +52,8 @@
 $(document).ready(function(){
 
   $("#b2bos_sixnine_code").keypress(function(e) {  
-      e = e || window.event; 
-      if(event.keyCode == 13 ){
+      var e = e || window.event; 
+      if(e.keyCode == 13 ){
         $.ajax({
           type : 'GET',
           url : '/keyclientorders/b2bfind69code/',
