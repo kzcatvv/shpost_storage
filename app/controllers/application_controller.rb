@@ -37,6 +37,17 @@ class ApplicationController < ActionController::Base
     object ||= eval("@#{controller_name.singularize}")
 
     operation = args.first[:operation]
+    if operation.eql?"确认出库"
+      if object
+        if object.order_type.eql?"b2b"
+          operation = "b2b确认出库"
+        else
+          if object.order_type.eql?"b2c"
+            operation = "电商确认出库"
+          end
+        end
+      end
+    end
     
     operation ||= I18n.t("action_2_operation.#{action_name}") + object.class.model_name.human.to_s
 
@@ -69,9 +80,9 @@ class ApplicationController < ActionController::Base
         # if args.first[:operation].eql? "面单信息回馈"  or args.first[:operation].eql? "生成出库单" or args.first[:operation].eql? "电商确认出库"
         #   @user_log.orders = object.orders
         # end 
-        # if args.first[:operation].eql? "包装出库"
-        #   @user_log.orders = Order.where(id: object.id)
-        # end
+        if args.first[:operation].eql? "包装出库"
+          @user_log.orders = Order.where(id: object.id)
+        end
         
         @user_log.save
       end
@@ -82,6 +93,7 @@ class ApplicationController < ActionController::Base
       end
       @user_log.save
     end
+    
   end
 
   def set_product_select(objid)
