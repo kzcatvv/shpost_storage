@@ -14,10 +14,10 @@
   <tbody>
     <% @stocks.each_with_index do |x, i| %>
         <tr>
-          <td><%= @relationships[i].business.name %></td>
-          <td><%= @relationships[i].specification.name %></td>
-          <td><%= @relationships[i].supplier.name %></td>
-          <td><%= x.actual_amount %>/<%= @relationships[i].warning_amt %></td>
+          <td><%= x.business.name %></td>
+          <td><%= x.specification.name %></td>
+          <td><%= x.supplier.name %></td>
+          <td><%= x.actual_amount %>/<%= x.warning_amt %></td>
         </tr>
     <% end %>
   </tbody>
