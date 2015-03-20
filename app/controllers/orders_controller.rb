@@ -461,10 +461,10 @@ class OrdersController < ApplicationController
         @order_details = order.order_details
         @curr_dtl = 0
         @dtl_cnt = order.order_details.count
-        if order.order_details.where("desc = 'haspacked'").count <= 0
+        if order.order_details.where(desc: 'haspacked').count <= 0
           @act_cnt = 0
         else
-          @act_cnt = order.order_details.where("desc = 'haspacked'").count
+          @act_cnt = order.order_details.where(desc: 'haspacked').count
         end
       end
     end
