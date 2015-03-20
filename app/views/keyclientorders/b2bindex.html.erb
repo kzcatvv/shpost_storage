@@ -51,7 +51,9 @@
         # (link_to t('.edit', :default => t("helpers.links.edit")), edit_keyclientorder_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :update, keyclientorder) << ' ' <<
         # (link_to t('.destroy', :default => t("helpers.links.destroy")), keyclientorder_path(keyclientorder), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => 'Are you sure?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, keyclientorder)<< ' ' <<
         # (link_to t('.pddetails', :default => t("helpers.links.pddetails")), keyclientorder_keyclientorderdetails_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :details, keyclientorder)<< ' ' <<
-        (link_to t('.b2bstockout', :default => t("helpers.links.b2bstockout")), b2bstockout_keyclientorders_path(keyclientorder), :class => 'btn btn-xs btn-primary' if ( keyclientorder.status == "waiting" or keyclientorder.status == "printed" ) and can? :b2bstockout, keyclientorder)<< ' ' << 
+        
+        (link_to t('.b2bstockout', :default => t("helpers.links.b2bstockout")), "/keyclientorders/" + keyclientorder.id.to_s + "/stockout" ,:class => 'btn btn-xs btn-primary' if can? :b2bstockout, keyclientorder)<< ' ' << 
+
         (link_to t('.b2bordersplit', :default => t("helpers.links.b2bordersplit")), b2bordersplit_keyclientorders_path(keyclientorder), :class => 'btn btn-xs btn-primary' if ( keyclientorder.status == "waiting" or keyclientorder.status == "printed" or keyclientorder.status == "picking" or keyclientorder.status == "checked") and can? :b2bordersplit, keyclientorder )
         # (link_to t('打印面单'), "/print/keytracking?id=#{keyclientorder.id}", target: '_blank',:class => 'btn btn-xs btn-info')<< ' ' <<
         # (link_to t('生成出库单'), "/orders/stockout?keyclientorder_id=#{keyclientorder.id}", :class => 'btn btn-xs btn-info')

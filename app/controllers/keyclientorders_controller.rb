@@ -2,9 +2,9 @@ class KeyclientordersController < ApplicationController
   #before_action :set_keyclientorder, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource
 
-  user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '电商确认出库', object: :keyclientorder
+  user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '确认出库', object: :keyclientorder, parent: :keyclientorder
 
-  user_logs_filter only: [:stockout], symbol: :keyclient_name, operation: '生成出库单', object: :keyclientorder
+  user_logs_filter only: [:stockout], symbol: :keyclient_name, operation: '生成出库单', object: :keyclientorder, parent: :keyclientorder
   # GET /keyclientorders
   # GET /keyclientorders.json
   def index
@@ -211,10 +211,14 @@ class KeyclientordersController < ApplicationController
 #       end
 #     end
 
-    if @keyclientorder.keyclient_name == "auto"
-      redirect_to '/orders/findprintindex'
-    else
-      redirect_to "/keyclientorders"
+    if @keyclientorder.order_type == "b2b"
+      redirect_to "/keyclientorders/b2bindex"
+    else 
+      if @keyclientorder.keyclient_name == "auto"
+        redirect_to '/orders/findprintindex'
+      else
+        redirect_to "/keyclientorders"
+      end
     end
   end
 

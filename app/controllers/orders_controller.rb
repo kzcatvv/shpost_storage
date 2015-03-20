@@ -3,8 +3,8 @@ class OrdersController < ApplicationController
   
   user_logs_filter only: [:standard_orders_import2], symbol: "订单导入 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入'
   # user_logs_filter only: [:exportorders], operation: '订单导出'
-  user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder
-  user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '确认出库', object: :keyclientorder
+  user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder, parent: :keyclientorder
+  user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '批量确认出库', object: :keyclientorder, parent: :keyclientorder
   user_logs_filter only: [:setoutstatus], symbol: :batch_no, operation: '包装出库', object: :order
 
   @@orders_export = []
@@ -461,10 +461,10 @@ class OrdersController < ApplicationController
         @order_details = order.order_details
         @curr_dtl = 0
         @dtl_cnt = order.order_details.count
-        if order.order_details.where("desc = 'haspacked'").count <= 0
+        if order.order_details.where(desc: 'haspacked').count <= 0
           @act_cnt = 0
         else
-          @act_cnt = order.order_details.where("desc = 'haspacked'").count
+          @act_cnt = order.order_details.where(desc: 'haspacked').count
         end
       end
     end
