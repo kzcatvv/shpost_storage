@@ -461,10 +461,10 @@ class OrdersController < ApplicationController
         @order_details = order.order_details
         @curr_dtl = 0
         @dtl_cnt = order.order_details.count
-        if order.order_details.where("desc = 'haspacked'").count <= 0
+        if order.order_details.where(desc: 'haspacked').count <= 0
           @act_cnt = 0
         else
-          @act_cnt = order.order_details.where("desc = 'haspacked'").count
+          @act_cnt = order.order_details.where(desc: 'haspacked').count
         end
       end
     end
@@ -1370,12 +1370,23 @@ class OrdersController < ApplicationController
       flash[:alert] = "无订单"
       redirect_to :action => 'findprintindex'
     else
-      respond_to do |format|
-        format.xls {   
-          send_data(exportorders_xls_content_for(find_has_stock(orders,false)),  
-              :type => "text/excel;charset=utf-8; header=present",  
-              :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
-        }  
+      checkbox_all = params[:checkbox][:all]
+      if checkbox_all.eql? '0'
+        respond_to do |format|
+          format.xls {   
+            send_data(exportorders_xls_content_for(find_has_stock(orders,false)),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          }  
+        end
+      else
+        respond_to do |format|
+          format.xls {   
+            send_data(exportorders_xls_content_for(orders),  
+                :type => "text/excel;charset=utf-8; header=present",  
+                :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          }  
+        end
       end
     end
   end

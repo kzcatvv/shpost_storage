@@ -230,11 +230,17 @@ class TcbdSoap
   
   def updateOrder(yjbh,tdxq,td_status)
     order = Order.find_by_tracking_number yjbh
+    # tracking_info length limit to 1000 characters(max length is 4000 bytes and one chinese contain 3 bytes)
+    infoLength = 1000
+    if tdxq.size > infoLength
+      tdxq = tdxq[-infoLength,infoLength]
+      tdxq = tdxq[tdxq.index("\n")+1,infoLength]
+    end
     if !order.blank?
       order.update status: td_status, tracking_info: tdxq
     end
   end
-  
+
   def returnStatus(tdxq,qrxq)
     if !tdxq.blank?
       if tdxq.start_with? '已妥投'
