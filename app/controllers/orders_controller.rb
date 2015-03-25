@@ -21,7 +21,7 @@ class OrdersController < ApplicationController
   end
 
   def order_alert
-    @orders = Order.where( [ "status = ? and storage_id = ? and orders.created_at < ?", 'waiting',session[:current_storage], Time.now-Business.find_by(no: StorageConfig.config["business"]['jh_id']).alertday.day]).joins(:business).where('alertday is not null')
+    @orders = Order.where( [ "status = ? and storage_id = ? and orders.created_at < ?", 'waiting',current_storage.id, Time.now-Business.find_by(no: StorageConfig.config["business"]['jh_id']).alertday.day]).joins(:business).where('alertday is not null')
     @orders_grid = initialize_grid(@orders)
   end
 
@@ -175,7 +175,7 @@ class OrdersController < ApplicationController
       if ordercnt > 0
         time = Time.new
         # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-        @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: session[:current_storage],user: current_user,status: "waiting")
+        @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "waiting")
         orders=Order.where(id: findorders)
         orders.update_all(keyclientorder_id: @keycorder)
 
@@ -423,7 +423,7 @@ class OrdersController < ApplicationController
   def packout
     @order_details=[]
     @curr_order=""
-    @orders = Order.where("storage_id = ?", session[:current_storage])
+    @orders = Order.where("storage_id = ?", current_storage.id)
     @orders_grid=initialize_grid(@orders,
       :conditions => ['order_type = ? and is_split != ',"b2c", true])
   end
@@ -1275,7 +1275,7 @@ class OrdersController < ApplicationController
 
                 #供应商编号
                 if !instance.cell(dline,'D').blank?
-                  supplier_no = instance.cell(dline,'D').to_s.split('.0')[0].rjust(10, '0')
+                  supplier_no = instance.cell(dline,'D').to_s.split('.0')[0]
                   supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
                 end
    
@@ -1776,7 +1776,7 @@ def exportorders_xls_content_for(objs)
   def getKeycOrderID()
     time = Time.new
     # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    keycorder = Keyclientorder.create(keyclient_name: "面单信息回馈 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s,unit_id: current_user.unit_id,storage_id: session[:current_storage],user: current_user,status: "printed")
+    keycorder = Keyclientorder.create(keyclient_name: "面单信息回馈 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s,unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "printed")
     return keycorder.id
   end
 
