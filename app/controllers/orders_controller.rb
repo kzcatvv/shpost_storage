@@ -685,7 +685,7 @@ class OrdersController < ApplicationController
                 #判断是否已存在该订单
                 if ori_order.blank?
                   #不存在创建
-                  order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_name: instance.cell(line,'F'), customer_address: instance.cell(line,'G'), customer_postcode: instance.cell(line,'H').to_s.split('.0')[0], province: instance.cell(line,'I'), city: instance.cell(line,'J'), county: instance.cell(line,'K'), customer_tel: instance.cell(line,'L').to_s.split('.0')[0],customer_phone: instance.cell(line,'M').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_storage.id, status: 'waiting'
+                  order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: tran_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_unit: instance.cell(line,'F'), customer_name: instance.cell(line,'G'), customer_address: instance.cell(line,'H'), customer_postcode: instance.cell(line,'I').to_s.split('.0')[0], province: instance.cell(line,'J'), city: instance.cell(line,'K'), county: instance.cell(line,'L'), customer_tel: instance.cell(line,'M').to_s.split('.0')[0],customer_phone: instance.cell(line,'N').to_s.split('.0')[0], business: business, unit_id: current_user.unit.id, storage_id: current_storage.id, status: 'waiting'
 
                   ords[0] = order
                   if find_has_stock(ords,false).blank?
@@ -703,7 +703,7 @@ class OrdersController < ApplicationController
                   if (order_status <=> "waiting")==0
                     order_id = ori_order.id.to_s
 
-                    order = Order.update(order_id,tracking_number:tracking_number,transport_type:tran_type,total_weight:instance.cell(line,'D').to_f,pingan_ordertime:instance.cell(line,'E'),customer_name:instance.cell(line,'F'),customer_address:instance.cell(line,'G'),customer_postcode:instance.cell(line,'H').to_s.split('.0')[0],province:instance.cell(line,'I'),city:instance.cell(line,'J'),county:instance.cell(line,'K'),customer_tel:instance.cell(line,'L').to_s.split('.0')[0],customer_phone:instance.cell(line,'M').to_s.split('.0')[0])
+                    order = Order.update(order_id,tracking_number:tracking_number,transport_type:tran_type,total_weight:instance.cell(line,'D').to_f,pingan_ordertime:instance.cell(line,'E'),customer_unit:instance.cell(line,'F'),customer_name:instance.cell(line,'G'),customer_address:instance.cell(line,'H'),customer_postcode:instance.cell(line,'I').to_s.split('.0')[0],province:instance.cell(line,'J'),city:instance.cell(line,'K'),county:instance.cell(line,'L'),customer_tel:instance.cell(line,'M').to_s.split('.0')[0],customer_phone:instance.cell(line,'N').to_s.split('.0')[0])
 
                     ords[0] = order
                     if find_has_stock(ords,false).blank?
@@ -1139,7 +1139,7 @@ class OrdersController < ApplicationController
             line = 2
             # until instance.cell(line,'A').blank? do
             line.upto(instance.last_row) do |line|
-              batch_no = to_string(instance.cell(line,'O'))
+              batch_no = to_string(instance.cell(line,'P'))
 
               if batch_no.blank?
                 business_order_id = to_string(instance.cell(line,'A'))
@@ -1154,7 +1154,7 @@ class OrdersController < ApplicationController
                   end 
                 end
 
-                business_name = instance.cell(line,'N')
+                business_name = instance.cell(line,'O')
                 if business_name.blank?
                   raise "导入文件第一页第" + line.to_s + "行数据, 缺少商户名称，导入失败"
                 end
@@ -1220,14 +1220,15 @@ class OrdersController < ApplicationController
                                               
                 order.total_weight = instance.cell(line,'D').to_f
                 order.pingan_ordertime = instance.cell(line,'E')
-                order.customer_name = instance.cell(line,'F')
-                order.customer_address = instance.cell(line,'G')
-                order.customer_postcode = instance.cell(line,'H').to_s.split('.0')[0]
-                order.province = instance.cell(line,'I')
-                order.city = instance.cell(line,'J')
-                order.county = instance.cell(line,'K')
-                order.customer_tel = instance.cell(line,'L').to_s.split('.0')[0]
-                order.customer_phone = instance.cell(line,'M').to_s.split('.0')[0]
+                order.customer_unit = instance.cell(line,'F')
+                order.customer_name = instance.cell(line,'G')
+                order.customer_address = instance.cell(line,'H')
+                order.customer_postcode = instance.cell(line,'I').to_s.split('.0')[0]
+                order.province = instance.cell(line,'J')
+                order.city = instance.cell(line,'K')
+                order.county = instance.cell(line,'L')
+                order.customer_tel = instance.cell(line,'M').to_s.split('.0')[0]
+                order.customer_phone = instance.cell(line,'N').to_s.split('.0')[0]
                 order.save
               end
 
@@ -1569,7 +1570,7 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
     count_row = 1
     objs.each do |obj|
       transport_type = obj.transport_type
@@ -1617,19 +1618,20 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,2]=tran_type
       sheet1[count_row,3]=obj.total_weight
       sheet1[count_row,4]=obj.pingan_ordertime
-      sheet1[count_row,5]=obj.customer_name
-      sheet1[count_row,6]=obj.customer_address
-      sheet1[count_row,7]=obj.customer_postcode
-      sheet1[count_row,8]=obj. province
-      sheet1[count_row,9]=obj.city
-      sheet1[count_row,10]=obj.county
-      sheet1[count_row,11]=obj.customer_tel
-      sheet1[count_row,12]=obj.customer_phone
-      sheet1[count_row,13]=obj.business.name
-      sheet1[count_row,14]=obj.batch_no
-      sheet1[count_row,15]=business_trans_no
-      sheet1[count_row,16]=obj.status_name
-      sheet1[count_row,17]=all_name[0,all_name.size-1]
+      sheet1[count_row,5]=obj.customer_unit
+      sheet1[count_row,6]=obj.customer_name
+      sheet1[count_row,7]=obj.customer_address
+      sheet1[count_row,8]=obj.customer_postcode
+      sheet1[count_row,9]=obj. province
+      sheet1[count_row,10]=obj.city
+      sheet1[count_row,11]=obj.county
+      sheet1[count_row,12]=obj.customer_tel
+      sheet1[count_row,13]=obj.customer_phone
+      sheet1[count_row,14]=obj.business.name
+      sheet1[count_row,15]=obj.batch_no
+      sheet1[count_row,16]=business_trans_no
+      sheet1[count_row,17]=obj.status_name
+      sheet1[count_row,18]=all_name[0,all_name.size-1]
     
       count_row += 1
     end  
