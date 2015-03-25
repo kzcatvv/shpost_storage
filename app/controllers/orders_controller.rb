@@ -738,7 +738,7 @@ class OrdersController < ApplicationController
 
               #供应商编号
               if !instance.cell(dline,'D').blank?
-                supplier_no = instance.cell(dline,'D').to_s.split('.0')[0].rjust(10, '0')
+                supplier_no = instance.cell(dline,'D').to_s.split('.0')[0]
                 supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
               end
         
