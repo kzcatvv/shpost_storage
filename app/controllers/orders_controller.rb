@@ -1134,7 +1134,7 @@ class OrdersController < ApplicationController
               instance= Roo::CSV.new(file)
             end
             instance.default_sheet = instance.sheets.first
-
+            binding.pry
             flash_message = "导入成功!"
             koid = getKeycOrderID()
             @keyclientorder = Keyclientorder.find koid
@@ -1653,7 +1653,10 @@ def exportorders_xls_content_for(objs)
       business_id = obj.business_id
       order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj_id}")
       order_details.each do |order_detail|
- 
+        if obj.is_shortage.eql? 'yes'
+          red = Spreadsheet::Format.new :color => :red
+          sheet2.row(detail_row).default_format = red  
+        end
         supplier_id = order_detail.supplier_id
         supplier_no = Supplier.accessible_by(current_ability).find_by('id = ?',"#{supplier_id}").no
 
