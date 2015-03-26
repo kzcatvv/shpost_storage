@@ -157,16 +157,19 @@ class OrdersController < ApplicationController
         end
         hasstockchk=hasstockchk && dtlchk
       end
-
+      is_shortage = ''
       if hasstockchk
         findorders += Order.where(id: o)
         ordercnt += 1
+        is_shortage = 'no'
       else
         o.order_details.each do |dtl|
           product = [o.business_id,dtl.specification_id,dtl.supplier_id]
           allcnt[product][1]=allcnt[product][1]-dtl.amount
         end
+        is_shortage = 'yes'
       end
+      Order.update(o.id,is_shortage: is_shortage)
       Rails.logger.info "all product info: " + allcnt.to_s
        #end
     end
@@ -1573,6 +1576,10 @@ def exportorders_xls_content_for(objs)
     sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
     count_row = 1
     objs.each do |obj|
+      if obj.is_shortage.eql? 'yes'
+        red = Spreadsheet::Format.new :color => :red
+        sheet1.row(count_row).default_format = red  
+      end
       transport_type = obj.transport_type
       case transport_type
         when "tcsd"
