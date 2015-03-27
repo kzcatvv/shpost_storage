@@ -1134,7 +1134,7 @@ class OrdersController < ApplicationController
               instance= Roo::CSV.new(file)
             end
             instance.default_sheet = instance.sheets.first
-            binding.pry
+            # binding.pry
             flash_message = "导入成功!"
             koid = getKeycOrderID()
             @keyclientorder = Keyclientorder.find koid
