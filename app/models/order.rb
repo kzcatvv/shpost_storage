@@ -18,7 +18,7 @@ class Order < ActiveRecord::Base
 
   TYPE = { b2b: 'b2b', b2c: 'b2c' }
   # PAY_TYPE={ on_web: '网上支付', on_time: '货到付款' }
-  STATUS = { waiting: 'waiting', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned', cancel: 'cancel' }
+  STATUS = { waiting: 'waiting', spliting: 'spliting', splited: 'splited', printed: 'printed', picking: 'picking', checked: 'checked', packed: 'packed', delivering: 'delivering', delivered: 'delivered', declined: 'declined', returned: 'returned', cancel: 'cancel' }
 
   # STATUS = { waiting: '待处理', printed: '已打印', picking: '拣货中', checked: '已审核', packed: '已包装', delivering: '配送中', delivered: '已签收', declined: '拒收', returned: '已退回' }
 
@@ -26,7 +26,7 @@ class Order < ActiveRecord::Base
 
   PACKAGED_STATUS = [Order::STATUS[:packed] , Order::STATUS[:delivering], STATUS[:delivered], STATUS[:declined], STATUS[:returned]]
 
-  STATUS_SHOW = { waiting: '待处理', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回', cancel: '取消' }
+  STATUS_SHOW = { waiting: '待处理',spliting: '拆单中', splited: '已拆单', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回', cancel: '取消' }
 
 
   TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城速递', ems: 'EMS', ttkd: '天天快递', bsht: '百世汇通', qt: '其他'}
@@ -160,6 +160,14 @@ class Order < ActiveRecord::Base
     if self.b2b_can_update_parent
       self.parent.update(status: STATUS[:packed])
       self.parent.keyclientorder.update(status: STATUS[:packed])
+    end
+  end
+
+  def b2csetsplitstatus
+    self.update(status: STATUS[:packed])
+
+    if self.b2b_can_update_parent
+      self.parent.update(status: STATUS[:packed])
     end
   end
 

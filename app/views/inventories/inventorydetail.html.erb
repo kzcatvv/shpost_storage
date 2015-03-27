@@ -48,7 +48,7 @@ function inventory_preview(){
     LODOP.SET_PRINT_STYLE("FontSize",12);
     LODOP.SET_PRINT_STYLE("Bold",0);
 
-    <% @inventory.stock_logs.each do |stocklog| %>
+    <% @inventory.stock_logs.where(operation_type: 'reset').each do |stocklog| %>
     h=h+50;
      LODOP.ADD_PRINT_TEXT(h,"5%",260,25,'<%= stocklog.shelf.shelf_code %>');
      LODOP.ADD_PRINT_TEXT(h,"25%",260,25,'<%= stocklog.batch_no %>'+' '+'<%= stocklog.specification.name %>');

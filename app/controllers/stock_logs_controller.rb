@@ -145,6 +145,9 @@ class StockLogsController < ApplicationController
 
   def remove
     # binding.pry
+      if !Inventory.where(id: @stock_log.parent).blank?
+        @stock_log.parent.stock_logs.where(stock: @stock_log.stock).where(operation_type: ['in','out']).delete_all
+      end
       if !@stock_log.blank?
         @stock_log.delete
       end
@@ -201,12 +204,21 @@ class StockLogsController < ApplicationController
       if params[:slid].blank?
         @inventory = Inventory.find(params[:inv_id])
         @stock_log = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:reset], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)      
-
+        if Integer(params[:amount]) > @orgstock.actual_amount
+          @stock_log_dtl = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: (Integer(params[:amount]) - @orgstock.actual_amount) )
+        elsif Integer(params[:amount]) < @orgstock.actual_amount
+          @stock_log_dtl = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:out], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: ( @orgstock.actual_amount - Integer(params[:amount]) ) )
+        end
       else
 
         @stock_log = StockLog.find(params[:slid])
+        @stock_log.parent.stock_logs.where(stock: @stock_log.stock).where(operation_type: ['in','out']).delete_all
         @stock_log.update(user: current_user ,stock: @orgstock, batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
-      
+        if Integer(params[:amount]) > @orgstock.actual_amount
+          @stock_log_dtl = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: (Integer(params[:amount]) - @orgstock.actual_amount) )
+        elsif Integer(params[:amount]) < @orgstock.actual_amount
+          @stock_log_dtl = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:out], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: ( @orgstock.actual_amount - Integer(params[:amount]) ) )
+        end
       end
 
       @stock_log.update_amount(Integer(params[:amount]))
