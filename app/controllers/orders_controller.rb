@@ -479,9 +479,9 @@ class OrdersController < ApplicationController
   end
 
   def findprintindex
-    status = ["waiting","printed","picking"]
+    status = ["waiting","spliting","printed","picking"]
     
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true],:order => 'orders.keyclientorder_id',
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
      :order_direction => 'desc', :per_page => 15)
 
     @orders_grid.with_resultset do |orders|
@@ -490,7 +490,7 @@ class OrdersController < ApplicationController
 
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) and orders.is_split != ?',"b2c",status, true])
+    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
 
     #some wice_grad lazy do the resultset is [] without once call
     begin
@@ -499,7 +499,7 @@ class OrdersController < ApplicationController
 
     end
     
-    @selectorders=Order.where('order_type = ? and status in (?) and is_split != ? and storage_id = ?',"b2c",status, true, current_storage.id)
+    @selectorders=Order.where('order_type = ? and status in (?) and storage_id = ?',"b2c",status, current_storage.id)
     # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
 
     if !params[:grid].nil?
@@ -1399,6 +1399,85 @@ class OrdersController < ApplicationController
       end
     end
 
+  end
+
+  def b2csplitorder
+      @oi=@order.id
+      @or_details_hash = @order.order_details.includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      ors = @order.children
+      @scanall = OrderDetail.where(order_id: ors).includes(:order).group(:specification_id, :supplier_id, :business_id, :storage_id).sum(:amount)
+      @dtl_cnt = @or_details_hash.length
+      @act_cnt = 0
+  end
+
+  def b2cfind69code
+
+    @scanspecification = Specification.where("sixnine_code = ?",params[:sixninecode]).first
+
+    if @scanspecification.nil?
+       @curr_sp=0
+       @curr_sixnine=0
+       @curr_der=1
+    else
+       @order=Order.find(params[:keyco])
+       si = @order.order_details.select(:specification_id)
+       sncodes=Specification.where(id: si).where("sixnine_code = ?",params[:sixninecode])
+       if sncodes.blank?
+        @curr_der=1
+       else
+        @curr_der=0
+       end
+       @curr_sp=@scanspecification.id
+       @curr_sixnine=@scanspecification.sixnine_code
+    end
+
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def b2csplitanorder
+    @porder = Order.find(params[:keyco])
+    parentorder = @porder
+    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: 'waiting',business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id,is_split: true,customer_name: parentorder.customer_name,customer_unit: parentorder.customer_unit,customer_tel: parentorder.customer_tel,customer_phone: parentorder.customer_phone,customer_address: parentorder.customer_address,customer_postcode: parentorder.customer_postcode,province: parentorder.province,city: parentorder.city,county: parentorder.county)
+    ods = parentorder.order_details
+    ods.each do |od|
+      curr_specification = Specification.find(od.specification_id)
+      scanlabal = "b2cscancuram_" + curr_specification.sixnine_code
+      if Integer(params[scanlabal.to_sym]) > 0
+        childorder.order_details.create(name: od.name,specification_id: od.specification_id,amount: params[scanlabal.to_sym],batch_no: od.batch_no,supplier_id: od.supplier_id)
+      end
+    end
+    @porder.update(status: 'spliting')
+    #binding.pry
+    @order_details = childorder.order_details
+    @order = childorder
+
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def b2csettrackingnumber
+    @curr_or = Order.find(params[:split_order])
+    if !params[:split_tracking_num].nil?
+      @curr_or.update_attribute(:tracking_number,params[:split_tracking_num])
+    end
+
+    podam=Order.find(@curr_or.parent.try(:id)).order_details.sum(:amount)
+    cos=Order.find(@curr_or.parent.try(:id)).children
+    codam = 0
+    cos.each do |co|
+      codam = codam + co.order_details.sum(:amount)
+    end
+    if podam == codam
+      @curr_or.parent.update(status: 'splited')
+    end
+
+    # @curr_or.b2bsetsplitstatus
+    respond_to do |format|
+      format.js 
+    end
   end
 
   private

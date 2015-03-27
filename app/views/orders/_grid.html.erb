@@ -94,6 +94,8 @@
       order.status_name
     end
 
+    g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight', filter_type: :range, detach_with_id: :total_weight_filter
+
     g.column name: "备注" do |order|
       (order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc)
     end
@@ -124,7 +126,8 @@
 
       # (link_to t('.cancel', :default => t("helpers.links.cancel")),
       #                 cancel_order_path(order), :data => { :confirm => t('wice_grid.saved_query_cancel_confirmation', :default => t("helpers.links.confirm", :default => '确定取消?')) }, :class => 'btn btn-xs btn-primary' if can? :cancel, order) << ' ' <<
-      button_tag("详细信息", class: "btn btn-default toggle-trigger")
+      button_tag("详细信息", class: "btn btn-default toggle-trigger")<< ' ' <<
+      (link_to t('.b2csplitorder', :default => t("helpers.links.b2csplitorder")), "/orders/" + order.id.to_s + "/b2csplitorder" ,:class => 'btn btn-xs btn-primary' if order.order_details.sum(:amount) > 1 && (order.status == 'waiting' || order.status == 'spliting') )
     end
 
   end 

@@ -1,0 +1,46 @@
+var spid = <%= @curr_sp %>;
+var erid = <%= @curr_der %>;
+if (spid == 0){
+    $('#b2cos_sixnine_code').val("");
+    selfAlert("无符合条件的商品",3000);
+}else{
+    $('#b2cos_sixnine_code').val("");
+    if (erid == 0){ 
+      var tddaid = "#b2cdetailam_" + <%= @curr_sixnine %>;
+      var tdsaid = "#b2cscanallam_" + <%= @curr_sixnine %>;
+      var tdscid = "#b2cscancuram_" + <%= @curr_sixnine %>;
+      var trid = "#b2ctr_" + <%= @curr_sixnine %>;
+      
+      if ( parseInt( $(tddaid).val() ) != parseInt( $(tdsaid).val() ) )
+      {
+
+        if ( parseInt( $(tddaid).val() ) > parseInt( $(tdsaid).val() ) )
+        {
+           $(tdsaid).val(parseInt($(tdsaid).val())+1);
+           $(tdscid).val(parseInt($(tdscid).val())+1);
+           //alert($(tdraid).val());
+        }
+
+        if ( parseInt( $(tddaid).val() ) == parseInt( $(tdsaid).val() ) )
+        {
+           $(trid).css("color","blue");
+           $('#b2cactcnt').val(parseInt($('#b2cactcnt').val())+1);
+           //selfAlert("该商品已全部扫描完成",3000);           
+        }
+
+        if ( parseInt( $('#b2cdtlcnt').val() ) == parseInt( $('#b2cactcnt').val() ) )
+           {
+             $.ajax({
+                     type : 'GET',
+                     url : '/orders/setoutstatus/',
+                     data: { orderid: $('#orderid').val() },
+                     dataType : 'script'
+                    });
+           }
+        }
+        
+     }else{
+       selfAlert("该订单中无此69码的商品",3000);
+     }
+
+}

@@ -5,7 +5,7 @@
 
 <%= grid(@constock_logs_grid) do |g|
 
-    g.column name: model_class.human_attribute_name(:name), attribute: 'name', model: 'User' do |constock_log|
+    g.column name: '用户', attribute: 'name', model: 'User' do |constock_log|
         constock_log.user.try :name
       end
 
