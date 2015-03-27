@@ -99,6 +99,8 @@
 
     g.column name: model_class.human_attribute_name(:no), attribute: 'no'
 
+    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit', detach_with_id: :customer_unit_filter
+
     g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name'
 
     g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone'
@@ -135,6 +137,13 @@
    
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |order|
         order.created_at.to_s(:db)
+    end
+
+    g.column name: '出库时间' do |order|
+      if !order.keyclientorder.blank?
+        UserLog.find_by(parent_id: order.keyclientorder.id,operation: ['电商确认出库','批量确认出库']).blank?? "" :UserLog.find_by(parent_id: order.keyclientorder.id,operation: ['电商确认出库','批量确认出库']).created_at.strftime('%Y-%m-%d %H:%M:%S').to_s
+      end
+      
     end
 
     g.column do |order|

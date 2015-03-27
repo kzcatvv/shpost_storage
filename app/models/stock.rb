@@ -342,7 +342,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.warning_stocks(storage)
-    select('specification_id as spec_id, business_id as b_id, supplier_id as s_id, sum(actual_amount) as actual_amount').in_storage(storage).normal.group(:specification_id, :business_id, :supplier_id).having('sum(actual_amount) < (?)', Relationship.select(:warning_amt).where('specification_id = spec_id and business_id = b_id and supplier_id = s_id'))
+    select(:relationship_id, 'sum(actual_amount) as actual_amount').in_storage(storage).normal.group(:relationship_id).having('sum(actual_amount) < (?)', Relationship.select(:warning_amt).where("relationships.id = stocks.relationship_id"))
   end
 
   def update_sn(sn, type)

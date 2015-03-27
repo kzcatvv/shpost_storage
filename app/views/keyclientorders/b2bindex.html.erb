@@ -46,6 +46,11 @@
 
     end
 
+    g.column name: '出库时间' do |keyclientorder|
+      UserLog.find_by(parent_id: keyclientorder.id,operation: 'b2b确认出库').blank?? "" :UserLog.find_by(parent_id: keyclientorder.id,operation: 'b2b确认出库').created_at.strftime('%Y-%m-%d %H:%M:%S').to_s
+      
+    end
+
     g.column do |keyclientorder|
       ActiveSupport::SafeBuffer.new << 
         # (link_to t('.edit', :default => t("helpers.links.edit")), edit_keyclientorder_path(keyclientorder), :class => 'btn btn-xs btn-primary' if can? :update, keyclientorder) << ' ' <<
