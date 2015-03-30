@@ -133,10 +133,14 @@ ShpostStorage::Application.routes.draw do
         get 'importorders1'
         post 'importorders2'
         post 'export'
+        get 'b2cfind69code'
+        get 'b2csplitanorder'
+        get 'b2csettrackingnumber'
       end
 
     member do
       get 'cancel'
+      get 'b2csplitorder'
     end
 
      resources :order_details

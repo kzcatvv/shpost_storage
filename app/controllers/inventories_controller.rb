@@ -87,7 +87,7 @@ class InventoriesController < ApplicationController
         
       @inventory.update(status: "inventoring")
     end
-    @stock_logs = @inventory.stock_logs
+    @stock_logs = @inventory.stock_logs.where(operation_type: 'reset')
   end
 
   def find_shelf_stock

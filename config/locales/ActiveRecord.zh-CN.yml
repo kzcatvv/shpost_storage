@@ -191,6 +191,8 @@ zh-CN:
       inventory_check: 盘点确认
       modconsumablestocks: 修改耗材库存
       inoutlogs: 出入库日志
+      b2csplitorder: 拆单
+
     titles:
       edit: 编辑%{model}
       new: 新增%{model}

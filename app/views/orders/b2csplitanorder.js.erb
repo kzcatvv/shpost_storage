@@ -1,0 +1,4 @@
+$("input[id^='b2cscancuram_']").each(function(){ 
+  $(this).val(0);  
+});
+$('#b2csplitorders').html(" <%= escape_javascript(render(:partial => "orders/ordetails_forms",:object => @order)) %> ");
