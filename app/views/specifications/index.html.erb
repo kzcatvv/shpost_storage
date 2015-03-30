@@ -37,7 +37,8 @@
     g.column do |specification|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_commodity_specification_path(@commodity,specification), :class => 'btn btn-xs btn-primary' if can? :update, specification) << ' ' <<
-        (link_to t('.destroy', :default => t("helpers.links.destroy")), commodity_specification_path(@commodity,specification), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, specification)
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), commodity_specification_path(@commodity,specification), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, specification) << ' ' <<
+        (link_to t('.inoutlogs', :default => t("helpers.links.inoutlogs")), inoutlogs_commodity_specification_path(@commodity,specification), :class => 'btn btn-xs btn-primary', target: '_blank',:method => "get")
     end
   end 
 %>

@@ -56,4 +56,16 @@ jQuery(function(){
         changeMonth:true,
         changeYear:true
     });
+    $('#sp_start_date_sp_start_date').datepicker({
+        showAnim:"blind",
+        changeMonth:true,
+        changeYear:true,
+        changeDay:true
+    });
+    $('#sp_end_date_sp_end_date').datepicker({
+        showAnim:"blind",
+        changeMonth:true,
+        changeYear:true,
+        changeDay:true
+    });
 });

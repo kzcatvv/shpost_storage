@@ -514,12 +514,13 @@ class OrdersController < ApplicationController
         end
       end
     end
-
+    
+    selorders = @selectorders
     @selectorders=@selectorders.to_ary
     @selectorders.each do |o|
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
-        order_count =  Order.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+        order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
 
         if @allcnt.has_key?(product)
           @allcnt[product][0]=@allcnt[product][0]+d.amount
@@ -738,7 +739,7 @@ class OrdersController < ApplicationController
 
               #供应商编号
               if !instance.cell(dline,'D').blank?
-                supplier_no = instance.cell(dline,'D').to_s.split('.0')[0].rjust(10, '0')
+                supplier_no = instance.cell(dline,'D').to_s.split('.0')[0]
                 supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
               end
         

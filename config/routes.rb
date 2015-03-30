@@ -312,7 +312,12 @@ ShpostStorage::Application.routes.draw do
    end
 
   resources :commodities do
-    resources :specifications
+    resources :specifications do
+      member do
+        get 'inoutlogs'
+        get 'inoutlog_details'
+      end
+    end
     collection do 
       get 'commodity_import'
       post 'commodity_import' => 'commodities#commodity_import'

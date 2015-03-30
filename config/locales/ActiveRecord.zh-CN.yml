@@ -190,6 +190,7 @@ zh-CN:
       inventorydetail: 盘点明细
       inventory_check: 盘点确认
       modconsumablestocks: 修改耗材库存
+      inoutlogs: 出入库日志
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -457,6 +458,8 @@ zh-CN:
         operation_b2b_stock_out: "大客户出库"
         operation_order_return: "退货"
         operation_order_bad_return: "破损退货"
+        business_id: "所属商户"
+        supplier_id: "供应商"
       supplier:
         "no": "供应商编号"
         name: "名称"
