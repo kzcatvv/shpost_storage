@@ -1,0 +1,60 @@
+<%- model_class = Specification -%>
+<div class="page-header">
+  <h1><%=@specification.name %></h1>
+</div> 
+<div>
+   <%= form_tag(inoutlogs_commodity_specification_path(@commodity,@specification), method: "get")%>
+    <%= label_tag(:sp_start_date, "开始日期:") %>
+    <%= text_field("sp_start_date","sp_start_date", default: 1.month.ago) %>
+    <%= label_tag(:sp_end_date, "结束日期:") %>
+    <%= text_field("sp_end_date","sp_end_date",default: Date.today) %>
+    <%= submit_tag("查询") %>
+
+   </form>
+</div>
+<div>
+  <table id="inoutlogs" class="table table-striped">
+    <thead>
+      <tr>
+        <th>商品规格</th>
+        <th>商户</th>
+        <th>供应商</th>
+        <th>日期</th>
+        <th>入库数量</th>
+        <th>出库数量</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @inoutlogs_hash.each do |key,value| %>
+    <tr>
+        <td>
+        <%  if !key[0].blank?
+              specification = Specification.find_by id:key[0]
+            end
+        %>
+        <%= specification.blank?? "":specification.all_name %>
+        </td>
+        <td>
+        <%  if !key[1].blank?
+              business = Business.find_by id:key[1]
+            end
+        %>
+        <%= business.blank?? "":business.name %>
+        </td>
+        <td>
+        <%  if !key[2].blank?
+              supplier = Supplier.find_by id:key[2]
+            end
+        %>
+        <%= supplier.blank?? "":supplier.name %>
+        </td>
+        <td><%= key[3] %></td>
+        <td><%= value[0] %></td>
+        <td><%= value[1] %></td>
+        <td><%=link_to t('详细信息'),"/commodities/#{@commodity.id}/specifications/#{@specification.id}/inoutlog_details?key0=#{key[0]}&key1=#{key[1]}&key2=#{key[2]}&key3=#{key[3]}", target: '_blank', :class => 'btn btn-primary'%>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

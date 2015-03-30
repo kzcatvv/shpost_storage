@@ -517,12 +517,13 @@ class OrdersController < ApplicationController
         end
       end
     end
-
+    
+    selorders = @selectorders
     @selectorders=@selectorders.to_ary
     @selectorders.each do |o|
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
-        order_count =  Order.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+        order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
 
         if @allcnt.has_key?(product)
           @allcnt[product][0]=@allcnt[product][0]+d.amount
