@@ -1175,7 +1175,6 @@ class OrdersController < ApplicationController
               else
                 order = Order.accessible_by(current_ability).find_by  batch_no: batch_no
               end
-
               if order.blank?
                 txt = "订单不存在"
                 sheet1_error << (instance.row(line) << txt)
@@ -1185,7 +1184,6 @@ class OrdersController < ApplicationController
                 flash_message << "导入文件第一页第" + line.to_s + "行数据, 订单已处理，无法导入!"
                 next
               end
-
 
               if order.status.eql? "waiting" or order.status.eql? "printed"
                 tracking_number = to_string(instance.cell(line,'B'))
@@ -1407,13 +1405,12 @@ class OrdersController < ApplicationController
             end
             flash[:notice] = flash_message
 
-            binding.pry
             respond_to do |format|
               format.xls {   
                 if !sheet1_error.blank? && !sheet2_error.blank?
                   send_data(exporterrororders_xls_content_for(sheet1_error,sheet2_error),  
                     :type => "text/excel;charset=utf-8; header=present",  
-                    :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+                    :filename => "Error_Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
                 else
                   redirect_to :action => 'findprintindex'
                 end
@@ -1955,7 +1952,7 @@ def exportorders_xls_content_for(objs)
 
   def exist_in(arrays,id)
     arrays.each do |x|
-      if to_string(x[0]).equal? id
+      if to_string(x[0]).eql? id
         return true
       else
         next
@@ -1970,26 +1967,23 @@ def exportorders_xls_content_for(objs)
     end
     instance.default_sheet = instance.sheets.first
     2.upto(instance.last_row) do |line|
-      binding.pry
-      if to_string(instance.row(line)[0]).equal? id
+      if to_string(instance.row(line)[0]).eql? id
         target << (instance.row(line) << txt)
         return target
       end
     end
-    binding.pry
     return target
   end
 
   def detail_add(target,content,instance,txt=nil)
     instance.default_sheet = instance.sheets.second
     2.upto(instance.last_row) do |line|
-      if to_string(instance.row(line)[0]).equal? to_string(content[0])
+      if to_string(instance.row(line)[0]).eql? to_string(content[0])
         if target.find{|x| x == content}.blank?
           target << (instance.row(line) << txt)
         end
       end
     end
-    binding.pry
     return target
   end
 
@@ -2040,8 +2034,8 @@ def exportorders_xls_content_for(objs)
     book = Spreadsheet::Workbook.new  
     sheet1 = book.create_worksheet :name => "Orders"  
 
-    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
-    sheet1.row(0).default_format = blue  
+    red = Spreadsheet::Format.new :color => :red, :weight => :bold, :size => 10  
+    sheet1.row(0).default_format = red  
 
     sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
     count_row = 1
@@ -2109,13 +2103,14 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,16]=obj[16]
       sheet1[count_row,17]=obj[17]
       sheet1[count_row,18]=obj[18]
+      sheet1[count_row,19]=obj[19]
 
       count_row += 1
     end  
 
     sheet2 = book.create_worksheet :name => "OrderDetails"
     detail_row = 0
-    sheet2.row(detail_row).default_format = blue 
+    sheet2.row(detail_row).default_format = red 
     sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户名称 订单流水号}
     detail_row = detail_row + 1
     obj2.each do |obj|
@@ -2169,7 +2164,7 @@ def exportorders_xls_content_for(objs)
         sheet2[detail_row,5]=obj[5]
         sheet2[detail_row,6]=obj[6]
         sheet2[detail_row,7]=obj[7]
-        sheet2[detail_row,7]=obj[8]
+        sheet2[detail_row,8]=obj[8]
         
         detail_row += 1
       # end
