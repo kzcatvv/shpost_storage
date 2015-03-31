@@ -176,15 +176,19 @@ class StocksController < ApplicationController
     @actual_hash = {}
     @virtual_hash = {}
     @stocks=[]
+    @selrels=[]
+    @zerorels=""
     @ex_code=params[:ex_code]
     @sixnine_code=params[:sixnine_code]
     @area_code=params[:area_code]
+    @is_zero=params[:is_zero]
 
     if !params[:ex_code].blank?
       @relationship=Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
       if !@relationship.blank?
         @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
       end
+      @selrels = Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
     end
     if !params[:sixnine_code].blank?
       @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).accessible_by(current_ability).first
@@ -194,7 +198,11 @@ class StocksController < ApplicationController
         else 
           @stocks=@stocks.where(specification_id: @specification)
         end
-          
+        if @selrels.blank?
+          @selrels = Relationship.where(specification: @specification)
+        else
+          @selrels = @selrels.where(specification: @specification)
+        end
       end
     end
     if !params[:area_code].blank?
@@ -221,7 +229,17 @@ class StocksController < ApplicationController
           @virtual_hash[gb]=s.virtual_amount
         end
       end
-
+      if params[:is_zero] == 'yes'
+        st = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).to_ary
+        slre = Stock.where(id: st).select(:relationship_id).distinct
+        slreary = Relationship.where(id: slre).to_ary
+        zerostocks = Relationship.where(id: slreary)
+        if @selrel.blank?
+          @zerorels = Relationship.where.not(id: zerostocks)
+        else
+          @zerorels = @selrels.where.not(id: zerostocks)
+        end
+      end
     else
       @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
       # @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
@@ -232,6 +250,17 @@ class StocksController < ApplicationController
           @virtual_hash[gb]=@virtual_hash[gb]+s.virtual_amount
         else
           @virtual_hash[gb]=s.virtual_amount
+        end
+      end
+
+      if params[:is_zero] == 'yes'
+        zerostocks = @stocks.select(:relationship_id).distinct
+        if @selrel.blank?
+          resls = Relationship.where(id: zerostocks)
+          @zerorels = Relationship.where.not(id: resls)
+        else
+          resls = Relationship.where(id: zerostocks)
+          @zerorels = @selrels.where.not(id: resls)
         end
       end
     end
@@ -242,12 +271,15 @@ class StocksController < ApplicationController
     @actual_hash = {}
     @virtual_hash = {}
     @stocks=[]
+    @selrels=[]
+    @zerorels=""
 
     if !params[:ex_code].blank?
       @relationship=Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
       if !@relationship.blank?
         @stocks=Stock.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
       end
+      @selrels = Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
     end
     if !params[:sixnine_code].blank?
       @specification=Specification.where("sixnine_code=?",params[:sixnine_code]).accessible_by(current_ability).first
@@ -257,7 +289,11 @@ class StocksController < ApplicationController
         else 
           @stocks=@stocks.where(specification_id: @specification)
         end
-          
+        if @selrels.blank?
+          @selrels = Relationship.where(specification: @specification)
+        else
+          @selrels = @selrels.where(specification: @specification)
+        end
       end
     end
     if !params[:area_code].blank?
@@ -284,6 +320,19 @@ class StocksController < ApplicationController
           @virtual_hash[gb]=s.virtual_amount
         end
       end
+
+      if params[:is_zero] == 'yes'
+        st = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).to_ary
+        slre = Stock.where(id: st).select(:relationship_id).distinct
+        slreary = Relationship.where(id: slre).to_ary
+        zerostocks = Relationship.where(id: slreary)
+        if @selrel.blank?
+          @zerorels = Relationship.where.not(id: zerostocks)
+        else
+          @zerorels = @selrels.where.not(id: zerostocks)
+        end
+      end
+
     else
       @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
       # @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
@@ -296,18 +345,30 @@ class StocksController < ApplicationController
           @virtual_hash[gb]=s.virtual_amount
         end
       end
+
+      if params[:is_zero] == 'yes'
+        zerostocks = @stocks.select(:relationship_id).distinct
+        if @selrel.blank?
+          resls = Relationship.where(id: zerostocks)
+          @zerorels = Relationship.where.not(id: resls)
+        else
+          resls = Relationship.where(id: zerostocks)
+          @zerorels = @selrels.where.not(id: resls)
+        end
+      end
+
     end
 
     # respond_to do |format|
     #   format.xls {   
-        send_data(exportstocks_xls_content_for(@actual_hash,@virtual_hash), :type => "text/excel;charset=utf-8; header=present", :filename => "Stocks_#{Time.now.strftime("%Y%m%d")}.xls")  
+        send_data(exportstocks_xls_content_for(@actual_hash,@virtual_hash,@zerorels), :type => "text/excel;charset=utf-8; header=present", :filename => "Stocks_#{Time.now.strftime("%Y%m%d")}.xls")  
     #   }  
     # end
     
   end
 
 
-  def exportstocks_xls_content_for(actual_hash,virtual_hash)  
+  def exportstocks_xls_content_for(actual_hash,virtual_hash,zerorels)  
     
     xls_report = StringIO.new  
     book = Spreadsheet::Workbook.new  
@@ -329,6 +390,16 @@ class StocksController < ApplicationController
       sheet1[count_row,3] = virtual_hash[key]
 
     count_row += 1
+    end
+
+    if !zerorels.blank?
+      zerorels.each do |rel|
+        sheet1[count_row,0] = ""
+        sheet1[count_row,1] = rel.specification.blank? ? "" : rel.specification.all_name
+        sheet1[count_row,2] = 0
+        sheet1[count_row,3] = 0
+        count_row += 1
+      end
     end
 
     book.write xls_report  
