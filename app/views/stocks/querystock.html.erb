@@ -11,9 +11,11 @@
     <%= text_field_tag(:ex_code) %>
     <%= label_tag(:area_code, "区域编码:") %>
     <%= text_field_tag(:area_code) %>
+    </br>
+    <%= check_box_tag(:is_zero,'yes',false) %> 无库存是否导出 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <%= submit_tag("查询") %>
 
-    <%= link_to t('导出'),"/stocks/export?sixnine_code=#{@sixnine_code}&ex_code=#{@ex_code}&area_code=#{@area_code}" ,:class => 'btn btn-primary', :action => 'export', method: "post", format: "xls" %> 
+    <%= link_to t('导出'),"/stocks/export?sixnine_code=#{@sixnine_code}&ex_code=#{@ex_code}&area_code=#{@area_code}&is_zero=#{@is_zero}" ,:class => 'btn btn-primary', :action => 'export', method: "post", format: "xls" %> 
    </form>
 </div>
 <div>
@@ -56,6 +58,18 @@
         <td><%=link_to t('详细信息'),"/stocks/stock_details?key0=#{key[0]}&key1=#{key[1]}&key2=#{key[2]}&key3=#{key[3]}", target: '_blank', :class => 'btn btn-primary'%>
         </td>
       </tr>
+    <% end %>
+    <% if !@zerorels.blank? %>
+     <% @zerorels.each do |rel| %>
+      <tr>
+        <td> </td>
+        <td>
+        <%= rel.specification.blank? ? "" : rel.specification.all_name %>
+        </td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+     <% end %>
     <% end %>
     </tbody>
   </table>
