@@ -517,12 +517,13 @@ class OrdersController < ApplicationController
         end
       end
     end
-
+    
+    selorders = @selectorders
     @selectorders=@selectorders.to_ary
     @selectorders.each do |o|
       o.order_details.each do |d|
         product = [o.business_id,d.specification_id,d.supplier_id]
-        order_count =  Order.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+        order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
 
         if @allcnt.has_key?(product)
           @allcnt[product][0]=@allcnt[product][0]+d.amount
@@ -1123,8 +1124,8 @@ class OrdersController < ApplicationController
     def importorders2()
     unless request.get?
       if file = upload_pingan(params[:file]['file'])    
-        Order.transaction do
-          begin
+        # Order.transaction do
+        #   begin
             instance=nil
             if file.include?('.xlsx')
               instance= Roo::Excelx.new(file)
@@ -1133,8 +1134,10 @@ class OrdersController < ApplicationController
             elsif file.include?('.csv')
               instance= Roo::CSV.new(file)
             end
+            sheet1_error = []
+            sheet2_error = []
             instance.default_sheet = instance.sheets.first
-            binding.pry
+            # binding.pry
             flash_message = "导入成功!"
             koid = getKeycOrderID()
             @keyclientorder = Keyclientorder.find koid
@@ -1147,7 +1150,9 @@ class OrdersController < ApplicationController
               if batch_no.blank?
                 business_order_id = to_string(instance.cell(line,'A'))
                 if business_order_id.blank?
-                  raise "导入文件第一页第" + line.to_s + "行数据, 缺少外部订单号，导入失败"
+                  sheet1_error << instance.row(line)
+                  next
+                  # raise "导入文件第一页第" + line.to_s + "行数据, 缺少外部订单号，导入失败"
                 end
 
                 business_trans_no = to_string(instance.cell(line,'Q'))
@@ -1159,7 +1164,10 @@ class OrdersController < ApplicationController
 
                 business_name = instance.cell(line,'O')
                 if business_name.blank?
-                  raise "导入文件第一页第" + line.to_s + "行数据, 缺少商户名称，导入失败"
+                  txt = "缺少商户名称"
+                  sheet1_error << (instance.row(line) << txt)
+                  next
+                  # raise "导入文件第一页第" + line.to_s + "行数据, 缺少商户名称，导入失败"
                 end
                 business_id = Business.accessible_by(current_ability).find_by(name: business_name).id
 
@@ -1169,9 +1177,12 @@ class OrdersController < ApplicationController
               end
 
               if order.blank?
-                raise "导入文件第一页第" + line.to_s + "行数据, 订单不存在，导入失败"
+                txt = "订单不存在"
+                sheet1_error << (instance.row(line) << txt)
+                next
+                # raise "导入文件第一页第" + line.to_s + "行数据, 订单不存在，导入失败"
               elsif !order.can_import()
-                flash_message << "导入文件第一页第" + line.to_s + "行数据, 订单已处理，无法导入"
+                flash_message << "导入文件第一页第" + line.to_s + "行数据, 订单已处理，无法导入!"
                 next
               end
 
@@ -1242,8 +1253,15 @@ class OrdersController < ApplicationController
             dline = 2
             dline.upto(instance.last_row) do |dline|
               business_order_id = to_string(instance.cell(dline,'A'))
+              if exist_in(sheet1_error,business_order_id)
+                sheet2_error << instance.row(dline)
+                next
+              end
               if business_order_id.blank?
-                raise "导入文件第二页第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
+                txt = "缺少外部订单号"
+                sheet2_error << (instance.row(dline) << text)
+                next
+                # raise "导入文件第二页第" + dline.to_s + "行数据, 缺少外部订单号，导入失败"
               end
               
               business_trans_no = to_string(instance.cell(line,'B'))
@@ -1257,7 +1275,11 @@ class OrdersController < ApplicationController
               if batch_no.blank?
                 business_name = instance.cell(dline,'G')
                 if business_name.blank?
-                  raise "导入文件第二页第" + dline.to_s + "行数据, 缺少商户名称，导入失败"
+                  txt = "缺少商户名称"
+                  sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,nil)
+                  sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                  next
+                  # raise "导入文件第二页第" + dline.to_s + "行数据, 缺少商户名称，导入失败"
                 end
                 business_id = Business.accessible_by(current_ability).find_by(name: business_name).id
 
@@ -1268,7 +1290,11 @@ class OrdersController < ApplicationController
               end
               
               if dorder.blank?
-                raise "导入文件第二页第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
+                txt = "详单对应订单不存在"
+                sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                next
+                # raise "导入文件第二页第" + dline.to_s + "行数据, 详单对应订单不存在，导入失败"
               end
 
               dorder_id = dorder.id.to_s
@@ -1297,7 +1323,11 @@ class OrdersController < ApplicationController
                         relationship = Relationship.accessible_by(current_ability).includes(:specification).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{dorder_business_id}","#{supplier.id}")
                         
                       else
-                        raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
+                        txt = "69码找不到供应商"
+                        sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                        sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                        next
+                        # raise "导入文件第二页第" + dline.to_s + "行数据, 69码找不到供应商，导入失败"
                       end
                     end
                     
@@ -1305,25 +1335,45 @@ class OrdersController < ApplicationController
                       specification = relationship.specification
                       supplier = relationship.supplier
                     else
-                      raise "导入文件第二页第" + dline.to_s + "行数据, 找不到对应关系，导入失败"
+                      txt = "找不到对应关系"
+                      sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                      sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                      next
+                      # raise "导入文件第二页第" + dline.to_s + "行数据, 找不到对应关系，导入失败"
                     end
                   else
                     if supplier.blank?
-                      raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
+                      txt = "sku找不到供应商"
+                      sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                      sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                      next
+                      # raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到供应商，导入失败"
                     else
                       relationship = Relationship.accessible_by(current_ability).find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
                       if relationship.blank?
-                        raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
+                        txt = "sku找不到对应关系"
+                        sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                        sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                        next
+                        # raise "导入文件第二页第" + dline.to_s + "行数据, sku找不到对应关系，导入失败"
                       end
                     end
                   end
                 else
-                  raise "导入文件第二页第" + dline.to_s + "行数据, 缺少sku/第三方编码/69码，导入失败"
+                  txt = "缺少sku/第三方编码/69码"
+                  sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                  sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                  next
+                  # raise "导入文件第二页第" + dline.to_s + "行数据, 缺少sku/第三方编码/69码，导入失败"
                 end
 
                 amount = instance.cell(dline,'E').to_s.split('.0')[0]
                 if amount.blank?
-                  raise "导入文件第二页第" + dline.to_s + "行数据, 缺少数量，导入失败"
+                  txt = "缺少数量"
+                  sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                  sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                  next
+                  # raise "导入文件第二页第" + dline.to_s + "行数据, 缺少数量，导入失败"
                 end
 
                 ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
@@ -1342,19 +1392,34 @@ class OrdersController < ApplicationController
                     # dorder_total_amount = dorder_total_amount - ori_detail_amount + amount.to_i
                     # Order.update(dorder_id,total_amount: dorder_total_amount)
                   else
-                    raise "导入文件第二页第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
+                    txt = "订单明细数量不能负数"
+                    sheet1_error = order_add(sheet1_error,business_order_id,instance.sheets.first,txt)
+                    sheet2_error = detail_add(sheet2_error,instance.row(dline),instance.sheets.second,txt)
+                    next
+                    # raise "导入文件第二页第" + dline.to_s + "行数据, 订单明细数量不能负数，导入失败"
                   end
                 end
               end
             end
-
+            redeal_with_errororder(sheet1_error,2)
+            if !sheet1_error.blank? || !sheet2_error.blank?
+              flash_message << "有部分订单导入失败！"
+            end
             flash[:notice] = flash_message
-          rescue Exception => e
-            Rails.logger.error e.backtrace
-            flash[:alert] = e.message
-            raise ActiveRecord::Rollback
-          end
-        end
+            # todo
+            respond_to do |format|
+              format.xls {   
+                send_data(exporterrororders_xls_content_for(sheet1_error,sheet2_error),  
+                    :type => "text/excel;charset=utf-8; header=present",  
+                    :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+              }  
+            end
+          # rescue Exception => e
+          #   Rails.logger.error e.backtrace
+          #   flash[:alert] = e.message
+          #   raise ActiveRecord::Rollback
+          # end
+        # end
       end   
     end
   end
@@ -1385,7 +1450,7 @@ class OrdersController < ApplicationController
       else
         respond_to do |format|
           format.xls {   
-            send_data(exportorders_xls_content_for(orders),  
+            send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),  
                 :type => "text/excel;charset=utf-8; header=present",  
                 :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
           }  
@@ -1883,5 +1948,49 @@ def exportorders_xls_content_for(objs)
     end
   end
 
-  
+  def exist_in(arrays,id)
+    arrays.each do |x|
+      if to_string(x[0]).equal? id
+        return true
+      else
+        next
+      end
+    end
+    return false
+  end
+
+  def order_add(target,id,instance,txt=nil)
+    if !target.find{|x| to_string(x[0]) == id}.blank?
+      return target
+    end
+    2.upto(instance.last_row) do |line|
+      if to_string(instance.row(line)[0]).equal? id
+        target << (instance.row(line) << txt)
+        return target
+      end
+    end
+    return target
+  end
+
+  def detail_add(target,content,instance,txt=nil)
+    2.upto(instance.last_row) do |line|
+      if to_string(instance.row(line)[0]).equal? to_string(content[0])
+        if target.find{|x| x == content}.blank?
+          target << (instance.row(line) << txt)
+        end
+      end
+    end
+    return target
+  end
+
+  # todo
+  def redeal_with_errororder(target,type)
+    case type
+    when 1
+      # remove the order and details
+    when 2
+      #  update the order status to waiting and clean transtype info
+    end
+  end
+
 end
