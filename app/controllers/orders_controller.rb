@@ -1470,7 +1470,6 @@ class OrdersController < ApplicationController
               flash_message << "有部分订单导入失败！"
             end
             flash[:notice] = flash_message
-            binding.pry
             respond_to do |format|
               format.xls {   
                 if !sheet1_error.blank? && !sheet2_error.blank?
@@ -2043,7 +2042,6 @@ def exportorders_xls_content_for(objs)
   end
 
   def order_add(target,index,id,instance,txt=nil)
-    binding.pry
     if !target.find{|x| to_string(x[index]) == id}.blank?
       return target
     end
@@ -2059,7 +2057,6 @@ def exportorders_xls_content_for(objs)
 
   def detail_add(target,index,content,instance,txt=nil)
     instance.default_sheet = instance.sheets.second
-    binding.pry
     2.upto(instance.last_row) do |line|
       index_content = 15
       if index == 0
