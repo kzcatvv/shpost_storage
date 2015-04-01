@@ -31,41 +31,4 @@ jQuery(function(){
         isRTL: false
     };
     $.datepicker.setDefaults($.datepicker.regional['zh-CN']);
-    $('#purchase_detail_expiration_date').datepicker({
-        showAnim:"blind",
-        changeMonth:true,
-        changeYear:true
-    });
-    $('#purchase_arrival_expiration_date').datepicker({
-        showAnim:"blind",
-        changeMonth:true,
-        changeYear:true
-    });
-    $('#purchase_arrival_arrived_at').datepicker({
-        showAnim:"blind",
-        changeMonth:true,
-        changeYear:true
-    });
-    $('#start_date_start_date').datepicker({
-        showAnim:"blind",
-        changeMonth:true,
-        changeYear:true
-    });
-    $('#end_date_end_date').datepicker({
-        showAnim:"blind",
-        changeMonth:true,
-        changeYear:true
-    });
-    $('#sp_start_date_sp_start_date').datepicker({
-        showAnim:"blind",
-        changeMonth:true,
-        changeYear:true,
-        changeDay:true
-    });
-    $('#sp_end_date_sp_end_date').datepicker({
-        showAnim:"blind",
-        changeMonth:true,
-        changeYear:true,
-        changeDay:true
-    });
 });
