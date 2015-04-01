@@ -2055,7 +2055,7 @@ def exportorders_xls_content_for(objs)
     case type
     when 1
       # remove the order and details
-      # todo:different between exist order and new order
+      # different between exist order and new order
       # new order should be delete and exist order must be keep
       target.each do |x|
         business_id = x[0]
@@ -2066,7 +2066,7 @@ def exportorders_xls_content_for(objs)
         elsif !batch_no.blank?
           order = Order.accessible_by(current_ability).find_by business_order_id: business_id
         end
-        # skip the exist order
+        # skip the exist order and delete the new order
         if !order.blank? && (order.created_at == order.updated_at)
           order.order_details.delete_all
           order.delete
