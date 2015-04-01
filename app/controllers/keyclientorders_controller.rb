@@ -157,18 +157,33 @@ class KeyclientordersController < ApplicationController
   def b2bsplitanorder
     @keyclientorder = Keyclientorder.find(params[:keyco])
     parentorder = @keyclientorder.orders.first
-    childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: parentorder.status,business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id,is_split: true,customer_name: parentorder.customer_name,customer_unit: parentorder.customer_unit,customer_tel: parentorder.customer_tel,customer_phone: parentorder.customer_phone,customer_address: parentorder.customer_address,customer_postcode: parentorder.customer_postcode,province: parentorder.province,city: parentorder.city,county: parentorder.county)
     ods = parentorder.order_details
+    hasselect = false
+    @order_details=nil
+    @order=nil
     ods.each do |od|
       curr_specification = Specification.find(od.specification_id)
-      scanlabal = "scancuram_" + curr_specification.sixnine_code
-      if Integer(params[scanlabal.to_sym]) > 0
-        childorder.order_details.create(name: od.name,specification_id: od.specification_id,amount: params[scanlabal.to_sym],batch_no: od.batch_no,supplier_id: od.supplier_id)
+      sellabal = "b2cscancuram_" + curr_specification.sixnine_code
+      if Integer(params[sellabal.to_sym]) > 0
+        hasselect = hasselect || true
+      else
+        hasselect = hasselect || false
       end
     end
+    if hasselect
+      childorder = parentorder.children.create(order_type: "b2c",customer_name: parentorder.customer_name,transport_type: parentorder.transport_type,status: 'waiting',business_id: parentorder.business_id,unit_id: parentorder.unit_id,storage_id: parentorder.storage_id,keyclientorder_id: parentorder.keyclientorder_id,is_split: true,customer_name: parentorder.customer_name,customer_unit: parentorder.customer_unit,customer_tel: parentorder.customer_tel,customer_phone: parentorder.customer_phone,customer_address: parentorder.customer_address,customer_postcode: parentorder.customer_postcode,province: parentorder.province,city: parentorder.city,county: parentorder.county, business_order_id: parentorder.business_order_id)
+
+      ods.each do |od|
+        curr_specification = Specification.find(od.specification_id)
+        scanlabal = "scancuram_" + curr_specification.sixnine_code
+        if Integer(params[scanlabal.to_sym]) > 0
+          childorder.order_details.create(name: od.name,specification_id: od.specification_id,amount: params[scanlabal.to_sym],batch_no: od.batch_no,supplier_id: od.supplier_id)
+        end
+      end
     #binding.pry
-    @order_details = childorder.order_details
-    @order = childorder
+      @order_details = childorder.order_details
+      @order = childorder
+    end
 
     respond_to do |format|
       format.js 
