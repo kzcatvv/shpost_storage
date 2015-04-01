@@ -14,7 +14,7 @@ class OrdersController < ApplicationController
   # GET /orderes.json
   def index
     @orders_grid = initialize_grid(@orders,
-     :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder])
+     :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder],:order => 'created_at', :order_direction => 'desc')
     @orders_grid.with_resultset do |orders|
       @@orders_query_export = orders
     end
@@ -1470,7 +1470,7 @@ class OrdersController < ApplicationController
               flash_message << "有部分订单导入失败！"
             end
             flash[:notice] = flash_message
-
+            binding.pry
             respond_to do |format|
               format.xls {   
                 if !sheet1_error.blank? && !sheet2_error.blank?
@@ -2043,6 +2043,7 @@ def exportorders_xls_content_for(objs)
   end
 
   def order_add(target,index,id,instance,txt=nil)
+    binding.pry
     if !target.find{|x| to_string(x[index]) == id}.blank?
       return target
     end
@@ -2058,8 +2059,13 @@ def exportorders_xls_content_for(objs)
 
   def detail_add(target,index,content,instance,txt=nil)
     instance.default_sheet = instance.sheets.second
+    binding.pry
     2.upto(instance.last_row) do |line|
-      if to_string(instance.row(line)[index]).eql? to_string(content[index])
+      index_content = 15
+      if index == 0
+        index_content = 0
+      end
+      if to_string(instance.row(line)[index]).eql? to_string(content[index_content])
         if target.find{|x| x == content}.blank?
           target << (instance.row(line) << txt)
         end
@@ -2118,8 +2124,9 @@ def exportorders_xls_content_for(objs)
     book = Spreadsheet::Workbook.new  
     sheet1 = book.create_worksheet :name => "Orders"  
 
-    red = Spreadsheet::Format.new :color => :red, :weight => :bold, :size => 10  
-    sheet1.row(0).default_format = red  
+    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+    red = Spreadsheet::Format.new :color => :red
+    sheet1.row(0).default_format = blue  
 
     sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
     count_row = 1
@@ -2194,7 +2201,7 @@ def exportorders_xls_content_for(objs)
 
     sheet2 = book.create_worksheet :name => "OrderDetails"
     detail_row = 0
-    sheet2.row(detail_row).default_format = red 
+    sheet2.row(detail_row).default_format = blue 
     sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户名称 订单流水号}
     detail_row = detail_row + 1
     obj2.each do |obj|
