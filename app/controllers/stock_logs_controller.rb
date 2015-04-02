@@ -14,7 +14,7 @@ class StockLogsController < ApplicationController
       include: [:user, :stock, :shelf, :specification],
       :name => 'stock_logs',
       :enable_export_to_csv => true,
-      :csv_file_name => 'stock_logs')
+      :csv_file_name => 'Stock_Logs')
     
     export_grid_if_requested
   end
