@@ -28,7 +28,7 @@ class OrdersController < ApplicationController
   def packaging_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGING_STATUS)
     @orders_grid=initialize_grid(@orders,
-        :conditions => ['order_type = ? and is_split != ?',"b2c", true])
+        :conditions => ['order_type = ?',"b2c"])
 
     render :layout => false
   end
@@ -36,7 +36,7 @@ class OrdersController < ApplicationController
   def packaged_index
     @orders = Order.accessible_by(current_ability).where(status: Order::PACKAGED_STATUS).where('created_at > ?', Date.today.to_time)
     @orders_grid=initialize_grid(@orders,
-      :conditions => ['order_type = ? and is_split != ?',"b2c", true])
+      :conditions => ['order_type = ?',"b2c"])
 
     render :layout => false
   end
