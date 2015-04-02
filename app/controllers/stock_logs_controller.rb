@@ -12,6 +12,11 @@ class StockLogsController < ApplicationController
       order: "stock_logs.id",
       order_direction: 'desc', 
       include: [:user, :stock, :shelf, :specification])
+      :name => 'stock_logs',
+      :enable_export_to_csv => true,
+      :csv_file_name => 'stock_logs')
+    
+    export_grid_if_requested
   end
 
   # GET /stock_logs/1

@@ -1,0 +1,44 @@
+<%- model_class = StockLog -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
+
+<%= grid(@stock_logs_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:username), attribute: 'name', model: 'User' do |stock_log|
+        stock_log.user.try :name
+      end
+
+    #g.column name: model_class.human_attribute_name(:operation), attribute: 'operation'
+    g.column name: model_class.human_attribute_name(:operation), attribute: 'operation',custom_filter: StockLog::OPERATION.invert do |stock_log| 
+      stock_log.operation_name
+    end
+
+    g.column name: model_class.human_attribute_name(:amount), attribute: 'amount'
+
+    # g.column name: model_class.human_attribute_name(:object_symbol), attribute: 'object_symbol'
+
+    g.column name: model_class.human_attribute_name(:spec_name), attribute: 'name', model: 'Specification' do |stock_log|
+        stock_log.specification.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:shelf_code), attribute: 'shelf_code', model: 'Shelf' do |stock_log|
+        stock_log.shelf.try :shelf_code
+    end
+
+    #g.column name: model_class.human_attribute_name(:status), attribute: 'status'
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: StockLog::STATUS.invert do |stock_log| 
+      stock_log.status_name
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |stock_log|
+        stock_log.created_at.to_s(:db)
+      end
+
+    g.column name: model_class.human_attribute_name(:checked_at), attribute: 'checked_at' do |stock_log|
+        stock_log.checked_at.try :to_s, :db
+      end
+
+  end 
+%>
