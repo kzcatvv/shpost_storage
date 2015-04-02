@@ -11,10 +11,10 @@ class StockLogsController < ApplicationController
     @stock_logs_grid = initialize_grid(@stock_logs, 
       order: "stock_logs.id",
       order_direction: 'desc', 
-      include: [:user, :stock, :shelf, :specification])
+      include: [:user, :stock, :shelf, :specification],
       :name => 'stock_logs',
       :enable_export_to_csv => true,
-      :csv_file_name => 'stock_logs')
+      :csv_file_name => 'Stock_Logs')
     
     export_grid_if_requested
   end
