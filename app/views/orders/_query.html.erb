@@ -139,7 +139,7 @@
         order.created_at.to_s(:db)
     end
 
-    g.column name: '出库时间' do |order|
+    g.column name: '出库时间', attribute: 'created_at',model: 'UserLog', filter: false do |order|
       if !order.keyclientorder.blank?
         UserLog.find_by(parent_id: order.keyclientorder.id,operation: ['电商确认出库','批量确认出库']).blank?? "" :UserLog.find_by(parent_id: order.keyclientorder.id,operation: ['电商确认出库','批量确认出库']).created_at.strftime('%Y-%m-%d %H:%M:%S').to_s
       end
