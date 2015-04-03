@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150310030613) do
+ActiveRecord::Schema.define(version: 20150403024823) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -338,6 +338,7 @@ ActiveRecord::Schema.define(version: 20150310030613) do
     t.integer  "parent_id"
     t.boolean  "is_split",                       default: false
     t.float    "volume"
+    t.datetime "out_at"
   end
 
   create_table "orders_user_logs", id: false, force: true do |t|

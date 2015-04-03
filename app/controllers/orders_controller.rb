@@ -13,49 +13,49 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    @userlogs=UserLog.all
-    keyclientorders = []
-    operation=['电商确认出库','批量确认出库']
-    if !params[:order_start_date].blank? and !params[:order_start_date]["order_start_date"].blank?
-      if params[:order_start_date]["order_start_date"].include?'-'
-        start_date = Date.civil(params[:order_start_date]["order_start_date"].split(/-|\//)[0].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[1].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[2].to_i)
-      else
-        flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
-        redirect_to (orders_path) and return
-      end
+    # @userlogs=UserLog.all
+    # keyclientorders = []
+    # operation=['电商确认出库','批量确认出库']
+    # if !params[:order_start_date].blank? and !params[:order_start_date]["order_start_date"].blank?
+    #   if params[:order_start_date]["order_start_date"].include?'-'
+    #     start_date = Date.civil(params[:order_start_date]["order_start_date"].split(/-|\//)[0].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[1].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[2].to_i)
+    #   else
+    #     flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
+    #     redirect_to (orders_path) and return
+    #   end
 
-      @userlogs = @userlogs.where("user_logs.created_at>=? and user_logs.operation in (?)",start_date,operation)
+    #   @userlogs = @userlogs.where("user_logs.created_at>=? and user_logs.operation in (?)",start_date,operation)
       
-      if params[:order_end_date].blank? or params[:order_end_date]["order_end_date"].blank?
-        @userlogs.each do |u|
-          if !u.parent_id.blank?
-            keyclientorders << u.parent_id
-          end
-        end
+    #   if params[:order_end_date].blank? or params[:order_end_date]["order_end_date"].blank?
+    #     @userlogs.each do |u|
+    #       if !u.parent_id.blank?
+    #         keyclientorders << u.parent_id
+    #       end
+    #     end
 
-        @orders = @orders.where keyclientorder_id:keyclientorders
-      end
-    end
+    #     @orders = @orders.where keyclientorder_id:keyclientorders
+    #   end
+    # end
 
-    if !params[:order_end_date].blank? and !params[:order_end_date]["order_end_date"].blank?
-      if params[:order_end_date]["order_end_date"].include?'-'
-        end_date = Date.civil(params[:order_end_date]["order_end_date"].split(/-|\//)[0].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[1].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[2].to_i)
-      else
-        flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
-        redirect_to (orders_path) and return
-      end
+    # if !params[:order_end_date].blank? and !params[:order_end_date]["order_end_date"].blank?
+    #   if params[:order_end_date]["order_end_date"].include?'-'
+    #     end_date = Date.civil(params[:order_end_date]["order_end_date"].split(/-|\//)[0].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[1].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[2].to_i)
+    #   else
+    #     flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
+    #     redirect_to (orders_path) and return
+    #   end
         
-      @userlogs = @userlogs.where("user_logs.created_at<=? and user_logs.operation in (?)",(end_date+1),operation)
+    #   @userlogs = @userlogs.where("user_logs.created_at<=? and user_logs.operation in (?)",(end_date+1),operation)
 
-      @userlogs.each do |u|
-        if !u.parent_id.blank?
-          keyclientorders << u.parent_id
-        end
-      end
+    #   @userlogs.each do |u|
+    #     if !u.parent_id.blank?
+    #       keyclientorders << u.parent_id
+    #     end
+    #   end
 
-      @orders = @orders.where keyclientorder_id:keyclientorders
+    #   @orders = @orders.where keyclientorder_id:keyclientorders
 
-    end
+    # end
 
 
     @orders_grid = initialize_grid(@orders,

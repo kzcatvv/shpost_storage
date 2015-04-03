@@ -80,11 +80,20 @@ class ApplicationController < ActionController::Base
         # if args.first[:operation].eql? "面单信息回馈"  or args.first[:operation].eql? "生成出库单" or args.first[:operation].eql? "电商确认出库"
         #   @user_log.orders = object.orders
         # end 
+        
         if args.first[:operation].eql? "包装出库"
           @user_log.orders = Order.where(id: object.id)
         end
         
         @user_log.save
+
+        if args.first[:operation].eql? "包装出库"
+          Order.where(id: object.id).update_all(out_at:@user_log.created_at)
+        end
+        if args.first[:operation].eql?"批量确认出库" or args.first[:operation].eql?"确认出库"
+          Order.where(keyclientorder_id: object.id).update_all(out_at:@user_log.created_at)
+        end
+    
       end
     else
       if args.first[:operation].eql? "订单导入"
@@ -93,7 +102,7 @@ class ApplicationController < ActionController::Base
       end
       @user_log.save
     end
-    
+  
   end
 
   def set_product_select(objid)

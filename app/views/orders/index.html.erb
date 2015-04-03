@@ -3,7 +3,7 @@
   <h1><%=t '.title', :default => model_class.model_name.human%></h1>
 </div> 
 
-<div>
+<!-- <div>
    <%= form_tag(orders_path, method: "get")%>
     <%= label_tag(:order_start_date, "出库时间开始:") %>
     <%= text_field("order_start_date","order_start_date", default: 1.month.ago) %>
@@ -13,7 +13,7 @@
 
    </form>
 </div>  
-
+ -->
 <%= render partial: 'query'%>
 
   <div style="float:right">
