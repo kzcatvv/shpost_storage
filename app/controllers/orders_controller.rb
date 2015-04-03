@@ -200,6 +200,12 @@ class OrdersController < ApplicationController
             dtlchk=false
           end
         end
+        if dtlchk
+          shortage = "no"
+        else
+          shortage = "yes"
+        end
+        OrderDetail.update(d.id, is_shortage: shortage)
         hasstockchk=hasstockchk && dtlchk
       end
       is_shortage = ''
@@ -1924,7 +1930,7 @@ def exportorders_xls_content_for(objs)
       business_id = obj.business_id
       order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj_id}")
       order_details.each do |order_detail|
-        if obj.is_shortage.eql? 'yes'
+        if order_detail.is_shortage.eql? 'yes'
           red = Spreadsheet::Format.new :color => :red
           sheet2.row(detail_row).default_format = red  
         end
