@@ -92,7 +92,13 @@ class SpecificationsController < ApplicationController
       start_date = time.split(/-|\//)[0]+"-"+(time.split(/-|\//)[1].to_i-1).to_s.rjust(2,'0')+"-"+time.split(/-|\//)[2]
       @stocklogs=@stocklogs.where("stock_logs.created_at>=?",start_date)
     else 
-      start_date = Date.civil(params[:sp_start_date]["sp_start_date"].split(/-|\//)[0].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[1].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[2].to_i)
+      if params[:sp_start_date]["sp_start_date"].include?'-'
+        start_date = Date.civil(params[:sp_start_date]["sp_start_date"].split(/-|\//)[0].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[1].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[2].to_i)
+      else
+         flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
+         redirect_to (inoutlogs_commodity_specification_path(@commodity,@specification)) and return
+      end
+
       @stocklogs=@stocklogs.where("stock_logs.created_at>=?",start_date)
     end
     
@@ -102,7 +108,13 @@ class SpecificationsController < ApplicationController
       end_date = time
       @stocklogs=@stocklogs.where("stock_logs.created_at<=?",end_date)
     else
-      end_date = Date.civil(params[:sp_end_date]["sp_end_date"].split(/-|\//)[0].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[1].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[2].to_i)
+      if params[:sp_end_date]["sp_end_date"].include?'-'
+        end_date = Date.civil(params[:sp_end_date]["sp_end_date"].split(/-|\//)[0].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[1].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[2].to_i)
+      else
+         flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
+         redirect_to (inoutlogs_commodity_specification_path(@commodity,@specification)) and return
+      end
+
       @stocklogs=@stocklogs.where("stock_logs.created_at<=?",(end_date+1))
     end
     

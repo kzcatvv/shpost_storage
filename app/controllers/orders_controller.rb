@@ -13,8 +13,53 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
+    # @userlogs=UserLog.all
+    # keyclientorders = []
+    # operation=['电商确认出库','批量确认出库']
+    # if !params[:order_start_date].blank? and !params[:order_start_date]["order_start_date"].blank?
+    #   if params[:order_start_date]["order_start_date"].include?'-'
+    #     start_date = Date.civil(params[:order_start_date]["order_start_date"].split(/-|\//)[0].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[1].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[2].to_i)
+    #   else
+    #     flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
+    #     redirect_to (orders_path) and return
+    #   end
+
+    #   @userlogs = @userlogs.where("user_logs.created_at>=? and user_logs.operation in (?)",start_date,operation)
+      
+    #   if params[:order_end_date].blank? or params[:order_end_date]["order_end_date"].blank?
+    #     @userlogs.each do |u|
+    #       if !u.parent_id.blank?
+    #         keyclientorders << u.parent_id
+    #       end
+    #     end
+
+    #     @orders = @orders.where keyclientorder_id:keyclientorders
+    #   end
+    # end
+
+    # if !params[:order_end_date].blank? and !params[:order_end_date]["order_end_date"].blank?
+    #   if params[:order_end_date]["order_end_date"].include?'-'
+    #     end_date = Date.civil(params[:order_end_date]["order_end_date"].split(/-|\//)[0].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[1].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[2].to_i)
+    #   else
+    #     flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
+    #     redirect_to (orders_path) and return
+    #   end
+        
+    #   @userlogs = @userlogs.where("user_logs.created_at<=? and user_logs.operation in (?)",(end_date+1),operation)
+
+    #   @userlogs.each do |u|
+    #     if !u.parent_id.blank?
+    #       keyclientorders << u.parent_id
+    #     end
+    #   end
+
+    #   @orders = @orders.where keyclientorder_id:keyclientorders
+
+    # end
+
+
     @orders_grid = initialize_grid(@orders,
-     :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder],:order => 'created_at', :order_direction => 'desc')
+     :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder, :user_logs],:order => 'created_at', :order_direction => 'desc')
     @orders_grid.with_resultset do |orders|
       @@orders_query_export = orders
     end
@@ -155,6 +200,12 @@ class OrdersController < ApplicationController
             dtlchk=false
           end
         end
+        if dtlchk
+          shortage = "no"
+        else
+          shortage = "yes"
+        end
+        OrderDetail.update(d.id, is_shortage: shortage)
         hasstockchk=hasstockchk && dtlchk
       end
       is_shortage = ''
@@ -1879,7 +1930,7 @@ def exportorders_xls_content_for(objs)
       business_id = obj.business_id
       order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj_id}")
       order_details.each do |order_detail|
-        if obj.is_shortage.eql? 'yes'
+        if order_detail.is_shortage.eql? 'yes'
           red = Spreadsheet::Format.new :color => :red
           sheet2.row(detail_row).default_format = red  
         end

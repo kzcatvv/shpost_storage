@@ -559,6 +559,7 @@ zh-CN:
         county: "区"
         tracking_number: "面单号"
         is_split: "是否拆分订单"
+        out_at: "出库时间"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150310030613) do
+ActiveRecord::Schema.define(version: 20150403024823) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -166,6 +166,8 @@ ActiveRecord::Schema.define(version: 20150310030613) do
     t.integer  "business_id"
   end
 
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -264,6 +266,7 @@ ActiveRecord::Schema.define(version: 20150310030613) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "business_deliver_no"
+    t.string   "is_shortage"
   end
 
   create_table "order_details_stock_logs", id: false, force: true do |t|
@@ -338,6 +341,7 @@ ActiveRecord::Schema.define(version: 20150310030613) do
     t.integer  "parent_id"
     t.boolean  "is_split",                       default: false
     t.float    "volume"
+    t.datetime "out_at"
   end
 
   create_table "orders_user_logs", id: false, force: true do |t|
