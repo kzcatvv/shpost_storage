@@ -428,7 +428,7 @@ class OrdersController < ApplicationController
     @curr_order=""
     @orders = Order.where("storage_id = ?", current_storage.id)
     @orders_grid=initialize_grid(@orders,
-      :conditions => ['order_type = ? and is_split != ',"b2c", true])
+      :conditions => ['order_type = ? ',"b2c"])
   end
 
   def findorderout
