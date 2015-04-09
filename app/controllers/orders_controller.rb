@@ -2129,12 +2129,12 @@ def exportorders_xls_content_for(objs)
       # different between exist order and new order
       # new order should be delete and exist order must be keep
       target.each do |x|
-        business_id = x[0]
-        batch_no = x[15]
+        business_id = to_string(x[0])
+        batch_no = to_string(x[15])
         order = nil
         if !batch_no.blank?
           order = Order.accessible_by(current_ability).find_by batch_no: batch_no
-        elsif !batch_no.blank?
+        elsif !business_id.blank?
           order = Order.accessible_by(current_ability).find_by business_order_id: business_id
         end
         # skip the exist order and delete the new order
@@ -2146,8 +2146,8 @@ def exportorders_xls_content_for(objs)
     when 2
       #  update the order status to waiting and clean transtype info
       target.each do |x|
-        business_id = x[0]
-        batch_no = x[15]
+        business_id = to_string(x[0])
+        batch_no = to_string(x[15])
         order = nil
         if !batch_no.blank?
           order = Order.accessible_by(current_ability).find_by batch_no: batch_no
