@@ -1,5 +1,6 @@
 class ReportController < ApplicationController
-
+  load_and_authorize_resource
+  
   def purchase_arrival_report
     unless request.get?
       business_id = params[:business_id]
@@ -314,5 +315,78 @@ class ReportController < ApplicationController
       book.write xls_report  
       xls_report.string  
     end
+
+  def order_report
+    unless request.get?
+      start_date = Date.civil(params[:order_start_date]["order_start_date"].split(/-|\//)[0].to_i,
+                         params[:order_start_date]["order_start_date"].split(/-|\//)[1].to_i,
+                         params[:order_start_date]["order_start_date"].split(/-|\//)[2].to_i)
+      end_date = Date.civil(params[:order_end_date]["order_end_date"].split(/-|\//)[0].to_i,
+                         params[:order_end_date]["order_end_date"].split(/-|\//)[1].to_i,
+                         params[:order_end_date]["order_end_date"].split(/-|\//)[2].to_i)
+      status = ["waiting","checked","packed","delivering","delivered","returned"]
+
+      orders=Order.accessible_by(current_ability).where("orders.created_at >= ? and orders.created_at <= ? and orders.status in (?)", start_date, (end_date+1),status)
+      if orders.blank?
+        flash[:alert] = "无订单数据"
+        redirect_to :action => 'order_report'
+      else
+        send_data(order_report_xls_content_for(orders),:type => "text/excel;charset=utf-8; header=present",:filename => "订单汇总_#{Time.now.strftime("%Y%m%d")}.xls")  
+      end
+    end
+  end
+  
+  def order_report_xls_content_for(objs) 
+    xls_report = StringIO.new  
+    book = Spreadsheet::Workbook.new  
+    sheet1 = book.create_worksheet :name => "订单汇总"  
+    
+    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+    sheet1.row(0).default_format = blue  
+  
+    sheet1.row(0).concat %w{商户 物流供应商 待处理 已审核 已包装 正在寄送中 已寄达 退回 总计}
+    count_row = 1
+    businesses = objs.select(:business_id).distinct.order(:business_id)
+    tran_types = objs.select(:transport_type).distinct.order(:transport_type)
+          
+    businesses.each do |b|
+      if !b.business_id.blank?
+        bamount = objs.where(business_id:b.business_id).count
+        if bamount>0
+          sheet1[count_row,0] = Business.find_by(id:b.business_id).name
+          tran_types.each do |t|
+            # if !t.transport_type.blank?
+              tamount = objs.where(business_id:b.business_id,transport_type:t.transport_type).count
+              if tamount>0
+                sheet1[count_row,1] = t.transport_type_name
+                sheet1[count_row,2] = objs.where(business_id:b.business_id,transport_type:t.transport_type,status:"waiting").count
+                sheet1[count_row,3] = objs.where(business_id:b.business_id,transport_type:t.transport_type,status:"checked").count
+                sheet1[count_row,4] = objs.where(business_id:b.business_id,transport_type:t.transport_type,status:"packed").count
+                sheet1[count_row,5] = objs.where(business_id:b.business_id,transport_type:t.transport_type,status:"delivering").count
+                sheet1[count_row,6] = objs.where(business_id:b.business_id,transport_type:t.transport_type,status:"delivered").count
+                sheet1[count_row,7] = objs.where(business_id:b.business_id,transport_type:t.transport_type,status:"returned").count
+                sheet1[count_row,8] = tamount
+                count_row += 1
+              end
+            # end
+          end
+        end
+      end
+    end
+    sheet1[count_row,0] = "总计"
+    sheet1[count_row,2] = objs.where(status:"waiting").count
+    sheet1[count_row,3] = objs.where(status:"checked").count
+    sheet1[count_row,4] = objs.where(status:"packed").count
+    sheet1[count_row,5] = objs.where(status:"delivering").count
+    sheet1[count_row,6] = objs.where(status:"delivered").count
+    sheet1[count_row,7] = objs.where(status:"returned").count
+    sheet1[count_row,8] = objs.count
+
+    book.write xls_report  
+    xls_report.string
+  end
+                
+
+
 
 end

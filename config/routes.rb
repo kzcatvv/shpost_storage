@@ -356,7 +356,8 @@ ShpostStorage::Application.routes.draw do
   # report
   match "/shpost_storage/report/purchase_arrival_report" => "report#purchase_arrival_report", via: [:get, :post]
   match "/shpost_storage/report/stock_stat_report" => "report#stock_stat_report", via: [:get, :post]
-
+  match "/shpost_storage/report/order_report" => "report#order_report", via: [:get, :post]
+  
   #stabdar_interface
   match "/shpost_storage/standard_interface/commodity_enter" => "standard_interface#commodity_enter", via: [:get, :post]
   match "/shpost_storage/standard_interface/order_enter" => "standard_interface#order_enter", via: [:get, :post]

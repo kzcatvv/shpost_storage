@@ -1,0 +1,18 @@
+<center>
+<br><br>
+<font face="微软雅黑" color='#006030' size=6>订单汇总</font>   
+
+<br><br><br>
+ 
+
+<%= form_tag("/shpost_storage/report/order_report",format: "xls", method: "post") do -%>
+    <div><%= label_tag(:order_start_date, "汇总开始日期:") %><%= text_field("order_start_date","order_start_date", default: 1.week.ago) %></div>
+    <br/>
+    <div><%= label_tag(:order_end_date, "汇总结束日期:") %><%= text_field("order_end_date","order_end_date",default: Date.today) %></div>
+    <br/>
+    <%= submit_tag "订单导出",:class => 'btn btn-primary' %>
+       
+<% end -%>
+
+
+</center>

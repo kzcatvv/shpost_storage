@@ -171,6 +171,8 @@ class OrdersController < ApplicationController
   def find_has_stock(orders,createKeyCilentOrderFlg)
     allcnt = {}
     findorders = []
+    oid = []
+    arrorders = []
     ordercnt = 0
     orders.each do |o|
       hasstockchk = true
@@ -213,6 +215,8 @@ class OrdersController < ApplicationController
         findorders += Order.where(id: o)
         ordercnt += 1
         is_shortage = 'no'
+        oid << o.id
+        # binding.pry
       else
         o.order_details.each do |dtl|
           product = [o.business_id,dtl.specification_id,dtl.supplier_id]
@@ -230,8 +234,13 @@ class OrdersController < ApplicationController
         time = Time.new
         # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
         @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "waiting")
-        orders=Order.where(id: findorders)
-        orders.update_all(keyclientorder_id: @keycorder)
+        until oid.blank? do
+          x = Order.where(id: oid.pop(1000))
+          x.update_all(keyclientorder_id: @keycorder)
+          arrorders += x
+        end
+        # orders=Order.where(id: findorders)
+        # orders.update_all(keyclientorder_id: @keycorder)
 
         allcnt.each do |k,v|
           if v[1] > 0
@@ -240,7 +249,14 @@ class OrdersController < ApplicationController
         end
       end
     end
-    orders=Order.where(id: findorders)
+    # orders=Order.where(id: findorders)
+    if arrorders.blank?
+      until oid.blank? do
+        arrorders += Order.where(id: oid.pop(1000))
+      end
+    end
+    return arrorders
+    
   end
 
   def nextbatch
@@ -564,7 +580,7 @@ class OrdersController < ApplicationController
         end
 
         if !params[:grid][:f][:created_at].nil?
-          @selectorders=@selectorders.where(["created_at >= ? and created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
+          @selectorders=@selectorders.where(["orders.created_at >= ? and orders.created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
         end
       end
     end
@@ -1303,9 +1319,16 @@ class OrdersController < ApplicationController
               if order.status.eql? "waiting" or order.status.eql? "printed"
                 tracking_number = to_string(instance.cell(line,'B'))
                 if tracking_number.blank?
+                  txt = "缺少物流单号"
+                  sheet1_error << (instance.row(line) << txt)
                   next
                 end
                 transport_type = instance.cell(line,'C')
+                if transport_type.blank?
+                  txt = "缺少物流供应商"
+                  sheet1_error << (instance.row(line) << txt)
+                  next
+                end
                 case transport_type
                   when "同城速递","tcsd","TCSD"
                     tran_type = 'tcsd'
@@ -1557,6 +1580,7 @@ class OrdersController < ApplicationController
       redirect_to :action => 'findprintindex'
     else
       checkbox_all = params[:checkbox][:all]
+      
       if checkbox_all.eql? '0'
         respond_to do |format|
           format.xls {   
@@ -1566,12 +1590,24 @@ class OrdersController < ApplicationController
           }  
         end
       else
-        respond_to do |format|
-          format.xls {   
-            send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),  
+        has_stock_orders = find_has_stock(orders,false)
+        ordid = []
+        if !has_stock_orders.blank?
+          has_stock_orders.each do |o|
+           ordid << o.id
+          end
+       
+          respond_to do |format|
+            format.xls {   
+              send_data(exportorders_xls_content_for(orders.where.not(id: ordid)),  
                 :type => "text/excel;charset=utf-8; header=present",  
                 :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
-          }  
+              # send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),:type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls") 
+            }  
+          end
+        else
+          flash[:alert] = "无有库存订单"
+          redirect_to :action => 'findprintindex'
         end
       end
     end
@@ -1586,7 +1622,7 @@ class OrdersController < ApplicationController
     #   @orders += Order.where(id: x.pop(1000))
     # end
     
-    if @@orders_query_export.nil?
+    if @@orders_query_export.blank?
       flash[:alert] = "无订单"
       redirect_to :action => 'index'
     else
@@ -1893,7 +1929,7 @@ def exportorders_xls_content_for(objs)
       order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj.id}")
       order_details.each do |order_detail|
         if !order_detail.specification.blank?
-          all_name = all_name + order_detail.specification.all_name + "*" + order_detail.amount.to_s + ","
+          all_name = all_name + order_detail.specification.name + "*" + order_detail.amount.to_s + ","
         end
       end
 

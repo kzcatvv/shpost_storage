@@ -960,6 +960,13 @@ zh-CN:
         stock_stat_report:
           name: "库存状态报表下载"
           link: "/shpost_storage/report/stock_stat_report"
+        order_report:
+          name: "订单汇总"
+          link: "/shpost_storage/report/order_report"
+          # needrole:
+          #   can: :read
+          #   role: :superadmin
+      
     consumables:
       name: "耗材管理"
       needrole:

@@ -73,8 +73,9 @@ class Ability
 
         cannot :resend, InterfaceInfo do |interface_info|
             (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
-
         end
+        # can :manage, Report
+        
         # can :manage,BusinessRelationship
 
     elsif user.user?
@@ -197,6 +198,8 @@ class Ability
         can :manage, Mobile, storage_id: storage.id
 
         can :read, Task, storage_id: storage.id
+
+        # can :order_report, Report
     end
 
     if user.order?(storage)
