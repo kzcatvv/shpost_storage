@@ -1592,4 +1592,28 @@ function showgrid() {
   })
 
 }
+var ready;
+var lastMenuId = "";
+ready = function() {
+  //set menu height
+  $(".left-slider").pin({containerSelector: ".main-container"});
+  var height = window.innerHeight;
+  $(".left-slider").css("min-height" , height + "px");
+  
+  //set menu selected
+  $(".mu-a").click(function(){
+    lastMenuId = $(this).parent().parent().parent().attr("id").replace(/menu-group-/,"");
+  });
+  if (lastMenuId != "") {
+    $("#menu-group-" + lastMenuId + " .menu-title").addClass("selected");
+    var parentIdsArray = lastMenuId.split("-");
+    var toDisplayId = parentIdsArray[0];
+    for (var i = 1; i < parentIdsArray.length - 1; i++) {
+      toDisplayId += "-" + parentIdsArray[i];
+      $("#menu-" + toDisplayId).addClass("in");
+    };
+  };
+};
 
+$(document).ready(ready);
+$(document).on('page:load', ready);

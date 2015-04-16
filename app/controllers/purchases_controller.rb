@@ -1,6 +1,6 @@
 class PurchasesController < ApplicationController
   load_and_authorize_resource
-
+  skip_before_filter :verify_authenticity_token, :only => [:assign_select]
   user_logs_filter only: [:create, :close, :destroy], symbol: :name, parent: :purchase#, object: :user, operation: '新增用户'
   user_logs_filter only: [:check], symbol: :no, operation: '采购单确认入库', parent: :purchase#, object: :user, operation: '新增用户'
   user_logs_filter only: [:onecheck], symbol: :desc, operation: '采购单明细确认入库', object: :stock_log, parent: :purchase
@@ -83,6 +83,7 @@ class PurchasesController < ApplicationController
     @tasker = Task.tasker_in_work(@purchase)
     @task_finished = !@purchase.has_waiting_stock_logs()
     @sorters = current_storage.get_sorter()
+    render :layout=> false
   end
 
   def assign_select
