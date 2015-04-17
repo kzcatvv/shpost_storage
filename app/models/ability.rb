@@ -21,6 +21,7 @@ class Ability
 
         can :manage, InterfaceInfo
         can :manage, UpDownload
+        can :manage, Logistic
 
         cannot :resend, InterfaceInfo do |interface_info|
             (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)

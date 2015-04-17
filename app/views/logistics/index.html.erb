@@ -1,0 +1,44 @@
+<%- model_class = Logistic -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Logistic %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_logistic_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@logistics_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:print_format), attribute: 'print_format'
+
+    g.column name: model_class.human_attribute_name(:is_getnum), attribute: 'is_getnum',filter_type: :boolean 
+
+    g.column name: model_class.human_attribute_name(:contact), attribute: 'contact'
+
+    g.column name: model_class.human_attribute_name(:address), attribute: 'address'
+
+    g.column name: model_class.human_attribute_name(:contact_phone), attribute: 'contact_phone'
+
+    g.column name: model_class.human_attribute_name(:post), attribute: 'post'
+
+    g.column name: model_class.human_attribute_name(:is_default), attribute: 'is_default',filter_type: :boolean 
+
+    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'storage_id',custom_filter: Storage.all.collect {|g| [g.name,g.id]} do |logistic|
+      if !logistic.storage_id.blank?
+        Storage.find(logistic.storage_id).name
+      end
+    end
+
+
+    g.column do |logistic|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")), edit_logistic_path(logistic), :class => 'btn btn-xs btn-primary' if can? :update, logistic) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), logistic_path(logistic), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, logistic)
+    end
+  end 
+%>

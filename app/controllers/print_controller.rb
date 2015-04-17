@@ -37,6 +37,7 @@ class PrintController < ApplicationController
     def webtracking
         @ids=params[:ids]
         @flag=params[:flag]
+        @logistics = Logistic.where(storage_id: current_storage.id).order(is_default: :desc)
     end
 
     def webtrackingnum
@@ -46,7 +47,8 @@ class PrintController < ApplicationController
             # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
             @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "printed")
         end
-        @transport_type=params[:transport_type]
+        @logistic = Logistic.find(params[:transport_type])
+        @transport_type=@logistic.print_format
         #regular = /([\D]*)([\d]*)/
         start=getTrackingNumber(@transport_type, params[:start])
         numberSize = start[1].size
@@ -134,12 +136,16 @@ class PrintController < ApplicationController
 
     def websplitordertracking
         @order = Order.find(params[:orid])
+        @logistics = Logistic.where(storage_id: current_storage.id).order(is_default: :desc)
     end
 
     def websplitordertrackingnum
         @order = Order.find(params[:orid])
-        @transport_type = params[:transport_type]
-        @order.update(transport_type: params[:transport_type])
+        @logistic = Logistic.find(params[:transport_type])
+        @transport_type = @logistic.print_format
+        @order.update(transport_type: @transport_type)
+        rq=@logistic.getMailNum('信息局','TC','TCBD',1)
+        
     end
 
     def shelfbarcodeprint
