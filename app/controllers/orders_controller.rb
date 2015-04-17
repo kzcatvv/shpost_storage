@@ -1965,7 +1965,7 @@ def exportorders_xls_content_for(objs)
       order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj.id}")
       order_details.each do |order_detail|
         if !order_detail.specification.blank?
-          all_name = all_name + order_detail.specification.name + "*" + order_detail.amount.to_s + ","
+          all_name = all_name + order_detail.specification.all_name + "*" + order_detail.amount.to_s + ","
         end
       end
 
