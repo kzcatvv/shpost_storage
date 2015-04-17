@@ -136,6 +136,7 @@ ShpostStorage::Application.routes.draw do
         get 'b2cfind69code'
         get 'b2csplitanorder'
         get 'b2csettrackingnumber'
+        
       end
 
     member do
@@ -348,6 +349,12 @@ ShpostStorage::Application.routes.draw do
 
   resources :businesses do
      resources :relationships, :controller => 'business_relationship'
+  end
+
+  resources :order_statistics do
+      collection do
+        get 'query_order_report'
+      end 
   end
 
   # get 'scans' => 'scans#scans'

@@ -176,7 +176,7 @@ class SpecificationsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def specification_params
-      params.require(:specification).permit( :sku, :sixnine_code, :desc, :name,:long,:wide,:high,:weight,:volume,:start_date,:end_date)
+      params.require(:specification).permit( :sku, :sixnine_code, :desc, :name,:long,:wide,:high,:weight,:volume)
     end
 
 

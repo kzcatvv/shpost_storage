@@ -36,6 +36,13 @@ ready = ->
     changeMonth:true,
     changeYear:true
   });
-
+  $('#query_order_start_date_query_order_start_date').datepicker({
+    changeMonth:true,
+    changeYear:true
+  });
+  $('#query_order_end_date_query_order_end_date').datepicker({
+    changeMonth:true,
+    changeYear:true
+  });
 $(document).ready(ready)
 $(document).on('page:load', ready)

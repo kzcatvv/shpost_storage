@@ -1605,9 +1605,6 @@ class OrdersController < ApplicationController
               # send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),:type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls") 
             }  
           end
-        else
-          flash[:alert] = "无有库存订单"
-          redirect_to :action => 'findprintindex'
         end
       end
     end
@@ -1728,6 +1725,45 @@ class OrdersController < ApplicationController
       format.js 
     end
   end
+
+
+  # def query_order_report
+  #   @order_hash = {}
+  #   @orders = Order.all
+  #   status = ["waiting","checked","packed","delivering","delivered","returned"]
+    
+  #   if params[:query_order_start_date].blank? or params[:query_order_start_date]["query_order_start_date"].blank?
+  #     start_date = Time.now.beginning_of_week
+  #     if RailsEnv.is_oracle?
+  #       start_date = to_char(DateTime.parse(start_date.to_s),'yyyymmdd')
+  #     else
+  #       start_date=DateTime.parse(start_date.to_s).strftime('%Y-%m-%d').to_s
+  #     end
+  #     @orders=@orders.accessible_by(current_ability).where("orders.created_at >= ? and orders.status in (?)", start_date,status)
+  #   else 
+  #     start_date = Date.civil(params[:query_order_start_date]["query_order_start_date"].split(/-|\//)[0].to_i, params[:query_order_start_date]["query_order_start_date"].split(/-|\//)[1].to_i, params[:query_order_start_date]["query_order_start_date"].split(/-|\//)[2].to_i)
+  #     @orders=@orders.accessible_by(current_ability).where("orders.created_at >= ? and orders.status in (?)", start_date,status)
+  #   end
+  #   if params[:query_order_end_date].blank? or params[:query_order_end_date]["query_order_end_date"].blank?
+  #     end_date = Time.now.end_of_week
+  #     if RailsEnv.is_oracle?
+  #       end_date = to_char(DateTime.parse(end_date.to_s),'yyyymmdd')
+  #     else
+  #       end_date=DateTime.parse(end_date.to_s).strftime('%Y-%m-%d').to_s
+  #     end
+  #     end_date = Date.civil(end_date.split(/-|\//)[0].to_i, end_date.split(/-|\//)[1].to_i, end_date.split(/-|\//)[2].to_i)
+  #     @orders=@orders.accessible_by(current_ability).where("orders.created_at <= ? and orders.status in (?)", (end_date+1),status)
+  #   else
+  #     end_date = Date.civil(params[:query_order_end_date]["query_order_end_date"].split(/-|\//)[0].to_i, params[:query_order_end_date]["query_order_end_date"].split(/-|\//)[1].to_i, params[:query_order_end_date]["query_order_end_date"].split(/-|\//)[2].to_i)
+  #     @orders=@orders.accessible_by(current_ability).where("orders.created_at <= ? and orders.status in (?)", (end_date+1),status)
+
+  #   end
+
+
+  #   @order_hash = @orders.group(:business_id).group(:transport_type).order(:business_id).order(:transport_type).count
+
+
+  # end
 
   private
   # Use callbacks to share common setup or constraints between actions.
