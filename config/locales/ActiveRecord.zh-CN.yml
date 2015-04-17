@@ -200,6 +200,7 @@ zh-CN:
       ready2bad: "移入残次品区"
       move_stock: "移库单"
       inventory: "盘点单"
+      query_order_report: "订单汇总"
   number:
     currency:
       format:
@@ -960,6 +961,16 @@ zh-CN:
         stock_stat_report:
           name: "库存状态报表下载"
           link: "/shpost_storage/report/stock_stat_report"
+        order_report:
+          name: "订单汇总下载"
+          link: "/shpost_storage/report/order_report"
+        query_order_report:
+          name: "订单汇总"
+          link: "/order_statistics/query_order_report"
+          # needrole:
+          #   can: :read
+          #   role: :superadmin
+      
     consumables:
       name: "耗材管理"
       needrole:

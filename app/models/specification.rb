@@ -9,7 +9,11 @@ class Specification < ActiveRecord::Base
   before_save :set_all_name
 
   def full_title
-    "#{commodity.name} #{name}"
+    if self.commodity.name.eql? self.name
+      "#{commodity.name}"
+    else
+      "#{commodity.name} #{name}"
+    end
   end
 
   def set_all_name

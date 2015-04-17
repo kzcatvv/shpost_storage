@@ -2,6 +2,7 @@ class Ability
   include CanCan::Ability
 
   def initialize(user,storage = nil)
+    user ||= User.new
     if user.superadmin?
         can :manage, User
         can :manage, Unit
@@ -27,6 +28,7 @@ class Ability
             (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
         end
 
+        
     elsif user.unitadmin?
     #can :manage, :all
         can [:manage,:br_autocomplete_specification_name], Business, unit_id: user.unit_id
@@ -74,8 +76,10 @@ class Ability
 
         cannot :resend, InterfaceInfo do |interface_info|
             (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
-
         end
+
+        can :query_order_report, :orders
+        
         # can :manage,BusinessRelationship
 
     elsif user.user?
@@ -101,6 +105,8 @@ class Ability
         can [:read, :up_download_export], UpDownload
         cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
 
+        cannot :query_order_report, :orders
+
     else
         cannot :manage, :all
         #can :update, User, id: user.id
@@ -110,7 +116,7 @@ class Ability
         cannot :read, Business
 
         cannot :manage, InterfaceInfo
-
+        can :query_order_report, :orders
     end
 
     if user.admin?(storage)
@@ -164,6 +170,7 @@ class Ability
         can :manage, Keyclientorderdetail, keyclientorder: {storage_id: storage.id}
 
         can :manage, Order, storage_id: storage.id
+        can :query_order_report, :orders
         cannot :cancel, Order, status: ['printed','picking']
         can :manage, OrderDetail, order: {storage_id: storage.id}
 
@@ -198,6 +205,8 @@ class Ability
         can :manage, Mobile, storage_id: storage.id
 
         can :read, Task, storage_id: storage.id
+
+        
     end
 
     if user.order?(storage)
@@ -254,6 +263,7 @@ class Ability
         can :packout, Order, storage_id: storage.id
         can :packaging_index, Order, storage_id: storage.id
         can :packaged_index, Order, storage_id: storage.id
+        
     end
 
     if user.sorter?(storage)
@@ -308,10 +318,14 @@ class Ability
         can :manage, Inventory, unit_id: user.unit_id
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
+        
     end
 
     end
 end
+
+
+
 
 # if user.admin?(storage)
 
