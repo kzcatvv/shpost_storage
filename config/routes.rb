@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :logistics
+
   resources :consumable_stocks do
     collection do
       get 'modconsumablestocks'
