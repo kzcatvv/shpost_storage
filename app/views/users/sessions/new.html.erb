@@ -1,43 +1,26 @@
 <center>
   <%= bootstrap_flash %>
-  <div id="bg">
+    <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
     <div id="login-wrapper" class="png_bg">
-      <div id="login-top">
-        <font face="微软雅黑" color='#006030' size=6><%= t('devise.sessions.new.title', :default => "Sign in") %></font>
-      </div>
-      <br><br><br>
-      <div id="login-content">
-      	<%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
-      	<p>
-
-          <%= f.label t('devise.sessions.new.username', :default => "Username") %> 
-          <%= f.text_field :username, :class=>"text-input" %>
-        </p>
-
-        <div class="clear"></div>
-
-        <p>
-          <%= f.label t('devise.sessions.new.password', :default => "Password") %>
-          <%= f.password_field :password, :class=>"text-input" %>
-        </p>
-        
-        <div class="clear"></div>
-
-        <p id="remember-password">
-          <% if devise_mapping.rememberable? -%>
-          <%= f.check_box :remember_me %> <%= f.label t('devise.sessions.new.remember_me', :default => "Remember me") %>
-          <% end -%>
-        </p>
-        
-
-        <div class="clear"></div>
-
-
-        <p><%= f.submit t('devise.sessions.new.sign_in', :default => "Sign in"), :class=>"button" %></p>
-        
-        <% end %>
-        
+      	<div class="uname-div">
+          <%= f.text_field :username, :class=>"form-control input-md" %>
         </div>
+
+        <div class="pwd-div">
+          <%= f.password_field :password, :class=>"form-control input-md" %>
+        </div>
+
+        <div class="remember-div" id="remember-password">
+          <% if devise_mapping.rememberable? -%>
+          <%= f.check_box :remember_me %> 
+          <%= f.label t('devise.sessions.new.remember_me', :default => "Remember me") , :for => "user_remember_me"%>
+          <% end -%>
+        </div>
+
+        <div class="button-div">
+          <%= f.submit t('devise.sessions.new.sign_in', :default => "Sign in"), :class=>"login-btn" ,:value=>"" %>
+        </div>
+
       </div>
-    </div>
+    <% end %>
 </center>
