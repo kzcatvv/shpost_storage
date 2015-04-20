@@ -1,0 +1,81 @@
+<%- model_class = Order -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'helpers.titles.query_order_report', '%{model} (订单汇总)'], :model => model_class.model_name.human.titleize %></h1>
+
+</div> 
+<div>
+  <%= form_tag("/order_statistics/query_order_report", method: "get")%>
+    <div><%= label_tag(:query_order_start_date, "汇总开始日期:") %><%= text_field("query_order_start_date","query_order_start_date", default: 1.week.ago) %></div>
+    <br/>
+    <div><%= label_tag(:query_order_end_date, "汇总结束日期:") %><%= text_field("query_order_end_date","query_order_end_date",default: Date.today) %></div>
+    <br/>
+    <%= submit_tag "查询",:class => 'btn btn-primary' %>
+  </form>
+</div>
+<div>
+  <table id="orders" class="table table-striped">
+    <thead>
+      <tr>
+        <th>商户</th>
+        <th>物流供应商</th>
+        <th>待处理</th>
+        <th>已审核</th>
+        <th>已包装</th>
+        <th>正在寄送中</th>
+        <th>已寄达</th>
+        <th>退回</th>
+        <th>总计</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    <% if !@order_hash.blank? and !@orders.blank?%>
+    <% bid=0 %>
+    <% @order_hash.each do |key,value| %>
+    <tr>
+        <%  if !key[0].blank?
+              if key[0]==bid 
+                 business_name="" 
+              else
+                 business = Business.find_by id:key[0]
+                 if !business.blank?
+                   business_name=business.name.blank?? "":business.name
+                 end
+              end
+            else
+              business_name="" 
+            end
+        %>
+
+        <td>
+        <%= business_name %>
+        </td>
+        <td><%= key[1].blank?? "":@orders.find_by(transport_type:key[1]).transport_type_name %></td>
+        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"waiting").count %></td>
+        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"checked").count %></td>
+        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"packed").count %></td>
+        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"delivering").count %></td>
+        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"delivered").count %></td>
+        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"returned").count %></td>
+        <td>
+        <%= @orders.where(business_id:key[0],transport_type:key[1]).count %>
+        </td>
+    </tr>
+    <% bid=key[0] %>
+    <% end %>
+    <tr>
+    <td>总计</td>
+    <td></td>
+    <td><%= @orders.where("orders.status = 'waiting'").count %></td>
+    <td><%= @orders.where("orders.status = 'checked'").count %></td>
+    <td><%= @orders.where("orders.status = 'packed'").count %></td>
+    <td><%= @orders.where("orders.status = 'delivering'").count %></td>
+    <td><%= @orders.where("orders.status = 'delivered'").count %></td>
+    <td><%= @orders.where("orders.status = 'returned'").count %></td>
+    <td><%= @orders.count %></td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+    

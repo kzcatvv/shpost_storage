@@ -21,7 +21,7 @@
   <form action="/print/websplitordertrackingnum" method="post">
     <%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
          <input type=hidden id='orid' name='orid' value='<%= @order.id%>'/>
-         <h3>快递类型：<%= select_tag(:transport_type, options_for_select(Order::TRANSPORT_TYPE_print)) %></h3>
+         <h3>快递类型：<%= select_tag(:transport_type, options_from_collection_for_select(@logistics, "id", "name")) %></h3>
          <br><br>
          <input type="submit" id='sub' value="打印面单" class='btn btn-primary'/> 
     </form>
