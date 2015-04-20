@@ -20,7 +20,7 @@
           <%= select_tag("stock_logs[][inv_shelf_id]", options_for_select(Shelf.where("id in (?)",stock_log.parent.inv_type_dtl.split(",")).map{|u| [u.shelf_code,u.id]}.insert(0,"请选择"), stock_log.shelf_id), id: "stock_logs_invshelfid_#{stock_log.id}")%>
         </td>
         <td>
-          <%= select_tag("stock_logs[][inv_stock_id]", options_for_select(Stock.where("shelf_id in (?)",stock_log.parent.inv_type_dtl.split(",") ).map{|u| [u.batch_no+u.specification.all_name,u.id]}.insert(0,"请选择"), stock_log.stock_id), id: "stock_logs_invstockid_#{stock_log.id}")%>
+          <%= select_tag("stock_logs[][inv_stock_id]", options_for_select(Stock.where("shelf_id in (?)",stock_log.parent.inv_type_dtl.split(",") ).map{|u| [u.batch_no+u.specification.full_title,u.id]}.insert(0,"请选择"), stock_log.stock_id), id: "stock_logs_invstockid_#{stock_log.id}")%>
         </td>
         <td>
           <%= text_field_tag("stock_logs[][inv_act_amount]", stock_log.amount, id: "stock_logs_invactamount_#{stock_log.id}",disabled: true ) %>

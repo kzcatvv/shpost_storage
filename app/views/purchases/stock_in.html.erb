@@ -47,7 +47,7 @@ function CreateStockinPage(){
     LODOP.SET_PRINT_STYLE("Bold",0);
     <% @stock_logs.map(&:id).each do |j| %>
         h=h+42;
-        LODOP.ADD_PRINT_TEXT(h,"5%",340,25,'<%= StockLog.find(j).specification.name.gsub(/[\r\n]/,'') %>');
+        LODOP.ADD_PRINT_TEXT(h,"5%",340,25,'<%= StockLog.find(j).specification.full_title.gsub(/[\r\n]/,'') %>');
         LODOP.ADD_PRINT_TEXT(h,"50%",260,25,'<%= StockLog.find(j).amount %>');
         LODOP.ADD_PRINT_TEXT(h,"60%",260,25,'<%= StockLog.find(j).shelf.shelf_code %>');
         LODOP.ADD_PRINT_TEXT(h,"80%",260,25,'<%= StockLog.find(j).specification.sixnine_code %>');

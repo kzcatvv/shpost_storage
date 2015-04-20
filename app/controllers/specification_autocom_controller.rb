@@ -17,7 +17,7 @@ class SpecificationAutocomController < ApplicationController
     #specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
 
     # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.full_title, :value => specification.all_name, :obj => obj_id} }
 
   end
 
@@ -32,7 +32,7 @@ class SpecificationAutocomController < ApplicationController
     specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
 
     # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.full_title, :value => specification.full_title, :obj => obj_id} }
 
   end
 
@@ -49,7 +49,7 @@ class SpecificationAutocomController < ApplicationController
     specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
       
     # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.full_title, :value => specification.full_title, :obj => obj_id} }
 
   end
 
@@ -67,7 +67,7 @@ class SpecificationAutocomController < ApplicationController
     specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
       
     # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.full_title, :value => specification.full_title, :obj => obj_id} }
 
   end
 
@@ -85,7 +85,7 @@ class SpecificationAutocomController < ApplicationController
     specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
       
     # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.full_title, :value => specification.full_title, :obj => obj_id} }
 
   end
 
@@ -103,7 +103,7 @@ class SpecificationAutocomController < ApplicationController
     specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
       
     # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name, :obj => obj_id} }
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.full_title, :value => specification.full_title, :obj => obj_id} }
 
   end
 
@@ -116,7 +116,7 @@ class SpecificationAutocomController < ApplicationController
     specifications = Specification.where(id: si).accessible_by(current_ability).order(:all_name).all
 
     # binding.pry
-    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.all_name, :value => specification.all_name} }
+    render :json => specifications.map { |specification| {:id => specification.id, :label => specification.full_title, :value => specification.full_title} }
 
   end
 end

@@ -32,7 +32,7 @@
               specification = Specification.find_by id:key[0]
             end
         %>
-        <%= specification.blank?? "":specification.all_name %>
+        <%= specification.blank?? "":specification.full_title %>
         </td>
         <td>
         <%  if !key[1].blank?
