@@ -87,7 +87,7 @@ background-color: #0099CC;
 }
 #menu-group-0 .panel .panel .menu-title.selected {
     background-color: #000000;
-    background-image: url("/assets/menu_selected.jpg");
+    background-image: url('<%=asset_path("menu_selected.jpg")%>');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -104,14 +104,13 @@ background-color: #0099CC;
     display: table;
 }
 .main-container .container {
-    position: relative;
     width: auto !important;
     margin: 0px 5px 0px 230px;
 }
 .left-slider .logo {
     display: table-cell;
     width: 61px;
-    background-image: url("/assets/left_logo.png");
+    background-image: url('<%=asset_path("left_logo.png")%>');
     background-size: contain;
     background-position: top center;
     background-repeat: no-repeat;
@@ -129,7 +128,7 @@ background-color: #0099CC;
     width: 555px;
     height: 59px;
     float: left;
-    background-image: url("/assets/logo.png");
+    background-image: url('<%=asset_path("logo.png")%>');
     background-size: contain;
     background-position: left center;
     background-repeat: no-repeat;
@@ -138,7 +137,7 @@ background-color: #0099CC;
     position: relative;
     height: 59px;
     margin: 0px 0px 0px 555px;
-    background-image: url("/assets/top_bg.png");
+    background-image: url('<%=asset_path("/assets/top_bg.png")%>');
     background-size: contain;
     background-position: center;
     background-repeat: repeat;
@@ -161,14 +160,14 @@ background-color: #0099CC;
 .header-container .bg li.dropdown>a {
     color: #ffffff;
 }
-.pin-wrapper {
+.main-container .pin-wrapper {
     float: left;
 }
 #login-wrapper {
     width: 514px;
     height: 316px;
     margin: 120px auto 0px;
-    background-image: url("/assets/login_bg.jpg");
+    background-image: url('<%=asset_path("login_bg.jpg")%>');
     background-size: 514px 316px;
     background-position: center;
     background-repeat: no-repeat;
@@ -201,7 +200,7 @@ background-color: #0099CC;
 #login-wrapper .button-div .login-btn {
     width: 109px;
     height: 39px;
-    background-image: url("/assets/login_btn.jpg");
+    background-image: url('<%=asset_path("login_btn.jpg")%>');
     background-size: 109px 39px;
     background-position: center;
     background-repeat: no-repeat;

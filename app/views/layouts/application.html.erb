@@ -46,31 +46,33 @@
     <body>
       <% if user_signed_in? %>
         <div class="header-container">
-          <div class="logo"></div>
-          <div class="bg">
-            <ul class="nav navbar-nav pull-right">
-              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                <%= current_user.name %><b class="caret"></b></a>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                  <li><%= link_to t('user_navigation.update_self'), edit_user_path(current_user.id) %></li>
-                  <li><%= link_to t('devise.navigation.sign_out'), destroy_user_session_path, :method => :delete %></li>
-                </ul>
-              </li>
-              <% if !session[:current_storage].nil? %>
-              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  <%= Storage.find(session[:current_storage]).name %><b class="caret"></b></a>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                  <% current_user.storages.each do |s| %>
-                    <li>
-                      <%= link_to s.name, "/storages/#{s.id}/change", method: :get %>
-                    </li>
-                  <% end %>
-                </ul>
-              </li>
-              <% else %>
-              <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  无 </a></li>
-              <% end %>
-            </ul>
+          <div>
+            <div class="logo"></div>
+            <div class="bg">
+              <ul class="nav navbar-nav pull-right">
+                <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                  <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                  <%= current_user.name %><b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                    <li><%= link_to t('user_navigation.update_self'), edit_user_path(current_user.id), :method => :get %></li>
+                    <li><%= link_to t('devise.navigation.sign_out'), destroy_user_session_path, :method => :delete %></li>
+                  </ul>
+                </li>
+                <% if !session[:current_storage].nil? %>
+                <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  <%= Storage.find(session[:current_storage]).name %><b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                    <% current_user.storages.each do |s| %>
+                      <li>
+                        <%= link_to s.name, "/storages/#{s.id}/change", method: :get %>
+                      </li>
+                    <% end %>
+                  </ul>
+                </li>
+                <% else %>
+                <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">当前仓库:  无 </a></li>
+                <% end %>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="main-container">
