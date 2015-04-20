@@ -24,9 +24,7 @@
     g.column name: model_class.human_attribute_name(:address), attribute: 'address'
 
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
-
-    g.column name: model_class.human_attribute_name(:alertday), attribute: 'alertday'
-
+    
     g.column do |business|
       ActiveSupport::SafeBuffer.new << 
       (link_to t('.edit', :default => t("helpers.links.edit")),
