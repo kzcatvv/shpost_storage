@@ -87,10 +87,11 @@ background-color: #0099CC;
 }
 #menu-group-0 .panel .panel .menu-title.selected {
     background-color: #000000;
-    background-image: url('<%=asset_path("menu_selected.jpg")%>');
-    background-size: cover;
-    background-position: center;
+    background-image: url('<%=asset_path("left_arrow.png")%>');
+    background-size: 13px 20px;
+    background-position: 156px 9px;
     background-repeat: no-repeat;
+    background-color: #064300;
 }
 .header-container {
     width: 100%;
@@ -195,7 +196,7 @@ background-color: #0099CC;
 }
 #login-wrapper .remember-div {
     position: absolute;
-    top: 238px;
+    top: 240x;
     left: 200px;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -210,11 +211,18 @@ background-color: #0099CC;
 #login-wrapper .button-div .login-btn {
     width: 109px;
     height: 39px;
-    background-image: url('<%=asset_path("login_btn.jpg")%>');
+    background-image: url('<%=asset_path("login_btn.png")%>');
     background-size: 109px 39px;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: transparent;
+    -webkit-appearance: none;
+    outline: none;
+    border: 0px;
 }
 #remember-password label {
     display: inline-block;
+}
+.uname-div input, .pwd-div input {
+    width: 206px;
 }
