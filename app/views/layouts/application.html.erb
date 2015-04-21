@@ -36,7 +36,6 @@
       
       <%= javascript_include_tag :defaults %>
       <%= javascript_include_tag "application" %>
-      <%= javascript_include_tag "jquery.pin.min" %>
 
       <!-- <%= javascript_include_tag 'jquery-1.10.2.js', 'jquery-ui-1.10.4.custom.min.js', 'autocomplete-rails.js', 'rails.js'  %> -->
       
@@ -54,7 +53,7 @@
                   <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                   <%= current_user.name %><b class="caret"></b></a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    <li><%= link_to t('user_navigation.update_self'), edit_user_path(current_user.id), :method => :get %></li>
+                    <li><%= link_to t('user_navigation.update_self'), edit_user_path(current_user.id) %></li>
                     <li><%= link_to t('devise.navigation.sign_out'), destroy_user_session_path, :method => :delete %></li>
                   </ul>
                 </li>
