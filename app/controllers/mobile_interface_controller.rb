@@ -90,7 +90,7 @@ class MobileInterfaceController < ApplicationController
       batch_no = stock_logs.reject{|stock_log| stock_log.batch_no.blank?}.map{|stock_log| stock_log.batch_no}.join("_")
       sn = stock_logs.reject{|stock_log| stock_log.sn.blank?}.map{|stock_log| stock_log.sn}.join(Stock::SN_SPLIT)
 
-      products << {sku: relationship.barcode, product: relationship.specification.full_title, business: relationship.business.name, supplier: relationship.supplier.name, batch: batch_no, product_barcode: relationship.try(:barcode), product_sixnine: relationship.specification.sixnine_code, product_sn: sn.blank? ? nil : sn.try(:split, Stock::SN_SPLIT), amount: y, scan: relationship.piece_to_piece ? "Y" : "N", shelf: shelf.shelf_code, shelf_barcode: shelf.barcode, type: x[2] }
+      products << {sku: relationship.barcode, product: relationship.specification.full_title, business: relationship.business.name, supplier: relationship.supplier.name, batch: batch_no, product_barcode: relationship.try(:barcode), product_sixnine: relationship.specification.sixnine_code, product_three: relationship.external_code, product_sn: sn.blank? ? nil : sn.try(:split, Stock::SN_SPLIT), amount: y, scan: relationship.piece_to_piece ? "Y" : "N", shelf: shelf.shelf_code, shelf_barcode: shelf.barcode, type: x[2] }
     end
 
     success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), mission: task.id, barcode: task.barcode, title: task.title, type: task.task_type, mission_time: task.created_at.strftime('%Y%m%d %H:%M:%S'), products: products})
@@ -261,15 +261,16 @@ class MobileInterfaceController < ApplicationController
     stocks = nil
 
     relationship = Relationship.find_by barcode: barcode
+    relationship ||= Relationship.find_by external_code: barcode
     specification = Specification.find_by sixnine_code: barcode
 
     if ! relationship.blank?
-      stocks = Stock.find_stocks_in_storage(relationship.specification, relationship.business, relationship.supplier, @storage, nil)
+      stocks = Stock.find_stocks_in_storage(relationship.specification, relationship.supplier, relationship.business, @storage, nil)
     elsif ! specification.blank?
       stocks = Stock.find_stocks_in_storage(specification, nil, nil, @storage, nil)
     end
 
-    stocks = Stock.includes(:storage).where(storages:{id: @storage}).where('sn like ?', "%#{barcode}%") if stocks.blank?
+    stocks ||= Stock.includes(:storage).where(storages:{id: @storage}).where('sn like ?', "%#{barcode}%") if stocks.blank?
     
     if stocks.blank?
       shelf = Shelf.includes(:storage).where(storages:{id: @storage}).find_by(barcode: barcode)
@@ -280,7 +281,7 @@ class MobileInterfaceController < ApplicationController
 
     if ! stocks.blank?
       stocks.each do |stock|
-        products << {stock: stock.id, product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, Stock::SN_SPLIT), expiration: stock.expiration_date.try(:strftime,'%Y%m%d'), amount: stock.on_shelf_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y%m%d %H:%M:%S') }
+        products << {stock: stock.id, product: stock.specification.full_title, business: stock.business.name, supplier: stock.supplier.name, batch: stock.batch_no, product_barcode: stock.relationship.try(:barcode), product_three: stock.relationship.try(:external_code), product_sixnine: stock.specification.sixnine_code, product_sn: stock.sn.try(:split, Stock::SN_SPLIT), expiration: stock.expiration_date.try(:strftime,'%Y%m%d'), amount: stock.on_shelf_amount, shelf: stock.shelf.shelf_code, shelf_barcode: stock.shelf.barcode, type: stock.shelf.shelf_type, date: stock.updated_at.strftime('%Y%m%d %H:%M:%S') }
       end
 
       success_builder({time: Time.now.strftime('%Y%m%d %H:%M:%S'), products: products})

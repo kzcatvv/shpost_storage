@@ -83,16 +83,17 @@ class Stock < ActiveRecord::Base
       return
     end
 
-    in_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, nil, move_shelf)
+    in_stock = get_available_stock_in_shelf(stock.specification, stock.supplier, stock.business, stock.batch_no, move_shelf)
 
-    out_stock_log = StockLog.create(user: operation_user, stock: stock, operation: is_broken ? StockLog::OPERATION[:move_to_bad] : StockLog::OPERATION[:move_stock_out], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now, batch_no: stock.batch_no, parent: move_stock)
+    out_stock_log = StockLog.create(user: operation_user, stock: stock, operation: is_broken ? StockLog::OPERATION[:move_to_bad] : StockLog::OPERATION[:move_stock_out], status: StockLog::STATUS[:waiting], operation_type: StockLog::OPERATION_TYPE[:out], amount: amount, checked_at: Time.now, batch_no: stock.batch_no, parent: move_stock)
 
-    stock.check_out_amount(amount)
+    # stock.check_out_amount(amount)
 
-    in_stock.check_in_amount(amount)
+    in_stock_log = StockLog.create(user: operation_user, stock: in_stock, operation: is_broken ? StockLog::OPERATION[:bad_stock_in] : StockLog::OPERATION[:move_stock_in], status: StockLog::STATUS[:waiting], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now, batch_no: in_stock.batch_no, pick_out: out_stock_log.reload, parent: move_stock)
 
-    in_stock_log = StockLog.create(user: operation_user, stock: in_stock, operation: is_broken ? StockLog::OPERATION[:bad_stock_in] : StockLog::OPERATION[:move_stock_in], status: StockLog::STATUS[:checked], operation_type: StockLog::OPERATION_TYPE[:in], amount: amount, checked_at: Time.now, batch_no: stock.batch_no, pick_out: out_stock_log, parent: move_stock)
+    # in_stock.check_in_amount(amount)
 
+    move_stock.check!
     move_stock
   end
 
