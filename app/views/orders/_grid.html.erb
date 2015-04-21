@@ -26,7 +26,7 @@
                         buffer += content_tag(:p,(order.province.nil? ? " " : order.province)+(order.city.nil? ? " " : order.city)+(order.county.nil? ? " " : order.county)+(order.customer_address.nil? ? " " : order.customer_address))
                       raw buffer
                        
-                   end, colspan:2)+
+                   end, colspan:3)+
                    content_tag(:td,
                       content_tag(:div) do
                        # without buffer only the last tag will appear
@@ -76,7 +76,7 @@
                        end
                       raw buffer
                        
-                   end, colspan:2) )
+                   end, colspan:3) )
          end
     end
 
