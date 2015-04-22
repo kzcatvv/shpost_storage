@@ -382,9 +382,12 @@ ShpostStorage::Application.routes.draw do
 
   match "/print/tracking" => "print#tracking",via: [:get, :post]
   match "/print/trackingnum" => "print#trackingnum",via: [:get, :post]
+  match "/print/keyprint" => "print#keyprint",via: [:get, :post]
   match "/print/keytracking" => "print#keytracking",via: [:get, :post]
   match "/print/keytrackingnum" => "print#keytrackingnum",via: [:get, :post]
+  match "/print/webprint" => "print#webprint",via: [:get, :post]
   match "/print/webtracking" => "print#webtracking",via: [:get, :post]
+  match "/print/webhottracking" => "print#webhottracking",via: [:get, :post]
   match "/print/webtrackingnum" => "print#webtrackingnum",via: [:get, :post]
   match "/print/websplitordertracking" => "print#websplitordertracking",via: [:get, :post]
   match "/print/websplitordertrackingnum" => "print#websplitordertrackingnum",via: [:get, :post]
