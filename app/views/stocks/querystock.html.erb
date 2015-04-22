@@ -51,7 +51,7 @@
               specification = Specification.find_by id:key[3]
             end
         %>
-        <%= specification.blank?? "":specification.all_name %>
+        <%= specification.blank?? "":specification.full_title %>
         </td>
         <td><%= @actual_hash[key] %></td>
         <td><%= @virtual_hash[key] %></td>
@@ -64,7 +64,7 @@
       <tr>
         <td> </td>
         <td>
-        <%= rel.specification.blank? ? "" : rel.specification.all_name %>
+        <%= rel.specification.blank? ? "" : rel.specification.full_title %>
         </td>
         <td>0</td>
         <td>0</td>

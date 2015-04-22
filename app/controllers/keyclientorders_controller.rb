@@ -1,6 +1,7 @@
 class KeyclientordersController < ApplicationController
   #before_action :set_keyclientorder, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource
+  skip_before_filter :verify_authenticity_token, :only => [:assign_select]
 
   user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '确认出库', object: :keyclientorder, parent: :keyclientorder
 
@@ -273,6 +274,7 @@ class KeyclientordersController < ApplicationController
     @tasker = Task.tasker_in_work(@keyclientorder)
     @task_finished = !@keyclientorder.has_waiting_stock_logs()
     @sorters = current_storage.get_sorter()
+    render :layout=> false
   end
 
   def assign_select

@@ -1,12 +1,12 @@
 <%= form_for ([ @business, @relationship]), :html => { :class => 'form-horizontal' } do |f| %>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :business_id, :class => 'control-label' %>
     <div class="controls">
       <!--<%= f.select(:business_id, Business.accessible_by(current_ability).map{|u| [u.name,u.id]})%>-->
       <%= Business.find(@relationship.business_id).name %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :supplier_id, :class => 'control-label' %>
     <div class="controls">
       <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]},:include_blank => "请选择")%>
@@ -14,28 +14,28 @@
       
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
       <%= br_product_select_autocom("relationship",@business.id) %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :external_code, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :external_code, :class => 'form-control' %>
+      <%= f.text_field :external_code, :class => 'text_field' %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :spec_desc, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :spec_desc, :class => 'form-control' %>
+      <%= f.text_field :spec_desc, :class => 'text_field' %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :warning_amt, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :warning_amt, :class => 'form-control' %>
+      <%= f.text_field :warning_amt, :class => 'text_field' %>
     </div>
   </div>
 

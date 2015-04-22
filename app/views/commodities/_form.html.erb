@@ -1,17 +1,18 @@
 <%= form_for @commodity, :html => { :class => 'form-horizontal' } do |f| %>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :name, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :name, :class => 'form-control' %>
+      <%= f.text_field :name, :class => 'text_field' %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :goodstype_id, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select :goodstype_id, Goodstype.accessible_by(current_ability).collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
+      <%= f.select :goodstype_id, Goodstype.accessible_by(current_ability).collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'text_field' %>
     </div>
   </div>
-  
+
+
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
             commodities_path, :class => 'btn btn-default' %>

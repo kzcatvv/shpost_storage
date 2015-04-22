@@ -21,8 +21,8 @@
         <td><%= hidden_field_tag("stock_logs[][id]", stock_log.id, id: "stock_logs_id_#{stock_log.id}") %></td>
         <td>
         <% orid = stock_log.parent.id %>
-          <%= select_tag("stock_logs[][orid]", options_for_select(OrderReturnDetail.where(order_return_id: orid).map{|u| ["#{u.order_detail.specification.all_name}",u.id]}, orid), id: "stock_logs_orid_#{stock_log.id}", style: "display: none;") <<
-          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.all_name}", {id: "stock_logs_orid_#{stock_log.id}"}) %>
+          <%= select_tag("stock_logs[][orid]", options_for_select(OrderReturnDetail.where(order_return_id: orid).map{|u| ["#{u.order_detail.specification.full_title}",u.id]}, orid), id: "stock_logs_orid_#{stock_log.id}", style: "display: none;") <<
+          content_tag(:p, "#{stock_log.batch_no}_#{stock_log.specification.full_title}", {id: "stock_logs_orid_#{stock_log.id}"}) %>
         </td>
         <td>
         <%= content_tag(:p, stock_log.shelf.shelf_code, {id: "stock_logs_oshelfid_#{stock_log.id}"}) <<

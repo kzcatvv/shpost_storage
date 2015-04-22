@@ -1,6 +1,7 @@
 class ManualStocksController < ApplicationController
   load_and_authorize_resource
   # before_action :set_manual_stock, only: [:show, :edit, :update, :destroy]
+  skip_before_filter :verify_authenticity_token, :only => [:assign_select]
 
   # GET /manual_stocks
   # GET /manual_stocks.json
@@ -87,6 +88,7 @@ class ManualStocksController < ApplicationController
     @tasker = Task.tasker_in_work(@manual_stock)
     @task_finished = !@manual_stock.has_waiting_stock_logs()
     @sorters = current_storage.get_sorter()
+    render :layout=> false
   end
 
   def assign_select

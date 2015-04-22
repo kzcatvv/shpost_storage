@@ -1,34 +1,34 @@
 <%= form_for ([ @keyclientorder, @keyclientorderdetail]), :html => { :class => 'form-horizontal' } do |f| %>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :supplier_id, :class => 'control-label' %>
     <div class="controls">
       <%= f.select(:supplier_id, Supplier.accessible_by(current_ability).map{|u| [u.name,u.id]},:include_blank => "请选择")%>
       <%= hidden_field_tag('ko_sid',@koid) %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :specification_id, :class => 'control-label' %>
     <div class="controls">
       <%= ko_product_select_autocom("keyclientorderdetail"),@keyclientorder.id %>
     </div>
 
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :desc, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :desc, :class => 'form-control' %>
+      <%= f.text_field :desc, :class => 'text_field' %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :amount, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :amount, :class => 'form-control' %>
+      <%= f.text_field :amount, :class => 'text_field' %>
     </div>
   </div>
-  <div class="form-group">
+  <div class="control-group">
     <%= f.label :batch_no, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :batch_no, :class => 'form-control' %>
+      <%= f.text_field :batch_no, :class => 'text_field' %>
     </div>
   </div>
   

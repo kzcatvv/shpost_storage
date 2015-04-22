@@ -61,7 +61,7 @@ class OrdersController < ApplicationController
     @orders_grid = initialize_grid(@orders,
      :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder, :user_logs],:order => 'created_at', :order_direction => 'desc')
     @orders_grid.with_resultset do |orders|
-      @@orders_query_export = orders
+      @@orders_query_export = orders.order(created_at: :desc)
     end
   end
 
@@ -1423,7 +1423,10 @@ class OrdersController < ApplicationController
 
                 dorder = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id: business_id 
               else
-
+                if exist_in_batchno(sheet1_error,batch_no)
+                  sheet2_error << instance.row(dline)
+                  next
+                end
                 dorder = Order.accessible_by(current_ability).find_by batch_no: batch_no
               end
               
@@ -1965,7 +1968,7 @@ def exportorders_xls_content_for(objs)
       order_details = OrderDetail.accessible_by(current_ability).where('order_id = ?',"#{obj.id}")
       order_details.each do |order_detail|
         if !order_detail.specification.blank?
-          all_name = all_name + order_detail.specification.name + "*" + order_detail.amount.to_s + ","
+          all_name = all_name + order_detail.specification.full_title + "*" + order_detail.amount.to_s + ","
         end
       end
 
@@ -2045,7 +2048,7 @@ def exportorders_xls_content_for(objs)
         sheet2[detail_row,2]=sku_extcode_69code
         sheet2[detail_row,3]=supplier_no
         sheet2[detail_row,4]=order_detail.amount
-        sheet2[detail_row,5]=specification.all_name
+        sheet2[detail_row,5]=specification.full_title
         sheet2[detail_row,6]=obj.business.name
         sheet2[detail_row,7]=order_detail.order.batch_no
         
@@ -2156,6 +2159,17 @@ def exportorders_xls_content_for(objs)
   def exist_in(arrays,id)
     arrays.each do |x|
       if to_string(x[0]).eql? id
+        return true
+      else
+        next
+      end
+    end
+    return false
+  end
+
+  def exist_in_batchno(arrays,id)
+    arrays.each do |x|
+      if to_string(x[15]).eql? id
         return true
       else
         next

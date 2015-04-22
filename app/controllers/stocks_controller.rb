@@ -385,7 +385,7 @@ class StocksController < ApplicationController
       if !key[3].blank?
         specification = Specification.find_by id:key[3]
       end
-      sheet1[count_row,1] = specification.blank?? "":specification.all_name
+      sheet1[count_row,1] = specification.blank?? "":specification.full_title
       sheet1[count_row,2] = actual_hash[key]
       sheet1[count_row,3] = virtual_hash[key]
 
@@ -395,7 +395,7 @@ class StocksController < ApplicationController
     if !zerorels.blank?
       zerorels.each do |rel|
         sheet1[count_row,0] = ""
-        sheet1[count_row,1] = rel.specification.blank? ? "" : rel.specification.all_name
+        sheet1[count_row,1] = rel.specification.blank? ? "" : rel.specification.full_title
         sheet1[count_row,2] = 0
         sheet1[count_row,3] = 0
         count_row += 1
