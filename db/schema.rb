@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150417014854) do
+ActiveRecord::Schema.define(version: 20150420065118) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -197,6 +197,8 @@ ActiveRecord::Schema.define(version: 20150417014854) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "storage_id"
+    t.string   "param_val1"
+    t.string   "param_val2"
   end
 
   create_table "manual_stock_details", force: true do |t|
