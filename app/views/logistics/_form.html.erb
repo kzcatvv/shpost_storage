@@ -53,6 +53,18 @@
       <%= f.select :storage_id, Storage.all.collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
     </div>
   </div>
+  <div class="control-group">
+    <%= f.label :param_val1, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :param_val1, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :param_val2, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :param_val2, :class => 'text_field' %>
+    </div>
+  </div>
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
