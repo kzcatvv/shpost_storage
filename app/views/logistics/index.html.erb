@@ -34,6 +34,10 @@
       end
     end
 
+    g.column name: model_class.human_attribute_name(:param_val1), attribute: 'param_val1'
+
+    g.column name: model_class.human_attribute_name(:param_val2), attribute: 'param_val2'
+
 
     g.column do |logistic|
       ActiveSupport::SafeBuffer.new << 

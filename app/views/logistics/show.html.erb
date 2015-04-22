@@ -22,6 +22,10 @@
   <dd><%= @logistic.post %></dd>
   <dt><strong><%= model_class.human_attribute_name(:is_default) %>:</strong></dt>
   <dd><%= @logistic.is_default %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:param_val1) %>:</strong></dt>
+  <dd><%= @logistic.param_val1 %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:param_val2) %>:</strong></dt>
+  <dd><%= @logistic.param_val2 %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
