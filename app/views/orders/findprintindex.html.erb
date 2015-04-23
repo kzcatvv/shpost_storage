@@ -18,7 +18,7 @@
     <%=link_to t('面单信息回馈'), "/orders/importorders1", target: '_blank',:class => 'btn btn-primary' %>
     </form>
     <br/>
-    <%=link_to t('打印面单'), "/print/webprint?flag=filter&&ids=#{@orders_grid.all_pages_records.map{|o| o.id if (o.status=='waiting')}.compact.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
+    <%=link_to t('打印面单'), "/print/webtracking?flag=filter&&ids=#{@orders_grid.all_pages_records.map{|o| o.id if (o.status=='waiting')}.compact.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
     <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
      <% if can? :stockout, Order %>
 

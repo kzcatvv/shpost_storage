@@ -120,11 +120,12 @@ class PrintController < ApplicationController
                 @ids.each_with_index do |num,i|
                     @order=Order.find(num)
                     @order.update(tracking_number: numary[i])
+                    @order.update(status: 'printed')
                 end
             else
-                url = "/print/webtracking?flag="+params[:flag]+"&&ids="+params[:id]
+                # url = "/print/webtracking?flag="+params[:flag]+"&&ids="+params[:id]
                 flash[:error]="取号段失败"+rqback[1]
-                redirect_to url
+                redirect_to :action => "webprint",:flag => params[:flag],:ids => params[:id]
             end
         end
     end
@@ -172,15 +173,25 @@ class PrintController < ApplicationController
                     return_no << tracking_number 
                 end
             end
+        when "gnxb"
+            if num_count == 1
+                return_no << tracking_number
+            elsif num_count > 1
+                return_no << tracking_number
+                (2..num_count).each_with_index do |num,i|
+                    tracking_number = calNextTrackingNo(tracking_number)
+                    return_no << tracking_number 
+                end
+            end
         end
         return return_no    
     end
 
     def calNextTrackingNo(tracking_number)
         rt_num = ""
-        tmpnum = tracking_number[1,8]
-        chknum = checkTrackingNO((tmpnum.to_i+1).to_s)
-        rt_num = tracking_number[0,2]+(tracking_number[1,8].to_i+1).to_s+chknum+tracking_number[11,2]
+        tmpnum = tracking_number[2,8]
+        chknum = checkTrackingNO( ("%08d" % (tmpnum.to_i+1) ) )
+        rt_num = tracking_number[0,2]+("%08d" % (tracking_number[2,8].to_i+1) )+chknum+tracking_number[11,2]
         return rt_num
     end
 
