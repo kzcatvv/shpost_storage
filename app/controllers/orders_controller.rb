@@ -1860,7 +1860,7 @@ class OrdersController < ApplicationController
             else
               if !tracking_number.blank?
                 status = "printed"
-                @keyclientorder = Keyclientorder.find koid
+                @keyclientorder = Keyclientorder.find_by koid
               else
                 tracking_number = nil
               end
