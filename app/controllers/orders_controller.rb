@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
   load_and_authorize_resource
-  user_logs_filter only: [:orders_import], symbol: "订单导入回馈 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入回馈', object: :keyclientorder, parent: :keyclientorder,import_type: "#{import_type}"
+  user_logs_filter only: [:orders_import], symbol: "订单导入回馈 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入回馈', object: :keyclientorder, parent: :keyclientorder, import_type: :import_type
   # user_logs_filter only: [:standard_orders_import2], symbol: "订单导入 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入'
   # user_logs_filter only: [:exportorders], operation: '订单导出'
   # user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder, parent: :keyclientorder
@@ -1775,6 +1775,7 @@ class OrdersController < ApplicationController
 
   def orders_import
     @ids = []
+    @import_type = ""
     unless request.get?
       if file = upload_pingan(params[:file]['file'])
         instance=nil
@@ -1798,9 +1799,9 @@ class OrdersController < ApplicationController
         business_id = params[:business_select]
         if params[:business_select].blank?
           koid = getKeycOrderID()
-          import_type=back
+          @import_type="back"
         else
-          import_type=standard
+          @import_type="standard"
         end
         #从第二行开始一直读取，直到空行 
         line = 2
