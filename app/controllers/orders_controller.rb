@@ -928,7 +928,7 @@ class OrdersController < ApplicationController
                       ori_order_detail = ori_order_detail.where(business_deliver_no:sub_order_id)
                     end
                 end
-                binding.pry
+                
                 #原来没有，创建
                 if ori_order_detail.blank? 
                   #数量小等于0，跳过
