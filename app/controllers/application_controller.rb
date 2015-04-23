@@ -96,7 +96,7 @@ class ApplicationController < ActionController::Base
     
       end
     else
-      if args.first[:operation].eql? "订单导入"
+      if args.first[:operation].eql? "订单导入回馈"
           @user_log.orders = Order.where(id: ids)
           @user_log.object_symbol = symbol
       end
