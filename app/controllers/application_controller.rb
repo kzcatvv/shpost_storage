@@ -36,6 +36,8 @@ class ApplicationController < ActionController::Base
     
     object ||= eval("@#{controller_name.singularize}")
 
+
+
     operation = args.first[:operation]
     if operation.eql?"确认出库"
       if object
@@ -48,8 +50,18 @@ class ApplicationController < ActionController::Base
         end
       end
     end
+
+    import_type = args.first[:import_type]
+    if !import_type.blank?
+      if import_type.eql?"back" and operation.eql?"订单导入回馈"
+        operation = "订单导入"
+      end
+      if import_type.eql?"standard" and operation.eql?"订单导入回馈"
+        operation = "面单信息回馈"
+      end
+    end
     
-    operation ||= I18n.t("action_2_operation.#{action_name}") + object.class.model_name.human.to_s
+    # operation ||= I18n.t("action_2_operation.#{action_name}") + object.class.model_name.human.to_s
 
     symbol = args.first[:symbol]
 
@@ -95,13 +107,13 @@ class ApplicationController < ActionController::Base
         end
     
       end
-    else
-      if args.first[:operation].eql? "订单导入回馈"
-          @user_log.orders = Order.where(id: ids)
-          @user_log.object_symbol = symbol
-      end
-      @user_log.save
     end
+    if operation.eql? "订单导入"
+      @user_log.orders = Order.where(id: ids)
+      @user_log.object_symbol = symbol
+    end
+    @user_log.save
+    
   
   end
 

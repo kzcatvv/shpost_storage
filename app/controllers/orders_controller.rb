@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
   load_and_authorize_resource
-  user_logs_filter only: [:orders_import], symbol: "订单导入回馈 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入回馈', object: :keyclientorder, parent: :keyclientorder
+  user_logs_filter only: [:orders_import], symbol: "订单导入回馈 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入回馈', object: :keyclientorder, parent: :keyclientorder,import_type: "#{import_type}"
   # user_logs_filter only: [:standard_orders_import2], symbol: "订单导入 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入'
   # user_logs_filter only: [:exportorders], operation: '订单导出'
   # user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder, parent: :keyclientorder
@@ -1792,11 +1792,16 @@ class OrdersController < ApplicationController
         is_shortage = ""
         ords = []
         status = "waiting"
-        koid = ""
+        koid=""        
 
         #商户
         business_id = params[:business_select]
-        
+        if params[:business_select].blank?
+          koid = getKeycOrderID()
+          import_type=back
+        else
+          import_type=standard
+        end
         #从第二行开始一直读取，直到空行 
         line = 2
         line.upto(instance.last_row) do |line|
@@ -1855,7 +1860,6 @@ class OrdersController < ApplicationController
             else
               if !tracking_number.blank?
                 status = "printed"
-                koid = getKeycOrderID()
                 @keyclientorder = Keyclientorder.find koid
               else
                 tracking_number = nil
@@ -2108,7 +2112,11 @@ class OrdersController < ApplicationController
             next
           end
         end
-        redeal_with_errororder(sheet1_error,1)
+        if !params[:business_select].blank?
+          redeal_with_errororder(sheet1_error,1)
+        else
+          redeal_with_errororder(sheet1_error,2)
+        end
         if !sheet1_error.blank? || !sheet2_error.blank?
           flash_message << "有部分订单导入失败！"
         end
