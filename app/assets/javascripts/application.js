@@ -1595,12 +1595,6 @@ function showgrid() {
 var ready;
 var lastMenuId = "";
 ready = function() {
-  //set menu height
-  $(".left-slider").pin({padding: {top: 59}});
-  $(".header-container > div").pin();
-  var height = window.innerHeight - 59;
-  $(".left-slider").css("min-height" , height + "px");
-
   //set menu selected
   $(".mu-a").click(function(){
     lastMenuId = $(this).parent().parent().parent().attr("id").replace(/menu-group-/,"");
@@ -1614,7 +1608,6 @@ ready = function() {
       $("#menu-" + toDisplayId).addClass("in");
     };
   };
-  $(".container").css("min-height" , height + "px");
 };
 
 $(document).ready(ready);
