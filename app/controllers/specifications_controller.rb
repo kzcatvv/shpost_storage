@@ -81,11 +81,11 @@ class SpecificationsController < ApplicationController
     
     if RailsEnv.is_oracle?
       date_condition = "to_char(stock_logs.created_at,'yyyymmdd')"
-      time = to_char(DateTime.parse(Time.now.to_s),'yyyymmdd')
+      # time = to_char(DateTime.parse(Time.now.to_s),'yyyymmdd')
     else
       date_condition = "strftime('%Y%m%d',stock_logs.created_at)"
-      time=DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d').to_s
     end
+      time=DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d').to_s
 
     
     if params[:sp_start_date].blank? or params[:sp_start_date]["sp_start_date"].blank?

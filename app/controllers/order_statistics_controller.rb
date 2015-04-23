@@ -13,11 +13,8 @@ class OrderStatisticsController < ApplicationController
     
     if params[:query_order_start_date].blank? or params[:query_order_start_date]["query_order_start_date"].blank?
       start_date = Time.now.beginning_of_week
-      if RailsEnv.is_oracle?
-        start_date = to_char(DateTime.parse(start_date.to_s),'yyyymmdd')
-      else
-        start_date=DateTime.parse(start_date.to_s).strftime('%Y-%m-%d').to_s
-      end
+      start_date=DateTime.parse(start_date.to_s).strftime('%Y-%m-%d').to_s
+      
       if current_user.blank?
         @orders=@orders.where("orders.created_at >= ? and orders.status in (?)", start_date,status)
       else
@@ -33,11 +30,8 @@ class OrderStatisticsController < ApplicationController
     end
     if params[:query_order_end_date].blank? or params[:query_order_end_date]["query_order_end_date"].blank?
       end_date = Time.now.end_of_week
-      if RailsEnv.is_oracle?
-        end_date = to_char(DateTime.parse(end_date.to_s),'yyyymmdd')
-      else
-        end_date=DateTime.parse(end_date.to_s).strftime('%Y-%m-%d').to_s
-      end
+      end_date=DateTime.parse(end_date.to_s).strftime('%Y-%m-%d').to_s
+      
       end_date = Date.civil(end_date.split(/-|\//)[0].to_i, end_date.split(/-|\//)[1].to_i, end_date.split(/-|\//)[2].to_i)
       if current_user.blank?
         @orders=@orders.where("orders.created_at <= ? and orders.status in (?)", (end_date+1),status)
