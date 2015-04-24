@@ -16,7 +16,9 @@
 
     g.column name: model_class.human_attribute_name(:print_format), attribute: 'print_format'
 
-    g.column name: model_class.human_attribute_name(:is_getnum), attribute: 'is_getnum',filter_type: :boolean 
+    g.column name: model_class.human_attribute_name(:is_getnum), attribute: 'is_getnum',filter_type: :boolean do |logistic| 
+      logistic.is_default_name
+    end
 
     g.column name: model_class.human_attribute_name(:contact), attribute: 'contact'
 
@@ -26,7 +28,9 @@
 
     g.column name: model_class.human_attribute_name(:post), attribute: 'post'
 
-    g.column name: model_class.human_attribute_name(:is_default), attribute: 'is_default',filter_type: :boolean 
+    g.column name: model_class.human_attribute_name(:is_default), attribute: 'is_default',filter_type: :boolean do |logistic| 
+      logistic.is_getnum_name
+    end
 
     g.column name: model_class.human_attribute_name(:storage_id), attribute: 'storage_id',custom_filter: Storage.all.collect {|g| [g.name,g.id]} do |logistic|
       if !logistic.storage_id.blank?

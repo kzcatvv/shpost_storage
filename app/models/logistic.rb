@@ -1,8 +1,26 @@
 class Logistic < ActiveRecord::Base
 	belongs_to :storage
 
+  def is_default_name
+     if is_default
+        name = "是"
+     else
+        name = "否"
+     end
+  end
+
+  def is_getnum_name
+     if is_getnum
+        name = "是"
+     else
+        name = "否"
+     end
+  end
+
 	def getMailNum(sqzmc,ywdl,ywzl,sqsl)
-		if self.is_getnum
+		  case self.print_format
+      when 'tcbd'
+        if self.is_getnum
           begin
             url = URI.parse("#{GETNUM_URL}")
             Net::HTTP.start(url.host, url.port) do |http|
@@ -15,5 +33,6 @@ class Logistic < ActiveRecord::Base
             return nil
           end
         end
+      end
 	end
 end
