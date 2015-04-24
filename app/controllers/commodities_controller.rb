@@ -164,8 +164,8 @@ class CommoditiesController < ApplicationController
         end
         flash[:notice] = flash_message
 
-        respond_to do |format|
-          format.xls {   
+        # respond_to do |format|
+        #   format.xls {   
             if !sheet_error.blank?
               send_data(exporterrorcommodities_xls_content_for(sheet_error),  
               :type => "text/excel;charset=utf-8; header=present",  
@@ -173,8 +173,8 @@ class CommoditiesController < ApplicationController
             else
               redirect_to :action => 'index'
             end
-          }
-        end
+        #   }
+        # end
       end   
     end
   end
@@ -190,12 +190,13 @@ class CommoditiesController < ApplicationController
         specification_name = to_string(x[5])
         specification = nil
         specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:specification_name
-      end
-      if !specification.blank? && (specification.created_at == specification.updated_at)
-        specification.delete
-      end
-      if commodity.specifications.blank?
-        commodity.delete
+        if !specification.blank? && (specification.created_at == specification.updated_at)
+          specification.delete
+        end
+      
+        if commodity.specifications.blank? && (commodity.created_at == commodity.updated_at)
+          commodity.delete
+        end
       end
     end
   end
