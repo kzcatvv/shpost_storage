@@ -184,16 +184,14 @@ class StocksController < ApplicationController
     @is_zero=params[:is_zero]
 
     if !params[:ex_code].blank?
-      @relationship=Relationship.accessible_by(current_ability).where("external_code=?",params[:ex_code]).first
-      if !@relationship.blank?
-        @stocks=@stocks.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
-      end
+      @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
       @selrels = Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
     end
     if !params[:sixnine_code].blank?
+      @stocks=@stocks.includes(:specification).where("specifications.sixnine_code=?",params[:sixnine_code]).accessible_by(current_ability)
+
       @specification=Specification.accessible_by(current_ability).where("sixnine_code=?",params[:sixnine_code]).first
       if !@specification.blank?
-        @stocks=@stocks.where(specification_id: @specification)
         if @selrels.blank?
           @selrels = Relationship.where(specification: @specification)
         else
@@ -219,7 +217,6 @@ class StocksController < ApplicationController
     # if @stocks.blank?
     #   @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group("areas.id").group("stocks.business_id").group("stocks.supplier_id").group("stocks.specification_id").order("areas.id,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
 
-    #   # @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
     #   vstocks = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).order("areas.id,stocks.business_id,stocks.supplier_id,stocks.specification_id")
     #   vstocks.each do |s|
     #     gb = [s.shelf.area.id,s.business_id,s.supplier_id,s.specification_id]
@@ -273,16 +270,13 @@ class StocksController < ApplicationController
     @zerorels=""
 
     if !params[:ex_code].blank?
-      @relationship=Relationship.accessible_by(current_ability).where("external_code=?",params[:ex_code]).first
-      if !@relationship.blank?
-        @stocks=@stocks.where("business_id=? and specification_id=? and supplier_id=?",@relationship.business_id,@relationship.specification_id,@relationship.supplier_id)
-      end
+      @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
       @selrels = Relationship.where("external_code=?",params[:ex_code]).accessible_by(current_ability).first
     end
     if !params[:sixnine_code].blank?
+      @stocks=@stocks.includes(:specification).where("specifications.sixnine_code=?",params[:sixnine_code]).accessible_by(current_ability)
       @specification=Specification.accessible_by(current_ability).where("sixnine_code=?",params[:sixnine_code]).first
       if !@specification.blank?
-        @stocks=@stocks.where(specification_id: @specification)
         if @selrels.blank?
           @selrels = Relationship.where(specification: @specification)
         else
@@ -307,7 +301,6 @@ class StocksController < ApplicationController
 
     # if @stocks.blank?
     #   @actual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group("areas.id").group("stocks.business_id").group("stocks.supplier_id").group("stocks.specification_id").order("areas.id,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
-    #   # @virtual_hash = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
     #   vstocks = Stock.includes(:area).where("areas.storage_id = ?",current_storage.id).order("areas.id,stocks.business_id,stocks.supplier_id,stocks.specification_id")
     #   vstocks.each do |s|
     #     gb = [s.shelf.area.id,s.business_id,s.supplier_id,s.specification_id]
@@ -332,7 +325,6 @@ class StocksController < ApplicationController
 
     # else
       @actual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group("areas.id").group("stocks.business_id").group("stocks.supplier_id").group("stocks.specification_id").order("areas.id,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:actual_amount)
-      # @virtual_hash = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).group(:name,:business_id,:supplier_id,:specification_id).order("areas.name,stocks.business_id,stocks.supplier_id,stocks.specification_id").sum(:virtual_amount)
       vstocks = @stocks.includes(:area).where("areas.storage_id = ?",current_storage.id).order("areas.id,stocks.business_id,stocks.supplier_id,stocks.specification_id")
       vstocks.each do |s|
         gb = [s.shelf.area.id,s.business_id,s.supplier_id,s.specification_id]
