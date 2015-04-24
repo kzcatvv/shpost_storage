@@ -9,7 +9,7 @@
     <%= text_field_tag(:sixnine_code) %>
     <%= label_tag(:ex_code, "第三方商品编码:") %>
     <%= text_field_tag(:ex_code) %>
-    <%= label_tag(:area_code, "区域编码:") %>
+    <%= label_tag(:area_code, "区域编号:") %>
     <%= text_field_tag(:area_code) %>
     </br>
     <%= check_box_tag(:is_zero,'yes',false) %> 无库存是否导出 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -45,7 +45,13 @@
     %>
 
       <tr>
-        <td><%= key[0] %></td>
+        <td>
+        <%  if !key[0].blank?
+              area = Area.find_by id:key[0]
+            end
+        %>
+        <%= area.blank?? "":area.name %>
+        </td>
         <td>
         <%  if !key[3].blank?
               specification = Specification.find_by id:key[3]

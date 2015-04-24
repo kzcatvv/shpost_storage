@@ -224,6 +224,7 @@ class CommoditiesController < ApplicationController
       sheet1[count_row,9]=obj[9]
       sheet1[count_row,10]=obj[10]
       sheet1[count_row,11]=obj[11]
+      sheet1[count_row,11]=obj[12]
       count_row += 1
     end 
     book.write xls_report  
