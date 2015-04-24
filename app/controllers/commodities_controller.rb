@@ -194,7 +194,7 @@ class CommoditiesController < ApplicationController
           specification.delete
         end
       
-        if commodity.specifications.blank?
+        if commodity.specifications.blank? && (commodity.created_at == commodity.updated_at)
           commodity.delete
         end
       end
