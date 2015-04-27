@@ -30,7 +30,7 @@ class Stock < ActiveRecord::Base
     purchase.purchase_arrivals.each do |arrival|
       # while x.waiting_amount > 0
       next if arrival.purchase_detail.specification.blank?
-      
+
       while arrival.waiting_amount > 0
         stock = Stock.get_available_stock_in_storage(arrival.purchase_detail.specification, arrival.purchase_detail.supplier, purchase.business, arrival.expiration_date.blank? ? nil : arrival.batch_no, purchase.storage, false)
         
@@ -44,9 +44,7 @@ class Stock < ActiveRecord::Base
       end
     end
 
-    if purchase.has_waiting_stock_logs()
-      Task.save_task(purchase,purchase.storage.id,nil)
-    end
+    Task.save_task(purchase, purchase.storage, nil)
   end
 
   def self.order_return_stock_in(order_return, operation_user = nil)
@@ -104,18 +102,16 @@ class Stock < ActiveRecord::Base
     if Stock.is_enough_stock?(manual_stock)
       Stock.stock_out(manual_stock, operation_user)
     end
-    if manual_stock.has_waiting_stock_logs()
-      Task.save_task(manual_stock,manual_stock.storage.id,nil)
-    end
+    
+    Task.save_task(manual_stock,manual_stock.storage,nil)
   end
 
   def self.order_stock_out(keyclientorder, operation_user = nil)
     if Stock.is_enough_stock?(keyclientorder)
       Stock.stock_out(keyclientorder, operation_user)
     end
-    if keyclientorder.has_waiting_stock_logs()
-      Task.save_task(keyclientorder,keyclientorder.storage.id,nil)
-    end
+    
+    Task.save_task(keyclientorder,keyclientorder.storage,nil)
   end
 
   # def self.order_pick_stock_out(keyclientorder, operation_user = nil)
