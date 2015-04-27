@@ -13,14 +13,18 @@
   </form>
 </div>
 <div>
+  <h4><%=@start_date.to_s+"~"+@end_date.to_s+"  订单汇总信息" %></h4>
   <table id="orders" class="table table-striped">
     <thead>
       <tr>
+        <th>仓库</th>
         <th>商户</th>
         <th>物流供应商</th>
         <th>待处理</th>
         <th>已审核</th>
         <th>已包装</th>
+        <th>面单已匹配</th>
+        <th>拣货中</th>
         <th>正在寄送中</th>
         <th>已寄达</th>
         <th>退回</th>
@@ -30,14 +34,31 @@
     <tbody>
     
     <% if !@order_hash.blank? and !@orders.blank?%>
-    <% bid=0 %>
+    <% sid = 0
+       bid=0 %>
     <% @order_hash.each do |key,value| %>
     <tr>
         <%  if !key[0].blank?
-              if key[0]==bid 
+              if key[0]==sid 
+                 storage_name="" 
+              else
+                storage = Storage.find_by id: key[0]
+                if !storage.blank?
+                  storage_name=storage.name.blank?? "":storage.name
+                end
+              end
+            else
+              storage_name="" 
+            end
+        %>
+        <td>
+        <%= storage_name %>
+        </td>
+        <%  if !key[1].blank?
+              if key[1]==bid and key[0]==sid
                  business_name="" 
               else
-                 business = Business.find_by id:key[0]
+                 business = Business.find_by id:key[1]
                  if !business.blank?
                    business_name=business.name.blank?? "":business.name
                  end
@@ -46,29 +67,34 @@
               business_name="" 
             end
         %>
-
         <td>
         <%= business_name %>
         </td>
-        <td><%= key[1].blank?? "":@orders.find_by(transport_type:key[1]).transport_type_name %></td>
-        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"waiting").count %></td>
-        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"checked").count %></td>
-        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"packed").count %></td>
-        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"delivering").count %></td>
-        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"delivered").count %></td>
-        <td><%= @orders.where(business_id:key[0],transport_type:key[1],status:"returned").count %></td>
+        <td><%= key[2].blank?? "暂未匹配面单":@orders.find_by(transport_type:key[2]).transport_type_name %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"waiting").count %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"checked").count %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"packed").count %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"printed").count %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"picking").count %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"delivering").count %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"delivered").count %></td>
+        <td><%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2],status:"returned").count %></td>
         <td>
-        <%= @orders.where(business_id:key[0],transport_type:key[1]).count %>
+        <%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2]).count %>
         </td>
     </tr>
-    <% bid=key[0] %>
+    <% sid=key[0]
+       bid=key[1] %>
     <% end %>
     <tr>
     <td>总计</td>
     <td></td>
+    <td></td>
     <td><%= @orders.where("orders.status = 'waiting'").count %></td>
     <td><%= @orders.where("orders.status = 'checked'").count %></td>
     <td><%= @orders.where("orders.status = 'packed'").count %></td>
+    <td><%= @orders.where("orders.status = 'printed'").count %></td>
+    <td><%= @orders.where("orders.status = 'picking'").count %></td>
     <td><%= @orders.where("orders.status = 'delivering'").count %></td>
     <td><%= @orders.where("orders.status = 'delivered'").count %></td>
     <td><%= @orders.where("orders.status = 'returned'").count %></td>
