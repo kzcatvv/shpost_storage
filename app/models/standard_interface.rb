@@ -4,7 +4,7 @@ class StandardInterface
     supplier_no = context['SUPPLIER']
     sku = context['SKU']
     spec = context['SPEC']
-    name = context['NAME']
+    name = context['COMMODITY']
     desc = context['DESC']
     sixnine_code = context['SIXNINE']
 
@@ -42,7 +42,7 @@ class StandardInterface
     mobile = context['MOBILE']
     tel = context['TEL']
     zip = context['ZIP']
-    email = context['email']
+    email = context['EMAIL']
     buyer_desc = context['DESC']
     qty_sum = context['QTY_SUM']
     amt_sum = context['AMT_SUM']
