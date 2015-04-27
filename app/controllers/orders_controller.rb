@@ -1,9 +1,9 @@
 class OrdersController < ApplicationController
   load_and_authorize_resource
-  
-  user_logs_filter only: [:standard_orders_import2], symbol: "订单导入 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入'
+  user_logs_filter only: [:orders_import], symbol: "订单导入回馈 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入回馈', object: :keyclientorder, parent: :keyclientorder, import_type: :import_type
+  # user_logs_filter only: [:standard_orders_import2], symbol: "订单导入 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", ids: :ids, operation: '订单导入'
   # user_logs_filter only: [:exportorders], operation: '订单导出'
-  user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder, parent: :keyclientorder
+  # user_logs_filter only: [:importorders2], symbol: :keyclient_name, operation: '面单信息回馈', object: :keyclientorder, parent: :keyclientorder
   user_logs_filter only: [:ordercheck], symbol: :keyclient_name, operation: '批量确认出库', object: :keyclientorder, parent: :keyclientorder
   user_logs_filter only: [:setoutstatus], symbol: :batch_no, operation: '包装出库', object: :order
 
@@ -706,7 +706,7 @@ class OrdersController < ApplicationController
             sheet1_error = []
             sheet2_error = []
             instance.default_sheet = instance.sheets.first
-
+            
             # @keyclientorder=Keyclientorder.create! keyclient_name: "标准导入订单 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: business.id, unit_id: current_user.unit.id, storage_id: current_storage.id
             flash_message = "导入成功!"
             is_shortage = ""
@@ -733,7 +733,7 @@ class OrdersController < ApplicationController
                   else
                     tran_type = nil
                 end 
-
+                
                 #物流单号
                 tracking_number = to_string(instance.cell(line,'B'))
                 if tracking_number.blank?
@@ -826,6 +826,7 @@ class OrdersController < ApplicationController
         
               #SKU/第三方编码/69码
               sku_extcode_69code = to_string(instance.cell(dline,'C'))
+
               if !sku_extcode_69code.blank?
                 #先考虑为sku
                 specification = Specification.accessible_by(current_ability).find_by sku: sku_extcode_69code
@@ -884,14 +885,16 @@ class OrdersController < ApplicationController
               end
               
               #数量
-              amount = instance.cell(dline,'E').to_s.split('.0')[0]
-              if amount.blank?
+              temp_amount = instance.cell(dline,'E').to_s.split('.0')[0]
+              if temp_amount.blank?
                 txt = "缺少数量"
                 sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
                 sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
                 next
                 # raise "导入文件第二页第" + dline.to_s + "行数据, 缺少数量，导入失败"
               end
+
+              amount = find_in_instance(instance,dline,business_order_id,sku_extcode_69code,supplier_no,sub_order_id,temp_amount)
 
               #根据外部订单号找到对应订单
                dorder = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business_id
@@ -914,13 +917,16 @@ class OrdersController < ApplicationController
               dorder_status = dorder.status
               if (dorder_status <=> "waiting")==0
                 #取得原有订单明细记录
-                ori_order_detail = OrderDetail.accessible_by(current_ability).find_by('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
+                ori_order_detail = OrderDetail.accessible_by(current_ability).where('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
                 
                 business_deliver_no = ""
                 business_trans_no = ""
                 if !sub_order_id.blank?
                     business_deliver_no = sub_order_id
                     business_trans_no = dorder.business_order_id
+                    if !ori_order_detail.blank?
+                      ori_order_detail = ori_order_detail.where(business_deliver_no:sub_order_id)
+                    end
                 end
                 
                 #原来没有，创建
@@ -937,9 +943,9 @@ class OrdersController < ApplicationController
                   end
                 #原来有，更新原记录
                 else
-                  order_detail_id = ori_order_detail.id
+                  order_detail_id = ori_order_detail.first.id
 
-                  ori_detail_amount = ori_order_detail.amount
+                  ori_detail_amount = ori_order_detail.first.amount
                   #数量为0，删除该订单明细，同时对应订单数量减少
                   if amount.to_i == 0
                     OrderDetail.destroy(order_detail_id)
@@ -1583,13 +1589,12 @@ class OrdersController < ApplicationController
       redirect_to :action => 'findprintindex'
     else
       checkbox_all = params[:checkbox][:all]
-      
       if checkbox_all.eql? '0'
         respond_to do |format|
           format.xls {   
             send_data(exportorders_xls_content_for(find_has_stock(orders,false)),  
                 :type => "text/excel;charset=utf-8; header=present",  
-                :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+                :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
           }  
         end
       else
@@ -1604,7 +1609,7 @@ class OrdersController < ApplicationController
             format.xls {   
               send_data(exportorders_xls_content_for(orders.where.not(id: ordid)),  
                 :type => "text/excel;charset=utf-8; header=present",  
-                :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+                :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
               # send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),:type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls") 
             }  
           end
@@ -1628,7 +1633,7 @@ class OrdersController < ApplicationController
     else
       respond_to do |format|
         format.xls {   
-          send_data(exportorders_xls_content_for(@@orders_query_export), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+          send_data(exportorders_xls_content_for(@@orders_query_export), :type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
         }  
       end
     end
@@ -1767,6 +1772,372 @@ class OrdersController < ApplicationController
 
 
   # end
+
+  def orders_import
+    @ids = []
+    @import_type = ""
+    unless request.get?
+      if file = upload_pingan(params[:file]['file'])
+        instance=nil
+        if file.include?('.xlsx')
+          instance= Roo::Excelx.new(file)
+        elsif file.include?('.xls')
+          instance= Roo::Excel.new(file)
+        elsif file.include?('.csv')
+          instance= Roo::CSV.new(file)
+        end
+        sheet1_error = []
+        sheet2_error = []
+        instance.default_sheet = instance.sheets.first
+        flash_message = "导入成功!"
+        is_shortage = ""
+        ords = []
+        status = "waiting"
+        koid=""        
+
+        #商户
+        business_id = params[:business_select]
+        if params[:business_select].blank?
+          koid = getKeycOrderID()
+          @import_type="back"
+        else
+          @import_type="standard"
+        end
+        #从第二行开始一直读取，直到空行 
+        line = 2
+        line.upto(instance.last_row) do |line|
+          batch_no = to_string(instance.cell(line,'Q'))
+          if batch_no.blank?
+            business_order_id = to_string(instance.cell(line,'A'))
+            if business_order_id.blank?
+              txt = "缺少外部订单号"
+              sheet1_error << (instance.row(line) << txt)
+              next
+            else
+              business_trans_no = to_string(instance.cell(line,'R'))
+              if !business_trans_no.blank?
+                if !business_trans_no.eql?business_order_id
+                  business_order_id = business_trans_no
+                end 
+              end
+              if business_id.blank?
+                business_no = instance.cell(line,'O')
+                if business_no.blank?
+                  txt = "缺少商户编号"
+                  sheet1_error << (instance.row(line) << txt)
+                  next
+                else
+                  business = Business.accessible_by(current_ability).find_by(no: business_no)
+                end
+              else
+                business = Business.accessible_by(current_ability).find_by(id: business_id)
+              end
+
+              ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id:business.id
+                
+            end
+          else
+            ori_order = Order.accessible_by(current_ability).find_by  batch_no: batch_no
+            if ori_order.blank?
+              txt = "批次号错误"
+              sheet1_error << (instance.row(line) << txt)
+              next
+            end
+          end
+          
+          transport_type = to_string(instance.cell(line,'C'))
+          tracking_number = to_string(instance.cell(line,'B'))
+          if transport_single(transport_type,tracking_number)
+            txt = "物流单号和物流供应商不能只填一个"
+            sheet1_error << (instance.row(line) << txt)
+            next
+          end
+          if !transport_type.blank?
+            transport_type = to_transport_type(transport_type)
+            if transport_type.blank?
+              txt = "物流供应商错误"
+              sheet1_error << (instance.row(line) << txt)
+              next
+            else
+              if !tracking_number.blank?
+                status = "printed"
+                @keyclientorder = Keyclientorder.find_by id:koid
+              else
+                tracking_number = nil
+              end
+            end
+          else
+            transport_type = nil
+          end
+
+          if ori_order.blank? 
+            order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: transport_type,  total_weight: instance.cell(line,'D').to_f, pingan_ordertime: instance.cell(line,'E'), customer_unit: instance.cell(line,'F'), customer_name: instance.cell(line,'G'), customer_address: instance.cell(line,'H'), customer_postcode: to_string(instance.cell(line,'I')), 
+              province: instance.cell(line,'J'), 
+              city: instance.cell(line,'K'), 
+              county: instance.cell(line,'L'), customer_tel: to_string(instance.cell(line,'M')),
+              customer_phone: to_string(instance.cell(line,'N')), 
+              business: business, 
+              unit_id: current_user.unit.id, 
+              storage_id: current_storage.id, 
+              status: status,
+              keyclientorder: @keyclientorder,
+              user_id: current_user.id
+
+            ords[0] = order
+            if find_has_stock(ords,false).blank?
+              is_shortage = "yes"
+            else
+              is_shortage = "no"
+            end
+            Order.update(order.id,is_shortage: is_shortage)
+                      
+            @ids << order.id
+          else
+            order_status = ori_order.status
+            if order_status.eql?"waiting" or order_status.eql? "printed"
+              order_id = ori_order.id.to_s
+
+              order = Order.update(order_id,tracking_number:tracking_number,transport_type:transport_type,total_weight:instance.cell(line,'D').to_f,pingan_ordertime:instance.cell(line,'E'),customer_unit:instance.cell(line,'F'),customer_name:instance.cell(line,'G'),customer_address:instance.cell(line,'H'),customer_postcode:to_string(instance.cell(line,'I')),province:instance.cell(line,'J'),city:instance.cell(line,'K'),county:instance.cell(line,'L'),customer_tel:to_string(instance.cell(line,'M')),customer_phone:to_string(instance.cell(line,'N')),
+                status: status,keyclientorder: @keyclientorder,user_id: current_user.id)
+            
+              ords[0] = order
+              if find_has_stock(ords,false).blank?
+                is_shortage = "yes"
+              else
+                is_shortage = "no"
+              end
+              Order.update(order.id,is_shortage: is_shortage)
+                      
+              @ids << order_id
+            else
+              txt = "订单已处理"
+              sheet1_error << (instance.row(line) << txt)
+              next
+            end
+          end          
+          line = line+1
+        end
+      
+        #读取订单明细     
+        instance.default_sheet = instance.sheets.second
+        dline = 2
+        dline.upto(instance.last_row) do |dline|
+          #供应商编号
+          supplier_no = to_string(instance.cell(dline,'D'))
+          if !supplier_no.blank?
+            supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
+          end
+          
+          #批次号
+          batch_no = to_string(instance.cell(dline,'I'))
+          if batch_no.blank?
+            #外部订单号
+            business_order_id = to_string(instance.cell(dline,'A'))
+            if exist_in(sheet1_error,business_order_id)
+              sheet2_error << instance.row(dline)
+              next
+            end
+
+            if business_order_id.blank?
+              txt = "缺少外部订单号"
+              sheet2_error << (instance.row(dline) << txt)
+              next
+            end
+
+            #子订单号
+            sub_order_id = to_string(instance.cell(dline,'B'))
+            if !sub_order_id.blank?
+              if !sub_order_id.eql?business_order_id
+                business_order_id = sub_order_id
+              end 
+            end
+          
+            
+            if business_id.blank?
+              business_no = to_string(instance.cell(dline,'G'))
+              if business_no.blank?
+                txt = "缺少商户编号"
+                sheet1_error = order_add(sheet1_error,0,business_order_id,instance,nil)
+                sheet2_error = detail_add(sheet2_error,7,dline,instance,txt)
+                next
+              else
+                business = Business.accessible_by(current_ability).find_by(no: business_no)
+              end
+            else
+              business = Business.accessible_by(current_ability).find_by(id: business_id)
+            end
+            #根据外部订单号找到对应订单
+            dorder = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business.id
+
+            if dorder.blank?
+              txt = "详单对应订单不存在"
+              sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+              sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+              next
+            end
+        
+          else
+            if exist_in_batchno(sheet1_error,batch_no)
+              sheet2_error << instance.row(dline)
+              next
+            end
+            dorder = Order.accessible_by(current_ability).find_by batch_no: batch_no
+            if dorder.blank?
+              txt = "批次号错误"
+              sheet2_error << (instance.row(dline) << txt)
+              next
+            end
+            business=dorder.business
+
+          end
+
+          
+          #SKU/第三方编码/69码
+          sku_extcode_69code = to_string(instance.cell(dline,'C'))
+
+          if !sku_extcode_69code.blank?
+            #先考虑为sku
+            specification = Specification.accessible_by(current_ability).find_by sku: sku_extcode_69code
+            #不是sku，考虑为第三方编码
+            if specification.blank?
+              relationship = Relationship.accessible_by(current_ability).find_by("business_id = ? and external_code = ?", business.id,"#{sku_extcode_69code}")
+              #不是第三方编码，考虑为69码
+              if relationship.blank?
+                if !supplier.blank?
+                  relationship = Relationship.includes(:specification).accessible_by(current_ability).find_by("specifications.sixnine_code=? and relationships.business_id = ? and relationships.supplier_id=?","#{sku_extcode_69code}","#{business.id}","#{supplier.id}")
+                else
+                  txt = "69码找不到供应商"
+                  sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+                  sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+                  next
+                end
+              end
+                  
+              if !relationship.blank?
+                specification = relationship.specification
+                supplier = relationship.supplier
+              else
+                txt = "找不到对应关系"
+                sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+                sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+                next
+              end
+            else
+              if supplier.blank?
+                txt = "sku找不到供应商"
+                sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+                sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+                next
+              else
+                relationship = Relationship.accessible_by(current_ability).find_by("specification_id = ? and supplier_id = ?", "#{specification.id}","#{supplier.id}")
+                if relationship.blank?
+                  txt = "sku找不到对应关系"
+                  sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+                  sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+                  next
+                end
+              end
+            end
+          else
+            txt = "缺少sku/第三方编码/69码"
+            sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+            sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+            next
+          end
+          
+          #数量
+          temp_amount = to_string(instance.cell(dline,'E'))
+          if temp_amount.blank?
+            txt = "缺少数量"
+            sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+            sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+            next
+          end
+
+          amount = find_in_instance(instance,dline,business_order_id,sku_extcode_69code,supplier_no,sub_order_id,temp_amount)
+         
+          dorder_id = dorder.id.to_s
+          dorder_status = dorder.status
+          if dorder.status.eql? "waiting" or dorder.status.eql? "printed"
+            #取得原有订单明细记录
+            ori_order_detail = OrderDetail.accessible_by(current_ability).where('supplier_id = ? and specification_id = ? and order_id = ?',"#{supplier.id}","#{specification.id}","#{dorder_id}")
+            business_deliver_no = ""
+            business_trans_no = ""
+            if !sub_order_id.blank?
+              if to_string(instance.cell(dline,'A')).eql?sub_order_id
+                business_deliver_no = sub_order_id
+                business_trans_no = dorder.business_order_id
+
+                if !ori_order_detail.blank?
+                ori_order_detail = ori_order_detail.where(business_deliver_no:sub_order_id)
+                end
+              else
+                business_deliver_no = nil
+                business_trans_no = to_string(instance.cell(dline,'A'))
+              end
+            end     
+
+            #原来没有，创建
+            if ori_order_detail.blank? 
+              #数量小等于0，跳过
+              if amount.to_i <=0
+                 next
+              #数量大于0，创建，同时对应订单数量增加
+              else 
+                OrderDetail.create! name: specification.name,batch_no: batch_no, specification: specification, amount: amount.to_i, supplier: supplier,business_deliver_no: business_deliver_no, order: dorder
+                Order.update(dorder_id,business_trans_no: business_trans_no) 
+              end
+            #原来有，更新原记录
+            else
+              order_detail_id = ori_order_detail.first.id
+
+              #数量为0，删除该订单明细
+              if amount.to_i == 0
+                OrderDetail.destroy(order_detail_id)
+              #数量大于0，更新该订单明细
+              elsif amount.to_i > 0
+                OrderDetail.update(order_detail_id,amount: amount.to_i,business_deliver_no: business_deliver_no)
+                Order.update(dorder_id,business_trans_no: business_trans_no)
+              #数量小于0，报错
+              else
+                txt = "订单明细数量不能负数"
+                sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+                sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+                next
+              end
+            end 
+          else
+            txt = "只有待处理状态的订单才能重复导入"
+            sheet1_error = order_add(sheet1_error,0,business_order_id,instance,txt)
+            sheet2_error = detail_add(sheet2_error,0,dline,instance,txt)
+            next
+          end
+        end
+        if !params[:business_select].blank?
+          redeal_with_errororder(sheet1_error,1)
+        else
+          redeal_with_errororder(sheet1_error,2)
+        end
+        if !sheet1_error.blank? || !sheet2_error.blank?
+          flash_message << "有部分订单导入失败！"
+        end
+        flash[:notice] = flash_message
+
+        respond_to do |format|
+          format.xls {   
+            if !sheet1_error.blank? && !sheet2_error.blank?
+              send_data(exporterrororders_xls_content_for(sheet1_error,sheet2_error),  
+              :type => "text/excel;charset=utf-8; header=present",  
+              :filename => "Error_Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+            else
+              redirect_to :action => 'findprintindex'
+            end
+          }
+        end
+      end   
+    end
+  end
+
 
   private
   # Use callbacks to share common setup or constraints between actions.
@@ -1925,29 +2296,15 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 订单流水号 子订单号 状态 商品信息}  
     count_row = 1
     objs.each do |obj|
       if obj.is_shortage.eql? 'yes'
         red = Spreadsheet::Format.new :color => :red
         sheet1.row(count_row).default_format = red  
       end
-      transport_type = obj.transport_type
-      case transport_type
-        when "tcsd"
-          tran_type = '同城速递'
-        when "gnxb"
-          tran_type = '国内小包'  
-        when "ems"
-          tran_type = 'EMS'
-        when "ttkd"
-          tran_type = '天天快递'
-        when "bsht"
-          tran_type = '百世汇通'
-        when "qt"
-          tran_type = '其他'
-      end
-
+      transport_type = obj.transport_type_name
+      
       if obj.business_trans_no.blank?
         # 原始订单
         business_order_id = obj.business_order_id
@@ -1974,7 +2331,7 @@ def exportorders_xls_content_for(objs)
 
       sheet1[count_row,0]=business_order_id
       sheet1[count_row,1]=obj.tracking_number.to_s
-      sheet1[count_row,2]=tran_type
+      sheet1[count_row,2]=transport_type
       sheet1[count_row,3]=obj.total_weight
       sheet1[count_row,4]=obj.pingan_ordertime
       sheet1[count_row,5]=obj.customer_unit
@@ -1986,11 +2343,12 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,11]=obj.county
       sheet1[count_row,12]=obj.customer_tel
       sheet1[count_row,13]=obj.customer_phone
-      sheet1[count_row,14]=obj.business.name
-      sheet1[count_row,15]=obj.batch_no
-      sheet1[count_row,16]=business_trans_no
-      sheet1[count_row,17]=obj.status_name
-      sheet1[count_row,18]=all_name[0,all_name.size-1]
+      sheet1[count_row,14]=obj.business.no
+      sheet1[count_row,15]=obj.business.name
+      sheet1[count_row,16]=obj.batch_no
+      sheet1[count_row,17]=business_trans_no
+      sheet1[count_row,18]=obj.status_name
+      sheet1[count_row,19]=all_name[0,all_name.size-1]
     
       count_row += 1
     end  
@@ -1998,7 +2356,7 @@ def exportorders_xls_content_for(objs)
     sheet2 = book.create_worksheet :name => "OrderDetails"
     detail_row = 0
     sheet2.row(detail_row).default_format = blue 
-    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户名称 订单流水号}
+    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户编号 商户名称 订单流水号}
     detail_row = detail_row + 1
     objs.each do |obj|
       obj_id = obj.id
@@ -2049,8 +2407,9 @@ def exportorders_xls_content_for(objs)
         sheet2[detail_row,3]=supplier_no
         sheet2[detail_row,4]=order_detail.amount
         sheet2[detail_row,5]=specification.full_title
-        sheet2[detail_row,6]=obj.business.name
-        sheet2[detail_row,7]=order_detail.order.batch_no
+        sheet2[detail_row,6]=obj.business.no
+        sheet2[detail_row,7]=obj.business.name
+        sheet2[detail_row,8]=order_detail.order.batch_no
         
         detail_row += 1
       end
@@ -2169,7 +2528,7 @@ def exportorders_xls_content_for(objs)
 
   def exist_in_batchno(arrays,id)
     arrays.each do |x|
-      if to_string(x[15]).eql? id
+      if to_string(x[16]).eql? id
         return true
       else
         next
@@ -2262,7 +2621,7 @@ def exportorders_xls_content_for(objs)
     red = Spreadsheet::Format.new :color => :red
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户名称 订单流水号 子订单号 状态 商品信息}  
+    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 订单流水号 子订单号 状态 商品信息}  
     count_row = 1
     obj1.each do |obj|
       # if obj.is_shortage.eql? 'yes'
@@ -2329,6 +2688,7 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,17]=obj[17]
       sheet1[count_row,18]=obj[18]
       sheet1[count_row,19]=obj[19]
+      sheet1[count_row,20]=obj[20]
 
       count_row += 1
     end  
@@ -2336,7 +2696,7 @@ def exportorders_xls_content_for(objs)
     sheet2 = book.create_worksheet :name => "OrderDetails"
     detail_row = 0
     sheet2.row(detail_row).default_format = blue 
-    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户名称 订单流水号}
+    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户编号 商户名称 订单流水号}
     detail_row = detail_row + 1
     obj2.each do |obj|
       # obj_id = obj.id
@@ -2390,6 +2750,7 @@ def exportorders_xls_content_for(objs)
         sheet2[detail_row,6]=obj[6]
         sheet2[detail_row,7]=obj[7]
         sheet2[detail_row,8]=obj[8]
+        sheet2[detail_row,9]=obj[9]
         
         detail_row += 1
       # end
@@ -2399,4 +2760,50 @@ def exportorders_xls_content_for(objs)
     xls_report.string  
   end
 
+  def find_in_instance(instance,dline,business_order_id,sku_extcode_69code,supplier_no,business_deliver_no,amount)
+    instance.default_sheet = instance.sheets.second
+    amount=amount.to_i
+    # binding.pry
+    2.upto(dline-1) do |line|
+      re=(to_string(instance.row(line)[0]).eql?business_order_id and to_string(instance.row(line)[2]).eql?sku_extcode_69code and to_string(instance.row(line)[3]).eql?supplier_no)
+      if !business_deliver_no.blank?
+        re=(re and to_string(instance.row(line)[1]).eql?business_deliver_no)
+      end
+      if re
+        amount=amount+to_string(instance.row(line)[4]).to_i
+      end
+    end
+    return amount
+  end
+
+  def to_transport_type(transport_type)
+    case transport_type
+      when "同城速递","tcsd","TCSD"
+        tran_type = 'tcsd'
+      when "国内小包","gnxb","GNXB"
+        tran_type = 'gnxb'  
+      when "EMS","ems"
+        tran_type = 'ems'
+      when "天天快递","ttkd","TTKD"
+        tran_type = 'ttkd'
+      when "百世汇通","bsht","BSHT"
+        tran_type = 'bsht'
+      when "其他","qt","QT"
+        tran_type = 'qt'
+      else
+        tran_type = nil
+    end
+    return tran_type
+  end
+
+  def transport_single(trantype,tracknumber)
+    if (!trantype.blank? and tracknumber.blank?) or (!tracknumber.blank? and trantype.blank?)
+      return true
+    else 
+      return false
+    end
+  end
+
+
+  
 end

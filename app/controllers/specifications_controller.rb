@@ -76,49 +76,34 @@ class SpecificationsController < ApplicationController
     operation=["in","out"]
     key_last=[]
     key_new=[]
+    start_date=DateTime
+    end_date=DateTime
 
     whereQuery = "storages.id=? and stock_logs.specification_id = ? and stock_logs.operation_type in (?)"
     
     if RailsEnv.is_oracle?
       date_condition = "to_char(stock_logs.created_at,'yyyymmdd')"
-      time = to_char(DateTime.parse(Time.now.to_s),'yyyymmdd')
+      # time = to_char(DateTime.parse(Time.now.to_s),'yyyymmdd')
     else
       date_condition = "strftime('%Y%m%d',stock_logs.created_at)"
-      time=DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d').to_s
     end
+    time=DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d').to_s
 
     
     if params[:sp_start_date].blank? or params[:sp_start_date]["sp_start_date"].blank?
-      start_date = time.split(/-|\//)[0]+"-"+(time.split(/-|\//)[1].to_i-1).to_s.rjust(2,'0')+"-"+time.split(/-|\//)[2]
-      @stocklogs=@stocklogs.where("stock_logs.created_at>=?",start_date)
+      start_date = to_date(time.split(/-|\//)[0],(time.split(/-|\//)[1].to_i-1).to_s.rjust(2,'0'),time.split(/-|\//)[2])
     else 
-      if params[:sp_start_date]["sp_start_date"].include?'-'
-        start_date = Date.civil(params[:sp_start_date]["sp_start_date"].split(/-|\//)[0].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[1].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[2].to_i)
-      else
-         flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
-         redirect_to (inoutlogs_commodity_specification_path(@commodity,@specification)) and return
-      end
-
-      @stocklogs=@stocklogs.where("stock_logs.created_at>=?",start_date)
+      start_date = Date.civil(params[:sp_start_date]["sp_start_date"].split(/-|\//)[0].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[1].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[2].to_i)
     end
     
-    
-
     if params[:sp_end_date].blank? or params[:sp_end_date]["sp_end_date"].blank?
-      end_date = time
-      @stocklogs=@stocklogs.where("stock_logs.created_at<=?",end_date)
+      end_date = to_date(time.split(/-|\//)[0],time.split(/-|\//)[1],time.split(/-|\//)[2])
     else
-      if params[:sp_end_date]["sp_end_date"].include?'-'
-        end_date = Date.civil(params[:sp_end_date]["sp_end_date"].split(/-|\//)[0].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[1].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[2].to_i)
-      else
-         flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
-         redirect_to (inoutlogs_commodity_specification_path(@commodity,@specification)) and return
-      end
-
-      @stocklogs=@stocklogs.where("stock_logs.created_at<=?",(end_date+1))
+      end_date = Date.civil(params[:sp_end_date]["sp_end_date"].split(/-|\//)[0].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[1].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[2].to_i)
     end
     
-    
+    @stocklogs=@stocklogs.where("stock_logs.created_at>=? and stock_logs.created_at<=?",start_date,(end_date+1))
+        
     @temp_hash = @stocklogs.includes(:storage).where(whereQuery,current_storage.id,@specification.id,operation).group(:specification_id).group(:business_id).group(:supplier_id).group(date_condition).group(:operation_type).order(created_at: :desc).sum(:amount)
 
     key_last[0] = ""
@@ -168,10 +153,16 @@ class SpecificationsController < ApplicationController
       :order_direction => 'desc')
   end
 
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_specification
       @specification = Specification.find(params[:id])
+    end
+
+    def to_date(year,month,day)
+      date = Date.civil(year.to_i,month.to_i,day.to_i)
+      return date
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

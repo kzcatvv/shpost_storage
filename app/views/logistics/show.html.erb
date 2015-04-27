@@ -9,19 +9,23 @@
   <dt><strong><%= model_class.human_attribute_name(:print_format) %>:</strong></dt>
   <dd><%= @logistic.print_format %></dd>
   <dt><strong><%= model_class.human_attribute_name(:is_getnum) %>:</strong></dt>
-  <dd><%= @logistic.is_getnum %></dd>
+  <dd><%= @logistic.is_getnum_name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:contact) %>:</strong></dt>
   <dd><%= @logistic.contact %></dd>
   <dt><strong><%= model_class.human_attribute_name(:address) %>:</strong></dt>
   <dd><%= @logistic.address %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:contact) %>:</strong></dt>
-  <dd><%= @logistic.contact %></dd>
   <dt><strong><%= model_class.human_attribute_name(:contact_phone) %>:</strong></dt>
   <dd><%= @logistic.contact_phone %></dd>
   <dt><strong><%= model_class.human_attribute_name(:post) %>:</strong></dt>
   <dd><%= @logistic.post %></dd>
+    <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
+  <dd><%= Storage.find(@logistic.storage_id).name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:is_default) %>:</strong></dt>
-  <dd><%= @logistic.is_default %></dd>
+  <dd><%= @logistic.is_default_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:param_val1) %>:</strong></dt>
+  <dd><%= @logistic.param_val1 %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:param_val2) %>:</strong></dt>
+  <dd><%= @logistic.param_val2 %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

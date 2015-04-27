@@ -99,50 +99,158 @@ class RelationshipsController < ApplicationController
       end
   end
 
+  # def relationship_import
+  #   unless request.get?
+  #     if file = upload_relationship(params[:file]['file'])       
+  #       Relationship.transaction do
+  #         begin
+  #           instance=nil
+  #           if file.include?('.xlsx')
+  #             instance= Roo::Excelx.new(file)
+  #           elsif file.include?('.xls')
+  #             instance= Roo::Excel.new(file)
+  #           elsif file.include?('.csv')
+  #             instance= Roo::CSV.new(file)
+  #           end
+  #           instance.default_sheet = instance.sheets.first
+
+  #           2.upto(instance.last_row) do |line|
+  #             specification = Specification.accessible_by(current_ability).find_by sku: to_string(instance.cell(line,'D'))
+  #             if specification.blank?
+  #               raise "导入文件第" + line.to_s + "行数据, 商品规格不存在，导入失败"
+  #             end
+  #             business = Business.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'H'))
+  #             if business.blank?
+  #               raise "导入文件第" + line.to_s + "行数据, 商户不存在，导入失败"
+  #             end
+  #             supplier = Supplier.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'I'))
+  #             if supplier.blank?
+  #               raise "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
+  #             end
+  #             relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id, supplier_id: supplier.id
+  #             if relationship.nil?
+  #               Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
+  #             else
+  #               Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
+  #             end
+  #           end
+  #           flash[:alert] = "导入成功"
+  #         rescue Exception => e
+  #           flash[:alert] = e.message
+  #           raise ActiveRecord::Rollback
+  #         end
+  #       end
+  #     end   
+  #   end
+  # end
+
   def relationship_import
     unless request.get?
       if file = upload_relationship(params[:file]['file'])       
-        Relationship.transaction do
-          begin
-            instance=nil
-            if file.include?('.xlsx')
-              instance= Roo::Excelx.new(file)
-            elsif file.include?('.xls')
-              instance= Roo::Excel.new(file)
-            elsif file.include?('.csv')
-              instance= Roo::CSV.new(file)
-            end
-            instance.default_sheet = instance.sheets.first
-
-            2.upto(instance.last_row) do |line|
-              specification = Specification.accessible_by(current_ability).find_by sku: to_string(instance.cell(line,'D'))
-              if specification.blank?
-                raise "导入文件第" + line.to_s + "行数据, 商品规格不存在，导入失败"
-              end
-              business = Business.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'H'))
-              if business.blank?
-                raise "导入文件第" + line.to_s + "行数据, 商户不存在，导入失败"
-              end
-              supplier = Supplier.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'I'))
-              if supplier.blank?
-                raise "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
-              end
-              relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id, supplier_id: supplier.id
-              if relationship.nil?
-                Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
-              else
-                Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
-              end
-            end
-            flash[:alert] = "导入成功"
-          rescue Exception => e
-            flash[:alert] = e.message
-            raise ActiveRecord::Rollback
+        instance=nil
+        if file.include?('.xlsx')
+          instance= Roo::Excelx.new(file)
+        elsif file.include?('.xls')
+          instance= Roo::Excel.new(file)
+        elsif file.include?('.csv')
+          instance= Roo::CSV.new(file)
+        end
+        sheet_error = []
+        instance.default_sheet = instance.sheets.first
+        flash_message = "导入成功!"
+        2.upto(instance.last_row) do |line|
+          sku = to_string(instance.cell(line,'D'))
+          if sku.blank?
+            txt = "缺少SKU"
+            sheet_error << (instance.row(line) << txt)
+            next
           end
+          specification = Specification.accessible_by(current_ability).find_by sku: sku
+          if specification.blank?
+            txt = "商品规格不存在"
+            sheet_error << (instance.row(line) << txt)
+            next
+            # raise "导入文件第" + line.to_s + "行数据, 商品规格不存在，导入失败"
+          end
+          business_name = to_string(instance.cell(line,'H'))
+          if business_name.blank?
+            txt = "缺少商户"
+            sheet_error << (instance.row(line) << txt)
+            next
+          end
+          business = Business.accessible_by(current_ability).find_by name: business_name
+          if business.blank?
+            txt = "商户不存在"
+            sheet_error << (instance.row(line) << txt)
+            next
+            # raise "导入文件第" + line.to_s + "行数据, 商户不存在，导入失败"
+          end
+          supplier_name = to_string(instance.cell(line,'I'))
+          if supplier_name.blank?
+            txt = "缺少供应商"
+            sheet_error << (instance.row(line) << txt)
+            next
+          end
+          supplier = Supplier.accessible_by(current_ability).find_by name: supplier_name
+          if supplier.blank?
+            txt = "供应商不存在"
+            sheet_error << (instance.row(line) << txt)
+            next
+            # raise "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
+          end
+          relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id, supplier_id: supplier.id
+          if relationship.nil?
+            Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
+          else
+            Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
+          end
+        end
+
+        if !sheet_error.blank?
+          flash_message << "有部分信息导入失败！"
+        end
+        flash[:notice] = flash_message
+
+        if !sheet_error.blank?
+          send_data(exporterrorrelationships_xls_content_for(sheet_error),  
+          :type => "text/excel;charset=utf-8; header=present",  
+          :filename => "Error_Relationships_#{Time.now.strftime("%Y%m%d")}.xls")  
+        else
+          redirect_to :action => 'index'
         end
       end   
     end
   end
+
+  def exporterrorrelationships_xls_content_for(obj)
+    xls_report = StringIO.new  
+    book = Spreadsheet::Workbook.new  
+    sheet1 = book.create_worksheet :name => "Relationships"  
+
+    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+    red = Spreadsheet::Format.new :color => :red
+    sheet1.row(0).default_format = blue 
+    sheet1.row(0).concat %w{商品编号 商品名称 商品类型 SKU 69码 规格名称 规格描述 商户 供应商 第三方商品编码 规格描述 预警数量} 
+    count_row = 1
+    obj.each do |obj|
+      sheet1[count_row,0]=obj[0]
+      sheet1[count_row,1]=obj[1]
+      sheet1[count_row,2]=obj[3]
+      sheet1[count_row,3]=obj[3]
+      sheet1[count_row,4]=obj[4]
+      sheet1[count_row,5]=obj[5]
+      sheet1[count_row,6]=obj[6]
+      sheet1[count_row,7]=obj[7]
+      sheet1[count_row,8]=obj[8]
+      sheet1[count_row,9]=obj[9]
+      sheet1[count_row,10]=obj[10]
+      sheet1[count_row,11]=obj[11]
+      sheet1[count_row,12]=obj[12]
+      count_row += 1
+    end 
+    book.write xls_report  
+    xls_report.string  
+  end 
 
   def specification_export
     @specifications=Specification.accessible_by(current_ability).all

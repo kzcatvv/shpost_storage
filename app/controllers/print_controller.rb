@@ -34,7 +34,18 @@ class PrintController < ApplicationController
         flash[:alert] = "正在打印"
     end
 
+    def webprint
+        @ids=params[:ids]
+        @flag=params[:flag]
+    end
+
     def webtracking
+        @ids=params[:ids]
+        @flag=params[:flag]
+    end
+
+    def webhottracking
+        # binding.pry
         @ids=params[:ids]
         @flag=params[:flag]
         @logistics = Logistic.where(storage_id: current_storage.id).order(is_default: :desc)
@@ -47,8 +58,7 @@ class PrintController < ApplicationController
             # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
             @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "printed")
         end
-        @logistic = Logistic.find(params[:transport_type])
-        @transport_type=@logistic.print_format
+        @transport_type=params[:transport_type]
         #regular = /([\D]*)([\d]*)/
         start=getTrackingNumber(@transport_type, params[:start])
         numberSize = start[1].size
@@ -86,6 +96,40 @@ class PrintController < ApplicationController
         # format.json { head :no_content }
     end
 
+    def webhottrackingnum
+        @keycorder =nil
+        if params[:flag]=='filter'
+            time = Time.new
+            # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+            @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "printed")
+        end
+        @logistic = Logistic.find(params[:transport_type])
+        @transport_type=@logistic.print_format
+        numberSize = params[:mlnum].to_i
+        @ids=params[:id].split(",").map(&:to_i)
+
+        rq=@logistic.getMailNum('信息局',@logistic.param_val1,@logistic.param_val2,numberSize)
+        if !rq.nil?
+            rqback=rq.split(':')
+            if rqback[0] == "SUCCESS"
+                rqbody = rqback[1].split("|")
+                seqno = rqbody[0]
+                numstart = rqbody[1]
+                numend = rqbody[2]
+                numary = getHotTrackingNumber(@transport_type,numstart,numberSize)
+                @ids.each_with_index do |num,i|
+                    @order=Order.find(num)
+                    @order.update(tracking_number: numary[i])
+                    @order.update(status: 'printed')
+                end
+            else
+                # url = "/print/webtracking?flag="+params[:flag]+"&&ids="+params[:id]
+                flash[:error]="取号段失败"+rqback[1]
+                redirect_to :action => "webprint",:flag => params[:flag],:ids => params[:id]
+            end
+        end
+    end
+
     def getTrackingNumber(transport_type, tracking_number)
         return_no = []
         case transport_type
@@ -116,6 +160,41 @@ class PrintController < ApplicationController
         return return_no    
     end
 
+    def getHotTrackingNumber(transport_type, tracking_number, num_count)
+        return_no = []
+        case transport_type
+        when "tcsd"
+            if num_count == 1
+                return_no << tracking_number
+            elsif num_count > 1
+                return_no << tracking_number
+                (2..num_count).each_with_index do |num,i|
+                    tracking_number = calNextTrackingNo(tracking_number)
+                    return_no << tracking_number 
+                end
+            end
+        when "gnxb"
+            if num_count == 1
+                return_no << tracking_number
+            elsif num_count > 1
+                return_no << tracking_number
+                (2..num_count).each_with_index do |num,i|
+                    tracking_number = calNextTrackingNo(tracking_number)
+                    return_no << tracking_number 
+                end
+            end
+        end
+        return return_no    
+    end
+
+    def calNextTrackingNo(tracking_number)
+        rt_num = ""
+        tmpnum = tracking_number[2,8]
+        chknum = checkTrackingNO( ("%08d" % (tmpnum.to_i+1) ) )
+        rt_num = tracking_number[0,2]+("%08d" % (tracking_number[2,8].to_i+1) )+chknum+tracking_number[11,2]
+        return rt_num
+    end
+
     def checkTrackingNO(num)
         x = [8,6,4,2,3,5,9,7]
         num_a = num.split("")
@@ -143,9 +222,7 @@ class PrintController < ApplicationController
         @order = Order.find(params[:orid])
         @logistic = Logistic.find(params[:transport_type])
         @transport_type = @logistic.print_format
-        @order.update(transport_type: @transport_type)
-        rq=@logistic.getMailNum('信息局','TC','TCBD',1)
-        
+        @order.update(transport_type: @transport_type)        
     end
 
     def shelfbarcodeprint

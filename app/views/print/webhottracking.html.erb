@@ -14,17 +14,16 @@
 
   	<center>
 <br><br>
-<h1>普通打印面单</h1>
+<h1>热敏打印面单</h1>
 </center>
 <br><br><br><br><br>
 <center> 
-	<form action="/print/webtrackingnum" onsubmit="return check(this)" method="post">
+	<form action="/print/webhottrackingnum" onsubmit="return check(this)" method="post">
 		<%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
-         <h3>开始面单号：<input type=text name='start' id='start' /></h3> 
-         <h3>结束面单号：<input type=text name='end' id='end' /></h3>
+         <h3>申请面单号数量：<input type=text name='mlnum' id='mlnum' /></h3>
          <input type=hidden id='id' name='id' value='<%= @ids%>'/>
          <input type=hidden id='flag' name='flag' value='<%= @flag%>'/>
-         <h3>快递类型：<%= select_tag(:transport_type, options_for_select(Order::TRANSPORT_TYPE_print)) %></h3>
+         <h3>快递类型：<%= select_tag(:transport_type, options_from_collection_for_select(@logistics, "id", "name")) %></h3>
          <br><br>
          <input type="submit" id='sub' value="打印面单" class='btn btn-primary'/> 
     </form>
@@ -32,14 +31,11 @@
 <script language="javascript" type="text/javascript">
 function check() {
 
-    if(document.getElementById('start').value.trim()==''||document.getElementById('end').value.trim()==''){
-    alert('请输入面单号');
+    if(document.getElementById('mlnum').value.trim()==''){
+    alert('请输入申请面单号数量');
     return false;
   }
-  if(parseInt(document.getElementById('end').value.trim())-parseInt(document.getElementById('start').value.trim())>24){
-    alert('面单数目不对');
-    return false;
-  }
+
     return true;
   };
 

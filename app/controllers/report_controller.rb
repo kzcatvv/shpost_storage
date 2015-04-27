@@ -318,29 +318,15 @@ class ReportController < ApplicationController
   def order_report
     unless request.get?
       if params[:order_start_date].blank? or params[:order_start_date]["order_start_date"].blank?
-        start_date = Time.now.beginning_of_week
-        if RailsEnv.is_oracle?
-          start_date = to_char(DateTime.parse(start_date.to_s),'yyyymmdd')
-        else
-          start_date=DateTime.parse(start_date.to_s).strftime('%Y-%m-%d').to_s
-        end
+        start_date=to_date(DateTime.parse(Time.now.beginning_of_week.to_s).strftime('%Y-%m-%d').to_s)
+        
       else
-        start_date = Date.civil(params[:order_start_date]["order_start_date"].split(/-|\//)[0].to_i,
-                         params[:order_start_date]["order_start_date"].split(/-|\//)[1].to_i,
-                         params[:order_start_date]["order_start_date"].split(/-|\//)[2].to_i)
+        start_date = to_date(params[:order_start_date]["order_start_date"])
       end
       if params[:order_end_date].blank? or params[:order_end_date]["order_end_date"].blank?
-        end_date = Time.now.end_of_week
-        if RailsEnv.is_oracle?
-          end_date = to_char(DateTime.parse(end_date.to_s),'yyyymmdd')
-        else
-          end_date=DateTime.parse(end_date.to_s).strftime('%Y-%m-%d').to_s
-        end
-        end_date = Date.civil(end_date.split(/-|\//)[0].to_i, end_date.split(/-|\//)[1].to_i, end_date.split(/-|\//)[2].to_i)
+        end_date=to_date(DateTime.parse(Time.now.end_of_week.to_s).strftime('%Y-%m-%d').to_s)
       else
-        end_date = Date.civil(params[:order_end_date]["order_end_date"].split(/-|\//)[0].to_i,
-                         params[:order_end_date]["order_end_date"].split(/-|\//)[1].to_i,
-                         params[:order_end_date]["order_end_date"].split(/-|\//)[2].to_i)
+        end_date =to_date(params[:order_end_date]["order_end_date"])
       end
       status = ["waiting","checked","packed","delivering","delivered","returned"]
 
@@ -404,7 +390,11 @@ class ReportController < ApplicationController
     xls_report.string
   end
                 
-
+  private
+  def to_date(time)
+    date = Date.civil(time.split(/-|\//)[0].to_i,time.split(/-|\//)[1].to_i,time.split(/-|\//)[2].to_i)
+    return date
+  end
 
 
 end

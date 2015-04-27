@@ -125,15 +125,15 @@ ShpostStorage::Application.routes.draw do
         get 'orders_b2b_import'
         post 'orders_b2b_import' => 'orders#orders_b2b_import'
         get 'standard_orders_import1'
-        post 'standard_orders_import2'
-        # post 'standard_orders_import' => 'orders#standard_orders_import'
+        post 'orders_import' => 'orders#orders_import'
+        # post 'standard_orders_import2'
         get 'pingan_b2c_outport'
         post 'pingan_b2c_xls_outport'
         get 'pingan_b2b_outport'
         post 'pingan_b2b_xls_outport'
         post 'exportorders'
         get 'importorders1'
-        post 'importorders2'
+        # post 'importorders2'
         post 'export'
         get 'b2cfind69code'
         get 'b2csplitanorder'
@@ -382,10 +382,14 @@ ShpostStorage::Application.routes.draw do
 
   match "/print/tracking" => "print#tracking",via: [:get, :post]
   match "/print/trackingnum" => "print#trackingnum",via: [:get, :post]
+  match "/print/keyprint" => "print#keyprint",via: [:get, :post]
   match "/print/keytracking" => "print#keytracking",via: [:get, :post]
   match "/print/keytrackingnum" => "print#keytrackingnum",via: [:get, :post]
+  match "/print/webprint" => "print#webprint",via: [:get, :post]
   match "/print/webtracking" => "print#webtracking",via: [:get, :post]
+  match "/print/webhottracking" => "print#webhottracking",via: [:get, :post]
   match "/print/webtrackingnum" => "print#webtrackingnum",via: [:get, :post]
+  match "/print/webhottrackingnum" => "print#webhottrackingnum",via: [:get, :post]
   match "/print/websplitordertracking" => "print#websplitordertracking",via: [:get, :post]
   match "/print/websplitordertrackingnum" => "print#websplitordertrackingnum",via: [:get, :post]
   match "/print/shelfbarcodeprint" => "print#shelfbarcodeprint",via: [:get, :post]

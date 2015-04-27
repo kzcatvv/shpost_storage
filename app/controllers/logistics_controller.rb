@@ -55,6 +55,6 @@ class LogisticsController < ApplicationController
     end
 
     def logistic_params
-      params.require(:logistic).permit(:name, :print_format, :is_getnum, :contact, :address, :contact_phone, :post, :is_default, :storage_id)
+      params.require(:logistic).permit(:name, :print_format, :is_getnum, :contact, :address, :contact_phone, :post, :is_default, :storage_id, :param_val1, :param_val2)
     end
 end
