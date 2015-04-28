@@ -23,8 +23,14 @@ class Task < ActiveRecord::Base
     (status.eql? Task::STATUS[:done]) ? true : false
   end
 
+
   def self.save_task(parent, storage, user = nil)
+    if !parent.has_waiting_stock_logs()
+      return
+    end
+    
     task = Task.where(parent: parent, status: STATUS[:doing], assign_type: ASSIGN_TYPE[:assigned]).first
+
     if task.blank?
       type = OPERATE_TYPE[parent.class.name.to_sym]
 
