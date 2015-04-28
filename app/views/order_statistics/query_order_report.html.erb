@@ -5,11 +5,13 @@
 </div> 
 <div>
   <%= form_tag("/order_statistics/query_order_report", method: "get")%>
-    <div><%= label_tag(:query_order_start_date, "汇总开始日期:") %><%= text_field("query_order_start_date","query_order_start_date", default: 1.week.ago) %></div>
+    <div><%= label_tag(:query_order_start_date, "汇总开始日期:") %><%= text_field("query_order_start_date","query_order_start_date", default: 1.week.ago,:style => "width:80px") %></div>
     <br/>
-    <div><%= label_tag(:query_order_end_date, "汇总结束日期:") %><%= text_field("query_order_end_date","query_order_end_date",default: Date.today) %></div>
-    <br/>
+    <div>
+    <%= label_tag(:query_order_end_date, "汇总结束日期:") %><%= text_field("query_order_end_date","query_order_end_date",default: Date.today,:style => "width:80px") %>
     <%= submit_tag "查询",:class => 'btn btn-primary' %>
+    </div>
+    
   </form>
 </div>
 <div>
