@@ -29,6 +29,8 @@ class Stock < ActiveRecord::Base
   def self.purchase_stock_in(purchase, operation_user = nil)
     purchase.purchase_arrivals.each do |arrival|
       # while x.waiting_amount > 0
+      next if arrival.purchase_detail.specification.blank?
+      
       while arrival.waiting_amount > 0
         stock = Stock.get_available_stock_in_storage(arrival.purchase_detail.specification, arrival.purchase_detail.supplier, purchase.business, arrival.expiration_date.blank? ? nil : arrival.batch_no, purchase.storage, false)
         

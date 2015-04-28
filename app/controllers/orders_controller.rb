@@ -706,7 +706,6 @@ class OrdersController < ApplicationController
   #           sheet1_error = []
   #           sheet2_error = []
   #           instance.default_sheet = instance.sheets.first
-            
   #           # @keyclientorder=Keyclientorder.create! keyclient_name: "标准导入订单 "+DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s, business_id: business.id, unit_id: current_user.unit.id, storage_id: current_storage.id
   #           flash_message = "导入成功!"
   #           is_shortage = ""
@@ -733,7 +732,6 @@ class OrdersController < ApplicationController
   #                 else
   #                   tran_type = nil
   #               end 
-                
   #               #物流单号
   #               tracking_number = to_string(instance.cell(line,'B'))
   #               if tracking_number.blank?
@@ -757,7 +755,6 @@ class OrdersController < ApplicationController
   #                 next
   #                 # raise "导入文件第一页第" + line.to_s + "行数据,缺少外部订单号，导入失败"
   #               end
-
   #               #判断是否已存在该订单
   #               if ori_order.blank?
   #                 #不存在创建

@@ -4,85 +4,76 @@
     g.after_row do |order, number_of_columns|
         content_tag(:tr, class: 'extra-row') do
               content_tag(:td,
-                   content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"客户单位")
-                        buffer += content_tag(:p,order.customer_unit)
-                      raw buffer
-                       
-                   end +
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"客户电话")
-                        buffer += content_tag(:p,order.customer_tel)
-                      raw buffer
-                       
-                   end) +
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"客户地址")
-                        buffer += content_tag(:p,(order.province.nil? ? " " : order.province)+(order.city.nil? ? " " : order.city)+(order.county.nil? ? " " : order.county)+(order.customer_address.nil? ? " " : order.customer_address))
-                      raw buffer
-                       
-                   end, colspan:3)+
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"邮编")
-                        buffer += content_tag(:p,order.customer_postcode)
-                      raw buffer
-                       
-                   end) +
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"商品重量")
-                        buffer += content_tag(:p,order.total_weight)
-                      raw buffer
-                       
-                   end) +
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"商品总数")
-                        buffer += content_tag(:p,order.total_amount)
-                      raw buffer
-                       
-                   end) +
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"所属仓库")
-                        buffer += content_tag(:p,Storage.find(order.storage_id).name)
-                      raw buffer
-                       
-                   end) +
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"所属单位")
-                        buffer += content_tag(:p,Unit.find(order.unit_id).name)
-                      raw buffer
-                       
-                   end)+ 
-                   content_tag(:td,
-                      content_tag(:div) do
-                       # without buffer only the last tag will appear
-                       buffer = content_tag(:b,"订单商品明细")
-                       order.order_details.each do |odl|
-                        buffer += content_tag(:p,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s)
-                       end
-                      raw buffer
-                       
-                   end, colspan:3) )
+                content_tag(:div,
+                  content_tag(:dl, class: "dl-horizontal") do
+                    # without buffer only the last tag will appear
+                    buffer = content_tag(:dt,"面单号/波次号")
+                    buffer += content_tag(:dd,"")
+                    # buffer += content_tag(:dt,"订单号:",style: 'width:50px;')
+                    # buffer += content_tag(:dd,order.batch_no,style: 'margin-left:60px;')
+                    buffer += content_tag(:dt,"面单号:",style: 'width:50px;')
+                    buffer += content_tag(:dd,order.tracking_number,style: 'margin-left:60px;')
+                    buffer += content_tag(:dt,"波次号:",style: 'width:50px;')
+                    buffer += content_tag(:dd,order.keyclientorder.blank?? nil:order.keyclientorder.batch_no,style: 'margin-left:60px;')
+                    raw buffer
+                  end), colspan:2) +
+              content_tag(:td,
+                content_tag(:div,
+                  content_tag(:dl, class: "dl-horizontal") do
+                    buffer = content_tag(:dt,"客户详情")
+                    buffer += content_tag(:dd,"")
+                    # buffer += content_tag(:dt,"客户名称:",style: 'width:70px;')
+                    # buffer += content_tag(:dd,order.customer_name,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"客户单位:",style: 'width:70px;')
+                    buffer += content_tag(:dd,order.customer_unit,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"客户电话:",style: 'width:70px;')
+                    buffer += content_tag(:dd,order.customer_tel.blank?? order.customer_phone : order.customer_tel,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"邮编:",style: 'width:70px;')
+                    buffer += content_tag(:dd,order.customer_postcode,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"地址:",style: 'width:70px;')
+                    buffer += content_tag(:dd,order.customer_address,style: 'margin-left:80px;')
+                    raw buffer
+                  end), colspan:3) +
+              content_tag(:td,
+                content_tag(:div,
+                  content_tag(:dl, class: "dl-horizontal") do
+                    buffer = content_tag(:dt,"订单详细")
+                    buffer += content_tag(:dd,"")
+                    buffer += content_tag(:dt,"配送商:",style: 'width:70px;')
+                    buffer += content_tag(:dd,order.transport_type_name,style: 'margin-left:80px;')
+                    # buffer += content_tag(:dt,"面单号:",style: 'width:70px;')
+                    # buffer += content_tag(:dd,order.tracking_number,style: 'margin-left:80px;')
+                    # buffer += content_tag(:dt,"状态:",style: 'width:70px;')
+                    # buffer += content_tag(:dd,order.status_name,style: 'margin-left:80px;')
+                    # buffer += content_tag(:dt,"商品重量:",style: 'width:70px;')
+                    # buffer += content_tag(:dd,order.total_weight,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"商品总数:",style: 'width:70px;')
+                    buffer += content_tag(:dd,order.total_amount,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"商品明细:",style: 'width:70px;')
+                    order.order_details.each do |odl|
+                      buffer += content_tag(:dd,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s,style: 'margin-left:80px;')
+                    end
+                    raw buffer
+                  end), colspan:3) +
+              content_tag(:td,
+                content_tag(:div,
+                  content_tag(:dl, class: "dl-horizontal") do
+                    buffer = content_tag(:dt,"其他")
+                    buffer += content_tag(:dd,"")
+                    # buffer += content_tag(:dt,"创建日期:",style: 'width:70px;')
+                    # buffer += content_tag(:dd,DateTime.parse(order.created_at.to_s).strftime('%Y-%m-%d').to_s,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"是否缺货:",style: 'width:70px;')
+                    buffer += content_tag(:dd,order.shortage_type_name,style: 'margin-left:80px;')
+                    buffer += content_tag(:dt,"备注:",style: 'width:70px;')
+                    buffer += content_tag(:dd,(order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc),style: 'margin-left:80px;')
+                    raw buffer
+                  end), colspan:2)
          end
     end
 
     g.column name: model_class.human_attribute_name(:no), attribute: 'batch_no', html: {style: 'width:10%;'},detach_with_id: :no_filter
 
-    g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit', html: {style: 'width:10%;'}, detach_with_id: :customer_unit_filter
+    # g.column name: model_class.human_attribute_name(:customer_unit), attribute: 'customer_unit', html: {style: 'width:10%;'}, detach_with_id: :customer_unit_filter
 
     g.column name: model_class.human_attribute_name(:customer_name), attribute: 'customer_name', html: {style: 'width:10%;'}, detach_with_id: :customer_name_filter
 
@@ -98,9 +89,9 @@
 
     g.column name: model_class.human_attribute_name(:total_weight), attribute: 'total_weight', html: {style: 'width:10%;'}, filter_type: :range, detach_with_id: :total_weight_filter
 
-    g.column name: "备注", html: {style: 'width:10%;'} do |order|
-      (order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc)
-    end
+    # g.column name: "备注", html: {style: 'width:10%;'} do |order|
+    #   (order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc)
+    # end
 
     g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id', html: {style: 'width:10%;'}, detach_with_id: :business_id_filter,custom_filter: Business.accessible_by(current_ability).map{|b| [b.name,b.id]} do |order|
       Business.find(order.business_id).name
@@ -115,12 +106,13 @@
       order.keyclientorder.try :batch_no
     end
 
-    g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage', html: {style: 'width:10%;'}, detach_with_id: :is_shortage_filter,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
-      order.shortage_type_name
-    end
+    # g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage', html: {style: 'width:10%;'}, detach_with_id: :is_shortage_filter,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
+    #   order.shortage_type_name
+    # end
 
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', html: {style: 'width:10%;'}, detach_with_id: :created_at_filter do |order|
-       order.created_at.to_s(:db)
+       # order.created_at.to_s(:db)
+       DateTime.parse(order.created_at.to_s).strftime('%Y-%m-%d').to_s
     end
 
     

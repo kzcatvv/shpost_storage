@@ -11,7 +11,7 @@ class StandardInterfaceController < ApplicationController
     
     return error_builder('0005', '商品sku编码为空')
     # spec = @context_hash['SPEC']
-    name = @context_hash['NAME']
+    name = @context_hash['COMMODITY']
     
     return error_builder('0005', '商品名称为空') if name.blank?
 

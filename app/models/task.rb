@@ -23,7 +23,7 @@ class Task < ActiveRecord::Base
     (status.eql? Task::STATUS[:done]) ? true : false
   end
 
-  def self.save_task(parent, storage_id, user_id = nil)
+  def self.save_task(parent, storage, user = nil)
     task = Task.where(parent: parent, status: STATUS[:doing], assign_type: ASSIGN_TYPE[:assigned]).first
     if task.blank?
       type = OPERATE_TYPE[parent.class.name.to_sym]
@@ -42,10 +42,10 @@ class Task < ActiveRecord::Base
       if title.blank?
         title = parent.class.name
       end
-      Task.create!(parent: parent, user_id: user_id, status: STATUS[:doing], storage_id: storage_id, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
+      Task.create!(parent: parent, user: user, status: STATUS[:doing], storage: storage, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
     else
-      if !user_id.blank?
-        task.update(user_id: user_id)
+      if !user.blank?
+        task.update(user: user)
       end
     end
   end
