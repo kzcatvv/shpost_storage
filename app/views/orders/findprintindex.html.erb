@@ -1,4 +1,4 @@
-<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0 style="display:none"> 
   <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
 </object>
 <%- model_class = Order -%>
@@ -9,52 +9,71 @@
 
 
 <%= render partial: 'grid'%>
-  <div style="float:right">
-    <%= form_tag(exportorders_orders_url(format: "xls")) %>
-    <%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
-    <%=link_to t('订单导入'), "/orders/standard_orders_import1", target: '_blank',:class => 'btn btn-primary' %>
-    <div><%= check_box("checkbox","all")%>导出缺货订单</div>
-    <%= submit_tag "订单导出",:class => 'btn btn-primary' %>
-    <%=link_to t('面单信息回馈'), "/orders/importorders1", target: '_blank',:class => 'btn btn-primary' %>
-    </form>
-    <br/>
-    <%=link_to t('打印面单'), "/print/webtracking?flag=filter&&ids=#{@orders_grid.all_pages_records.map{|o| o.id if (o.status=='waiting')}.compact.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
-    <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
-     <% if can? :stockout, Order %>
+  
+<div>
+  <div class="findprintindex-btns">
+    <% if can? :stockout, Order %>
 
-      <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
+    <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
                   "/keyclientorders/" + @orders_grid.current_page_records.first.try(:keyclientorder_id).to_s + "/stockout" ,
                   :class => 'btn btn-primary', disabled: (@orders_grid.current_page_records.first.try(:keyclientorder_id).blank? ? true : false) %>
-      <% end %>
+    <% end %>
+
+    <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
+
+    <%=link_to t('打印面单'), "/print/webtracking?flag=filter&&ids=#{@orders_grid.all_pages_records.map{|o| o.id if (o.status=='waiting')}.compact.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
+
+      <%= form_tag(exportorders_orders_url(format: "xls")) %>
+      <%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
+        <%=link_to t('面单信息回馈'), "/orders/importorders1", target: '_blank',:class => 'btn btn-primary' %>
+        <%= submit_tag "订单导出",:class => 'btn btn-primary' %>
+        <div class="pull-right" style="margin-left:6px;line-height:36px;"><%= check_box("checkbox","all")%>导出缺货订单</div>
+        <%=link_to t('订单导入'), "/orders/standard_orders_import1", target: '_blank',:class => 'btn btn-primary' %>
+      </form>
   </div>
+  <div class="findprintindex-filters">
+    <div>
+      <span>商户:</span>
+      <%= grid_filter(@orders_grid, :business_id_filter)%>
+    </div>
 
-    
-     <div>商户:</div>
-     <div><%= grid_filter(@orders_grid, :business_id_filter)%></div>
+    <div style="line-height: 15px;">
+      <span>日期:</span>
+      <%= grid_filter(@orders_grid, :created_at_filter)%>
+    </div>
 
-     <div>日期:</div>
-     <div><%= grid_filter(@orders_grid, :created_at_filter)%></div>
+    <div>
+      <span>运输方式:</span>
+      <%= grid_filter(@orders_grid, :transport_type_filter)%>
+    </div>
 
-     <div>运输方式:</div>
-     <div><%= grid_filter(@orders_grid, :transport_type_filter)%></div>
+    <div>
+      <span>重量:</span>
+      <%= grid_filter(@orders_grid, :total_weight_filter)%>
+    </div>
 
-     <div>重量:</div>
-     <div><%= grid_filter(@orders_grid, :total_weight_filter)%></div>
-
-     <div>状态:</div>
-     <div><%= grid_filter(@orders_grid, :status_show_filter)%></div>
+    <div>
+      <span>状态:</span>
+      <%= grid_filter(@orders_grid, :status_show_filter)%>
+    </div>
      
-     <div>面单号:</div>
-     <div><%= grid_filter(@orders_grid, :tracking_number_filter)%></div>
+    <div>
+      <span>面单号:</span>
+      <%= grid_filter(@orders_grid, :tracking_number_filter)%>
+    </div>
 
-     <div>大客户订单编号:</div>
-     <div style="width:150px"><%= grid_filter(@orders_grid, :keyclientorder_filter)%></div>
+    <div>
+      <span>大客户订单编号:</span>
+      <%= grid_filter(@orders_grid, :keyclientorder_filter)%>
+    </div>
 
-       <td><button class="wg-external-submit-button" data-grid-name="grid">递交</button></td>
-       <td><button class="wg-external-reset-button" data-grid-name="grid">重置</button></td>
-
+    <button class="wg-external-submit-button" data-grid-name="grid">递交</button>
+    <button class="wg-external-reset-button" data-grid-name="grid">重置</button>
+    
+  </div>
+</div>
  
- <%= render_grid(@orders_grid)%>
+<%= render_grid(@orders_grid)%>
 
 
 <div>
