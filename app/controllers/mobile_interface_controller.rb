@@ -37,7 +37,7 @@ class MobileInterfaceController < ApplicationController
     shelves_arry = []
 
     shelves.each do |x|
-      shelves_arry << {shelf: x.shelf_code, shelf_barcode: x.barcode, type: Shelf::SHELF_TYPE[x.shelf_type.to_sym], area: x.area.name}
+      shelves_arry << {shelf: x.shelf_code, shelf_barcode: x.barcode, type: Shelf::SHELF_TYPE[x.shelf_type.try(:to_sym)], area: x.area.name}
     end
 
     @mobile.update(last_sign_in_time: Time.now)

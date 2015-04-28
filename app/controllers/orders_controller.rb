@@ -1029,7 +1029,7 @@ class OrdersController < ApplicationController
         # amount = find_in_instance(orderarr,line,business_order_id,sku_extcode_69code,supplier_no,sub_order_id,temp_amount)
        
         #Load order_detail
-        order_detail = order.order_details.find_by(supplier_id: supplier.try(:id), specification_id: relationship.specification.id, order_id: order.id)
+        order_detail = order.order_details.find_by(supplier_id: supplier.try(:id), specification_id: relationship.specification.id)
 
         order_detail ||= order.order_details.find_by(business_deliver_no: sub_order_id)
 
@@ -1052,7 +1052,7 @@ class OrdersController < ApplicationController
         if order_detail.blank? 
           OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: supplier, business_deliver_no: business_deliver_no, order: order
         else
-          order_detail.update!(amount: amount,business_deliver_no: business_deliver_no)
+          order_detail.update!(amount: order_detail.amount + amount, business_deliver_no: business_deliver_no)
         end
 
         order.update!(business_trans_no: business_trans_no)

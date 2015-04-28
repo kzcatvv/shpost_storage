@@ -24,7 +24,7 @@ class Task < ActiveRecord::Base
   end
 
 
-  def self.save_task(parent, storage, user = nil)
+  def self.save_task(parent, storage, user_id = nil)
     if !parent.has_waiting_stock_logs()
       return
     end
@@ -48,10 +48,10 @@ class Task < ActiveRecord::Base
       if title.blank?
         title = parent.class.name
       end
-      Task.create!(parent: parent, user: user, status: STATUS[:doing], storage: storage, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
+      Task.create!(parent: parent, user: user_id, status: STATUS[:doing], storage: storage, assign_type: ASSIGN_TYPE[:assigned], task_type: type, title: title)
     else
       if !user.blank?
-        task.update(user: user)
+        task.update(user_id: user_id)
       end
     end
   end
