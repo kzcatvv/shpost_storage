@@ -9,7 +9,7 @@ class StandardInterfaceController < ApplicationController
   def commodity_enter
     sku = @context_hash['SKU']
     
-    return error_builder('0005', '商品sku编码为空')
+    return error_builder('0005', '商品sku编码为空') if sku.blank?
     # spec = @context_hash['SPEC']
     name = @context_hash['COMMODITY']
     
