@@ -377,6 +377,9 @@ zh-CN:
       constock_log:
         one: 耗材库存日志
         other: 耗材库存日志
+      logistic:
+        one: 物流商管理
+        other: 物流商管理
     attributes:
       user:
         email: "电子邮件"
@@ -751,7 +754,19 @@ zh-CN:
         amount: "数量"
         operation_type: "出入库"
         created_at: "创建时间"
-
+      logistic:
+        name: "物流商名称"
+        print_format: "物流商打印格式代号"
+        is_getnum: "是否取号段"
+        contact: "联系人"
+        address: "物流商地址"
+        contact_phone: "物流商电话"
+        post: "邮编"
+        is_default: "是否默认"
+        storage_id: "所属仓库"
+        param_val1: "物流商参数1"
+        param_val2: "物流商参数2"
+        created_at: "创建时间"
   menu:
     permission:
       name: "权限管理"
@@ -828,6 +843,9 @@ zh-CN:
         mobile:
           name: "设备管理"
           link: "/mobiles/"
+        logistic:
+          name: "物流商管理"
+          link: "/logistics/"
           # needrole:
           #   can: :read
           #   role: "shelf"

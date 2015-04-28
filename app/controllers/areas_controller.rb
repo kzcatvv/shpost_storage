@@ -30,6 +30,15 @@ class AreasController < ApplicationController
   # POST /areas.json
   def create
     # @area = Area.new(area_params)
+    
+    # area_code=@area.area_code 
+    # if !area_code.blank?
+    #   if !Area.accessible_by(current_ability).where(area_code:area_code).blank?
+    #     flash[:alert] = "该区域编号已存在"
+    #     redirect_to (new_area_path) and return
+    #   end
+    # end
+
     @area.storage_id = current_storage.id
 
     respond_to do |format|

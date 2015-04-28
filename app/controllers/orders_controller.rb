@@ -690,7 +690,7 @@ class OrdersController < ApplicationController
     unless request.get?
       if file = upload_pingan(params[:file]['file'])
         # Order.transaction do
-      #商户
+        #商户
           business_id = params[:business_select]
           business = Business.accessible_by(current_ability).find business_id
           Rails.logger.info "*************business_id:" + business_id + "************"
@@ -750,7 +750,7 @@ class OrdersController < ApplicationController
                 #外部订单号
                 business_order_id = to_string(instance.cell(line,'A'))
                 if !business_order_id.blank?
-                  ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id:business_id
+                  ori_order = Order.accessible_by(current_ability).find_by  business_order_id: business_order_id, business_id: business_id
                 else
                   txt = "缺少外部订单号"
                   sheet1_error << (instance.row(line) << txt)

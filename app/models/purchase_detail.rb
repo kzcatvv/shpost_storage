@@ -8,7 +8,7 @@ class PurchaseDetail < ActiveRecord::Base
 
   # before_validation :set_batch_no
 
-	validates_presence_of :name, :amount, message: '不能为空'
+	validates_presence_of :name, :amount, :specification_id, message: '不能为空'
   validates_numericality_of :sum, allow_blank: true
   validates_numericality_of :amount, only_integer: true # 必須是整數  
 

@@ -187,13 +187,12 @@ class CommoditiesController < ApplicationController
         commodity = Commodity.accessible_by(current_ability).find_by(no: commodity_no)
       end
       if !commodity.blank?
-        specification_name = to_string(x[5])
-        specification = nil
-        specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:specification_name
-        if !specification.blank? && (specification.created_at == specification.updated_at)
-          specification.delete
-        end
-      
+        # specification_name = to_string(x[5])
+        # specification = nil
+        # specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:specification_name
+        # if !specification.blank? && (specification.created_at == specification.updated_at)
+        #   specification.delete
+        # end
         if commodity.specifications.blank? && (commodity.created_at == commodity.updated_at)
           commodity.delete
         end
@@ -224,6 +223,7 @@ class CommoditiesController < ApplicationController
       sheet1[count_row,9]=obj[9]
       sheet1[count_row,10]=obj[10]
       sheet1[count_row,11]=obj[11]
+      sheet1[count_row,12]=obj[12]
       count_row += 1
     end 
     book.write xls_report  
