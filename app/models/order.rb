@@ -189,6 +189,30 @@ class Order < ActiveRecord::Base
     end
   end
 
+  def to_row
+    row = []
+    row << business_order_id
+    row << tracking_number
+    row << transport_type
+    row << total_weight
+    row << pingan_ordertime
+    row << customer_unit
+    row << customer_name
+    row << customer_address
+    row << customer_postcode
+    row << province
+    row << city
+    row << county
+    row << customer_tel
+    row << customer_phone
+    row << business.no
+    row << business.name
+    row << batch_no
+    row << business_trans_no
+    row << status
+    row << nil
+  end
+
   protected
 
   def can_update_status(status)
