@@ -156,53 +156,56 @@ class RelationshipsController < ApplicationController
           instance= Roo::CSV.new(file)
         end
         sheet_error = []
+        rowarr = []
         instance.default_sheet = instance.sheets.first
         flash_message = "导入成功!"
         2.upto(instance.last_row) do |line|
-          sku = to_string(instance.cell(line,'D'))
+          rowarr = instance.row(line)
+          sku = to_string(rowarr[3])
+          business_name = to_string(rowarr[7])
+          supplier_name = to_string(rowarr[8])
+          
           if sku.blank?
             txt = "缺少SKU"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
           end
           specification = Specification.accessible_by(current_ability).find_by sku: sku
           if specification.blank?
             txt = "商品规格不存在"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
             # raise "导入文件第" + line.to_s + "行数据, 商品规格不存在，导入失败"
           end
-          business_name = to_string(instance.cell(line,'H'))
           if business_name.blank?
             txt = "缺少商户"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
           end
           business = Business.accessible_by(current_ability).find_by name: business_name
           if business.blank?
             txt = "商户不存在"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
             # raise "导入文件第" + line.to_s + "行数据, 商户不存在，导入失败"
           end
-          supplier_name = to_string(instance.cell(line,'I'))
           if supplier_name.blank?
             txt = "缺少供应商"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
           end
           supplier = Supplier.accessible_by(current_ability).find_by name: supplier_name
           if supplier.blank?
             txt = "供应商不存在"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
             # raise "导入文件第" + line.to_s + "行数据, 供应商不存在，导入失败"
           end
           relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id, supplier_id: supplier.id
           if relationship.nil?
-            Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
+            Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(rowarr[9]), spec_desc: to_string(rowarr[10]), warning_amt: rowarr[11].to_i
           else
-            Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(instance.cell(line,'J')), spec_desc: to_string(instance.cell(line,'K')), warning_amt: instance.cell(line,'L').to_i
+            Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: to_string(rowarr[9]), spec_desc: to_string(rowarr[10]), warning_amt: rowarr[11].to_i
           end
         end
 

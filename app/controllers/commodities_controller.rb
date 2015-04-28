@@ -88,50 +88,52 @@ class CommoditiesController < ApplicationController
           instance= Roo::CSV.new(file)
         end
         sheet_error = []
+        rowarr = [] 
         instance.default_sheet = instance.sheets.first
         flash_message = "导入成功!"
         2.upto(instance.last_row) do |line|
+          rowarr = instance.row(line)
+          commodity_no = to_string(rowarr[0])
+          commodity_name = to_string(rowarr[1])
+          goodtype_name = to_string(rowarr[2])
+          sixnine_code = to_string(rowarr[4])
+          specification_name = to_string(rowarr[5])
+          desc = to_string(rowarr[6])
 
-          commodity_no = to_string(instance.cell(line,'A'))
           if commodity_no.blank?
             txt = "缺少商品编号"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
           end
-          commodity_name = to_string(instance.cell(line,'B'))
           if commodity_name.blank?
             txt = "缺少商品名称"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
           end
-          goodtype_name = to_string(instance.cell(line,'C'))
           if goodtype_name.blank?
             txt = "缺少商品类型"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
           end
-          sixnine_code = to_string(instance.cell(line,'E'))
-          specification_name = to_string(instance.cell(line,'F'))
           if specification_name.blank?
             txt = "缺少规格名称"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
           end
-          desc = to_string(instance.cell(line,'G'))
-
+          
           all_name = ""
           all_name << commodity_name
           all_name << specification_name
 
-          long = instance.cell(line,'H').blank? ? 0.0 : instance.cell(line,'H')
-              wide = instance.cell(line,'I').blank? ? 0.0 : instance.cell(line,'I')
-              high = instance.cell(line,'J').blank? ? 0.0 : instance.cell(line,'J')
-              weight = instance.cell(line,'K').blank? ? 0.0 : instance.cell(line,'K')
-              volume = instance.cell(line,'L').blank? ? 0.0 : instance.cell(line,'L')
+          long = rowarr[7].blank? ? 0.0 : rowarr[7]
+              wide = rowarr[8].blank? ? 0.0 : rowarr[8]
+              high = rowarr[9].blank? ? 0.0 : rowarr[9]
+              weight = rowarr[10].blank? ? 0.0 : rowarr[10]
+              volume = rowarr[11].blank? ? 0.0 : rowarr[11]
 
           if !(long.is_a? Float) || !(wide.is_a? Float) || !(high.is_a? Float) || !(weight.is_a? Float) || !(volume.is_a? Float)
             txt = "长宽高重量体积非数字"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
             # raise "导入文件第" + line.to_s + "行数据, 长宽高重量体积非数字，导入失败"
           end
@@ -140,7 +142,7 @@ class CommoditiesController < ApplicationController
           goodtype= Goodstype.accessible_by(current_ability).where(name: goodtype_name).first
           if goodtype.blank?
             txt = "商品类型不存在"
-            sheet_error << (instance.row(line) << txt)
+            sheet_error << (rowarr << txt)
             next
             # raise "导入文件第" + line.to_s + "行数据, 商品类型不存在，导入失败"
           end

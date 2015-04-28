@@ -36,19 +36,21 @@
     <tbody>
     
     <% if !@order_hash.blank? and !@orders.blank?%>
-    <% sid = 0
-       bid=0 %>
+    <% 
+      # sid = 0
+      # bid = 0 
+    %>
     <% @order_hash.each do |key,value| %>
     <tr>
         <%  if !key[0].blank?
-              if key[0]==sid 
-                 storage_name="" 
-              else
+              # if key[0]==sid 
+              #    storage_name="" 
+              # else
                 storage = Storage.find_by id: key[0]
                 if !storage.blank?
                   storage_name=storage.name.blank?? "":storage.name
                 end
-              end
+              # end
             else
               storage_name="" 
             end
@@ -57,14 +59,14 @@
         <%= storage_name %>
         </td>
         <%  if !key[1].blank?
-              if key[1]==bid and key[0]==sid
-                 business_name="" 
-              else
+              # if key[1]==bid and key[0]==sid
+              #    business_name="" 
+              # else
                  business = Business.find_by id:key[1]
                  if !business.blank?
                    business_name=business.name.blank?? "":business.name
                  end
-              end
+              # end
             else
               business_name="" 
             end
@@ -85,8 +87,10 @@
         <%= @orders.where(storage_id:key[0],business_id:key[1],transport_type:key[2]).count %>
         </td>
     </tr>
-    <% sid=key[0]
-       bid=key[1] %>
+    <% 
+      #sid=key[0]
+      #bid=key[1] 
+    %>
     <% end %>
     <tr>
     <td>总计</td>
