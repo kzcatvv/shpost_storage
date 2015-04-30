@@ -104,7 +104,11 @@ class SpecificationsController < ApplicationController
     
     @stocklogs=@stocklogs.where("stock_logs.created_at>=? and stock_logs.created_at<=?",start_date,(end_date+1))
         
-    @temp_hash = @stocklogs.includes(:storage).where(whereQuery,current_storage.id,@specification.id,operation).group(:specification_id).group(:business_id).group(:supplier_id).group(date_condition).group(:operation_type).order(created_at: :desc).sum(:amount)
+    if !RailsEnv.is_oracle?    
+      @temp_hash = @stocklogs.includes(:storage).where(whereQuery,current_storage.id,@specification.id,operation).group(:specification_id).group(:business_id).group(:supplier_id).group(date_condition).group(:operation_type).order(created_at: :desc).sum(:amount)
+    else
+      @temp_hash = @stocklogs.includes(:storage).where(whereQuery,current_storage.id,@specification.id,operation).group(:specification_id).group(:business_id).group(:supplier_id).group(date_condition).group(:operation_type).order("to_char(stock_logs.created_at,'yyyymmdd') desc").sum(:amount)
+    end
 
     key_last[0] = ""
     key_last[1] = ""
