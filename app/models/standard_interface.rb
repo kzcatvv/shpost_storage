@@ -7,6 +7,8 @@ class StandardInterface
     name = context['COMMODITY']
     desc = context['DESC']
     sixnine_code = context['SIXNINE']
+    # 0428 add columns for WISH
+    commodity_no = context['COMMODITY_NO']
 
     supplier = nil
 
