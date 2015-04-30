@@ -1359,7 +1359,7 @@ def exportorders_xls_content_for(objs)
   def getTrackingNumber(transport_type, tracking_number, line=nil)
     return_no = []
     case transport_type
-    when "tcsd","同城速递"
+    when "tcsd","同城速递","tcxb","同城小包"
       case tracking_number.size
       when 13
         return_no << tracking_number[0,2] << tracking_number[2,8] << tracking_number[11,2]
@@ -1684,7 +1684,7 @@ def exportorders_xls_content_for(objs)
 
   def to_transport_type(transport_type)
     case transport_type
-      when "同城速递","tcsd","TCSD"
+      when "同城速递","tcsd","TCSD","同城小包","tcxb","TCXB"
         tran_type = 'tcsd'
       when "国内小包","gnxb","GNXB"
         tran_type = 'gnxb'  
