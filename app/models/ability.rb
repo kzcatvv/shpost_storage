@@ -41,6 +41,7 @@ class Ability
         can :manage, Consumable, unit_id: user.unit_id
         can :manage, ConsumableStock, unit_id: user.unit_id
         can :read, ConstockLog
+        can [:read,:hotprint_ready,:hotprint_show], Logistic
 
             # can :manage, MoveStock, unit_id: user.unit_id
             # can :manage, Inventory, unit_id: user.unit_id
@@ -101,6 +102,8 @@ class Ability
         can :read, Relationship, business: {unit_id: user.unit_id}
 
         cannot :manage, InterfaceInfo
+
+        can [:read,:hotprint_ready,:hotprint_show], Logistic
 
         can [:read, :up_download_export], UpDownload
         cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
@@ -205,7 +208,7 @@ class Ability
         can :manage, Mobile, storage_id: storage.id
 
         can :read, Task, storage_id: storage.id
-
+        can [:read,:hotprint_ready,:hotprint_show], Logistic
         
     end
 
@@ -230,6 +233,7 @@ class Ability
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
 
         can :read, Task, storage_id: storage.id
+        can [:read,:hotprint_ready,:hotprint_show], Logistic
     end
 
     if user.purchase?(storage)
@@ -252,6 +256,7 @@ class Ability
         can :read, StockLog, shelf: {area: {storage_id: storage.id}}
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
+        can [:read,:hotprint_ready,:hotprint_show], Logistic
     end
 
     if user.packer?(storage)
@@ -263,7 +268,7 @@ class Ability
         can :packout, Order, storage_id: storage.id
         can :packaging_index, Order, storage_id: storage.id
         can :packaged_index, Order, storage_id: storage.id
-        
+        can [:read,:hotprint_ready,:hotprint_show], Logistic
     end
 
     if user.sorter?(storage)
@@ -318,7 +323,7 @@ class Ability
         can :manage, Inventory, unit_id: user.unit_id
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
-        
+        can [:read,:hotprint_ready,:hotprint_show], Logistic
     end
 
     end
