@@ -756,6 +756,7 @@ zh-CN:
         created_at: "创建时间"
       logistic:
         name: "物流商名称"
+        wl_no: "物流商编号"
         print_format: "物流商打印格式代号"
         is_getnum: "是否取号段"
         contact: "联系人"
