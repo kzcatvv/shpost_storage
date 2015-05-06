@@ -1,0 +1,37 @@
+<%- model_class = CountryCode -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, CountryCode %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_country_code_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@country_codes_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:chinese_name), attribute: 'chinese_name'
+
+    g.column name: model_class.human_attribute_name(:english_name), attribute: 'english_name'
+
+    g.column name: model_class.human_attribute_name(:code), attribute: 'code'
+
+    g.column name: model_class.human_attribute_name(:surfmail_partition_no), attribute: 'surfmail_partition_no'
+
+    g.column name: model_class.human_attribute_name(:regimail_partition_no), attribute: 'regimail_partition_no'
+
+    g.column name: model_class.human_attribute_name(:is_mail), attribute: 'is_mail',filter_type: :boolean do |country_code| 
+      country_code.is_mail_name
+    end
+   
+    g.column do |country_code|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")), edit_country_code_path(country_code), :class => 'btn btn-xs btn-primary' if can? :update, country_code) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), country_code_path(country_code), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, country_code)
+    end
+  end 
+%>
+
+

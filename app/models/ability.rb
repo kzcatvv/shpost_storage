@@ -23,6 +23,7 @@ class Ability
         can :manage, InterfaceInfo
         can :manage, UpDownload
         can :manage, Logistic
+        can :manage, CountryCode
 
         cannot :resend, InterfaceInfo do |interface_info|
             (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
@@ -79,7 +80,7 @@ class Ability
         end
 
         can :query_order_report, :orders
-        
+        can :manage, CountryCode
         # can :manage,BusinessRelationship
 
     elsif user.user?

@@ -1,5 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :country_codes
+
   resources :logistics
 
   resources :consumable_stocks do
