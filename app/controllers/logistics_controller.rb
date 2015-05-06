@@ -65,9 +65,8 @@ class LogisticsController < ApplicationController
     #     end
         @logistic = Logistic.find(params[:transport_type])
         @transport_type=@logistic.print_format
-        numberSize = params[:mlnum].to_i
         @ids=params[:oid].split(",").map(&:to_i)
-        @imurl="#{Rails.root}/public/gjlogo.png"
+        numberSize = @ids.size
         rq=@logistic.getMailNum('信息局',@logistic.param_val1,@logistic.param_val2,numberSize)
         if !rq.nil?
             rqback=rq.split(':')

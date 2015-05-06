@@ -20,7 +20,6 @@
 <center> 
 	<form action="/logistics/hotprint_show" onsubmit="return check(this)" method="post">
 		<%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
-         <h3>申请面单号数量：<input type=text name='mlnum' id='mlnum' /></h3>
          <input type=hidden id='oid' name='oid' value='<%= @ids%>'/>
          <input type=hidden id='flag' name='flag' value='<%= @flag%>'/>
          <h3>快递类型：<%= select_tag(:transport_type, options_from_collection_for_select(@logistics, "id", "name")) %></h3>
