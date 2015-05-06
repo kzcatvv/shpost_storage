@@ -168,6 +168,51 @@ class OrdersController < ApplicationController
     end
   end
 
+  # todo!!!!
+  def find_stock(orders,createKeyCilentOrderFlg,type='0')
+    order_details_hash = orders.includes(:order_details).where.not("order_details.specification_id" => nil, business_id: nil).group(:specification_id, :supplier_id, "orders.business_id").sum(:amount)
+    orders.update_all(is_shortage: 'no')
+    orders_changed = false
+    # binding.pry
+    order_details_hash.each do |key, sum|
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+      if orders_changed
+        sum = orders.includes(:order_details).where(is_shortage: 'no').where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).sum(:amount)
+      end
+      if stock_sum < sum
+        orders_changed = true
+        limit = sum - stock_sum
+        # todo: sum the limit orders, if equal cotinue,else loop the limit orders and sum .
+        offset_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).offset(limit).readonly(false)
+        offset_sum = offset_orders.includes(:order_details).sum(:amount)
+        if offset_sum == limit
+          offset_orders.update_all(is_shortage: 'yes')
+        else
+          offset_orders.each do |x|
+            tmp_sum = x.order_details.sum(:amount)
+            # binding.pry
+            x.update(is_shortage: 'yes')
+            limit = limit - tmp_sum
+            if limit <= 0
+              break
+            end
+          end
+        end
+        # order_array = []
+        # x.each do |y|
+        #   order_array << y.id
+        # end
+        # orders.delete_if {|item| !order_array.index(item.id).blank?}
+      end
+    end
+    if type.eql? '0'
+      return orders.reload.where(is_shortage: 'no')
+    else
+      return orders.reload.where(is_shortage: 'yes')
+    end
+
+  end
+
   def find_has_stock(orders,createKeyCilentOrderFlg)
     allcnt = {}
     finorders = []
@@ -590,32 +635,32 @@ class OrdersController < ApplicationController
       redirect_to :action => 'findprintindex'
     else
       checkbox_all = params[:checkbox][:all]
-      if checkbox_all.eql? '0'
+      # if checkbox_all.eql? '0'
         respond_to do |format|
           format.xls {   
-            send_data(exportorders_xls_content_for(find_has_stock(orders,false)),  
+            send_data(exportorders_xls_content_for(find_stock(orders,false,checkbox_all)),  
                 :type => "text/excel;charset=utf-8; header=present",  
                 :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
           }  
         end
-      else
-        has_stock_orders = find_has_stock(orders,false)
-        ordid = []
-        if !has_stock_orders.blank?
-          has_stock_orders.each do |o|
-           ordid << o.id
-          end
+      # else
+      #   has_stock_orders = find_has_stock_todo(orders,false)
+      #   ordid = []
+      #   # if !has_stock_orders.blank?
+      #   #   has_stock_orders.each do |o|
+      #   #    ordid << o.id
+      #   #   end
        
-          respond_to do |format|
-            format.xls {   
-              send_data(exportorders_xls_content_for(orders.where.not(id: ordid)),  
-                :type => "text/excel;charset=utf-8; header=present",  
-                :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
-              # send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),:type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls") 
-            }  
-          end
-        end
-      end
+      #   #   # respond_to do |format|
+      #   #   #   format.xls {   
+      #   #   #     send_data(exportorders_xls_content_for(orders.where.not(id: ordid)),  
+      #   #   #       :type => "text/excel;charset=utf-8; header=present",  
+      #   #   #       :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
+      #   #   #     # send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),:type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls") 
+      #   #   #   }  
+      #   #   # end
+      #   # end
+      # end
     end
   end
 
