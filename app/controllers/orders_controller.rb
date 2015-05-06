@@ -381,46 +381,64 @@ class OrdersController < ApplicationController
 
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
-
-    #some wice_grad lazy do the resultset is [] without once call
+    
     begin
-      @slorders.resultset
+      @orders_grid.resultset
     rescue
 
     end
-    
-    @selectorders=Order.where('order_type = ? and status in (?) and storage_id = ?',"b2c",status, current_storage.id)
-    # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
 
-    if !params[:grid].nil?
-      if !params[:grid][:f].nil?
-        if !params[:grid][:f]["businesses.name".to_sym].nil?
-          businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
-          @selectorders=@selectorders.where(:business_id,businessid)
-        end
+    @allcnt = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).sum(:amount)
+    order_count_hash = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
 
-        if !params[:grid][:f][:created_at].nil?
-          @selectorders=@selectorders.where(["orders.created_at >= ? and orders.created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
-        end
-      end
+    order_count_hash.each do |key,value|
+      order_sum = @allcnt[key]
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+
+      @allcnt[key] = [order_sum,value,stock_sum]
     end
+
+
+    # @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
+
+    # #some wice_grad lazy do the resultset is [] without once call
+    # begin
+    #   @slorders.resultset
+    # rescue
+
+    # end
     
-    selorders = @selectorders
-    @selectorders=@selectorders.to_ary
-    @selectorders.each do |o|
-      o.order_details.each do |d|
-        product = [o.business_id,d.specification_id,d.supplier_id]
-        order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+    # @selectorders=Order.where('order_type = ? and status in (?) and storage_id = ?',"b2c",status, current_storage.id)
+    # # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
 
-        if @allcnt.has_key?(product)
-          @allcnt[product][0]=@allcnt[product][0]+d.amount
+    # if !params[:grid].nil?
+    #   if !params[:grid][:f].nil?
+    #     if !params[:grid][:f]["businesses.name".to_sym].nil?
+    #       businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
+    #       @selectorders=@selectorders.where(:business_id,businessid)
+    #     end
 
-        else
-          @allcnt[product]=[d.amount,order_count]
-        end
-      end
-    end
+    #     if !params[:grid][:f][:created_at].nil?
+    #       @selectorders=@selectorders.where(["orders.created_at >= ? and orders.created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
+    #     end
+    #   end
+    # end
+    
+    # selorders = @selectorders
+    # @selectorders=@selectorders.to_ary
+    # @selectorders.each do |o|
+    #   o.order_details.each do |d|
+    #     product = [o.business_id,d.specification_id,d.supplier_id]
+    #     order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+
+    #     if @allcnt.has_key?(product)
+    #       @allcnt[product][0]=@allcnt[product][0]+d.amount
+
+    #     else
+    #       @allcnt[product]=[d.amount,order_count]
+    #     end
+    #   end
+    # end
   end
 
   def pingan_b2c_import
