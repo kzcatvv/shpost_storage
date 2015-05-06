@@ -36,6 +36,25 @@ class OrderStatisticsController < ApplicationController
 
   end
 
+  def order_statistic_details
+    if !current_user.blank?
+      authorize! :order_statistic_details, :orders
+    end
+    
+    @orders = []
+    start_date = to_date(params[:start_date])
+    end_date = to_date(params[:end_date])
+    storage_id = params[:key0].blank?? nil:params[:key0]
+    business_id = params[:key1].blank?? nil:params[:key1]
+    transport_type = params[:key2].blank?? nil:params[:key2]
+
+    @orders=Order.where("orders.created_at >= ? and orders.created_at<= ?", start_date,(end_date+1)).where(storage_id:storage_id,business_id:business_id,transport_type:transport_type)
+    
+    if !current_user.blank?
+      @orders=@orders.where("orders.unit_id = ?", current_user.unit_id)
+    end
+  end
+
   private
   def to_date(time)
     date = Date.civil(time.split(/-|\//)[0].to_i,time.split(/-|\//)[1].to_i,time.split(/-|\//)[2].to_i)

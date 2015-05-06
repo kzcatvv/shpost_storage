@@ -362,6 +362,7 @@ ShpostStorage::Application.routes.draw do
   resources :order_statistics do
       collection do
         get 'query_order_report'
+        get 'order_statistic_details'
       end 
   end
 

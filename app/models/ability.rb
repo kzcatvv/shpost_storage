@@ -81,6 +81,7 @@ class Ability
         end
 
         can :query_order_report, :orders
+        can :order_statistic_details, :orders
         can :manage, CountryCode
         # can :manage,BusinessRelationship
 
@@ -110,6 +111,7 @@ class Ability
         cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
 
         cannot :query_order_report, :orders
+        cannot :order_statistic_details, :orders
 
     else
         cannot :manage, :all
@@ -121,6 +123,7 @@ class Ability
 
         cannot :manage, InterfaceInfo
         can :query_order_report, :orders
+        can :order_statistic_details, :orders
     end
 
     if user.admin?(storage)
@@ -175,6 +178,7 @@ class Ability
 
         can :manage, Order, storage_id: storage.id
         can :query_order_report, :orders
+        can :order_statistic_details, :orders
         cannot :cancel, Order, status: ['printed','picking']
         can :manage, OrderDetail, order: {storage_id: storage.id}
 
