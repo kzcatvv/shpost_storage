@@ -12,7 +12,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20150506023339) do
-
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
     t.string   "desc"
@@ -210,6 +209,7 @@ ActiveRecord::Schema.define(version: 20150506023339) do
     t.integer  "storage_id"
     t.string   "param_val1"
     t.string   "param_val2"
+    t.string   "wl_no"
   end
 
   create_table "manual_stock_details", force: true do |t|
@@ -349,9 +349,9 @@ ActiveRecord::Schema.define(version: 20150506023339) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
-    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
+    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"

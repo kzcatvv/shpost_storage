@@ -18,9 +18,16 @@
     <% eorder=Order.find(id) %>
     //LODOP.NewPage();
     <% if @transport_type=='gnxb'%>
-      hot_gnxb();
-
-<% elsif @transport_type=='ems' %>
+      var func = "hot_" + '<%= @logistic.print_format %>';
+      window[func]();
+      //hot_gnxb();
+    <% elsif @transport_type=='gjxbp' %>
+      var func = "hot_" + '<%= @logistic.print_format %>';
+      window[func]();
+    <% elsif @transport_type=='gjxbg' %>
+      var func = "hot_" + '<%= @logistic.print_format %>';
+      window[func]();
+    <% elsif @transport_type=='ems' %>
 LODOP.PRINT_INITA("0mm","0mm","230.2mm","127.3mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
 LODOP.ADD_PRINT_TEXT("25.7mm","29.6mm","27.8mm","5.3mm",'<%= eorder.business.name %>');
