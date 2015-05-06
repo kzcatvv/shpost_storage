@@ -1,0 +1,45 @@
+<%= form_for @country_code, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+  <div class="control-group">
+    <%= f.label :chinese_name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :chinese_name, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :english_name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :english_name, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :code, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :code, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :surfmail_partition_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :surfmail_partition_no, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :regimail_partition_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :regimail_partition_no, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :is_mail, :class => 'control-label' %> 
+    <div class="controls">
+      <%=f.check_box :is_mail,:class =>'check_box'%>
+    </div>
+  </div>
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+            country_codes_path, :class => 'btn btn-default' %>
+ 
+<% end %>
+
+
