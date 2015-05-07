@@ -179,6 +179,8 @@ ActiveRecord::Schema.define(version: 20150507082940) do
     t.integer  "business_id"
   end
 
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -353,9 +355,9 @@ ActiveRecord::Schema.define(version: 20150507082940) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"

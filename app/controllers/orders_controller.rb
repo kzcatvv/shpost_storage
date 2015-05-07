@@ -236,7 +236,7 @@ class OrdersController < ApplicationController
 
   def find_has_stock(orders,createKeyCilentOrderFlg)
     allcnt = {}
-    finorders = []
+    findorders = []
     oid = []
     arrorders = []
     ordercnt = 0
@@ -278,7 +278,7 @@ class OrdersController < ApplicationController
       end
       is_shortage = ''
       if hasstockchk
-        finorders += Order.where(id: o)
+        findorders += Order.where(id: o)
         ordercnt += 1
         is_shortage = 'no'
         oid << o.id
@@ -340,7 +340,7 @@ class OrdersController < ApplicationController
       :conditions => ['order_type = ? ',"b2c"])
   end
 
-  def finorderout
+  def findorderout
     @_tracking_number = params[:_tracking_number]
     @tracking_number = params[:tracking_number]
 
