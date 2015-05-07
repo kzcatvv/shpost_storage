@@ -29,7 +29,7 @@ class Gjxbg < ActiveRecord::Base
       sum = sum + s.to_i* x[i]
     end
     sum = sum + 120
-    r = sum % 13
+    r = sum % 11
     case r
       when 0
         return "5"

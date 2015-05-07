@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507023708) do
-
+ActiveRecord::Schema.define(version: 20150507040151) do
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
     t.string   "desc"
@@ -51,7 +50,11 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+<<<<<<< HEAD
     t.string   "name_en"
+=======
+    t.string   "english_name"
+>>>>>>> 956429ac97e07f28987c120e83c657f4c76ff199
   end
 
   create_table "constock_logs", force: true do |t|
@@ -177,8 +180,6 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.integer  "supplier_id"
     t.integer  "business_id"
   end
-
-  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
 
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
@@ -458,6 +459,14 @@ ActiveRecord::Schema.define(version: 20150507023708) do
 
   add_index "roles", ["user_id", "storage_id", "role"], name: "index_roles_on_user_id_and_storage_id_and_role", unique: true
 
+  create_table "sequence_nos", force: true do |t|
+    t.integer "unit_id"
+    t.integer "storage_id"
+    t.integer "logistic_id"
+    t.string  "start_no"
+    t.string  "end_no"
+  end
+
   create_table "sequences", force: true do |t|
     t.string   "entity"
     t.integer  "unit_id"
@@ -502,8 +511,12 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
+<<<<<<< HEAD
     t.string   "name_en"
     t.float    "price"
+=======
+    t.string   "english_name"
+>>>>>>> 956429ac97e07f28987c120e83c657f4c76ff199
   end
 
   create_table "standard_interfaces", force: true do |t|
