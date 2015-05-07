@@ -4,7 +4,7 @@ class Gjxbg < ActiveRecord::Base
     storage_id = current_storage.id
     sequence_no = SequenceNo.find_by(storage_id:storage_id,logistic_id:logistic_id) if !logistic_id.blank?
     tracking_number = sequence_no.end_no if !sequence_no.blank?
-    tracking_number = (tracking_number.to_i+1).to_s
+    tracking_number = calNextTrackingNo(tracking_number)
     if !tracking_number.blank?
       if num_count == 1
         return_no << tracking_number
