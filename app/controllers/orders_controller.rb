@@ -371,21 +371,37 @@ class OrdersController < ApplicationController
     @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
      :order_direction => 'desc', :per_page => 15)
 
-    @orders_grid.with_resultset do |orders|
-      @@orders_export = orders
-    end
-
     @allcnt = {}
-    @allcnt.clear
-    
-    begin
-      @orders_grid.resultset
-    rescue
+
+    @orders_grid.with_resultset do |orders|
+
+      @@orders_export = orders
+
+      # @allcnt = orders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").sum(:amount)
+      # order_count_hash = orders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").count(:id)
+
+      # order_count_hash.each do |key,value|
+      #   # if order detail missing
+      #   if key[0].blank?
+      #     @allcnt.delete(key)
+      #     next
+      #   end
+      #   order_sum = @allcnt[key]
+      #   stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+
+      #   @allcnt[key] = [order_sum,value,stock_sum]
+      # end
 
     end
+    
+    # begin
+    #   @orders_grid.resultset
+    # rescue
 
-    @allcnt = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).sum(:amount)
-    order_count_hash = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
+    # end
+
+    @allcnt = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).sum(:amount)
+    order_count_hash = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
 
     order_count_hash.each do |key,value|
       # if order detail missing
@@ -398,6 +414,7 @@ class OrdersController < ApplicationController
 
       @allcnt[key] = [order_sum,value,stock_sum]
     end
+
 
 
     # @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
@@ -1399,7 +1416,7 @@ def exportorders_xls_content_for(objs)
           end
         end
 
-        sku_extcode_69code = specification.sku
+        sku_extcode_69code = relationship.barcode
         sku_extcode_69code ||= external_code
         sku_extcode_69code ||= specification.sixnine_code
 
