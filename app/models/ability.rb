@@ -82,7 +82,6 @@ class Ability
 
         can :query_order_report, :orders
         can :order_statistic_details, :orders
-        can :manage, CountryCode
         # can :manage,BusinessRelationship
 
     elsif user.user?

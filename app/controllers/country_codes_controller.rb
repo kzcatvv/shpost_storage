@@ -49,6 +49,12 @@ class CountryCodesController < ApplicationController
     end
   end
 
+  def get_code(name)
+    country_code = CountryCode.find_by(chinese_name:name) if ! name.blank?
+    country_code ||= CountryCode.find_by(english_name:name) if ! name.blank?
+    return country_code.blank?? "":country_code.code
+  end
+
   private
     def set_country_code
       @country_code = CountryCode.find(params[:id])

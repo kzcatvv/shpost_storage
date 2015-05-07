@@ -181,7 +181,7 @@ class Stock < ActiveRecord::Base
 
           outpick_sl = order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])          
           inpick_sl = order.stock_logs.create(stock: in_stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:in]) 
-          inpick_sl.pick_out = inpick_sl
+          inpick_sl.pick_out = outpick_sl
           inpick_sl.save
 
           if amount <= 0
