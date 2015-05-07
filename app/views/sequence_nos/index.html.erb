@@ -1,0 +1,43 @@
+<%- model_class = SequenceNo -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, SequenceNo %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_sequence_no_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@sequence_nos_grid) do |g|
+
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id',custom_filter: Unit.accessible_by(current_ability).all.collect {|g| [g.name,g.id]} do |sequence_no|
+      if !sequence_no.unit_id.blank?
+        Unit.accessible_by(current_ability).find(sequence_no.unit_id).name
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'storage_id',custom_filter: Storage.accessible_by(current_ability).all.collect {|g| [g.name,g.id]} do |sequence_no|
+      if !sequence_no.storage_id.blank?
+        Storage.accessible_by(current_ability).find(sequence_no.storage_id).name
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:logistic_id), attribute: 'logistic_id',custom_filter: Logistic.accessible_by(current_ability).all.collect {|g| [g.name,g.id]} do |sequence_no|
+      if !sequence_no.logistic_id.blank?
+        Logistic.accessible_by(current_ability).find(sequence_no.logistic_id).name
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:start_no), attribute: 'start_no'
+
+    g.column name: model_class.human_attribute_name(:end_no), attribute: 'end_no'
+
+    g.column do |sequence_no|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")), edit_sequence_no_path(sequence_no), :class => 'btn btn-xs btn-primary' if can? :update, sequence_no) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), sequence_no_path(sequence_no), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, sequence_no)
+    end
+  end 
+%>
