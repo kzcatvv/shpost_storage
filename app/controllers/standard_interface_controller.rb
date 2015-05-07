@@ -7,49 +7,49 @@ class StandardInterfaceController < ApplicationController
   #load_and_authorize_resource
 
   def commodity_enter
-    sku = @context_hash['SKU']
-    
-    return error_builder('0005', '商品sku编码为空') if sku.blank?
+    return error_builder('0005', '商品sku编码为空') if @context_hash['BUSINESS_SKU'].blank?
     # spec = @context_hash['SPEC']
-    name = @context_hash['COMMODITY']
+
+    return error_builder('0005', '商品编号为空') if @context_hash['COMMODITY_NO'].blank?
+
+    return error_builder('0005', '商品名称为空') if @context_hash['COMMODITY'].blank? && @context_hash['COMMODITY_EN'].blank?
     
-    return error_builder('0005', '商品名称为空') if name.blank?
+    return error_builder('0005', '规格名称为空') if @context_hash['SPEC'].blank? && @context_hash['SPEC_EN'].blank?
 
     # desc = @context_hash['DESC']
 
     relationship = StandardInterface.commodity_enter(@context_hash, @business, @unit)
 
     if !relationship.blank?
-      success_builder({'SKU' => relationship.specification.sku })
+      success_builder({'BUSINESS_SKU' => relationship.external_code, 'SKU' => relationship.barcdoe })
     else
       error_builder('9999')
     end
   end
 
   def order_enter
-    order_id = @context_hash['ORDER_ID']
-    return error_builder('0005', '订单号为空') if order_id.blank?
-    trans_sn = @context_hash['TRANS_SN']
-    return error_builder('0005', '交易流水号为空') if trans_sn.blank?
-    cust_name = @context_hash['CUST_NAME']
-    return error_builder('0005', '收件人姓名为空') if cust_name.blank?
-    addr = @context_hash['ADDR']
-    return error_builder('0005', '收货人地址为空') if addr.blank?
+    # order_id = @context_hash['ORDER_ID']
+    return error_builder('0005', '订单号为空') if @context_hash['ORDER_ID']
+    # trans_sn = @context_hash['TRANS_SN']
+    # return error_builder('0005', '交易流水号为空') if trans_sn.blank?
+    # cust_name = @context_hash['CUST_NAME']
+    return error_builder('0005', '收件人姓名为空') if @context_hash['CUST_NAME'].blank? && @context_hash['LOCAL_NAME'].blank?
+    # addr = @context_hash['ADDR']
+    return error_builder('0005', '收货人地址为空') if @context_hash['ADDR'].blank? && @context_hash['LOCAL_ADDR'].blank?
 
-    order_details = @context_hash['ORDER_DETAILS']
-    return error_builder('0005', '商品列表为空') if order_details.blank?
+    # order_details = @context_hash['ORDER_DETAILS']
+    return error_builder('0005', '商品列表为空') if @context_hash['ORDER_DETAILS'].blank?
 
     order = StandardInterface.order_enter(@context_hash, @business, @unit, @storage)
     if !order.blank?
       if order.is_a? Order
-        success_builder({'ORDER_NO' => order.batch_no })
+        success_builder({'ORDER_NO' => order.batch_no, 'DELIVER_NO' => order.tracking_number })
       else
         return error_builder('0006')
       end
     else
       return error_builder('9999')
     end
-
   end
 
   # def order_query
@@ -91,7 +91,6 @@ class StandardInterfaceController < ApplicationController
     #orders_got = StandardInterface.orders_query(@context_hash, @business, @unit)
     
     ids.each do |id|
-
       context_string = "{\"" + type + "\":\"" + id.to_s + "\"}"
       context = ActiveSupport::JSON.decode(context_string)
       orders = StandardInterface.order_query(context, @business, @unit)
@@ -104,23 +103,33 @@ class StandardInterfaceController < ApplicationController
           deliver_details = StandardInterface.generalise_tracking(order.tracking_info)
 
           order_detail['FLAG'] = "success"
-          order_detail['ORDER_ID'] = id
+          order_detail['ORDER_NO'] = order.batch_no
+          order_detail['DELIVER_NO'] = order.tracking_number
+          order_detail['ORDER_ID'] = order.business_order_id
+          order_detail['TRANS_SN'] = order.business_trans_no
           order_detail['STATUS'] = order.status
           order_detail['EXPS'] = order.transport_type
           order_detail['EXPS_NO'] = order.tracking_number
           order_detail['DESC'] = ""
+          order_detail['WEIGHT'] = order.total_weight
+          order_detail['VOLUME'] = order.volume
+          # todo
+          order_detail['STATUS_CODE'] = 10
+          
           order_detail['DELIVER_DETAIL'] = deliver_details
+
           order_details << order_detail
         end
       else
         order_detail = {}
         order_detail['FLAG'] = "failure"
         order_detail['ORDER_ID'] = id
-        order_detail['STATUS'] = ""
-        order_detail['EXPS'] = ""
-        order_detail['EXPS_NO'] = ""
-        order_detail['DESC'] = "订单号不存在"
-        order_detail['DELIVER_DETAIL'] = ""
+        # order_detail['STATUS'] = ""
+        # order_detail['EXPS'] = ""
+        # order_detail['EXPS_NO'] = ""
+        order_detail['CODE'] = "0005"
+        order_detail['MSG'] = "订单号不存在"
+        # order_detail['DELIVER_DETAIL'] = ""
         order_details << order_detail
       end
     end
@@ -129,16 +138,11 @@ class StandardInterfaceController < ApplicationController
   end
 
   def stock_query
-    sku = @context_hash['QUERY_ARRAY']
-    return error_builder('0005', '查询列表为空') if sku.blank?
+    return error_builder('0005', '查询列表为空') if @context_hash['QUERY_ARRY'].blank?
 
-    stock_array = StandardInterface.stock_query(@context_hash, @business, @unit)
+    stocks = StandardInterface.stock_query(@context_hash, @business, @unit, @storage)
 
-    if !stock_array.blank?
-      success_builder('STOCK_ARRAY' => stock_array)
-    else
-      error_builder('9999')
-    end
+    success_builder('STOCKS' => stocks)
   end
 
   private
@@ -169,7 +173,7 @@ class StandardInterfaceController < ApplicationController
 
   def verify_sign
     @sign = params[:sign]
-    return error_builder('0001') if !@sign.eql? Digest::MD5.hexdigest(@context + @business.secret_key)
+    return error_builder('0001') if !@sign.eql? Digest::MD5.hexdigest("#{@context}#{@business.secret_key}")
   end
 
   def interface_return

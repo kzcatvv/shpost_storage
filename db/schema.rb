@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150420065118) do
+ActiveRecord::Schema.define(version: 20150507023708) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20150420065118) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+    t.string   "name_en"
   end
 
   create_table "constock_logs", force: true do |t|
@@ -281,6 +282,8 @@ ActiveRecord::Schema.define(version: 20150420065118) do
     t.datetime "updated_at"
     t.string   "business_deliver_no"
     t.string   "is_shortage"
+    t.string   "from_country"
+    t.float    "weight"
   end
 
   create_table "order_details_stock_logs", id: false, force: true do |t|
@@ -356,6 +359,20 @@ ActiveRecord::Schema.define(version: 20150420065118) do
     t.boolean  "is_split",                       default: false
     t.float    "volume"
     t.datetime "out_at"
+    t.string   "api_key"
+    t.string   "exps_guid"
+    t.string   "exps_reg"
+    t.string   "exps_type"
+    t.string   "country"
+    t.string   "local_name"
+    t.string   "local_country"
+    t.string   "local_province"
+    t.string   "local_city"
+    t.string   "local_addr"
+    t.string   "send_province"
+    t.string   "send_city"
+    t.string   "logistic_id"
+    t.string   "country_code"
   end
 
   create_table "orders_user_logs", id: false, force: true do |t|
@@ -471,6 +488,8 @@ ActiveRecord::Schema.define(version: 20150420065118) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
+    t.string   "name_en"
+    t.float    "price"
   end
 
   create_table "standard_interfaces", force: true do |t|
@@ -556,6 +575,8 @@ ActiveRecord::Schema.define(version: 20150420065118) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "barcode"
+    t.string   "business_id"
+    t.string   "business_code"
   end
 
   create_table "tasks", force: true do |t|
