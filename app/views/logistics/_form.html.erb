@@ -53,12 +53,6 @@
       <%=f.check_box :is_default,:class =>'check_box'%>
     </div>
   </div>
-  <div class="form-group">
-    <%= f.label :storage_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select :storage_id, Storage.all.collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
-    </div>
-  </div>
   <div class="control-group">
     <%= f.label :param_val1, :class => 'control-label' %>
     <div class="controls">

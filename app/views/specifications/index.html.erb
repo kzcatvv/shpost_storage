@@ -24,9 +24,13 @@
 
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
+    g.column name: model_class.human_attribute_name(:name_en), attribute: 'name_en'
+
     g.column name: model_class.human_attribute_name(:weight), attribute: 'weight'
 
     g.column name: model_class.human_attribute_name(:volume), attribute: 'volume'
+
+    g.column name: model_class.human_attribute_name(:price), attribute: 'price'
 
     g.column do |specification|
       ActiveSupport::SafeBuffer.new << 
