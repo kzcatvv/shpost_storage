@@ -2,32 +2,55 @@ class StandardInterface
 
   def self.commodity_enter(context, business, unit)
     supplier_no = context['SUPPLIER']
-    sku = context['SKU']
+    business_sku = context['BUSINESS_SKU']
+    commodity_name = context['COMMODITY']
     spec = context['SPEC']
-    name = context['COMMODITY']
     desc = context['DESC']
     sixnine_code = context['SIXNINE']
+    
     # 0428 add columns for WISH
     commodity_no = context['COMMODITY_NO']
+    commodity_name_en = context['COMMODITY_EN']
+    spec_en = context['SPEC_EN']
+    price = context['PRICE']
 
     supplier = nil
 
+    #without suppliers sync interface
     if !supplier_no.blank?
-      supplier = Supplier.find_supplier(supplier_no, business)
+      supplier = Supplier.find_by(business_code: supplier_no, business: business)
 
-      supplier ||= Supplier.create_supplier!(supplier_no, business, unit)
+      supplier ||= Supplier.create!(business_code: supplier_no, business: business, unit: unit)
     end
-    
+
+    commodity = Commodity.find_by(no: commodity_no)
+
+    if commodity.blank?
+      commodity ||= Commodity.create! name: commodity_name, name_en: commodity_name_en, unit: unit
+    else
+      commodity.update!( name: commodity_name, name_en: commodity_name_en)
+    end
     #price = context['PRICE']
 
-    relationship =  Relationship.find_relationships(sku, supplier, spec, business, unit)
+    relationship = Relationship.find_by(external_code: business_sku, business: business)
+    # find_relationships(business_sku, supplier, spec, business, unit)
     
 
-    if relationship.nil?
-      commodity = Commodity.create! name: name, unit: unit
-      specification = Specification.create! commodity: commodity, desc: desc, name: spec, sixnine_code: sixnine_code
-      relationship = Relationship.create! business: business, supplier: supplier, specification: specification, external_code: sku, spec_desc: spec
+    if relationship.blank?
+      specification = Specification.create! commodity: commodity, desc: desc, name: spec, name_en: spec_en, sixnine_code: sixnine_code, price: price
+      relationship = Relationship.create! business: business, supplier: supplier, specification: specification, external_code: business_sku, spec_desc: spec
+    else
+      # relationship.upd
+      relationship.specification.update! commodity: commodity, desc: desc, name: spec, name_en: spec_en, sixnine_code: sixnine_code, price: price
+
+      relationship.update! spec_desc: spec
+
+      if ! supplier.blank?
+        relationship.update! supplier: supplier
+      end
     end
+
+    relationship
   end
 
   def self.order_enter(context, business, unit, storage = nil, separate = false)
@@ -53,9 +76,32 @@ class StandardInterface
     send_name = context['SEND_NAME']
     send_zip = context['SEND_ZIP']
     send_mobile = context['SEND_MOBILE']
-    weight = context['WEIGHT']
+    total_weight = context['TOTAL_WEIGHT']
     volume = context['VOLUME']
     b2b = context['B2B']
+
+    api_key = context['API_KEY']
+    exps_guid = context['EXPS_GUID']
+    exps_reg = context['EXPS_REG']
+    exps_type = context['EXPS_TYPE']
+    country = context['COUNTRY']
+    local_name = context['LOCAL_NAME']
+    local_country = context['LOCAL_COUNTRY']
+    local_province = context['LOCAL_PROVINCE']
+    local_city = context['LOCAL_CITY']
+    local_addr = context['LOCAL_ADDR']
+    send_province = context['SEND_PROVINCE']
+    send_city = context['SEND_CITY']
+
+    if ! exps.blank?
+      exps.downcase!
+
+      if exps.eql('gjxb')
+        exps = "#{exps}#{(exps_reg.eql? '1') ? 'g' : 'p'}"
+      end
+
+      logistic = Logistic.find_by print_format: exps
+    end
 
     # address
     if province.blank?
@@ -79,13 +125,13 @@ class StandardInterface
       return order
     end
 
-    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: storage.blank? ? unit.default_storage : storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume, is_split: false, keyclientorder_id: (b2b.eql? 'Y') ? getKeycOrderID(unit,storage,'b2b') : nil
+    order = Order.create! business_order_id: order_id,business_trans_no: trans_sn, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, logistic: logistic, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: storage.blank? ? unit.default_storage : storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume, is_split: false, keyclientorder_id: (b2b.eql? 'Y') ? getKeycOrderID(unit,storage,'b2b') : nil, api_key: api_key, exps_guid: exps_guid, exps_reg: exps_reg, exps_type: exps_type, country: country, local_name: local_name, local_country: local_country, local_province: local_province, local_city: local_city, local_addr: local_addr, send_province: send_province, send_city: send_city, total_weight: total_weight, send_addr: send_addr, send_name: send_name, send_zip: send_zip, send_mobile: send_mobile
 
     undeal_details = Array.new
 
     order_details.each_with_index do |x, i|
-      sku = x['SKU']
-      next if sku.blank?
+      business_sku = x['BUSINESS_SKU']
+      next if business_sku.blank?
       qyt = x['QTY']
       next if qyt.blank?
       supplier_no = x['SUPPLIER']
@@ -98,15 +144,17 @@ class StandardInterface
       end
       price = x['PRICE']
       amt = x['AMT']
+      from_country = x['FROM_COUNTRY']
+      weight = x['weight']
 
       supplier = nil
-      if !supplier_no.blank?
-        supplier = Supplier.find_supplier(supplier_no, business)
+      if ! supplier_no.blank?
+        supplier = Supplier.find_by(business_code: supplier_no, business: business)
       end
 
-      relationship = Relationship.find_relationships(sku, supplier, spec, business, unit)
+      relationship = Relationship.find_relationships(business_sku, supplier, spec, business, unit)
     
-      if relationship.nil?
+      if relationship.blank?
         if business.no.eql? StorageConfig.config["business"]['bst_id'].to_s
           undeal_details << x
           next
@@ -128,7 +176,7 @@ class StandardInterface
       #   order = Order.create! business_order_id: deliver_no,business_trans_no: order_id, order_type: Order::TYPE[(b2b.eql? 'Y') ? :b2b : :b2c], customer_name: cust_name, customer_unit: cust_unit, customer_tel: tel, customer_phone: mobile, province: province, city: city, county: county, customer_address: addr, customer_postcode: zip, customer_email: email, total_price: qty_sum, total_amount: amt_sum, transport_type: exps, transport_price: exps_sum, buyer_desc: buyer_desc, business: business, unit: unit, storage: unit.default_storage, status: Order::STATUS['waiting'.to_sym], pingan_ordertime: date, total_weight: weight, volume: volume
       # end
 
-      order.order_details.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, desc: desc, name: name
+      order.order_details.create! business_deliver_no: deliver_no, specification: relationship.specification, amount: qyt, price: price, supplier: relationship.supplier, desc: desc, name: name, from_country: from_country, weight: weight
     end
 
     if !undeal_details.blank?
@@ -157,16 +205,16 @@ class StandardInterface
       orders = Order.where(batch_no: order_no)
     end
 
-    if !deliver_no.blank?
-      orders ||= Order.where(tracking_number: deliver_no)
+    if orders.blank? && ! deliver_no.blank?
+      orders = Order.where(tracking_number: deliver_no)
     end
     
-    if !order_id.blank?
-      orders ||= Order.where(business_order_id: order_id)
+    if orders.blank? && !order_id.blank?
+      orders = Order.where(business_order_id: order_id)
     end
     
-    if !trans_sn.blank?
-      orders ||= Order.where(business_trans_no: trans_sn)
+    if orders.blank? && !trans_sn.blank?
+      orders = Order.where(business_trans_no: trans_sn)
     end
 
     return getB2Borders(orders)
@@ -174,32 +222,32 @@ class StandardInterface
 
   def self.stock_query(context, business, unit, storage = nil)
     query_array = context['QUERY_ARRAY']
-    stock_array = []
+    stocks = []
     query_array.each do |x| 
       supplier_no = x['SUPPLIER']
-      sku = x['SKU']
+      business_sku = x['BUSINESS_SKU']
       spec = x['SPEC']
 
       supplier = nil
       if !supplier_no.blank?
-        supplier = Supplier.find_supplier(supplier_no, business)
+        supplier = Supplier.find_by(business_code: supplier_no, business: business)
       end
       
-      relationship =  Relationship.find_relationships(sku, supplier, spec, business, unit)
+      relationship =  Relationship.find_relationships(business_sku, supplier, spec, business, unit)
 
-      if relationship.nil?
-        amount = 0
-      else
-        if !storage.nil?
+      if ! relationship.blank?
+        if !storage.blank?
           amount = Stock.total_stock_in_storage(relationship.specification, relationship.supplier, business, storage)
         else
           amount = Stock.total_stock_in_unit(relationship.specification, relationship.supplier, business, unit)
         end
-      end
 
-      stock_array << {'SKU' => sku,'AMT' => amount}
+        stocks << {'FLAG' => 'success', 'BUSINESS_SKU' => business_sku, 'SKU' => relationship.barcdoe, 'AMT' => amount}
+      else
+        stocks << {'FLAG' => 'failure', 'BUSINESS_SKU' => business_sku, 'CODE' => '0005', 'MSG' => '无相关商品信息'}
+      end
     end
-    return stock_array
+    return stocks
   end
 
   def self.generalise_tracking(tracking_infos)
@@ -212,10 +260,10 @@ class StandardInterface
           deliver_detail['DATE'] = x[0]
           deliver_detail['LOCAL'] = x[2]
           # deliver_detail['NAME'] = x[]
-          deliver_detail['DESC'] = x[1]
+          deliver_detail['DELIVER_DESC'] = x[1]
         elsif x.size == 2
           deliver_detail['DATE'] = x[0]
-          deliver_detail['DESC'] = x[1]
+          deliver_detail['DELIVER_DESC'] = x[1]
         end
         deliver_details << deliver_detail
       end
