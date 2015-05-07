@@ -16,7 +16,7 @@ class Logistic < ActiveRecord::Base
      end
   end
 
-	def getMailNum(num)
+	def getMailNum(num,storage)
 		  # case self.print_format
     #   when 'tcbd'
     #     if self.is_getnum
@@ -33,7 +33,7 @@ class Logistic < ActiveRecord::Base
     #       end
     #     end
     #   end
-    self.print_format.to_s.humanize.constantize.getHotTrackingNumber(self.id,num)
+    self.print_format.to_s.humanize.constantize.getHotTrackingNumber(self.id,storage,num)
 	end
 
 
