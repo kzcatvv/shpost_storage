@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150504024148) do
-
+ActiveRecord::Schema.define(version: 20150506023339) do
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
     t.string   "desc"
@@ -99,6 +98,17 @@ ActiveRecord::Schema.define(version: 20150504024148) do
   end
 
   add_index "contacts_relationships", ["contact_id", "relationship_id"], name: "index_contacts_relationships_on_contact_id_and_relationship_id", unique: true
+
+  create_table "country_codes", force: true do |t|
+    t.string   "chinese_name"
+    t.string   "english_name"
+    t.string   "code"
+    t.string   "surfmail_partition_no"
+    t.string   "regimail_partition_no"
+    t.boolean  "is_mail"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "deliver_notices", force: true do |t|
     t.integer  "order_id"

@@ -1,5 +1,6 @@
 ShpostStorage::Application.routes.draw do
 
+  resources :country_codes
   resources :logistics do
     collection do
       get 'hotprint_ready'
@@ -361,6 +362,7 @@ ShpostStorage::Application.routes.draw do
   resources :order_statistics do
       collection do
         get 'query_order_report'
+        get 'order_statistic_details'
       end 
   end
 

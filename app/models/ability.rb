@@ -23,6 +23,7 @@ class Ability
         can :manage, InterfaceInfo
         can :manage, UpDownload
         can :manage, Logistic
+        can :manage, CountryCode
 
         cannot :resend, InterfaceInfo do |interface_info|
             (interface_info.status == "success") || (interface_info.class_name.blank?) || (interface_info.method_name.blank?)
@@ -80,7 +81,7 @@ class Ability
         end
 
         can :query_order_report, :orders
-        
+        can :order_statistic_details, :orders
         # can :manage,BusinessRelationship
 
     elsif user.user?
@@ -109,6 +110,7 @@ class Ability
         cannot [:create, :to_import, :up_download_import,:destroy], UpDownload
 
         cannot :query_order_report, :orders
+        cannot :order_statistic_details, :orders
 
     else
         cannot :manage, :all
@@ -120,6 +122,7 @@ class Ability
 
         cannot :manage, InterfaceInfo
         can :query_order_report, :orders
+        can :order_statistic_details, :orders
     end
 
     if user.admin?(storage)
@@ -174,6 +177,7 @@ class Ability
 
         can :manage, Order, storage_id: storage.id
         can :query_order_report, :orders
+        can :order_statistic_details, :orders
         cannot :cancel, Order, status: ['printed','picking']
         can :manage, OrderDetail, order: {storage_id: storage.id}
 
