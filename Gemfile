@@ -61,7 +61,7 @@ gem 'yomu'
 
 group :test, :development do
   #gem 'rspec'
-  gem 'rspec-rails', '~> 3.0.0.beta'
+  gem 'rspec-rails', '~> 3.2.0'
   gem "factory_girl_rails", "~> 4.2.1"
 end
 

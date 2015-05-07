@@ -26,7 +26,7 @@
       // window[func]();
       LODOP.PRINT_INITA("0.8mm","1.1mm","232.8mm","160.1mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,1000,1500,"hgjxbp");
-LODOP.ADD_PRINT_IMAGE(14,7,92,34,"<img border='0' src='http://127.0.0.1:3000/gjlogo.png' />");
+LODOP.ADD_PRINT_IMAGE(14,7,92,34,"<img border='0' src='/assets/gjlogo.png' />");
 LODOP.ADD_PRINT_TEXT(20,179,145,20,"Small Packet BY AIR");
 LODOP.SET_PRINT_STYLEA(0,"Bold",1);
 LODOP.ADD_PRINT_BARCODE(284,146,206,44,"",'<%= eorder.tracking_number %>');
@@ -75,17 +75,17 @@ LODOP.ADD_PRINT_LINE(5,325,45,326,0,1);
 LODOP.ADD_PRINT_TEXT(523,10,204,20,"Sender's signiture& Data Signed:");
 LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
 LODOP.SET_PRINT_STYLEA(0,"Bold",1);
-LODOP.ADD_PRINT_IMAGE(14,99,80,25,"<img border='0' src='http://127.0.0.1:3000/gjwish.png' />");
+LODOP.ADD_PRINT_IMAGE(14,99,80,25,"<img border='0' src='/assets/gjwish.png' />");
   
-  LODOP.PRINT_DESIGN();
+  //LODOP.PRINT_DESIGN();
   //LODOP.PREVIEW();  
-  //LODOP.PRINT(); 
+  LODOP.PRINT(); 
     <% elsif @transport_type=='gjxbg' %>
       // var func = "hot_" + '<%= @logistic.print_format %>';
       // window[func]();
       LODOP.PRINT_INITA("0.8mm","1.1mm","232.8mm","160.1mm","tracking");
       LODOP.SET_PRINT_PAGESIZE(1,1000,1500,"hgjxbg");
-      LODOP.ADD_PRINT_IMAGE(4,0,92,30,"<img border='0' src='http://127.0.0.1:3000/gjlogo.png' />");
+      LODOP.ADD_PRINT_IMAGE(4,0,92,30,"<img border='0' src='/assets/gjlogo.png' />");
 LODOP.ADD_PRINT_TEXT(34,15,130,20,"Small Packet BY AIR");
 LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
 LODOP.SET_PRINT_STYLEA(0,"Bold",1);
@@ -132,11 +132,11 @@ LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
 LODOP.ADD_PRINT_TEXT(476,2,203,22,"Sender's signiture& Data Signed:");
 LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
 LODOP.SET_PRINT_STYLEA(0,"Bold",1);
-LODOP.ADD_PRINT_IMAGE(4,92,80,30,"<img border='0' src='http://127.0.0.1:3000/gjwish.png' />");
+LODOP.ADD_PRINT_IMAGE(4,92,80,30,"<img border='0' src='/assets/gjwish.png' />");
 
-  LODOP.PRINT_DESIGN();
+  //LODOP.PRINT_DESIGN();
   //LODOP.PREVIEW();  
-  //LODOP.PRINT();
+  LODOP.PRINT();
     <% elsif @transport_type=='ems' %>
 LODOP.PRINT_INITA("0mm","0mm","230.2mm","127.3mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
