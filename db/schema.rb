@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507082940) do
+ActiveRecord::Schema.define(version: 20150507091756) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20150507082940) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+    t.string   "english_name"
     t.string   "name_en"
   end
 
@@ -117,6 +118,16 @@ ActiveRecord::Schema.define(version: 20150507082940) do
     t.string   "status"
     t.string   "send_type"
     t.integer  "send_times", default: 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "gjxbgs", force: true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "gjxbps", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -513,6 +524,7 @@ ActiveRecord::Schema.define(version: 20150507082940) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
+    t.string   "english_name"
     t.string   "name_en"
     t.float    "price"
   end

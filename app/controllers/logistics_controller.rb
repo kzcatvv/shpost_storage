@@ -73,7 +73,7 @@ class LogisticsController < ApplicationController
         @ids=params[:oid].split(",").map(&:to_i)
         numberSize = @ids.size
 
-        numary=@logistic.getMailNum(numberSize)
+        numary=@logistic.getMailNum(numberSize,current_storage)
         if !numary.nil?
           @ids.each_with_index do |num,i|
             @order=Order.find(num)
