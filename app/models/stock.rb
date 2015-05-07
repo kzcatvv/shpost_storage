@@ -19,7 +19,7 @@ class Stock < ActiveRecord::Base
   scope :expiration_date_first, ->{order(:expiration_date )}
   scope :prior, ->{ includes(:shelf).order("shelves.priority_level ASC, actual_amount DESC")}
   scope :available, -> { where("1 = 1")}
-  scope :normal, -> { includes(:shelf).where("shelves.shelf_type != 'broken' or shelves.shelf_type is null")}
+  scope :normal, -> { includes(:shelf).where("shelves.shelf_type = 'normal' or shelves.shelf_type is null")}
   scope :broken, -> { includes(:shelf).where("shelves.shelf_type = 'broken'")}
   scope :not_empty, -> {where('actual_amount > 0')}
   scope :empty, -> {where('actual_amount = 0')}

@@ -22,7 +22,12 @@
 		<%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
          <input type=hidden id='oid' name='oid' value='<%= @ids%>'/>
          <input type=hidden id='flag' name='flag' value='<%= @flag%>'/>
+         <% if @logistic.blank? %>
          <h3>快递类型：<%= select_tag(:transport_type, options_from_collection_for_select(@logistics, "id", "name")) %></h3>
+         <% else %>
+         <h3>快递类型：<input type=text id='lo_name' name='lo_name' value='<%= @logistic.name%>'/></h3>
+         <input type=hidden id='transport_type' name='transport_type' value='<%= @logistic.id%>'/>
+         <% end %>
          <br><br>
          <input type="submit" id='sub' value="打印面单" class='btn btn-primary'/> 
     </form>

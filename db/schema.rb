@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507023708) do
+ActiveRecord::Schema.define(version: 20150507082940) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -208,7 +208,6 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.boolean  "is_default"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "storage_id"
     t.string   "param_val1"
     t.string   "param_val2"
     t.string   "wl_no"
@@ -353,9 +352,9 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
-    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
+    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -385,6 +384,10 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.string   "send_city"
     t.string   "logistic_id"
     t.string   "country_code"
+    t.string   "send_addr"
+    t.string   "send_name"
+    t.string   "send_zip"
+    t.string   "send_mobile"
   end
 
   create_table "orders_user_logs", id: false, force: true do |t|
