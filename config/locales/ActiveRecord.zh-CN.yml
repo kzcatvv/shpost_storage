@@ -383,6 +383,9 @@ zh-CN:
       country_code:
         one: 国家代码管理
         other: 国家代码管理
+      sequence_no:
+        one: 号段管理
+        other: 号段管理
     attributes:
       user:
         email: "电子邮件"
@@ -485,6 +488,7 @@ zh-CN:
         "no": "商品编号"
         name: "商品名称"
         goodstype_id: "商品类型"
+        name_en: "英文名称"
       specification:
         commodity_id: "商品名称"
         product_no: "商品规格编号"
@@ -496,6 +500,8 @@ zh-CN:
         high: "高(厘米)"
         weight: "重量(克)"
         volume: "体积"
+        name_en: "英文名称"
+        price: "价格"
       relationship:
         business_id: "商户"
         supplier_id: "供应商"
@@ -778,6 +784,12 @@ zh-CN:
         surfmail_partition_no: "平常邮件分区号"
         regimail_partition_no: "挂号邮件分区号"
         is_mail: "是否可寄"
+      sequence_no:
+        unit_id: "所属单位"
+        storage_id: "所属仓库"
+        logistic_id: "物流商"
+        start_no: "起始号"
+        end_no: "终止号"
   menu:
     permission:
       name: "权限管理"
@@ -857,6 +869,9 @@ zh-CN:
         logistic:
           name: "物流商管理"
           link: "/logistics/"
+        sequence_no:
+          name: "号段管理"
+          link: "/sequence_nos/"
           # needrole:
           #   can: :read
           #   role: "shelf"
