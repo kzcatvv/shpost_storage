@@ -40,7 +40,6 @@ class CommoditiesController < ApplicationController
   # POST /commodities.json
   def create
     #@commodity = Commodity.new(commodity_params)
-
     respond_to do |format|
       if @commodity.save
         format.html { redirect_to @commodity, notice: I18n.t('controller.create_success_notice', model: '商品') }
@@ -95,10 +94,12 @@ class CommoditiesController < ApplicationController
           rowarr = instance.row(line)
           commodity_no = to_string(rowarr[0])
           commodity_name = to_string(rowarr[1])
-          goodtype_name = to_string(rowarr[2])
-          sixnine_code = to_string(rowarr[4])
-          specification_name = to_string(rowarr[5])
-          desc = to_string(rowarr[6])
+          commodity_name_en = to_string(rowarr[2])
+          goodtype_name = to_string(rowarr[3])
+          sixnine_code = to_string(rowarr[5])
+          specification_name = to_string(rowarr[6])
+          specification_name_en = to_string(rowarr[7])
+          desc = to_string(rowarr[8])
 
           if commodity_no.blank?
             txt = "缺少商品编号"
@@ -125,14 +126,15 @@ class CommoditiesController < ApplicationController
           all_name << commodity_name
           all_name << specification_name
 
-          long = rowarr[7].blank? ? 0.0 : rowarr[7]
-              wide = rowarr[8].blank? ? 0.0 : rowarr[8]
-              high = rowarr[9].blank? ? 0.0 : rowarr[9]
-              weight = rowarr[10].blank? ? 0.0 : rowarr[10]
-              volume = rowarr[11].blank? ? 0.0 : rowarr[11]
+          long = rowarr[9].blank? ? 0.0 : rowarr[9]
+              wide = rowarr[10].blank? ? 0.0 : rowarr[10]
+              high = rowarr[11].blank? ? 0.0 : rowarr[11]
+              weight = rowarr[12].blank? ? 0.0 : rowarr[12]
+              volume = rowarr[13].blank? ? 0.0 : rowarr[13]
+              price = rowarr[14].blank? ? 0.0 : rowarr[14]
 
-          if !(long.is_a? Float) || !(wide.is_a? Float) || !(high.is_a? Float) || !(weight.is_a? Float) || !(volume.is_a? Float)
-            txt = "长宽高重量体积非数字"
+          if !(long.is_a? Float) || !(wide.is_a? Float) || !(high.is_a? Float) || !(weight.is_a? Float) || !(volume.is_a? Float) || !(price.is_a? Float)
+            txt = "长宽高重量体积价格非数字"
             sheet_error << (rowarr << txt)
             next
             # raise "导入文件第" + line.to_s + "行数据, 长宽高重量体积非数字，导入失败"
@@ -148,16 +150,18 @@ class CommoditiesController < ApplicationController
           end
           commodity = Commodity.accessible_by(current_ability).find_by no: commodity_no
           if commodity.blank?
-            commodity = Commodity.create! no: commodity_no,name: commodity_name,goodstype_id: goodtype.id,unit_id: current_user.unit.id
+            commodity = Commodity.create! no: commodity_no,name: commodity_name,name_en: commodity_name_en,goodstype_id: goodtype.id,unit_id: current_user.unit.id
+          else
+            commodity.update(name: commodity_name,name_en: commodity_name_en,goodstype_id: goodtype.id)
           end
           #binding.pry
           specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:specification_name
           if specification.blank?
-            specification=Specification.create! commodity_id:commodity.id,name:specification_name,sixnine_code: sixnine_code,desc:desc,long: long,wide: wide,high: high,weight: weight,volume: volume,all_name: all_name
+            specification=Specification.create! commodity_id:commodity.id,name:specification_name,name_en:specification_name_en,sixnine_code: sixnine_code,desc:desc,long: long,wide: wide,high: high,weight: weight,volume: volume,all_name: all_name,price: price
             # sku = goodtype.id.to_s + commodity.id.to_s + specification.id.to_s
                 # specification.update_attribute(:sku,sku)
           else
-            specification.update(sixnine_code: sixnine_code,desc:desc,long: long,wide: wide,high: high,weight: weight,volume: volume,all_name: all_name)
+            specification.update(name_en:specification_name_en,sixnine_code: sixnine_code,desc:desc,long: long,wide: wide,high: high,weight: weight,volume: volume,all_name: all_name,price: price)
           end
         end
         redeal_with_errorcommodities(sheet_error)
@@ -210,12 +214,12 @@ class CommoditiesController < ApplicationController
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     red = Spreadsheet::Format.new :color => :red
     sheet1.row(0).default_format = blue 
-    sheet1.row(0).concat %w{商品编号 商品名称 商品类型 SKU 69码 规格名称 规格描述 长 宽 高 重量 体积}  
+    sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 SKU 69码 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格}  
     count_row = 1
     obj.each do |obj|
       sheet1[count_row,0]=obj[0]
       sheet1[count_row,1]=obj[1]
-      sheet1[count_row,2]=obj[3]
+      sheet1[count_row,2]=obj[2]
       sheet1[count_row,3]=obj[3]
       sheet1[count_row,4]=obj[4]
       sheet1[count_row,5]=obj[5]
@@ -226,6 +230,9 @@ class CommoditiesController < ApplicationController
       sheet1[count_row,10]=obj[10]
       sheet1[count_row,11]=obj[11]
       sheet1[count_row,12]=obj[12]
+      sheet1[count_row,13]=obj[13]
+      sheet1[count_row,14]=obj[14]
+      sheet1[count_row,15]=obj[15]
       count_row += 1
     end 
     book.write xls_report  

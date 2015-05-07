@@ -30,6 +30,8 @@
 
     g.column name: model_class.human_attribute_name(:name), attribute: 'name'
 
+    g.column name: model_class.human_attribute_name(:name_en), attribute: 'name_en'
+
     g.column name: model_class.human_attribute_name(:goodstype_id), attribute: 'goodstype_id',custom_filter: Goodstype.accessible_by(current_ability).collect {|g| [g.name,g.id]} do |commodity|
       if !commodity.goodstype_id.blank?
         Goodstype.find(commodity.goodstype_id).name

@@ -1,6 +1,7 @@
 ShpostStorage::Application.routes.draw do
 
   resources :country_codes
+  resources :sequence_nos
   resources :logistics do
     collection do
       get 'hotprint_ready'

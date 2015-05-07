@@ -1,0 +1,27 @@
+<%- model_class = SequenceNo -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
+  <dd><%= Unit.accessible_by(current_ability).find(@sequence_no.unit_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
+  <dd><%= Storage.accessible_by(current_ability).find(@sequence_no.storage_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:logistic_id) %>:</strong></dt>
+  <dd><%= Logistic.accessible_by(current_ability).find(@sequence_no.logistic_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:start_no) %>:</strong></dt>
+  <dd><%= @sequence_no.start_no %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:end_no) %>:</strong></dt>
+  <dd><%= @sequence_no.end_no %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              sequence_nos_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_sequence_no_path(@sequence_no), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              sequence_no_path(@sequence_no),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => '确定删除?')) },
+              :class => 'btn btn-danger' %>

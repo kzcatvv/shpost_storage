@@ -1,14 +1,21 @@
 class Gjxbp < ActiveRecord::Base
-  def getNumber(tracking_number, num_count)
+  def getHotTrackingNumber(logistic_id, num_count)
     return_no = []
-    if num_count == 1
-      return_no << tracking_number
-    elsif num_count > 1
-      return_no << tracking_number
-      (2..num_count).each_with_index do |num,i|
-        tracking_number = calNextTrackingNo(tracking_number)
-        return_no << tracking_number 
+    storage_id = current_storage.id
+    sequence_no = SequenceNo.find_by(storage_id:storage_id,logistic_id:logistic_id) if !logistic_id.blank?
+    tracking_number = sequence_no.end_no if !sequence_no.blank?
+    tracking_number = (tracking_number.to_i+1).to_s
+    if !tracking_number.blank?
+      if num_count == 1
+        return_no << tracking_number
+      elsif num_count > 1
+        return_no << tracking_number
+        (2..num_count).each_with_index do |num,i|
+          tracking_number = calNextTrackingNo(tracking_number)
+          return_no << tracking_number 
+        end
       end
+      SequenceNo.update(sequence_no.id,end_no:tracking_number)
     end
     return return_no
   end
