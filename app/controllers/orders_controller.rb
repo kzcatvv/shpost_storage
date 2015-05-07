@@ -179,8 +179,9 @@ class OrdersController < ApplicationController
       end
       if stock_sum < sum
         orders_changed = true
-        limit = sum - stock_sum
-        offset_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).offset(limit).readonly(false)
+        related_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id)
+        limit = related_orders.count - (sum - stock_sum)
+        offset_orders = related_orders.offset(limit).readonly(false)
         offset_sum = offset_orders.includes(:order_details).sum(:amount)
         if offset_sum == limit
           offset_orders.update_all(is_shortage: 'yes')
@@ -201,11 +202,33 @@ class OrdersController < ApplicationController
         # orders.delete_if {|item| !order_array.index(item.id).blank?}
       end
     end
+
+    return_orders = nil
+
     if type.eql? '0'
-      return orders.reload.where(is_shortage: 'no')
+      return_orders = orders.reload.where(is_shortage: 'no')
     else
-      return orders.reload.where(is_shortage: 'yes')
+      return_orders = orders.reload.where(is_shortage: 'yes')
     end
+
+    if createKeyCilentOrderFlg
+      if ordercnt > 0
+        time = Time.new
+        # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+        @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "waiting")
+        return_orders.update_all(keyclientorder_id: @keycorder)
+
+        allcnt = return_orders.includes(:order_details).where.not("order_details.specification_id" => nil, business_id: nil).group("orders.business_id", :specification_id, :supplier_id).sum(:amount)
+
+        allcnt.each do |k,v|
+          if v[1] > 0
+            Keyclientorderdetail.create(keyclientorder: @keycorder,business_id: k[0],specification_id: k[1],supplier_id: k[2],amount: v)
+          end
+        end
+      end
+    end
+
+    return return_orders.reload
 
   end
 
@@ -887,7 +910,7 @@ class OrdersController < ApplicationController
           @error_orders = []
           @error_order_details = []
 
-          @ids = extract_orders(instance)
+          extract_orders(instance)
 
           extract_order_details(instance)
 
@@ -913,7 +936,6 @@ class OrdersController < ApplicationController
             raise e
           end
         end
-        flash[:notice] = flash_message
       end   
     end
   end
@@ -923,7 +945,6 @@ class OrdersController < ApplicationController
 
   def extract_orders(instance)
     #Orders
-    oids=[]
     instance.default_sheet = instance.sheets.first
 
     #从第二行开始一直读取，直到空行
@@ -1018,7 +1039,7 @@ class OrdersController < ApplicationController
           # end
           # Order.update(order.id, is_shortage: is_shortage)
                     
-          oids << order.id
+          # @ids << order.id
         else
           order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, keyclientorder: keyclientorder, user_id: current_user.id
 
@@ -1032,7 +1053,7 @@ class OrdersController < ApplicationController
           # end
           # Order.update(order.id,is_shortage: is_shortage)
                   
-          oids << order_id
+          # @ids << order_id
         end          
       rescue => e
         if e.is_a? RuntimeError
@@ -1044,7 +1065,6 @@ class OrdersController < ApplicationController
         line += 1
       end
     end
-    return oids
   end
 
   def extract_order_details(instance)
@@ -1419,7 +1439,7 @@ def exportorders_xls_content_for(objs)
           end
         end
 
-        sku_extcode_69code = relationship.barcode
+        sku_extcode_69code = relationship.blank? ? nil : relationship.barcode
         sku_extcode_69code ||= external_code
         sku_extcode_69code ||= specification.sixnine_code
 
