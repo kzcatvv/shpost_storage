@@ -29,7 +29,7 @@ class StandardInterfaceController < ApplicationController
 
   def order_enter
     # order_id = @context_hash['ORDER_ID']
-    return error_builder('0005', '订单号为空') if @context_hash['ORDER_ID']
+    return error_builder('0005', '订单号为空') if @context_hash['ORDER_ID'].blank?
     # trans_sn = @context_hash['TRANS_SN']
     # return error_builder('0005', '交易流水号为空') if trans_sn.blank?
     # cust_name = @context_hash['CUST_NAME']
