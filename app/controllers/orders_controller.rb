@@ -180,15 +180,17 @@ class OrdersController < ApplicationController
       if stock_sum < sum
         orders_changed = true
         related_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id)
-        limit = sum - stock_su
+        limit = sum - stock_sum
         offset_orders = related_orders.offset(related_orders.count - limit).readonly(false)
         offset_sum = offset_orders.includes(:order_details).sum(:amount)
         if offset_sum == limit
           offset_orders.update_all(is_shortage: 'yes')
         else
           offset_orders.each do |x|
-            tmp_sum = x.order_details.sum(:amount)
+            related_details = x.order_details.where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2])
+            tmp_sum = related_details.sum(:amount)
             x.update(is_shortage: 'yes')
+            related_details.update_all(is_shortage: 'yes')
             limit = limit - tmp_sum
             if limit <= 0
               break
