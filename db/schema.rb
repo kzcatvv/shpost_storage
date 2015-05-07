@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507055123) do
+ActiveRecord::Schema.define(version: 20150507082940) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -179,8 +179,6 @@ ActiveRecord::Schema.define(version: 20150507055123) do
     t.integer  "business_id"
   end
 
-  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
-
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -211,7 +209,6 @@ ActiveRecord::Schema.define(version: 20150507055123) do
     t.boolean  "is_default"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "storage_id"
     t.string   "param_val1"
     t.string   "param_val2"
     t.string   "wl_no"

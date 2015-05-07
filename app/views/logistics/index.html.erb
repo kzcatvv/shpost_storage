@@ -34,11 +34,11 @@
       logistic.is_getnum_name
     end
 
-    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'storage_id',custom_filter: Storage.all.collect {|g| [g.name,g.id]} do |logistic|
-      if !logistic.storage_id.blank?
-        Storage.find(logistic.storage_id).name
-      end
-    end
+    # g.column name: model_class.human_attribute_name(:storage_id), attribute: 'storage_id',custom_filter: Storage.all.collect {|g| [g.name,g.id]} do |logistic|
+    #   if !logistic.storage_id.blank?
+    #     Storage.find(logistic.storage_id).name
+    #   end
+    # end
 
     g.column name: model_class.human_attribute_name(:param_val1), attribute: 'param_val1'
 

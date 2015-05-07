@@ -1,5 +1,4 @@
 class Logistic < ActiveRecord::Base
-	belongs_to :storage
 
   def is_default_name
      if is_default
@@ -35,4 +34,6 @@ class Logistic < ActiveRecord::Base
         end
       end
 	end
+
+
 end

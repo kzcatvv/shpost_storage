@@ -57,7 +57,7 @@ class LogisticsController < ApplicationController
     if @order.transport_type=="gjxbp" || @order.transport_type=="gjxbg"
       @logistic=Logistic.where(print_format: @order.transport_type).first
     end
-    @logistics = Logistic.where(storage_id: current_storage.id).order(is_default: :desc)
+    @logistics = Logistic.all.order(is_default: :desc)
     render :layout => false
   end
 
@@ -101,6 +101,6 @@ class LogisticsController < ApplicationController
     end
 
     def logistic_params
-      params.require(:logistic).permit(:name, :wl_no, :print_format, :is_getnum, :contact, :address, :contact_phone, :post, :is_default, :storage_id, :param_val1, :param_val2)
+      params.require(:logistic).permit(:name, :wl_no, :print_format, :is_getnum, :contact, :address, :contact_phone, :post, :is_default, :param_val1, :param_val2)
     end
 end
