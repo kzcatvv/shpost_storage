@@ -72,26 +72,35 @@ class LogisticsController < ApplicationController
         @transport_type=@logistic.print_format
         @ids=params[:oid].split(",").map(&:to_i)
         numberSize = @ids.size
-        rq=@logistic.getMailNum('信息局',@logistic.param_val1,@logistic.param_val2,numberSize)
-        if !rq.nil?
-            rqback=rq.split(':')
-            if rqback[0] == "SUCCESS"
-                rqbody = rqback[1].split("|")
-                seqno = rqbody[0]
-                numstart = rqbody[1]
-                numend = rqbody[2]
-                numary = getHotTrackingNumber(@transport_type,numstart,numberSize)
-                @ids.each_with_index do |num,i|
-                    @order=Order.find(num)
-                    @order.update(tracking_number: numary[i])
-                    @order.update(status: 'printed')
-                end
-            else
-                # url = "/print/webtracking?flag="+params[:flag]+"&&ids="+params[:id]
-                flash[:error]="取号段失败"+rqback[1]
-                redirect_to :action => "webprint",:flag => params[:flag],:ids => params[:id]
-            end
+
+        numary=@logistic.getMailNum(numberSize,current_storage)
+        if !numary.nil?
+          @ids.each_with_index do |num,i|
+            @order=Order.find(num)
+            @order.update(tracking_number: numary[i])
+            @order.update(status: 'printed')
+          end
         end
+        # rq=@logistic.getMailNum('信息局',@logistic.param_val1,@logistic.param_val2,numberSize)
+        # if !rq.nil?
+        #     rqback=rq.split(':')
+        #     if rqback[0] == "SUCCESS"
+        #         rqbody = rqback[1].split("|")
+        #         seqno = rqbody[0]
+        #         numstart = rqbody[1]
+        #         numend = rqbody[2]
+        #         numary = getHotTrackingNumber(@transport_type,numstart,numberSize)
+        #         @ids.each_with_index do |num,i|
+        #             @order=Order.find(num)
+        #             @order.update(tracking_number: numary[i])
+        #             @order.update(status: 'printed')
+        #         end
+        #     else
+        #         # url = "/print/webtracking?flag="+params[:flag]+"&&ids="+params[:id]
+        #         flash[:error]="取号段失败"+rqback[1]
+        #         redirect_to :action => "webprint",:flag => params[:flag],:ids => params[:id]
+        #     end
+        # end
     render :layout => false
   end
 

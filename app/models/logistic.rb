@@ -16,23 +16,24 @@ class Logistic < ActiveRecord::Base
      end
   end
 
-	def getMailNum(sqzmc,ywdl,ywzl,sqsl)
-		  case self.print_format
-      when 'tcbd'
-        if self.is_getnum
-          begin
-            url = URI.parse("#{GETNUM_URL}")
-            Net::HTTP.start(url.host, url.port) do |http|
-                req = Net::HTTP::Post.new(url.path)
-                req.set_form_data({ 'callMethod' => 'getMailNum', 'sqzmc' => sqzmc, 'ywdl' => ywdl, 'ywzl' => ywzl, 'sqsl' => sqsl })
-                rspback = http.request(req).body
-				        return rspback   
-            end
-          rescue =>exception  
-            return nil
-          end
-        end
-      end
+	def getMailNum(num,storage)
+		  # case self.print_format
+    #   when 'tcbd'
+    #     if self.is_getnum
+    #       begin
+    #         url = URI.parse("#{GETNUM_URL}")
+    #         Net::HTTP.start(url.host, url.port) do |http|
+    #             req = Net::HTTP::Post.new(url.path)
+    #             req.set_form_data({ 'callMethod' => 'getMailNum', 'sqzmc' => sqzmc, 'ywdl' => ywdl, 'ywzl' => ywzl, 'sqsl' => sqsl })
+    #             rspback = http.request(req).body
+				#         return rspback   
+    #         end
+    #       rescue =>exception  
+    #         return nil
+    #       end
+    #     end
+    #   end
+    self.print_format.to_s.humanize.constantize.getHotTrackingNumber(self.id,storage,num)
 	end
 
 

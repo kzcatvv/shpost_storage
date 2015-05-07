@@ -1,7 +1,8 @@
 class Gjxbp < ActiveRecord::Base
-  def getHotTrackingNumber(logistic_id, num_count)
+
+  def self.getHotTrackingNumber(logistic_id,storage, num_count)
     return_no = []
-    storage_id = current_storage.id
+    storage_id = storage.id
     sequence_no = SequenceNo.find_by(storage_id:storage_id,logistic_id:logistic_id) if !logistic_id.blank?
     tracking_number = sequence_no.end_no if !sequence_no.blank?
     tracking_number = calNextTrackingNo(tracking_number)
@@ -20,7 +21,7 @@ class Gjxbp < ActiveRecord::Base
     return return_no
   end
 
-  def calNextTrackingNo(tracking_number)
+  def self.calNextTrackingNo(tracking_number)
     rt_num = ""
     tmpnum = tracking_number[3,9]
     chknum = checkTrackingNO( ("%07d" % (tmpnum.to_i+1) ) )
@@ -28,7 +29,7 @@ class Gjxbp < ActiveRecord::Base
     return rt_num
   end
 
-  def checkTrackingNO(num)
+  def self.checkTrackingNO(num)
     x = [6,4,2,3,5,9,7]
     num_a = num.split("")
     sum = 0
@@ -46,5 +47,4 @@ class Gjxbp < ActiveRecord::Base
         return (11 - r).to_s
     end
   end
-
 end
