@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507040151) do
+ActiveRecord::Schema.define(version: 20150507023045) do
+
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
     t.string   "desc"
@@ -50,7 +51,6 @@ ActiveRecord::Schema.define(version: 20150507040151) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-    t.string   "english_name"
   end
 
   create_table "constock_logs", force: true do |t|
@@ -491,7 +491,6 @@ ActiveRecord::Schema.define(version: 20150507040151) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
-    t.string   "english_name"
   end
 
   create_table "standard_interfaces", force: true do |t|
