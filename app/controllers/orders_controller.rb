@@ -180,8 +180,8 @@ class OrdersController < ApplicationController
       if stock_sum < sum
         orders_changed = true
         related_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id)
-        limit = related_orders.count - (sum - stock_sum)
-        offset_orders = related_orders.offset(limit).readonly(false)
+        limit = sum - stock_su
+        offset_orders = related_orders.offset(related_orders.count - limit).readonly(false)
         offset_sum = offset_orders.includes(:order_details).sum(:amount)
         if offset_sum == limit
           offset_orders.update_all(is_shortage: 'yes')
@@ -1092,8 +1092,12 @@ class OrdersController < ApplicationController
         if batch_no.blank?
           raise "缺少外部订单号" if business_order_id.blank?
 
-          raise "对应订单错误" if exist_in(@error_orders, business_order_id)
+          raise "对应订单错误" if exist_in(@error_orders,business_order_id)
 
+          if ! sub_order_id.blank? && ! sub_order_id.eql?(business_order_id)
+            business_order_id = sub_order_id
+          end
+                    
           business = Business.accessible_by(current_ability).find_by(id: @business_id) if ! @business_id.blank?
               
           business ||= Business.accessible_by(current_ability).find_by(no: business_no) if ! business_no.blank?
@@ -1101,10 +1105,7 @@ class OrdersController < ApplicationController
           raise "缺少商户编号" if business.blank?
 
           #Load Order
-
           order = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business.id
-
-          # order ||= Order.accessible_by(current_ability).find_by business_order_id: sub_order_id, business_id: business.id
 
           raise "对应订单不存在" if order.blank?
         else
@@ -1134,19 +1135,23 @@ class OrdersController < ApplicationController
         #Load order_detail
         order_detail = order.order_details.find_by(supplier_id: supplier.try(:id), specification_id: relationship.specification.id)
 
-        # order_detail ||= order.order_details.find_by(business_deliver_no: sub_order_id)
+        order_detail ||= order.order_details.find_by(business_deliver_no: sub_order_id)
 
-        # business_deliver_no = ""
-        # business_trans_no = ""
-        # if ! sub_order_id.blank?
-        #   if ! order.business_order_id.eql? sub_order_id
-        #     business_deliver_no = sub_order_id
-        #     # business_trans_no = order.business_order_id
-        #   else
-        #     business_deliver_no = nil
-        #     business_trans_no = to_string(row[0])
-        #   end
-        # end     
+        business_deliver_no = ""
+        business_trans_no = ""
+        if !sub_order_id.blank?
+          if to_string(row[0]).eql?sub_order_id
+            business_deliver_no = sub_order_id
+            business_trans_no = order.business_order_id
+
+            if !order_detail.blank?
+            order_detail = order.order_details.find_by(business_deliver_no: sub_order_id)
+            end
+          else
+            business_deliver_no = nil
+            business_trans_no = to_string(row[0])
+          end
+        end     
 
         if order_detail.blank? 
           OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: supplier, business_deliver_no: business_deliver_no, order: order
