@@ -8,6 +8,7 @@ class Gjxbg < ActiveRecord::Base
     if !snumber.blank?
       if num_count == 1
         return_no << calNextTrackingNo(snumber)
+        snumber=(snumber.to_i+1).to_s
       elsif num_count > 1
         (1..num_count).each_with_index do |num,i|
           tracking_number = calNextTrackingNo(snumber)
