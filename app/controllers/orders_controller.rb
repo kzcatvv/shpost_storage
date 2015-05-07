@@ -338,7 +338,7 @@ class OrdersController < ApplicationController
       :conditions => ['order_type = ? ',"b2c"])
   end
 
-  def finorderout
+  def findorderout
     @_tracking_number = params[:_tracking_number]
     @tracking_number = params[:tracking_number]
 
@@ -1155,6 +1155,7 @@ class OrdersController < ApplicationController
         #     business_trans_no = to_string(row[0])
         #   end
         # end     
+
         if order_detail.blank? 
           OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order
         else

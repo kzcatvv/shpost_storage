@@ -49,9 +49,6 @@ describe StandardInterfaceController do
 
 
         response_hash = ActiveSupport::JSON.decode(response.body)
-        puts "===================="
-        puts response_hash
-        puts "===================="
         # expect(response.body).to eq '{"FLAG":"success"}'
         expect(response_hash["FLAG"]).to eq "success"
       end
