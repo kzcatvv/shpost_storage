@@ -82,6 +82,7 @@ class Ability
 
         can :query_order_report, :orders
         can :order_statistic_details, :orders
+        can :manage, SequenceNo
         # can :manage,BusinessRelationship
 
     elsif user.user?
@@ -213,7 +214,7 @@ class Ability
 
         can :read, Task, storage_id: storage.id
         can [:read,:hotprint_ready,:hotprint_show], Logistic
-        
+        can :manage, SequenceNo
     end
 
     if user.order?(storage)

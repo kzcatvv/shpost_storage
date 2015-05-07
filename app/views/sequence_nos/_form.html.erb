@@ -1,0 +1,39 @@
+<%= form_for @sequence_no, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+  <div class="form-group">
+    <%= f.label :unit_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :unit_id, Unit.accessible_by(current_ability).all.collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :storage_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :storage_id, Storage.accessible_by(current_ability).all.collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
+    </div>
+  </div>
+  <div class="form-group">
+    <%= f.label :logistic_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :logistic_id, Logistic.accessible_by(current_ability).all.collect {|g| [g.name,g.id]}, {include_blank: ''}, :class => 'control-label' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :start_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :start_no, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :end_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :end_no, :class => 'text_field' %>
+    </div>
+  </div>
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+            sequence_nos_path, :class => 'btn btn-default' %>
+ 
+<% end %>
+
+

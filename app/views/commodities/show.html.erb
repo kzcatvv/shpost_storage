@@ -8,6 +8,8 @@
   <dd><%= @commodity.no %></dd>
   <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
   <dd><%= @commodity.name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:name_en) %>:</strong></dt>
+  <dd><%= @commodity.name_en %></dd>
   <dt><strong><%= model_class.human_attribute_name(:goodstype_id) %>:</strong></dt>
   <dd><%=Goodstype.find(@commodity.goodstype_id).name %></dd>
 </dl>
