@@ -49,13 +49,9 @@ class CountryCodesController < ApplicationController
     end
   end
 
-  def get_code(chinese_name,english_name)
-    if !chinese_name.blank?
-      country_code = CountryCode.find_by(chinese_name:chinese_name)
-    end
-    if !english_name.blank?
-      country_code = CountryCode.find_by(english_name:english_name)
-    end
+  def get_code(name)
+    country_code = CountryCode.find_by(chinese_name:name) if ! name.blank?
+    country_code ||= CountryCode.find_by(english_name:name) if ! name.blank?
     return country_code.blank?? "":country_code.code
   end
 
