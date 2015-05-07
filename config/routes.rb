@@ -1,6 +1,12 @@
 ShpostStorage::Application.routes.draw do
 
-  resources :logistics
+  resources :country_codes
+  resources :logistics do
+    collection do
+      get 'hotprint_ready'
+      post 'hotprint_show'
+    end
+  end
 
   resources :consumable_stocks do
     collection do
@@ -356,6 +362,7 @@ ShpostStorage::Application.routes.draw do
   resources :order_statistics do
       collection do
         get 'query_order_report'
+        get 'order_statistic_details'
       end 
   end
 
@@ -395,7 +402,6 @@ ShpostStorage::Application.routes.draw do
   match "/print/shelfbarcodeprint" => "print#shelfbarcodeprint",via: [:get, :post]
   match "/print/areabarcodeprint" => "print#areabarcodeprint",via: [:get, :post]
   match "/print/relationbarcodeprint" => "print#relationbarcodeprint",via: [:get, :post]
-
 
   match "/contact/add" => "contacts#add",via: [:get, :post]
   match "/contact/confirmadd" => "contacts#confirmadd",via: [:get, :post]

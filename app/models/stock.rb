@@ -145,11 +145,11 @@ class Stock < ActiveRecord::Base
     end
   end
 
-  def self.pick_stock_out(order, operation_user = nil)
+  def self.pick_stock_out(order,cur_storage, operation_user = nil)
     i=0
     order.waiting_amounts.each do |x, amount|
       if amount > 0
-        stocks_in_shelf_type = Stock.find_stocks_in_shelf_type(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), "pick", false)
+        stocks_in_shelf_type = Stock.find_stocks_in_shelf_type(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), "pick", cur_storage,false)
         if stocks_in_shelf_type.count > 0
           in_stock = stocks_in_shelf_type.first
         else
@@ -181,7 +181,7 @@ class Stock < ActiveRecord::Base
 
           outpick_sl = order.stock_logs.create(stock: stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:out])          
           inpick_sl = order.stock_logs.create(stock: in_stock, user: operation_user, operation: order.stock_log_operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: StockLog::OPERATION_TYPE[:in]) 
-          inpick_sl.pick_out = inpick_sl
+          inpick_sl.pick_out = outpick_sl
           inpick_sl.save
 
           if amount <= 0
@@ -255,8 +255,8 @@ class Stock < ActiveRecord::Base
     in_shelf(shelf).find_stocks(specification, supplier, business).expiration_date_first.available.prior
   end
 
-  def self.find_stocks_in_shelf_type(specification, supplier, business, shelf_type, is_broken = false)
-    in_shelf_type(shelf_type).find_stocks(specification, supplier, business, is_broken).expiration_date_first.available.prior
+  def self.find_stocks_in_shelf_type(specification, supplier, business, shelf_type,storage, is_broken = false)
+    in_storage(storage).in_shelf_type(shelf_type).find_stocks(specification, supplier, business, is_broken).expiration_date_first.available.prior
   end
 
   def self.total_stock_in_unit(specification, supplier, business, unit)

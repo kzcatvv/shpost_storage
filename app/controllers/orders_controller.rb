@@ -168,6 +168,51 @@ class OrdersController < ApplicationController
     end
   end
 
+  # todo!!!!
+  def find_stock(orders,createKeyCilentOrderFlg,type='0')
+    order_details_hash = orders.includes(:order_details).where.not("order_details.specification_id" => nil, business_id: nil).group(:specification_id, :supplier_id, "orders.business_id").sum(:amount)
+    orders.update_all(is_shortage: 'no')
+    orders_changed = false
+    # binding.pry
+    order_details_hash.each do |key, sum|
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+      if orders_changed
+        sum = orders.includes(:order_details).where(is_shortage: 'no').where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).sum(:amount)
+      end
+      if stock_sum < sum
+        orders_changed = true
+        limit = sum - stock_sum
+        # todo: sum the limit orders, if equal cotinue,else loop the limit orders and sum .
+        offset_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).offset(limit).readonly(false)
+        offset_sum = offset_orders.includes(:order_details).sum(:amount)
+        if offset_sum == limit
+          offset_orders.update_all(is_shortage: 'yes')
+        else
+          offset_orders.each do |x|
+            tmp_sum = x.order_details.sum(:amount)
+            # binding.pry
+            x.update(is_shortage: 'yes')
+            limit = limit - tmp_sum
+            if limit <= 0
+              break
+            end
+          end
+        end
+        # order_array = []
+        # x.each do |y|
+        #   order_array << y.id
+        # end
+        # orders.delete_if {|item| !order_array.index(item.id).blank?}
+      end
+    end
+    if type.eql? '0'
+      return orders.reload.where(is_shortage: 'no')
+    else
+      return orders.reload.where(is_shortage: 'yes')
+    end
+
+  end
+
   def find_has_stock(orders,createKeyCilentOrderFlg)
     allcnt = {}
     finorders = []
@@ -336,46 +381,64 @@ class OrdersController < ApplicationController
 
     @allcnt = {}
     @allcnt.clear
-    @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
-
-    #some wice_grad lazy do the resultset is [] without once call
+    
     begin
-      @slorders.resultset
+      @orders_grid.resultset
     rescue
 
     end
-    
-    @selectorders=Order.where('order_type = ? and status in (?) and storage_id = ?',"b2c",status, current_storage.id)
-    # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
 
-    if !params[:grid].nil?
-      if !params[:grid][:f].nil?
-        if !params[:grid][:f]["businesses.name".to_sym].nil?
-          businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
-          @selectorders=@selectorders.where(:business_id,businessid)
-        end
+    @allcnt = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).sum(:amount)
+    order_count_hash = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
 
-        if !params[:grid][:f][:created_at].nil?
-          @selectorders=@selectorders.where(["orders.created_at >= ? and orders.created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
-        end
-      end
+    order_count_hash.each do |key,value|
+      order_sum = @allcnt[key]
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+
+      @allcnt[key] = [order_sum,value,stock_sum]
     end
+
+
+    # @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
+
+    # #some wice_grad lazy do the resultset is [] without once call
+    # begin
+    #   @slorders.resultset
+    # rescue
+
+    # end
     
-    selorders = @selectorders
-    @selectorders=@selectorders.to_ary
-    @selectorders.each do |o|
-      o.order_details.each do |d|
-        product = [o.business_id,d.specification_id,d.supplier_id]
-        order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+    # @selectorders=Order.where('order_type = ? and status in (?) and storage_id = ?',"b2c",status, current_storage.id)
+    # # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
 
-        if @allcnt.has_key?(product)
-          @allcnt[product][0]=@allcnt[product][0]+d.amount
+    # if !params[:grid].nil?
+    #   if !params[:grid][:f].nil?
+    #     if !params[:grid][:f]["businesses.name".to_sym].nil?
+    #       businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
+    #       @selectorders=@selectorders.where(:business_id,businessid)
+    #     end
 
-        else
-          @allcnt[product]=[d.amount,order_count]
-        end
-      end
-    end
+    #     if !params[:grid][:f][:created_at].nil?
+    #       @selectorders=@selectorders.where(["orders.created_at >= ? and orders.created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
+    #     end
+    #   end
+    # end
+    
+    # selorders = @selectorders
+    # @selectorders=@selectorders.to_ary
+    # @selectorders.each do |o|
+    #   o.order_details.each do |d|
+    #     product = [o.business_id,d.specification_id,d.supplier_id]
+    #     order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
+
+    #     if @allcnt.has_key?(product)
+    #       @allcnt[product][0]=@allcnt[product][0]+d.amount
+
+    #     else
+    #       @allcnt[product]=[d.amount,order_count]
+    #     end
+    #   end
+    # end
   end
 
   def pingan_b2c_import
@@ -590,32 +653,32 @@ class OrdersController < ApplicationController
       redirect_to :action => 'findprintindex'
     else
       checkbox_all = params[:checkbox][:all]
-      if checkbox_all.eql? '0'
+      # if checkbox_all.eql? '0'
         respond_to do |format|
           format.xls {   
-            send_data(exportorders_xls_content_for(find_has_stock(orders,false)),  
+            send_data(exportorders_xls_content_for(find_stock(orders,false,checkbox_all)),  
                 :type => "text/excel;charset=utf-8; header=present",  
                 :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
           }  
         end
-      else
-        has_stock_orders = find_has_stock(orders,false)
-        ordid = []
-        if !has_stock_orders.blank?
-          has_stock_orders.each do |o|
-           ordid << o.id
-          end
+      # else
+      #   has_stock_orders = find_has_stock_todo(orders,false)
+      #   ordid = []
+      #   # if !has_stock_orders.blank?
+      #   #   has_stock_orders.each do |o|
+      #   #    ordid << o.id
+      #   #   end
        
-          respond_to do |format|
-            format.xls {   
-              send_data(exportorders_xls_content_for(orders.where.not(id: ordid)),  
-                :type => "text/excel;charset=utf-8; header=present",  
-                :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
-              # send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),:type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls") 
-            }  
-          end
-        end
-      end
+      #   #   # respond_to do |format|
+      #   #   #   format.xls {   
+      #   #   #     send_data(exportorders_xls_content_for(orders.where.not(id: ordid)),  
+      #   #   #       :type => "text/excel;charset=utf-8; header=present",  
+      #   #   #       :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
+      #   #   #     # send_data(exportorders_xls_content_for(orders.where.not(id: find_has_stock(orders,false).ids)),:type => "text/excel;charset=utf-8; header=present", :filename => "Orders_#{Time.now.strftime("%Y%m%d")}.xls") 
+      #   #   #   }  
+      #   #   # end
+      #   # end
+      # end
     end
   end
 
@@ -1300,7 +1363,8 @@ def exportorders_xls_content_for(objs)
           sheet2.row(detail_row).default_format = red  
         end
         supplier_id = order_detail.supplier_id
-        supplier_no = Supplier.accessible_by(current_ability).find_by('id = ?',"#{supplier_id}").no
+        s = Supplier.accessible_by(current_ability).find_by('id = ?',"#{supplier_id}")
+        supplier_no = s.blank? ? nil : s.no
 
         specification_id = order_detail.specification_id
         specification = Specification.accessible_by(current_ability).find(specification_id)

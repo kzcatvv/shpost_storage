@@ -101,6 +101,17 @@ ActiveRecord::Schema.define(version: 20150507023708) do
 
   add_index "contacts_relationships", ["contact_id", "relationship_id"], name: "index_contacts_relationships_on_contact_id_and_relationship_id", unique: true
 
+  create_table "country_codes", force: true do |t|
+    t.string   "chinese_name"
+    t.string   "english_name"
+    t.string   "code"
+    t.string   "surfmail_partition_no"
+    t.string   "regimail_partition_no"
+    t.boolean  "is_mail"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "deliver_notices", force: true do |t|
     t.integer  "order_id"
     t.string   "status"
@@ -167,6 +178,8 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.integer  "business_id"
   end
 
+  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
+
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
     t.string   "keyclient_addr"
@@ -200,6 +213,7 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.integer  "storage_id"
     t.string   "param_val1"
     t.string   "param_val2"
+    t.string   "wl_no"
   end
 
   create_table "manual_stock_details", force: true do |t|
@@ -515,10 +529,10 @@ ActiveRecord::Schema.define(version: 20150507023708) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.integer  "parent_id"
-    t.string   "parent_type"
     t.date     "expiration_date"
     t.string   "batch_no"
+    t.integer  "parent_id"
+    t.string   "parent_type"
     t.integer  "pick_id"
     t.integer  "relationship_id"
     t.string   "sn"

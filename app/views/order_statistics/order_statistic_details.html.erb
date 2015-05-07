@@ -1,0 +1,37 @@
+<%- model_class = Order -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+  </div>
+</div>
+<div>
+  <table id="orders" class="table table-striped">
+    <thead>
+      <tr>
+        <th>待处理</th>
+        <th>已打印</th>
+        <th>拣货中</th>
+        <th>已审核</th>
+        <th>已包装</th>
+        <th>寄送中</th>
+        <th>已寄达</th>
+        <th>退回</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% if !@orders.blank?%>
+    <tr>
+    <td><%= @orders.where(status:"waiting").count %></td>
+    <td><%= @orders.where(status:"printed").count %></td>
+    <td><%= @orders.where(status:"picking").count %></td>
+    <td><%= @orders.where(status:"checked").count %></td>
+    <td><%= @orders.where(status:"packed").count %></td>
+    <td><%= @orders.where(status:"delivering").count %></td>
+    <td><%= @orders.where(status:"delivered").count %></td>
+    <td><%= @orders.where(status:"returned").count %></td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+        

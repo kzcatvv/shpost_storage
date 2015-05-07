@@ -21,7 +21,7 @@
 
     <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
 
-    <%=link_to t('打印面单'), "/print/webtracking?flag=filter&&ids=#{@orders_grid.all_pages_records.map{|o| o.id if (o.status=='waiting')}.compact.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
+    <%=link_to t('打印面单'), "/print/webprint?flag=filter&&ids=#{@orders_grid.all_pages_records.map{|o| o.id if (o.status=='waiting')}.compact.join(",")}", target: '_blank',:class => 'btn btn-primary' %>
 
       <%= form_tag(exportorders_orders_url(format: "xls")) %>
       <%= hidden_field_tag('ids', "#{@orders_grid.all_pages_records.map{|o| o.id.to_s}.compact.join(",")}") %>
@@ -84,18 +84,22 @@
       <th>商户</th>
       <th>产品规格</th>
       <th>供应商</th>
-      <th>数量</th>
-      <th>订单数量</th>
+      <th>订单数</th>
+      <th>商品数</th>
+      <th>库存数</th>
+      <th>缺货数</th>
     </tr>
   </thead>
   <tbody>
     <% @allcnt.each do |key,value| %>
       <tr>
-        <td><%= Business.find(key[0]).name %></td>
-        <td><%= Specification.find(key[1]).name %></td>
-        <td><%= key[2].blank?? "":Supplier.find(key[2]).name %></td>
-        <td><%= value[0] %></td>
+        <td><%= Business.find(key[2]).name %></td>
+        <td><%= Specification.find(key[0]).name %></td>
+        <td><%= key[1].blank?? "":Supplier.find(key[1]).name %></td>
         <td><%= value[1] %></td>
+        <td><%= value[0] %></td>
+        <td><%= value[2] %></td>
+        <td><%= (value[2] - value[0] < 0) ? (value[0] - value[2]):''%></td>
       </tr>
     <% end %>
   </tbody>

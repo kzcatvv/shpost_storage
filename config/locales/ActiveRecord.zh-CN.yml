@@ -380,6 +380,9 @@ zh-CN:
       logistic:
         one: 物流商管理
         other: 物流商管理
+      country_code:
+        one: 国家代码管理
+        other: 国家代码管理
     attributes:
       user:
         email: "电子邮件"
@@ -756,6 +759,7 @@ zh-CN:
         created_at: "创建时间"
       logistic:
         name: "物流商名称"
+        wl_no: "物流商编号"
         print_format: "物流商打印格式代号"
         is_getnum: "是否取号段"
         contact: "联系人"
@@ -767,6 +771,13 @@ zh-CN:
         param_val1: "物流商参数1"
         param_val2: "物流商参数2"
         created_at: "创建时间"
+      country_code:
+        chinese_name: "中文名"
+        english_name: "英文名"
+        code: "寄达国代码"
+        surfmail_partition_no: "平常邮件分区号"
+        regimail_partition_no: "挂号邮件分区号"
+        is_mail: "是否可寄"
   menu:
     permission:
       name: "权限管理"
@@ -1004,6 +1015,16 @@ zh-CN:
         constock_log:
           name: "耗材库存日志"
           link: "/constock_logs"
+    country_codes:
+      name: "国家代码管理"
+      needrole:
+        can: :read
+        role: :CountryCode
+      submenu:
+        country_code:
+          name: "国家代码管理"
+          link: "/country_codes"
+    
     # filetemp:
     #   name: "模板管理"
     #   needrole: 

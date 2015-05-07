@@ -242,7 +242,7 @@ class StandardInterface
           amount = Stock.total_stock_in_unit(relationship.specification, relationship.supplier, business, unit)
         end
 
-        stocks << {'FLAG' => 'success', 'BUSINESS_SKU' => business_sku, 'SKU' => relationship.sku, 'AMT' => amount}
+        stocks << {'FLAG' => 'success', 'BUSINESS_SKU' => business_sku, 'SKU' => relationship.barcdoe, 'AMT' => amount}
       else
         stocks << {'FLAG' => 'failure', 'BUSINESS_SKU' => business_sku, 'CODE' => '0005', 'MSG' => '无相关商品信息'}
       end

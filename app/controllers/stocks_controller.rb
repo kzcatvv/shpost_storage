@@ -182,6 +182,7 @@ class StocksController < ApplicationController
     @sixnine_code=params[:sixnine_code]
     @area_code=params[:area_code]
     @is_zero=params[:is_zero]
+    zerostocks=[]
 
     if !params[:ex_code].blank?
       @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
@@ -250,7 +251,11 @@ class StocksController < ApplicationController
       end
 
       if params[:is_zero] == 'yes'
-        zerostocks = @stocks.select(:relationship_id).distinct
+        zerostockstemp = @stocks.select(:relationship_id).distinct
+        zerostockstemp.each do |s|
+          zerostocks << s.relationship_id
+        end
+
         if @selrel.blank?
           resls = Relationship.where(id: zerostocks)
           @zerorels = Relationship.where.not(id: resls)
@@ -259,6 +264,7 @@ class StocksController < ApplicationController
           @zerorels = @selrels.where.not(id: resls)
         end
       end
+      
     # end
   end
 
@@ -268,6 +274,7 @@ class StocksController < ApplicationController
     @stocks=Stock.all
     @selrels=[]
     @zerorels=""
+    zerostocks=[]
 
     if !params[:ex_code].blank?
       @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
@@ -336,7 +343,10 @@ class StocksController < ApplicationController
       end
 
       if params[:is_zero] == 'yes'
-        zerostocks = @stocks.select(:relationship_id).distinct
+        zerostockstemp = @stocks.select(:relationship_id).distinct
+        zerostockstemp.each do |s|
+          zerostocks << s.relationship_id
+        end
         if @selrel.blank?
           resls = Relationship.where(id: zerostocks)
           @zerorels = Relationship.where.not(id: resls)
