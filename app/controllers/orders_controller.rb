@@ -884,56 +884,57 @@ class OrdersController < ApplicationController
     unless request.get?
       if path = upload_orders_import(params[:file]['file'])
         flash_message = "导入成功!"
+        Order.transaction do
+          begin
 
-        begin
+            if File.extname(path).eql? '.xlsx'
+              instance = Roo::Excelx.new(path)
+            elsif File.extname(path).eql? '.xls' 
+              instance = Roo::Excel.new(path)
+            elsif File.extname(path).eql? '.csv'
+              instance = Roo::CSV.new(path)
+            else
+              raise "导入文件格式错误，只接受xls,xlsx及csv三种文件"
+            end
 
-          if File.extname(path).eql? '.xlsx'
-            instance = Roo::Excelx.new(path)
-          elsif File.extname(path).eql? '.xls' 
-            instance = Roo::Excel.new(path)
-          elsif File.extname(path).eql? '.csv'
-            instance = Roo::CSV.new(path)
-          else
-            raise "导入文件格式错误，只接受xls,xlsx及csv三种文件"
-          end
+            #Business
+            if params[:business_select].blank?
+              @import_type = "back"
+              type = 2
+            else
+              @business_id = params[:business_select]
+              @import_type = "standard"
+              type = 1
+            end
 
-          #Business
-          if params[:business_select].blank?
-            @import_type = "back"
-            type = 2
-          else
-            @business_id = params[:business_select]
-            @import_type = "standard"
-            type = 1
-          end
+            @error_orders = []
+            @error_order_details = []
 
-          @error_orders = []
-          @error_order_details = []
+            extract_orders(instance)
 
-          extract_orders(instance)
+            extract_order_details(instance)
 
-          extract_order_details(instance)
+            if ! @error_orders.blank? || ! @error_order_details.blank?
+              flash_message << "部分订单导入失败！"
+            end
 
-          if ! @error_orders.blank? || ! @error_order_details.blank?
-            flash_message << "部分订单导入失败！"
-          end
-
-          respond_to do |format|
-            format.xls {   
-              if ! @error_orders.blank? && ! @error_order_details.blank?
-                send_data(exporterrororders_xls_content_for(@error_orders, @error_order_details),  
-                :type => "text/excel;charset=utf-8; header=present",  
-                :filename => "Error_Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
-              else
-                redirect_to :action => 'findprintindex'
-              end
-            }
-          end
-        rescue => e
-          if e.is_a? RuntimeError
-            flash[:error] << e.message
-          else
-            raise e
+            respond_to do |format|
+              format.xls {   
+                if ! @error_orders.blank? || ! @error_order_details.blank?
+                  send_data(exporterrororders_xls_content_for(@error_orders, @error_order_details),  
+                  :type => "text/excel;charset=utf-8; header=present",  
+                  :filename => "Error_Orders_#{Time.now.strftime("%Y%m%d")}.xls")  
+                else
+                  redirect_to :action => 'findprintindex'
+                end
+              }
+            end
+          rescue => e
+            if e.is_a? RuntimeError
+              flash[:error] << e.message
+            else
+              raise e
+            end
           end
         end
       end   
@@ -1043,7 +1044,7 @@ class OrdersController < ApplicationController
         else
           order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, keyclientorder: keyclientorder, user_id: current_user.id
 
-          order.order_details.delete_all
+          order.order_details.destroy_all
         
           # ords[0] = order
           # if find_has_stock(ords,false).blank?
@@ -1071,6 +1072,7 @@ class OrdersController < ApplicationController
     #读取订单明细     
     instance.default_sheet = instance.sheets.second
     order = nil
+
     2.upto(instance.last_row) do |line|
       begin
         row = instance.row(line)
@@ -1098,22 +1100,28 @@ class OrdersController < ApplicationController
               
           business ||= Business.accessible_by(current_ability).find_by(no: business_no) if ! business_no.blank?
 
-          raise "缺少商户编号" if business.blank?
+          if business.blank?
+            raise "缺少商户编号" if Order.accessible_by(current_ability).where(business_order_id: business_order_id).size != 1
 
+            order = Order.accessible_by(current_ability).find_by business_order_id: business_order_id
+          else
+            order = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business.id
+          end
           #Load Order
 
-          order = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business.id
+          
 
           # order ||= Order.accessible_by(current_ability).find_by business_order_id: sub_order_id, business_id: business.id
 
           raise "对应订单不存在" if order.blank?
         else
-          raise "" if exist_in_batchno(@error_orders,batch_no)
+          raise "对应订单错误" if exist_in_batchno(@error_orders, batch_no)
 
           order = Order.accessible_by(current_ability).find_by batch_no: batch_no
 
           raise "批次号错误" if order.blank?
         end
+
 
         raise "订单已处理" if ! order.status.eql?(Order::STATUS[:waiting]) && ! order.status.eql?(Order::STATUS[:printed])
 
@@ -1132,7 +1140,7 @@ class OrdersController < ApplicationController
         # amount = find_in_instance(orderarr,line,business_order_id,sku_extcode_69code,supplier_no,sub_order_id,temp_amount)
        
         #Load order_detail
-        order_detail = order.order_details.find_by(supplier_id: supplier.try(:id), specification_id: relationship.specification.id)
+        order_detail = order.order_details.find_by(supplier_id: relationship.supplier.try(:id), specification_id: relationship.specification.id)
 
         # order_detail ||= order.order_details.find_by(business_deliver_no: sub_order_id)
 
@@ -1147,14 +1155,13 @@ class OrdersController < ApplicationController
         #     business_trans_no = to_string(row[0])
         #   end
         # end     
-
         if order_detail.blank? 
-          OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: supplier, business_deliver_no: business_deliver_no, order: order
+          OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order
         else
-          order_detail.update!(amount: order_detail.amount + amount, business_deliver_no: business_deliver_no)
+          order_detail.update!(amount: order_detail.amount + amount, business_deliver_no: sub_order_id)
         end
 
-        order.update!(business_trans_no: business_trans_no)
+        # order.update!(business_trans_no: business_trans_no)
 
       rescue => e
         if e.is_a? RuntimeError
@@ -1552,7 +1559,7 @@ def exportorders_xls_content_for(objs)
 
   def exist_in(arrays,id)
     arrays.each do |x|
-      if to_string(x[0]).eql? id
+      if to_string(x[0]).eql?(id) && !to_string(x.last).eql?("订单已创建，但订单明细错误")
         return true
       else
         next
@@ -1563,7 +1570,7 @@ def exportorders_xls_content_for(objs)
 
   def exist_in_batchno(arrays,id)
     arrays.each do |x|
-      if to_string(x[16]).eql? id
+      if to_string(x[16]).eql?(id) && !to_string(x.last).eql?("订单已创建，但订单明细错误")
         return true
       else
         next
@@ -1619,7 +1626,7 @@ def exportorders_xls_content_for(objs)
         end
         # skip the exist order and delete the new order
         if !order.blank? && (order.created_at == order.updated_at)
-          order.order_details.delete_all
+          order.order_details.destroy_all
           order.delete
         end
       end
@@ -1821,7 +1828,7 @@ def exportorders_xls_content_for(objs)
     if !order.blank? 
       if type ==1   
         if order.created_at == order.updated_at
-          order.order_details.delete_all
+          order.order_details.destroy_all
           order.delete
         end
       end
