@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150507040151) do
+ActiveRecord::Schema.define(version: 20150507055123) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -51,11 +51,8 @@ ActiveRecord::Schema.define(version: 20150507040151) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-<<<<<<< HEAD
-    t.string   "name_en"
-=======
     t.string   "english_name"
->>>>>>> 956429ac97e07f28987c120e83c657f4c76ff199
+    t.string   "name_en"
   end
 
   create_table "constock_logs", force: true do |t|
@@ -389,6 +386,10 @@ ActiveRecord::Schema.define(version: 20150507040151) do
     t.string   "send_city"
     t.string   "logistic_id"
     t.string   "country_code"
+    t.string   "send_addr"
+    t.string   "send_name"
+    t.string   "send_zip"
+    t.string   "send_mobile"
   end
 
   create_table "orders_user_logs", id: false, force: true do |t|
@@ -512,12 +513,9 @@ ActiveRecord::Schema.define(version: 20150507040151) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
-<<<<<<< HEAD
+    t.string   "english_name"
     t.string   "name_en"
     t.float    "price"
-=======
-    t.string   "english_name"
->>>>>>> 956429ac97e07f28987c120e83c657f4c76ff199
   end
 
   create_table "standard_interfaces", force: true do |t|

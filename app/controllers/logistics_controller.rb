@@ -52,6 +52,11 @@ class LogisticsController < ApplicationController
   def hotprint_ready
     @ids=params[:ids]
     @flag=params[:flag]
+    @oid=@ids.split(",").map(&:to_i)[0]
+    @order=Order.find(@oid)
+    if @order.transport_type=="gjxbp" || @order.transport_type=="gjxbg"
+      @logistic=Logistic.where(print_format: @order.transport_type).first
+    end
     @logistics = Logistic.where(storage_id: current_storage.id).order(is_default: :desc)
     render :layout => false
   end
