@@ -159,7 +159,7 @@ class OrdersController < ApplicationController
     @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
     if @orders.empty?
       @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id")
-      find_has_stock(@orders, true)
+      find_stock(@orders, true, '0')
     
     else
       @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_no').first
@@ -168,12 +168,10 @@ class OrdersController < ApplicationController
     end
   end
 
-  # todo!!!!
   def find_stock(orders,createKeyCilentOrderFlg,type='0')
     order_details_hash = orders.includes(:order_details).where.not("order_details.specification_id" => nil, business_id: nil).group(:specification_id, :supplier_id, "orders.business_id").sum(:amount)
     orders.update_all(is_shortage: 'no')
     orders_changed = false
-    # binding.pry
     order_details_hash.each do |key, sum|
       stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
       if orders_changed
@@ -182,7 +180,6 @@ class OrdersController < ApplicationController
       if stock_sum < sum
         orders_changed = true
         limit = sum - stock_sum
-        # todo: sum the limit orders, if equal cotinue,else loop the limit orders and sum .
         offset_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).offset(limit).readonly(false)
         offset_sum = offset_orders.includes(:order_details).sum(:amount)
         if offset_sum == limit
@@ -190,7 +187,6 @@ class OrdersController < ApplicationController
         else
           offset_orders.each do |x|
             tmp_sum = x.order_details.sum(:amount)
-            # binding.pry
             x.update(is_shortage: 'yes')
             limit = limit - tmp_sum
             if limit <= 0
@@ -375,28 +371,50 @@ class OrdersController < ApplicationController
     @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
      :order_direction => 'desc', :per_page => 15)
 
-    @orders_grid.with_resultset do |orders|
-      @@orders_export = orders
-    end
-
     @allcnt = {}
-    @allcnt.clear
-    
-    begin
-      @orders_grid.resultset
-    rescue
+
+    @orders_grid.with_resultset do |orders|
+
+      @@orders_export = orders
+
+      # @allcnt = orders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").sum(:amount)
+      # order_count_hash = orders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").count(:id)
+
+      # order_count_hash.each do |key,value|
+      #   # if order detail missing
+      #   if key[0].blank?
+      #     @allcnt.delete(key)
+      #     next
+      #   end
+      #   order_sum = @allcnt[key]
+      #   stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+
+      #   @allcnt[key] = [order_sum,value,stock_sum]
+      # end
 
     end
+    
+    # begin
+    #   @orders_grid.resultset
+    # rescue
 
-    @allcnt = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).sum(:amount)
-    order_count_hash = @orders_grid.resultset.limit(nil).includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
+    # end
+
+    @allcnt = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).sum(:amount)
+    order_count_hash = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
 
     order_count_hash.each do |key,value|
+      # if order detail missing
+      if key[0].blank?
+        @allcnt.delete(key)
+        next
+      end
       order_sum = @allcnt[key]
       stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
 
       @allcnt[key] = [order_sum,value,stock_sum]
     end
+
 
 
     # @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
@@ -1054,12 +1072,8 @@ class OrdersController < ApplicationController
         if batch_no.blank?
           raise "缺少外部订单号" if business_order_id.blank?
 
-          raise "对应订单错误" if exist_in(@error_orders,business_order_id)
+          raise "对应订单错误" if exist_in(@error_orders, business_order_id)
 
-          if ! sub_order_id.blank? && ! sub_order_id.eql?(business_order_id)
-            business_order_id = sub_order_id
-          end
-                    
           business = Business.accessible_by(current_ability).find_by(id: @business_id) if ! @business_id.blank?
               
           business ||= Business.accessible_by(current_ability).find_by(no: business_no) if ! business_no.blank?
@@ -1067,7 +1081,10 @@ class OrdersController < ApplicationController
           raise "缺少商户编号" if business.blank?
 
           #Load Order
+
           order = Order.accessible_by(current_ability).find_by business_order_id: business_order_id, business_id: business.id
+
+          # order ||= Order.accessible_by(current_ability).find_by business_order_id: sub_order_id, business_id: business.id
 
           raise "对应订单不存在" if order.blank?
         else
@@ -1097,23 +1114,19 @@ class OrdersController < ApplicationController
         #Load order_detail
         order_detail = order.order_details.find_by(supplier_id: supplier.try(:id), specification_id: relationship.specification.id)
 
-        order_detail ||= order.order_details.find_by(business_deliver_no: sub_order_id)
+        # order_detail ||= order.order_details.find_by(business_deliver_no: sub_order_id)
 
-        business_deliver_no = ""
-        business_trans_no = ""
-        if !sub_order_id.blank?
-          if to_string(row[0]).eql?sub_order_id
-            business_deliver_no = sub_order_id
-            business_trans_no = order.business_order_id
-
-            if !order_detail.blank?
-            order_detail = order.order_details.find_by(business_deliver_no: sub_order_id)
-            end
-          else
-            business_deliver_no = nil
-            business_trans_no = to_string(row[0])
-          end
-        end     
+        # business_deliver_no = ""
+        # business_trans_no = ""
+        # if ! sub_order_id.blank?
+        #   if ! order.business_order_id.eql? sub_order_id
+        #     business_deliver_no = sub_order_id
+        #     # business_trans_no = order.business_order_id
+        #   else
+        #     business_deliver_no = nil
+        #     business_trans_no = to_string(row[0])
+        #   end
+        # end     
 
         if order_detail.blank? 
           OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: supplier, business_deliver_no: business_deliver_no, order: order
@@ -1401,7 +1414,7 @@ def exportorders_xls_content_for(objs)
           end
         end
 
-        sku_extcode_69code = specification.sku
+        sku_extcode_69code = relationship.barcode
         sku_extcode_69code ||= external_code
         sku_extcode_69code ||= specification.sixnine_code
 

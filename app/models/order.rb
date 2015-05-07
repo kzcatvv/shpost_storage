@@ -4,6 +4,7 @@ class Order < ActiveRecord::Base
 	belongs_to :storage
   belongs_to :keyclientorder
   belongs_to :parent, :class_name => 'Order'
+  belongs_to :logistic
   has_many :order_details, dependent: :destroy
   has_many :stock_logs, through: :order_details
   has_many :deliver_notices
