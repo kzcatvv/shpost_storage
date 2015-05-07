@@ -425,7 +425,7 @@ class OrdersController < ApplicationController
 
     # end
 
-    @allcnt = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).sum(:amount)
+    @allcnt = @orders.includes(:order_details).where(status: status).group(:specification_id,:supplier_id,:business_id).sum(:amount)
     order_count_hash = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
 
     order_count_hash.each do |key,value|
