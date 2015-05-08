@@ -169,7 +169,7 @@ class OrdersController < ApplicationController
   end
 
   def find_stock(orders,createKeyCilentOrderFlg,type='0')
-    order_details_hash = orders.includes(:order_details).where.not("order_details.specification_id" => nil, business_id: nil).group(:specification_id, :supplier_id, "orders.business_id").sum(:amount)
+    order_details_hash = orders.unscope(:order).unscope(:includes).joins(:order_details).group(:specification_id, :supplier_id, :business_id).sum(:amount)
     orders.update_all(is_shortage: 'no')
     orders_changed = false
     order_details_hash.each do |key, sum|
