@@ -96,9 +96,9 @@
         <td><%= Business.find(key[2]).name %></td>
         <td><%= Specification.find(key[0]).name %></td>
         <td><%= key[1].blank?? "":Supplier.find(key[1]).name %></td>
-        <td><%= value[1] %></td>
-        <td><%= value[0] %></td>
-        <td><%= value[2] %></td>
+        <td><%= value[1].blank? ? 0:value[1] %></td>
+        <td><%= value[0].blank? ? 0:value[0] %></td>
+        <td><%= value[2].blank? ? 0:value[2] %></td>
         <td><%= (value[0].blank? || value[2].blank?) ? '' : ((value[2] - value[0] < 0) ? (value[0] - value[2]):'') %></td>
       </tr>
     <% end %>
