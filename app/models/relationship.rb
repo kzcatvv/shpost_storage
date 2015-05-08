@@ -33,8 +33,10 @@ class Relationship < ActiveRecord::Base
   end
 
   def change_external_code
-    self.external_code = self.barcode
-    self.save
+    if self.external_code.blank?
+      self.external_code = self.barcode
+      self.save
+    end
   end
   # def self.find_relationships(sku, supplier = nil, spec_desc = nil,unit)
 
