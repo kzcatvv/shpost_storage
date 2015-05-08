@@ -187,7 +187,7 @@ class OrdersController < ApplicationController
           offset_orders.update_all(is_shortage: 'yes')
         else
           offset_orders.each do |x|
-            related_details = x.order_details.where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2])
+            related_details = x.order_details.where(order_details: {specification_id: key[0], supplier_id: key[1]})
             tmp_sum = related_details.sum(:amount)
             x.update(is_shortage: 'yes')
             related_details.update_all(is_shortage: 'yes')
