@@ -67,6 +67,16 @@
       <%= grid_filter(@orders_grid, :keyclientorder_filter)%>
     </div>
 
+    <div>
+      <span>外部订单号:</span>
+      <%= grid_filter(@orders_grid, :business_order_id_filter)%>
+    </div>
+
+    <div>
+      <span>国家代码:</span>
+      <%= grid_filter(@orders_grid, :country_code_filter)%>
+    </div>
+
     <button class="wg-external-submit-button" data-grid-name="grid">递交</button>
     <button class="wg-external-reset-button" data-grid-name="grid">重置</button>
     

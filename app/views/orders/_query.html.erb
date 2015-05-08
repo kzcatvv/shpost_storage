@@ -127,6 +127,10 @@
       order.keyclientorder.try :batch_no
     end
 
+    g.column name: model_class.human_attribute_name(:business_order_id), attribute: 'business_order_id'
+
+    g.column name: model_class.human_attribute_name(:country_code), attribute: 'country_code'
+
     g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage',custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
       order.shortage_type_name
     end
