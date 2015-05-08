@@ -109,7 +109,7 @@
         <td><%= value[1] %></td>
         <td><%= value[0] %></td>
         <td><%= value[2] %></td>
-        <td><%= (value[2] - value[0] < 0) ? (value[0] - value[2]):''%></td>
+        <td><%= (value[0].blank? || value[2].blank?) ? '' : ((value[2] - value[0] < 0) ? (value[0] - value[2]):'') %></td>
       </tr>
     <% end %>
   </tbody>
