@@ -4,27 +4,25 @@ class Gjxbp < ActiveRecord::Base
     return_no = []
     storage_id = storage.id
     sequence_no = SequenceNo.find_by(storage_id:storage_id,logistic_id:logistic_id) if !logistic_id.blank?
-    snumber = sequence_no.end_no if !sequence_no.blank?
-    if !snumber.blank?
-      if num_count == 1
-        return_no << calNextTrackingNo(snumber)
-        snumber=(snumber.to_i+1).to_s
-      elsif num_count > 1
+    snumber = sequence_no.start_no if !sequence_no.blank?
+    enumber = sequence_no.end_no if !sequence_no.blank?
+    if !snumber.blank? and !enumber.blank?
+      if num_count<=(enumber.to_i-sunmber.to_i+1)
         (1..num_count).each_with_index do |num,i|
-          tracking_number = calNextTrackingNo(snumber)
-          snumber=(snumber.to_i+1).to_s
+          tracking_number = calTrackingNo(snumber)
+          snumber=("%07d" % ((snumber.to_i+1)).to_s
           return_no << tracking_number 
         end
       end
-      SequenceNo.update(sequence_no.id,end_no:snumber)
+      SequenceNo.update(sequence_no.id,start_no:snumber)
     end
     return return_no
   end
 
-  def self.calNextTrackingNo(tracking_number)
+  def self.calTrackingNo(snumber)
     rt_num = ""
-    chknum = checkTrackingNO( ("%07d" % (tracking_number.to_i+1) ) )
-    rt_num = "018"+("%07d" % (tracking_number.to_i+1) )+chknum
+    chknum = checkTrackingNO( ("%07d" % (snumber.to_i) ) )
+    rt_num = "018"+("%07d" % (snumber.to_i) )+chknum
     return rt_num
   end
 

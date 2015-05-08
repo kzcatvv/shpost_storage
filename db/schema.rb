@@ -51,7 +51,6 @@ ActiveRecord::Schema.define(version: 20150507091756) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-    t.string   "english_name"
     t.string   "name_en"
   end
 
@@ -188,8 +187,6 @@ ActiveRecord::Schema.define(version: 20150507091756) do
     t.integer  "supplier_id"
     t.integer  "business_id"
   end
-
-  add_index "keyclientorderdetails", ["keyclientorder_id"], name: "index_keyclientorderdetails_on_keyclientorder_id", unique: true
 
   create_table "keyclientorders", force: true do |t|
     t.string   "keyclient_name"
@@ -524,7 +521,6 @@ ActiveRecord::Schema.define(version: 20150507091756) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
-    t.string   "english_name"
     t.string   "name_en"
     t.float    "price"
   end

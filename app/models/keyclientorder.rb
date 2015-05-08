@@ -86,6 +86,10 @@ class Keyclientorder < ActiveRecord::Base
   end
 
   def pickcheck!
+    self.stock_logs.where(operation_type: 'out').each do |sl|
+      insl = sl.pick
+      outsl = self.stock_logs.create(stock: insl.stock, user: insl.user, operation: StockLog::OPERATION[:b2c_pick_out], status: StockLog::STATUS[:waiting], amount: insl.amount, operation_type: StockLog::OPERATION_TYPE[:out])
+    end
     self.stock_logs.each do |x|
       x.check!
     end
@@ -117,7 +121,7 @@ class Keyclientorder < ActiveRecord::Base
   end
 
   def pick_waiting_amounts
-    sum_stock_logs = self.stock_logs.where("operation_type='out'").group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    sum_stock_logs = self.stock_logs.where("operation_type='out' and operation='b2c_stock_out'").group(:specification_id, :supplier_id, :business_id).sum(:amount)
     sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
 
     compare_sum_amount(sum_amount, sum_stock_logs)

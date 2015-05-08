@@ -955,7 +955,6 @@ class OrdersController < ApplicationController
       begin
         row = instance.row(line)
 
-        # orderarr << row
         business_order_id = to_string(row[0])
         tracking_number = to_string(row[1])
         transport_type = to_string(row[2])
