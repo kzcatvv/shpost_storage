@@ -10,7 +10,7 @@ class Gjxbp < ActiveRecord::Base
       if num_count<=(enumber.to_i-sunmber.to_i+1)
         (1..num_count).each_with_index do |num,i|
           tracking_number = calTrackingNo(snumber)
-          snumber=("%07d" % ((snumber.to_i+1)).to_s
+          snumber=("%07d" % (snumber.to_i+1)).to_s
           return_no << tracking_number 
         end
       end
