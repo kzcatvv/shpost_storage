@@ -51,10 +51,7 @@ ActiveRecord::Schema.define(version: 20150507091756) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-<<<<<<< HEAD
-=======
     t.string   "english_name"
->>>>>>> 4265e950eb824688cc00ff5c56de0cf672a4627e
     t.string   "name_en"
   end
 
@@ -527,10 +524,7 @@ ActiveRecord::Schema.define(version: 20150507091756) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
-<<<<<<< HEAD
-=======
     t.string   "english_name"
->>>>>>> 4265e950eb824688cc00ff5c56de0cf672a4627e
     t.string   "name_en"
     t.float    "price"
   end
@@ -558,10 +552,10 @@ ActiveRecord::Schema.define(version: 20150507091756) do
     t.integer  "business_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
-    t.integer  "parent_id"
-    t.string   "parent_type"
     t.date     "expiration_date"
     t.string   "batch_no"
+    t.integer  "parent_id"
+    t.string   "parent_type"
     t.integer  "pick_id"
     t.integer  "relationship_id"
     t.string   "sn"
