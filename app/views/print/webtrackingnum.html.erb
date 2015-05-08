@@ -44,8 +44,8 @@ LODOP.ADD_PRINT_TEXT("46.6mm","161.4mm","33.1mm","6.6mm",CurentTime(0,1));
 LODOP.ADD_PRINT_TEXT("59.5mm","162.7mm","33.1mm","5.3mm",'<%= current_user.unit.name %>');
 LODOP.ADD_PRINT_TEXT("75.9mm","171.4mm","21.4mm","5.3mm",'<%= eorder.total_weight %>');
 LODOP.ADD_PRINT_TEXT("31.8mm","161.7mm","37.3mm","5.3mm",'<%= eorder.no %>');	
-LODOP.PREVIEW();	
-//LODOP.PRINT();	
+//LODOP.PREVIEW();	
+LODOP.PRINT();	
 <% elsif @transport_type=='ems' %>
 LODOP.PRINT_INITA("0mm","0mm","230.2mm","127.3mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
@@ -79,8 +79,8 @@ content='';
 content=content+'<%= j.name %>  数量：<%= j.amount %>,    '
 <% end %>
 LODOP.ADD_PRINT_TEXT("97.9mm","32.8mm","85.5mm","9.3mm",content);
-LODOP.PREVIEW();  
-//LODOP.PRINT();
+//LODOP.PREVIEW();  
+LODOP.PRINT();
 <% elsif @transport_type=='tcsd' %>
 LODOP.PRINT_INITA("0mm","0mm","229.7mm","127mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
@@ -100,8 +100,8 @@ content=content+'<%= j.name %>  数量：<%= j.amount %>,    '
 LODOP.ADD_PRINT_TEXT("41mm","115.1mm","33.6mm","28.6mm",content);
 LODOP.ADD_PRINT_TEXT("69.8mm","123mm","16.9mm","5.3mm",'<%= eorder.total_weight %>');
 
-LODOP.PREVIEW();  
-//LODOP.PRINT();
+//LODOP.PREVIEW();  
+LODOP.PRINT();
 <% end %>
 	<% end %>
     
