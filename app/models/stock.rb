@@ -93,7 +93,6 @@ class Stock < ActiveRecord::Base
 
     # in_stock.check_in_amount(amount)
 
-    move_stock.check!
     move_stock
   end
 

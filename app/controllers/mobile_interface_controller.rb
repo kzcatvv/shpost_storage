@@ -143,7 +143,6 @@ class MobileInterfaceController < ApplicationController
 
         error_builder('0007') if task.blank? || task.done? || parent.blank?
 
-
         new_stock_logs = []
 
         products.each do |x|
@@ -173,13 +172,13 @@ class MobileInterfaceController < ApplicationController
 
           stock_logs = parent.stock_logs.waiting.where(relationship: relationship, operation_type: type, shelf: shelf)
 
-          if stock_logs.blank?
-            stock_logs = parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.where(relationship: relationship, operation_type: type)
-          end
-
           if stock_logs.blank? && (! type.eql? 'reset')
-            code = "0010"
-            next
+            stock_logs = parent.stock_logs.joins(:shelf).where(shelves: {shelf_type: shelf.shelf_type}).waiting.where(relationship: relationship, operation_type: type)
+
+            if stock_logs.blank?
+              code = "0010"
+              next
+            end
           end
 
           if type.eql? 'in'
@@ -203,6 +202,9 @@ class MobileInterfaceController < ApplicationController
               amount -= x.amount
             end
           elsif type.eql? 'out'
+            operation = stock_logs.first.operation
+            stock_logs.destroy_all
+
             stocks = Stock.find_stocks_in_shelf(relationship.specification, relationship.supplier, relationship.business, shelf)
 
             stocks.each do |stock|
@@ -212,7 +214,7 @@ class MobileInterfaceController < ApplicationController
 
               amount -= out_amount
 
-              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: stock_logs.first.operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
+              new_stock_logs << parent.stock_logs.create!(stock: stock, user: @user, operation: operation, status: StockLog::STATUS[:waiting], amount: out_amount, operation_type: type, sn: sn.try(:join, Stock::SN_SPLIT))
 
               if amount <= 0
                 break
@@ -235,7 +237,7 @@ class MobileInterfaceController < ApplicationController
         end
 
         if ! task.task_type.eql? 'reset'
-          parent.stock_logs.waiting.where.not(id: new_stock_logs).delete_all
+          parent.stock_logs.waiting.where.not(id: new_stock_logs).destroy_all
         else
           parent.stock_logs.waiting.where.not(id: new_stock_logs).each do |x|
             x.update!(amount: 0)
@@ -243,9 +245,9 @@ class MobileInterfaceController < ApplicationController
         end
 
         # binding.pry
-
-        parent.check!
       end
+
+      task.parent.check!
       
       task.update!(status: Task::STATUS[:done])
       
@@ -299,12 +301,12 @@ class MobileInterfaceController < ApplicationController
 
     @storage = Storage.find_by(no: params[:storage]) if ! params[:storage].blank?
 
-    return error_builder('0003') if @storage.nil?
+    return error_builder('0003') if @storage.blank?
 
     @unit = @storage.unit
 
-    @mobile = Mobile.find_by(no: params[:mobile], storage: @storage) if ! params[:mobile].blank?
-    return error_builder('0004') if @mobile.nil?
+    @mobile = Mobile.find_by(no: params[:mobile]) if ! params[:mobile].blank?
+    return error_builder('0004') if @mobile.blank?
 
     @version = params[:version]
 
@@ -342,7 +344,7 @@ class MobileInterfaceController < ApplicationController
   def success_builder(info = nil)
     @status = true
     success = {flag: 'success'}
-    if info.nil?
+    if info.blank?
       @return_json = success
     else
       @return_json = success.merge info
@@ -356,7 +358,7 @@ class MobileInterfaceController < ApplicationController
 
   def error_builder(code, msg = nil)
     @status = false
-    @return_json = {flag: 'failure', code: code, msg: msg.nil? ? I18n.t("mobile_interface.error.#{code}") :  msg }.to_json
+    @return_json = {flag: 'failure', code: code, msg: msg.blank? ? I18n.t("mobile_interface.error.#{code}") :  msg }.to_json
 
     MobileLog.create(request_ip: request.ip, request: request.url, response: @return_json.to_json, user: @user, storage: @storage, unit: @unit, mobile: @mobile, status: 'failure', operate_type: request.method, request_params: request.params.to_json)
     # @return_json
