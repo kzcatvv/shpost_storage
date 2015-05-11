@@ -573,6 +573,8 @@ zh-CN:
         tracking_number: "面单号"
         is_split: "是否拆分订单"
         out_at: "出库时间"
+        business_order_id: "外部订单号"
+        country_code: "国家代码"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        

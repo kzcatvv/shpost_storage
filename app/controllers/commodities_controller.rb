@@ -100,6 +100,16 @@ class CommoditiesController < ApplicationController
           specification_name = to_string(rowarr[6])
           specification_name_en = to_string(rowarr[7])
           desc = to_string(rowarr[8])
+          long = rowarr[9].blank? ? 0.0 : rowarr[9]
+          wide = rowarr[10].blank? ? 0.0 : rowarr[10]
+          high = rowarr[11].blank? ? 0.0 : rowarr[11]
+          weight = rowarr[12].blank? ? 0.0 : rowarr[12]
+          volume = rowarr[13].blank? ? 0.0 : rowarr[13]
+          price = rowarr[14].blank? ? 0.0 : rowarr[14]
+          business_name = to_string(rowarr[15])
+          supplier_name = to_string(rowarr[16])
+          external_code = to_string(rowarr[17])
+          warning_amt = rowarr[18].to_i
 
           if commodity_no.blank?
             txt = "缺少商品编号"
@@ -125,13 +135,6 @@ class CommoditiesController < ApplicationController
           all_name = ""
           all_name << commodity_name
           all_name << specification_name
-
-          long = rowarr[9].blank? ? 0.0 : rowarr[9]
-              wide = rowarr[10].blank? ? 0.0 : rowarr[10]
-              high = rowarr[11].blank? ? 0.0 : rowarr[11]
-              weight = rowarr[12].blank? ? 0.0 : rowarr[12]
-              volume = rowarr[13].blank? ? 0.0 : rowarr[13]
-              price = rowarr[14].blank? ? 0.0 : rowarr[14]
 
           if !(long.is_a? Float) || !(wide.is_a? Float) || !(high.is_a? Float) || !(weight.is_a? Float) || !(volume.is_a? Float) || !(price.is_a? Float)
             txt = "长宽高重量体积价格非数字"
@@ -163,8 +166,29 @@ class CommoditiesController < ApplicationController
           else
             specification.update(name_en:specification_name_en,sixnine_code: sixnine_code,desc:desc,long: long,wide: wide,high: high,weight: weight,volume: volume,all_name: all_name,price: price)
           end
+
+          if !business_name.blank? and !supplier_name.blank?
+            business = Business.accessible_by(current_ability).find_by name: business_name
+            if business.blank?
+              txt = "商户不存在"
+              sheet_error << (rowarr << txt)
+              next
+            end
+            supplier = Supplier.accessible_by(current_ability).find_by name: supplier_name
+            if supplier.blank?
+              txt = "供应商不存在"
+              sheet_error << (rowarr << txt)
+              next
+            end
+            relationship = Relationship.accessible_by(current_ability).find_by business_id: business.id, specification_id: specification.id, supplier_id: supplier.id
+            if relationship.nil?
+              Relationship.create! business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: external_code, spec_desc: specification.desc, warning_amt: warning_amt
+            else
+              Relationship.update relationship.id ,business_id: business.id, supplier_id: supplier.id, specification_id: specification.id, external_code: external_code, spec_desc: specification.desc, warning_amt: warning_amt
+            end
+          end
         end
-        redeal_with_errorcommodities(sheet_error)
+        
         if !sheet_error.blank?
           flash_message << "有部分信息导入失败！"
         end
@@ -185,27 +209,6 @@ class CommoditiesController < ApplicationController
     end
   end
 
-  def redeal_with_errorcommodities(target)
-    target.each do |x|
-      commodity_no = to_string(x[0])
-      commodity = nil
-      if !commodity_no.blank?
-        commodity = Commodity.accessible_by(current_ability).find_by(no: commodity_no)
-      end
-      if !commodity.blank?
-        # specification_name = to_string(x[5])
-        # specification = nil
-        # specification = Specification.accessible_by(current_ability).find_by commodity_id:commodity.id,name:specification_name
-        # if !specification.blank? && (specification.created_at == specification.updated_at)
-        #   specification.delete
-        # end
-        if commodity.specifications.blank? && (commodity.created_at == commodity.updated_at)
-          commodity.delete
-        end
-      end
-    end
-  end
-
   def exporterrorcommodities_xls_content_for(obj)
     xls_report = StringIO.new  
     book = Spreadsheet::Workbook.new  
@@ -214,7 +217,7 @@ class CommoditiesController < ApplicationController
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     red = Spreadsheet::Format.new :color => :red
     sheet1.row(0).default_format = blue 
-    sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 SKU 69码 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格}  
+    sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 SKU 69码 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格 商户 供应商 第三方商品编码 预警数量}  
     count_row = 1
     obj.each do |obj|
       sheet1[count_row,0]=obj[0]
@@ -233,6 +236,10 @@ class CommoditiesController < ApplicationController
       sheet1[count_row,13]=obj[13]
       sheet1[count_row,14]=obj[14]
       sheet1[count_row,15]=obj[15]
+      sheet1[count_row,16]=obj[16]
+      sheet1[count_row,17]=obj[17]
+      sheet1[count_row,18]=obj[18]
+      sheet1[count_row,19]=obj[19]
       count_row += 1
     end 
     book.write xls_report  

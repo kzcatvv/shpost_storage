@@ -7,7 +7,10 @@ class PurchasesController < ApplicationController
   # GET /purchasees
   # GET /purchasees.json
   def index
-    @purchases_grid = initialize_grid(@purchases)
+    @purchases_grid = initialize_grid(@purchases,
+      include: [:business],
+      order: 'purchases.id',
+      order_direction: 'desc')
   end
 
   # GET /purchasees/1
