@@ -73,14 +73,14 @@ class LogisticsController < ApplicationController
         @ids=params[:oid].split(",").map(&:to_i)
         numberSize = @ids.size
 
-        numary=@logistic.getMailNum(numberSize,current_storage)
-        if !numary.nil?
-          @ids.each_with_index do |num,i|
-            @order=Order.find(num)
-            @order.update(tracking_number: numary[i])
-            @order.update(status: 'printed')
-          end
-        end
+        # numary=@logistic.getMailNum(numberSize,current_storage)
+        # if !numary.nil?
+        #   @ids.each_with_index do |num,i|
+        #     @order=Order.find(num)
+        #     @order.update(tracking_number: numary[i])
+        #     @order.update(status: 'printed')
+        #   end
+        # end
         # rq=@logistic.getMailNum('信息局',@logistic.param_val1,@logistic.param_val2,numberSize)
         # if !rq.nil?
         #     rqback=rq.split(':')
