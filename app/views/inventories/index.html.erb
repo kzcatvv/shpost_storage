@@ -21,13 +21,33 @@
   
     g.column name: model_class.human_attribute_name(:inv_type_dtl), attribute: 'inv_type_dtl',filter: false do |inventory| 
       od=content_tag(:tr,content_tag(:td," "))
-      idls=inventory.inv_type_dtl.split(",")
-      idls.each do |idl|
-        if inventory.inv_type == 'byshelf'
-          od=od+content_tag(:tr,content_tag(:td,Shelf.find(idl).shelf_code.to_s))
-        else
-          od=od+content_tag(:tr,content_tag(:td,Relationship.find(idl).specification.name))
-        end  
+      if !inventory.inv_type_dtl.nil?
+        idls=inventory.inv_type_dtl.split(",")
+        idls.each do |idl|
+          if inventory.inv_type == 'byarea'
+            od=od+content_tag(:tr,content_tag(:td,Area.find(idl).name.to_s))
+          end  
+        end
+      end
+      content_tag(:table,od)
+
+    end
+
+    g.column name: model_class.human_attribute_name(:goods_inv_type), attribute: 'goods_inv_type',custom_filter: Inventory::GOODS_INV_TYPE.invert do |inventory| 
+      inventory.goods_type_name
+    end
+  
+    g.column name: model_class.human_attribute_name(:goods_inv_dtl), attribute: 'goods_inv_dtl',filter: false do |inventory| 
+      od=content_tag(:tr,content_tag(:td," "))
+      if !inventory.goods_inv_dtl.nil?
+        igdls=inventory.goods_inv_dtl.split(",")
+        igdls.each do |igdl|
+          if inventory.goods_inv_dtl == 'bybusiness'
+            od=od+content_tag(:tr,content_tag(:td,Business.find(igdl).name.to_s))
+          else
+            od=od+content_tag(:tr,content_tag(:td,Relationship.find(igdl).specification.name))
+          end  
+        end
       end
       content_tag(:table,od)
 

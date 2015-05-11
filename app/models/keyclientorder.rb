@@ -90,7 +90,10 @@ class Keyclientorder < ActiveRecord::Base
       insl = sl.pick
       outsl = self.stock_logs.create(stock: insl.stock, user: insl.user, operation: StockLog::OPERATION[:b2c_pick_out], status: StockLog::STATUS[:waiting], amount: insl.amount, operation_type: StockLog::OPERATION_TYPE[:out])
     end
-    self.stock_logs.each do |x|
+    self.stock_logs.where(operation: 'b2c_stock_out').each do |x|
+      x.check!
+    end
+    self.stock_logs.where(operation: 'b2c_pick_out').each do |x|
       x.check!
     end
     if self.pick_waiting_amounts.blank?

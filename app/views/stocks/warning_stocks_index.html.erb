@@ -13,11 +13,12 @@
   </thead>
   <tbody>
     <% @stocks.each do |k, v| %>
+      <% x = Relationship.find k %>
         <tr>
-          <td><%= k.business.name %></td>
-          <td><%= k.specification.name %></td>
-          <td><%= k.supplier.name %></td>
-          <td><%= v %>/<%= k.warning_amt %></td>
+          <td><%= x.business.name %></td>
+          <td><%= x.specification.name %></td>
+          <td><%= x.supplier.name %></td>
+          <td><%= v %>/<%= x.warning_amt %></td>
         </tr>
     <% end %>
   </tbody>

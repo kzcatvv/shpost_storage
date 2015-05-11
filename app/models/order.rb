@@ -214,6 +214,72 @@ class Order < ActiveRecord::Base
     row << nil
   end
 
+  def self.find_stock(orders,createKeyCilentOrderFlg,type='0')
+    order_details_hash = orders.unscope(:order).unscope(:includes).joins(:order_details).group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    orders.update_all(is_shortage: 'no')
+    orders_changed = false
+    order_details_hash.each do |key, sum|
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+      if orders_changed
+        sum = orders.includes(:order_details).where(is_shortage: 'no').where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).sum(:amount)
+      end
+      if stock_sum < sum
+        orders_changed = true
+        related_orders = orders.joins(:order_details).where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id)
+        limit = sum - stock_sum
+        offset_orders = related_orders.offset(related_orders.count - limit).readonly(false)
+        offset_sum = offset_orders.includes(:order_details).sum(:amount)
+        if offset_sum == limit
+          offset_orders.update_all(is_shortage: 'yes')
+        else
+          offset_orders.each do |x|
+            related_details = x.order_details.where(order_details: {specification_id: key[0], supplier_id: key[1]})
+            tmp_sum = related_details.sum(:amount)
+            x.update(is_shortage: 'yes')
+            related_details.update_all(is_shortage: 'yes')
+            limit = limit - tmp_sum
+            if limit <= 0
+              break
+            end
+          end
+        end
+        # order_array = []
+        # x.each do |y|
+        #   order_array << y.id
+        # end
+        # orders.delete_if {|item| !order_array.index(item.id).blank?}
+      end
+    end
+
+    return_orders = nil
+
+    if type.eql? '0'
+      return_orders = orders.reload.where(is_shortage: 'no')
+    else
+      return_orders = orders.reload.where(is_shortage: 'yes')
+    end
+
+    if createKeyCilentOrderFlg
+      if ordercnt > 0
+        time = Time.new
+        # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
+        @keycorder = Keyclientorder.create(keyclient_name: "auto",unit_id: current_user.unit_id,storage_id: current_storage.id,user: current_user,status: "waiting")
+        return_orders.update_all(keyclientorder_id: @keycorder)
+
+        allcnt = return_orders.includes(:order_details).where.not("order_details.specification_id" => nil, business_id: nil).group("orders.business_id", :specification_id, :supplier_id).sum(:amount)
+
+        allcnt.each do |k,v|
+          if v[1] > 0
+            Keyclientorderdetail.create(keyclientorder: @keycorder,business_id: k[0],specification_id: k[1],supplier_id: k[2],amount: v)
+          end
+        end
+      end
+    end
+
+    return return_orders.reload
+
+  end
+
   protected
 
   def can_update_status(status)

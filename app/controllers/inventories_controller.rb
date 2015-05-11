@@ -10,9 +10,11 @@ class InventoriesController < ApplicationController
 
   def new
     @area = Area.where("storage_id = ?",current_storage.id)
-    @shelves_grid = initialize_grid(Shelf,
-      :include => [:storage],
-      :conditions => {"storages.id" => current_storage.id})
+    @areas_grid = initialize_grid(Area,
+      :conditions => {:storage_id => current_storage.id})
+
+    @businesses_grid = initialize_grid(Business,
+      :conditions => {:unit_id => current_storage.unit.id})
 
     @relationships_grid = initialize_grid(Relationship,
       :include => [:business,:supplier],
@@ -22,9 +24,11 @@ class InventoriesController < ApplicationController
 
   def edit
     @area = Area.where("storage_id = ?",current_storage.id)
-    @shelves_grid = initialize_grid(Shelf,
-      :include => [:storage],
-      :conditions => {"storages.id" => current_storage.id})
+    @areas_grid = initialize_grid(Area,
+      :conditions => {:storage_id => current_storage.id})
+
+    @businesses_grid = initialize_grid(Business,
+      :conditions => {:unit_id => current_storage.unit.id})
 
     @relationships_grid = initialize_grid(Relationship,
       :include => [:business,:supplier],
