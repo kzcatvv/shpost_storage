@@ -1002,6 +1002,8 @@ class OrdersController < ApplicationController
       begin
         row = instance.row(line)
 
+        order = nil
+
         # orderarr << row
         business_order_id = to_string(row[0])
         sub_order_id = to_string(row[1])
