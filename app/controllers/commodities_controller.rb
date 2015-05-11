@@ -96,18 +96,19 @@ class CommoditiesController < ApplicationController
           commodity_name = to_string(rowarr[1])
           commodity_name_en = to_string(rowarr[2])
           goodtype_name = to_string(rowarr[3])
-          sixnine_code = to_string(rowarr[5])
-          specification_name = to_string(rowarr[6])
-          specification_name_en = to_string(rowarr[7])
-          desc = to_string(rowarr[8])
-          long = rowarr[9].blank? ? 0.0 : rowarr[9]
-          wide = rowarr[10].blank? ? 0.0 : rowarr[10]
-          high = rowarr[11].blank? ? 0.0 : rowarr[11]
-          weight = rowarr[12].blank? ? 0.0 : rowarr[12]
-          volume = rowarr[13].blank? ? 0.0 : rowarr[13]
-          price = rowarr[14].blank? ? 0.0 : rowarr[14]
-          business_name = to_string(rowarr[15])
-          supplier_name = to_string(rowarr[16])
+          specification_name = to_string(rowarr[4])
+          specification_name_en = to_string(rowarr[5])
+          desc = to_string(rowarr[6])
+          long = rowarr[7].blank? ? 0.0 : rowarr[7]
+          wide = rowarr[8].blank? ? 0.0 : rowarr[8]
+          high = rowarr[9].blank? ? 0.0 : rowarr[9]
+          weight = rowarr[10].blank? ? 0.0 : rowarr[10]
+          volume = rowarr[11].blank? ? 0.0 : rowarr[11]
+          price = rowarr[12].blank? ? 0.0 : rowarr[12]
+          sixnine_code = to_string(rowarr[13])
+          business_name = to_string(rowarr[14])
+          supplier_name = to_string(rowarr[15])
+          sku = to_string(rowarr[16])
           external_code = to_string(rowarr[17])
           warning_amt = rowarr[18].to_i
 
@@ -217,7 +218,7 @@ class CommoditiesController < ApplicationController
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     red = Spreadsheet::Format.new :color => :red
     sheet1.row(0).default_format = blue 
-    sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 SKU 69码 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格 商户 供应商 第三方商品编码 预警数量}  
+    sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格 69码 商户 供应商 SKU 第三方商品编码 预警数量}  
     count_row = 1
     obj.each do |obj|
       sheet1[count_row,0]=obj[0]
@@ -247,17 +248,21 @@ class CommoditiesController < ApplicationController
   end
 
   def specification_export
-      @specifications = []
-      @@comm_export.each do |x|
-        @specifications += x.specifications
-      end
-      if @specifications.blank?
-         flash[:alert] = "无商品规格数据"
-         redirect_to :action => 'index'
+      # @specifications = []
+      # @@comm_export.each do |x|
+      #   @specifications += x.specifications
+      # end
+      # if @specifications.blank?
+      #    flash[:alert] = "无商品规格数据"
+      #    redirect_to :action => 'index'
+      # else
+      if @@comm_export.blank?
+        flash[:alert] = "无商品数据"
+        redirect_to :action => 'index'
       else
         respond_to do |format|  
           format.xls {   
-            send_data(specification_xls_content_for(@specifications),  
+            send_data(specification_xls_content_for(@@comm_export),  
                   :type => "text/excel;charset=utf-8; header=present",  
                   :filename => "Specifications_#{Time.now.strftime("%Y%m%d")}.xls")  
           }
@@ -310,53 +315,43 @@ class CommoditiesController < ApplicationController
       blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
       sheet1.row(0).default_format = blue  
   
-      sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 SKU 69码 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格 商户 供应商 第三方商品编码 预警数量}  
+      sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格 69码 商户 供应商 SKU 第三方商品编码 预警数量}  
       count_row = 1
       objs.each do |obj|  
-        relationship = Relationship.where(specification_id:obj.id).order(:business_id,:supplier_id)
-        if !relationship.blank?
-          relationship.each do |rel|
-            sheet1[count_row,0]=obj.commodity.no
-            sheet1[count_row,1]=obj.commodity.name
-            sheet1[count_row,2]=obj.commodity.name_en
-            sheet1[count_row,3]=obj.commodity.goodstype.name
-            sheet1[count_row,4]=rel.barcode
-            sheet1[count_row,5]=obj.sixnine_code
-            sheet1[count_row,6]=obj.name
-            sheet1[count_row,7]=obj.name_en
-            sheet1[count_row,8]=obj.desc
-            sheet1[count_row,9]=obj.long
-            sheet1[count_row,10]=obj.wide
-            sheet1[count_row,11]=obj.high
-            sheet1[count_row,12]=obj.weight
-            sheet1[count_row,13]=obj.volume
-            sheet1[count_row,14]=obj.price
-            sheet1[count_row,15]=rel.business.name
-            sheet1[count_row,16]=rel.supplier.name
-            sheet1[count_row,17]=rel.external_code
-            sheet1[count_row,18]=rel.warning_amt
-            count_row += 1
+        sheet1[count_row,0]=obj.no
+        sheet1[count_row,1]=obj.name
+        sheet1[count_row,2]=obj.name_en
+        sheet1[count_row,3]=obj.goodstype.name
+                
+        specs = obj.specifications
+        if !specs.blank?
+          specs.each do |spec|
+            sheet1[count_row,4]=spec.name
+            sheet1[count_row,5]=spec.name_en
+            sheet1[count_row,6]=spec.desc
+            sheet1[count_row,7]=spec.long
+            sheet1[count_row,8]=spec.wide
+            sheet1[count_row,9]=spec.high
+            sheet1[count_row,10]=spec.weight
+            sheet1[count_row,11]=spec.volume
+            sheet1[count_row,12]=spec.price
+            sheet1[count_row,13]=spec.sixnine_code
+                
+            relationship = Relationship.where(specification_id:spec.id).order(:business_id,:supplier_id)
+            if !relationship.blank?
+              relationship.each do |rel|
+                sheet1[count_row,14]=rel.business.name
+                sheet1[count_row,15]=rel.supplier.name
+                sheet1[count_row,16]=rel.barcode
+                sheet1[count_row,17]=rel.external_code
+                sheet1[count_row,18]=rel.warning_amt
+                count_row += 1
+              end
+            else
+              count_row += 1
+            end
           end
         else
-          sheet1[count_row,0]=obj.commodity.no
-          sheet1[count_row,1]=obj.commodity.name
-          sheet1[count_row,2]=obj.commodity.name_en
-          sheet1[count_row,3]=obj.commodity.goodstype.name
-          sheet1[count_row,4]=""
-          sheet1[count_row,5]=obj.sixnine_code
-          sheet1[count_row,6]=obj.name
-          sheet1[count_row,7]=obj.name_en
-          sheet1[count_row,8]=obj.desc
-          sheet1[count_row,9]=obj.long
-          sheet1[count_row,10]=obj.wide
-          sheet1[count_row,11]=obj.high
-          sheet1[count_row,12]=obj.weight
-          sheet1[count_row,13]=obj.volume
-          sheet1[count_row,14]=obj.price
-          sheet1[count_row,15]=""
-          sheet1[count_row,16]=""
-          sheet1[count_row,17]=""
-          sheet1[count_row,18]=""
           count_row += 1
         end
       end  
