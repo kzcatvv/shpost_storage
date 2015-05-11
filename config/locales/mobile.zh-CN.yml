@@ -1,6 +1,6 @@
 zh-CN:
   mobile_interface:
-    version: '1.0.42.0506'
+    version: '1.0.43.0511'
     url: '/apk/shpost_storage.apk'
     update: 'N'
     error: 
