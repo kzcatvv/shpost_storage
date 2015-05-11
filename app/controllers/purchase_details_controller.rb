@@ -6,7 +6,8 @@ class PurchaseDetailsController < ApplicationController
   # GET /purchase_detailes
   # GET /purchase_detailes.json
   def index
-    @purchase_details_grid = initialize_grid(@purchase_details)
+    @purchase_details_grid = initialize_grid(@purchase_details,
+      include: [:supplier,:specification])
   end
 
   # GET /purchase_detailes/1

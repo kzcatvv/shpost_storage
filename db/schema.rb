@@ -51,7 +51,6 @@ ActiveRecord::Schema.define(version: 20150511051950) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-    t.string   "english_name"
     t.string   "name_en"
   end
 
@@ -524,7 +523,6 @@ ActiveRecord::Schema.define(version: 20150511051950) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
-    t.string   "english_name"
     t.string   "name_en"
     t.float    "price"
   end
