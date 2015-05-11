@@ -7,7 +7,7 @@ class Gjxbp < ActiveRecord::Base
     snumber = sequence_no.start_no if !sequence_no.blank?
     enumber = sequence_no.end_no if !sequence_no.blank?
     if !snumber.blank? and !enumber.blank?
-      if num_count<=(enumber.to_i-sunmber.to_i+1)
+      if num_count<=(enumber.to_i-snumber.to_i+1)
         (1..num_count).each_with_index do |num,i|
           tracking_number = calTrackingNo(snumber)
           snumber=("%07d" % (snumber.to_i+1)).to_s
