@@ -93,6 +93,9 @@ class Keyclientorder < ActiveRecord::Base
     self.stock_logs.where(operation: 'b2c_stock_out').each do |x|
       x.check!
     end
+    self.stock_logs.where(operation: 'b2c_pick_out').each do |x|
+      x.check!
+    end
     if self.pick_waiting_amounts.blank?
       self.orders.each do |order|
         order.stock_out
