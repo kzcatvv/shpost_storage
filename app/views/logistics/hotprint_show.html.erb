@@ -133,8 +133,8 @@ pr='';
 <%= allwg = 0.00 %>
 <% allpr = 0.00 %>
 <% eorder.order_details.each do |j| %>
-<% allwg = allwg + j.weight * j.amount %>
-<% allpr = allpr + j.price * j.amount %>
+<% allwg = allwg + (j.weight.nil? ? j.specification.weight : j.weight) * j.amount %>
+<% allpr = allpr + (j.price.nil? ? j.specification.price : j.price) * j.amount %>
 content=content+'<%= j.name.nil? ? j.specification.commodity.english_name : j.name %>\n'
 wg=wg+'<%= j.weight.nil? ? j.specification.weight : j.weight %>\n'
 pr=pr+'<%= j.price.nil? ? j.specification.price : j.price %>\n'
