@@ -410,33 +410,75 @@ class OrdersController < ApplicationController
 
     # end
 
-    selectorders = @orders.where(status: status,order_type: 'b2c')
-    # binding.pry
-    if !params[:grid].nil?
-      if !params[:grid][:f].nil?
-        if !params[:grid][:f][:business_id].nil?
-          selectorders=selectorders.where(:business_id,params[:grid][:f][:business_id])
+    selectorders = @orders.includes(:keyclientorder).where(status: status,order_type: 'b2c')
+    if !params[:grid].blank?
+      if !params[:grid][:f].blank?
+        params_f = params[:grid][:f]
+        if !params_f[:business_id].blank?
+          selectorders=selectorders.where(business_id: params_f[:business_id])
         end
 
-        if !params[:grid][:f][:created_at].nil?
-          if !params[:grid][:f][:created_at][:fr].blank?
-            selectorders=selectorders.where("orders.created_at >= ?",params[:grid][:f][:created_at][:fr])
+        if !params_f[:created_at].blank?
+          if !params_f[:created_at][:fr].blank?
+            selectorders=selectorders.where("orders.created_at >= ?",params_f[:created_at][:fr])
           end
-          if !params[:grid][:f][:created_at][:to].blank?
-            selectorders=selectorders.where("orders.created_at <= ?",params[:grid][:f][:created_at][:to]+" 23:59:59")
+          if !params_f[:created_at][:to].blank?
+            selectorders=selectorders.where("orders.created_at <= ?",params_f[:created_at][:to]+" 23:59:59")
           end
         end
 
-        if !params[:grid][:f][:transport_type].nil?
-          selectorders=selectorders.where(:transport_type,params[:grid][:f][:transport_type])
+        if !params_f[:transport_type].blank?
+          selectorders=selectorders.where(transport_type: params_f[:transport_type])
         end
 
+        if !params_f[:status].blank?
+          selectorders=selectorders.where(status: params_f[:status])
+        end
+
+        if !params_f[:total_weight].blank?
+          if !params_f[:total_weight][:fr].blank?
+            selectorders=selectorders.where("orders.total_weight >= ?",params_f[:total_weight][:fr])
+          end
+          if !params_f[:total_weight][:to].blank?
+            selectorders=selectorders.where("orders.total_weight <= ?",params_f[:total_weight][:to])
+          end
+        end
+        
+        if !params_f[:tracking_number].blank?
+          if !params_f[:tracking_number][:fr].blank?
+            selectorders=selectorders.where("orders.tracking_number >= ?",params_f[:tracking_number][:fr])
+          end
+          if !params_f[:tracking_number][:to].blank?
+            selectorders=selectorders.where("orders.tracking_number <= ?",params_f[:tracking_number][:to])
+          end
+        end
+
+        if !params_f[:business_order_id].blank?
+          if !params_f[:business_order_id][:fr].blank?
+            selectorders=selectorders.where("orders.business_order_id >= ?",params_f[:business_order_id][:fr])
+          end
+          if !params_f[:business_order_id][:to].blank?
+            selectorders=selectorders.where("orders.business_order_id <= ?",params_f[:business_order_id][:to])
+          end
+        end
+
+        if !params_f[:country_code].blank?
+          if !params_f[:country_code][:fr].blank?
+            selectorders=selectorders.where("orders.country_code >= ?",params_f[:country_code][:fr])
+          end
+          if !params_f[:country_code][:to].blank?
+            selectorders=selectorders.where("orders.country_code <= ?",params_f[:country_code][:to])
+          end
+        end
+
+        if !params_f["keyclientorders.batch_no".to_sym].blank?
+          selectorders=selectorders.where("keyclientorders.batch_no = ?", params_f["keyclientorders.batch_no".to_sym])
+        end
       end
     end
 
-
-    @allcnt = @orders.includes(:order_details).where(status: status,order_type: 'b2c').group(:specification_id,:supplier_id,:business_id).sum(:amount)
-    order_count_hash = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
+    @allcnt = selectorders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").sum(:amount)
+    order_count_hash = selectorders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").count(:id)
 
     order_count_hash.each do |key,value|
       # if order detail missing
