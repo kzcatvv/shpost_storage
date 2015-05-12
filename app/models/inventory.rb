@@ -4,11 +4,16 @@ class Inventory < ActiveRecord::Base
   	has_many :stock_logs, as: :parent
     has_many :tasks, as: :parent
 
-    INV_TYPE = {byshelf: '按货架', byrel: '按商品'}
+    INV_TYPE = {byarea: '按区域'}
+    GOODS_INV_TYPE = {bybusiness: '按商户', byrel: '按商品关系'}
     STATUS = { opened: 'opened',inventoring: 'inventoring',closed: 'closed'}
 
     def inv_type_name
       inv_type.blank? ? "" : Inventory::INV_TYPE["#{inv_type}".to_sym]
+    end
+
+    def goods_type_name
+      goods_inv_type.blank? ? "" : Inventory::GOODS_INV_TYPE["#{goods_inv_type}".to_sym]
     end
 
   	def status_name

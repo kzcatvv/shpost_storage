@@ -18,31 +18,44 @@
       <%= select_tag("area_sel", options_from_collection_for_select(@area, "id", "name"))  %>  
     </div>
   </div> -->
+  <% if @inventory.inv_type.nil? || @inventory.inv_type == "byarea" %>
+  <div id="grid1">
 
+    <%= grid(@areas_grid) do |g|
+      g.action_column 
 
- 
-
-  <div class="control-group">
-    <%= f.label :desc, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_area :desc, :class => 'text_field' %>
-    </div>
-  </div>
- <% if @inventory.inv_type.nil? || @inventory.inv_type == "byshelf" %>
- <div id="grid1">
-
-  <%= grid(@shelves_grid) do |g|
-    g.action_column 
-
-    g.column name: 'shelf_code' do |shelf|
-      shelf.shelf_code
-    end
-  end 
+      g.column name: 'name' do |area|
+      area.name
+      end
+    end 
   %>
 </div>
 <% end -%>
-<% if @inventory.inv_type.nil? || @inventory.inv_type == "byrel" %>
+
+ 
+  <div class="control-group">
+    <%= f.label :goods_inv_type, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select(:goods_inv_type, Inventory::GOODS_INV_TYPE.invert,:include_blank => "请选择")%>      
+    </div>
+  </div>
+  <% if @inventory.inv_type.nil? || @inventory.inv_type == "bybusiness" %>
 <div id="grid2">
+
+  <%= grid(@businesses_grid) do |g|
+    g.action_column 
+
+    g.column name: 'business' do |business|
+      business.name
+    end
+
+  end 
+ %>
+</div>
+<% end -%>
+
+  <% if @inventory.inv_type.nil? || @inventory.inv_type == "byrel" %>
+<div id="grid3">
 
   <%= grid(@relationships_grid) do |g|
     g.action_column 
@@ -66,6 +79,14 @@
  %>
 </div>
 <% end -%>
+
+  <div class="control-group">
+    <%= f.label :desc, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_area :desc, :class => 'text_field' %>
+    </div>
+  </div>
+ 
 
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <% if can? :index, Inventory %>
