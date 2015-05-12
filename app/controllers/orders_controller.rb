@@ -1055,7 +1055,7 @@ class OrdersController < ApplicationController
           # end
           # Order.update(order.id,is_shortage: is_shortage)
                   
-          @ids << order_id
+          @ids << order.id
         end          
       rescue => e
         if e.is_a? RuntimeError
