@@ -310,22 +310,55 @@ class CommoditiesController < ApplicationController
       blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
       sheet1.row(0).default_format = blue  
   
-      sheet1.row(0).concat %w{商品编号 商品名称 商品类型 SKU 69码 规格名称 规格描述 商户 供应商 第三方商品编码 规格描述 预警数量}  
+      sheet1.row(0).concat %w{商品编号 商品名称 商品英文名称 商品类型 SKU 69码 规格名称 规格英文名称 规格描述 长 宽 高 重量 体积 价格 商户 供应商 第三方商品编码 预警数量}  
       count_row = 1
       objs.each do |obj|  
-        sheet1[count_row,0]=obj.commodity.no
-        sheet1[count_row,1]=obj.commodity.name
-        sheet1[count_row,2]=obj.commodity.goodstype.name
-        sheet1[count_row,3]=obj.sku
-        sheet1[count_row,4]=obj.sixnine_code
-        sheet1[count_row,5]=obj.name
-        sheet1[count_row,6]=obj.desc
-        sheet1[count_row,7]=""
-        sheet1[count_row,8]=""
-        sheet1[count_row,9]=""
-        sheet1[count_row,10]=""
-        sheet1[count_row,11]=""
-       count_row += 1
+        relationship = Relationship.where(specification_id:obj.id).order(:business_id,:supplier_id)
+        if !relationship.blank?
+          relationship.each do |rel|
+            sheet1[count_row,0]=obj.commodity.no
+            sheet1[count_row,1]=obj.commodity.name
+            sheet1[count_row,2]=obj.commodity.name_en
+            sheet1[count_row,3]=obj.commodity.goodstype.name
+            sheet1[count_row,4]=rel.barcode
+            sheet1[count_row,5]=obj.sixnine_code
+            sheet1[count_row,6]=obj.name
+            sheet1[count_row,7]=obj.name_en
+            sheet1[count_row,8]=obj.desc
+            sheet1[count_row,9]=obj.long
+            sheet1[count_row,10]=obj.wide
+            sheet1[count_row,11]=obj.high
+            sheet1[count_row,12]=obj.weight
+            sheet1[count_row,13]=obj.volume
+            sheet1[count_row,14]=obj.price
+            sheet1[count_row,15]=rel.business.name
+            sheet1[count_row,16]=rel.supplier.name
+            sheet1[count_row,17]=rel.external_code
+            sheet1[count_row,18]=rel.warning_amt
+            count_row += 1
+          end
+        else
+          sheet1[count_row,0]=obj.commodity.no
+          sheet1[count_row,1]=obj.commodity.name
+          sheet1[count_row,2]=obj.commodity.name_en
+          sheet1[count_row,3]=obj.commodity.goodstype.name
+          sheet1[count_row,4]=""
+          sheet1[count_row,5]=obj.sixnine_code
+          sheet1[count_row,6]=obj.name
+          sheet1[count_row,7]=obj.name_en
+          sheet1[count_row,8]=obj.desc
+          sheet1[count_row,9]=obj.long
+          sheet1[count_row,10]=obj.wide
+          sheet1[count_row,11]=obj.high
+          sheet1[count_row,12]=obj.weight
+          sheet1[count_row,13]=obj.volume
+          sheet1[count_row,14]=obj.price
+          sheet1[count_row,15]=""
+          sheet1[count_row,16]=""
+          sheet1[count_row,17]=""
+          sheet1[count_row,18]=""
+          count_row += 1
+        end
       end  
   
       book.write xls_report  
