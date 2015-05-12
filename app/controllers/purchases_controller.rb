@@ -147,63 +147,89 @@ class PurchasesController < ApplicationController
               instance= Roo::CSV.new(file)
             end
             instance.default_sheet = instance.sheets.first
-
+            rowarr = [] 
             purchase = nil
             2.upto(instance.last_row) do |line|
                #binding.pry
-
-              if !instance.cell(line,'A').to_s.blank?
+              rowarr = instance.row(line)
+              purchase_name = to_string(rowarr[0])
+              business_name = to_string(rowarr[1])
+              commodity_name1 = to_string(rowarr[2])
+              commodity_name2 = to_string(rowarr[3])
+              supplier_name = to_string(rowarr[4])
+              specification_name = to_string(rowarr[5])
+              sixnine_code = to_string(rowarr[6])
+              external_code = to_string(rowarr[7])
+              sku = to_string(rowarr[8])
+              expiration_date = to_string(rowarr[9])
+              amount = to_string(rowarr[10]).to_i
+              desc = to_string(rowarr[11])
+              
+              if !purchase_name.blank?
                 unit = current_user.unit
                 status = Purchase::STATUS[:opened]
                 storage = current_storage
-                business = Business.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'B'))
+                business = Business.accessible_by(current_ability).find_by name: business_name
 
                 if business.blank?
                   raise "导入文件第" + line.to_s + "行数据, 找不到商户，导入失败"
                 end
-                purchase = Purchase.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'A'))
+                purchase = Purchase.accessible_by(current_ability).find_by name: purchase_name
                 if purchase.blank?
-                  purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: to_string(instance.cell(line,'C')), status: status, storage_id: storage.id, name: to_string(instance.cell(line,'A'))
+                  purchase = Purchase.create! unit_id: unit.id, business_id: business.id, desc: commodity_name1, status: status, storage_id: storage.id, name: purchase_name
                 else
                   if purchase.status.eql? Purchase::STATUS[:opened]
-                    purchase.update(business_id: business.id, desc: to_string(instance.cell(line,'C')))
+                    purchase.update(business_id: business.id, desc: commodity_name1)
                   else
                     raise "导入文件第" + line.to_s + "行数据, 同名采购单已关闭，导入失败"
                   end
                 end
               end
-              supplier=Supplier.accessible_by(current_ability).find_by name: to_string(instance.cell(line,'E'))
+              supplier=Supplier.accessible_by(current_ability).find_by name: supplier_name
 
               if supplier.blank?
                 raise "导入文件第" + line.to_s + "行数据, 找不到供应商，导入失败"
               end
-
-              specifications=Specification.accessible_by(current_ability).where(sixnine_code: to_string(instance.cell(line,'G')))
-
-              specification=nil
-
-              if specifications.size > 1
-                specification=specifications.find_by name: to_string(instance.cell(line,'F'))
-              elsif specifications.size == 1
-                specification = specifications.first
+              
+              if !sku.blank?
+                relationship = Relationship.accessible_by(current_ability).find_by barcode: sku
               end
+              
+              if !external_code.blank?
+                relationship = Relationship.accessible_by(current_ability).find_by(business_id: business.id, external_code: external_code)
+              end
+
+              if !sixnine_code.blank?
+                relationship = Relationship.accessible_by(current_ability).includes(:specification).find_by(:specifications => {sixnine_code: sixnine_code}, business_id: business.id, supplier_id: supplier.id)
+              end
+
+              specification = relationship.specification if !relationship.blank?
+
+              # specifications=Specification.accessible_by(current_ability).where(sixnine_code: to_string(instance.cell(line,'G')))
+
+              # specification=nil
+
+              # if specifications.size > 1
+              #   specification=specifications.find_by name: to_string(instance.cell(line,'F'))
+              # elsif specifications.size == 1
+              #   specification = specifications.first
+              # end
 
               if specification.blank?
-                raise "导入文件第" + line.to_s + "行数据, 找不到69码或规格名称，导入失败"
+                raise "导入文件第" + line.to_s + "行数据, 找不到规格，导入失败"
               end
 
-              expiration_date = to_string(instance.cell(line, 'H'))
               purchase_detail = purchase.purchase_details.find_by(supplier_id: supplier.id, specification_id: specification.id)
               if purchase_detail.blank?
-                purchase_detail = PurchaseDetail.create! name: to_string(instance.cell(line, 'D')), purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')), status: "waiting"
+                purchase_detail = PurchaseDetail.create! name: commodity_name2, purchase_id: purchase.id, supplier_id: supplier.id, specification_id: specification.id, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: amount, desc: desc, status: "waiting"
               else
                 # if purchase_detail.status.eql? PurchaseDetail::STATUS[:waiting]
-                  purchase_detail.update(name: to_string(instance.cell(line, 'D')), expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: instance.cell(line,'I').to_i, desc: to_string(instance.cell(line,'J')))
+                  purchase_detail.update(name: commodity_name2, expiration_date: expiration_date.blank? ? nil : expiration_date.to_datetime.strftime("%Y-%m-%d %H:%M:%S"), amount: amount, desc: desc)
                 # else
                 #   raise "导入文件第" + line.to_s + "行数据, 同商品规格采购明细已处理，导入失败"
                 # end
               end
-              arrival_start = 11
+              arrival_start = 13
               arrival_length = 3
               while true
                 arrival_amount = instance.cell(line,arrival_start)

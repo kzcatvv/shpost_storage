@@ -556,7 +556,7 @@ class CSBSendWithSOAP
 
         # order_details = Array.new
 
-        order_detail.store('SKU', itemId)
+        order_detail.store('BUSINESS_SKU', itemId)
         # puts "SKU=" << itemId
         order_detail.store('DESC', giftName)
         #puts "DESC=" << giftName

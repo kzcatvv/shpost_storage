@@ -131,6 +131,7 @@ class StandardInterface
 
     order_details.each_with_index do |x, i|
       business_sku = x['BUSINESS_SKU']
+      business_sku ||= x['SKU']
       next if business_sku.blank?
       qyt = x['QTY']
       next if qyt.blank?

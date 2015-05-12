@@ -912,7 +912,7 @@ class OrdersController < ApplicationController
             @error_orders = []
             @error_order_details = []
 
-            extract_orders(instance)
+            @ids = extract_orders(instance)
 
             extract_order_details(instance)
 
@@ -1041,7 +1041,7 @@ class OrdersController < ApplicationController
           # end
           # Order.update(order.id, is_shortage: is_shortage)
                     
-          # @ids << order.id
+          @ids << order.id
         else
           order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, keyclientorder: keyclientorder, user_id: current_user.id
 
@@ -1055,7 +1055,7 @@ class OrdersController < ApplicationController
           # end
           # Order.update(order.id,is_shortage: is_shortage)
                   
-          # @ids << order_id
+          @ids << order_id
         end          
       rescue => e
         if e.is_a? RuntimeError
@@ -1067,6 +1067,7 @@ class OrdersController < ApplicationController
         line += 1
       end
     end
+    return @ids
   end
 
   def extract_order_details(instance)
