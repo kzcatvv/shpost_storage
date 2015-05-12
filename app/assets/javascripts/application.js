@@ -1565,29 +1565,30 @@ function showgrid() {
   $("#inventory_inv_type").change(function(){
     var i = $("#inventory_inv_type").val();
     var el1 = document.getElementById("grid1")
-    var el2 = document.getElementById("grid2")
-    var area = document.getElementById("areaselect")
 
-    if (i == 'byshelf'){
-      el2.style.display = 'none';
-      el1.style.display = 'block';
-      area.style.display = 'block';
-    }else{
+    if (i == 'byarea'){
+      el1.style.display = 'block';     
+    }else{ 
       el1.style.display = 'none';
-      el2.style.display = 'block';
-      area.style.display = 'none';
     }
    
   })
 
-  $("#area_sel").change(function(){
-    $.ajax({
-      type : 'GET',
-      url : '/relationships/select_commodities/',
-      data: { goodstype_id: $('#goodstype_id').val(),
-              object_id: $('#ajax_object_id').val()},
-      dataType : 'script'
-    });
+  $("#inventory_goods_inv_type").change(function(){
+    var l = $("#inventory_goods_inv_type").val();
+    var el2 = document.getElementById("grid2")
+    var el3 = document.getElementById("grid3")
+
+    if (l == 'bybusiness'){
+      el3.style.display = 'none';
+      el2.style.display = 'block';
+    }else if(l == 'byrel'){
+      el2.style.display = 'none';
+      el3.style.display = 'block';  
+    }else{
+      el2.style.display = 'none';
+      el3.style.display = 'none';
+    }
    
   })
 
