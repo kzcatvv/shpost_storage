@@ -84,9 +84,9 @@ LODOP.ADD_PRINT_IMAGE(14,99,80,25,"<img border='0' src='<%=asset_path("gjlogo.pn
 LODOP.ADD_PRINT_TEXT(358,238,47,99,wg);
 LODOP.ADD_PRINT_TEXT(357,291,71,97,pr);
   
-  LODOP.PRINT_DESIGN();
+  //LODOP.PRINT_DESIGN();
   //LODOP.PREVIEW();  
-  //LODOP.PRINT(); 
+  LODOP.PRINT(); 
     <% elsif @transport_type=='gjxbg' %>
       // var func = "hot_" + '<%= @logistic.print_format %>';
       // window[func]();
@@ -153,9 +153,9 @@ LODOP.ADD_PRINT_TEXT(232,235,45,60,wg);
 LODOP.ADD_PRINT_TEXT(232,285,75,60,pr);
 LODOP.ADD_PRINT_TEXT(72,224,130,20,'<%= eorder.customer_name %>');
 
-  LODOP.PRINT_DESIGN();
+  //LODOP.PRINT_DESIGN();
   //LODOP.PREVIEW();  
-  //LODOP.PRINT();
+  LODOP.PRINT();
     <% elsif @transport_type=='ems' %>
 LODOP.PRINT_INITA("0mm","0mm","230.2mm","127.3mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,"230mm","127mm","tracking");
