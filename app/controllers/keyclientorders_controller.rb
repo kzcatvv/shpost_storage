@@ -242,7 +242,7 @@ class KeyclientordersController < ApplicationController
     begin
     Order.transaction do
       # @keyclientorder = Keyclientorder.find(params[:format])
-      shortage_orders = find_stock(@keyclientorder.orders,false,'1')
+      shortage_orders = Order.find_stock(@keyclientorder.orders,false,'1')
       shortage_orders.update_all(keyclientorder_id: nil, status: 'waiting')
 
       needpick = current_storage.need_pick

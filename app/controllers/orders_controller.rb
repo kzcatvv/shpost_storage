@@ -159,7 +159,7 @@ class OrdersController < ApplicationController
     @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
     if @orders.empty?
       @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id")
-      find_stock(@orders, true, '0')
+      Order.find_stock(@orders, true, '0')
     
     else
       @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_no').first
@@ -402,21 +402,6 @@ class OrdersController < ApplicationController
 
       @@orders_export = orders
 
-      # @allcnt = orders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").sum(:amount)
-      # order_count_hash = orders.includes(:order_details).group(:specification_id,:supplier_id,"orders.business_id").count(:id)
-
-      # order_count_hash.each do |key,value|
-      #   # if order detail missing
-      #   if key[0].blank?
-      #     @allcnt.delete(key)
-      #     next
-      #   end
-      #   order_sum = @allcnt[key]
-      #   stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
-
-      #   @allcnt[key] = [order_sum,value,stock_sum]
-      # end
-
     end
     
     # begin
@@ -425,7 +410,32 @@ class OrdersController < ApplicationController
 
     # end
 
-    @allcnt = @orders.includes(:order_details).where(status: status).group(:specification_id,:supplier_id,:business_id).sum(:amount)
+    selectorders = @orders.where(status: status,order_type: 'b2c')
+    # binding.pry
+    if !params[:grid].nil?
+      if !params[:grid][:f].nil?
+        if !params[:grid][:f][:business_id].nil?
+          selectorders=selectorders.where(:business_id,params[:grid][:f][:business_id])
+        end
+
+        if !params[:grid][:f][:created_at].nil?
+          if !params[:grid][:f][:created_at][:fr].blank?
+            selectorders=selectorders.where("orders.created_at >= ?",params[:grid][:f][:created_at][:fr])
+          end
+          if !params[:grid][:f][:created_at][:to].blank?
+            selectorders=selectorders.where("orders.created_at <= ?",params[:grid][:f][:created_at][:to]+" 23:59:59")
+          end
+        end
+
+        if !params[:grid][:f][:transport_type].nil?
+          selectorders=selectorders.where(:transport_type,params[:grid][:f][:transport_type])
+        end
+
+      end
+    end
+
+
+    @allcnt = @orders.includes(:order_details).where(status: status,order_type: 'b2c').group(:specification_id,:supplier_id,:business_id).sum(:amount)
     order_count_hash = @orders.includes(:order_details).group(:specification_id,:supplier_id,:business_id).count(:id)
 
     order_count_hash.each do |key,value|
@@ -699,7 +709,7 @@ class OrdersController < ApplicationController
       # if checkbox_all.eql? '0'
         respond_to do |format|
           format.xls {   
-            send_data(exportorders_xls_content_for(find_stock(orders,false,checkbox_all)),  
+            send_data(exportorders_xls_content_for(Order.find_stock(orders,false,checkbox_all)),  
                 :type => "text/excel;charset=utf-8; header=present",  
                 :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
           }  
