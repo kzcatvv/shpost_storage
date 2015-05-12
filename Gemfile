@@ -98,9 +98,9 @@ gem 'nifty-generators'
 
 gem 'jquery_datepicker'
 
-# gem 'ruby-oci8'
+gem 'ruby-oci8'
 
-# gem "activerecord-oracle_enhanced-adapter"
+gem "activerecord-oracle_enhanced-adapter"
 
 # gem 'resque-scheduler'
 gem 'whenever'

@@ -13,51 +13,6 @@ class OrdersController < ApplicationController
   # GET /orderes
   # GET /orderes.json
   def index
-    # @userlogs=UserLog.all
-    # keyclientorders = []
-    # operation=['电商确认出库','批量确认出库']
-    # if !params[:order_start_date].blank? and !params[:order_start_date]["order_start_date"].blank?
-    #   if params[:order_start_date]["order_start_date"].include?'-'
-    #     start_date = Date.civil(params[:order_start_date]["order_start_date"].split(/-|\//)[0].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[1].to_i,params[:order_start_date]["order_start_date"].split(/-|\//)[2].to_i)
-    #   else
-    #     flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
-    #     redirect_to (orders_path) and return
-    #   end
-
-    #   @userlogs = @userlogs.where("user_logs.created_at>=? and user_logs.operation in (?)",start_date,operation)
-      
-    #   if params[:order_end_date].blank? or params[:order_end_date]["order_end_date"].blank?
-    #     @userlogs.each do |u|
-    #       if !u.parent_id.blank?
-    #         keyclientorders << u.parent_id
-    #       end
-    #     end
-
-    #     @orders = @orders.where keyclientorder_id:keyclientorders
-    #   end
-    # end
-
-    # if !params[:order_end_date].blank? and !params[:order_end_date]["order_end_date"].blank?
-    #   if params[:order_end_date]["order_end_date"].include?'-'
-    #     end_date = Date.civil(params[:order_end_date]["order_end_date"].split(/-|\//)[0].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[1].to_i,params[:order_end_date]["order_end_date"].split(/-|\//)[2].to_i)
-    #   else
-    #     flash[:alert] = "日期格式不对，应为'yyyy-mm-dd'"
-    #     redirect_to (orders_path) and return
-    #   end
-        
-    #   @userlogs = @userlogs.where("user_logs.created_at<=? and user_logs.operation in (?)",(end_date+1),operation)
-
-    #   @userlogs.each do |u|
-    #     if !u.parent_id.blank?
-    #       keyclientorders << u.parent_id
-    #     end
-    #   end
-
-    #   @orders = @orders.where keyclientorder_id:keyclientorders
-
-    # end
-
-
     @orders_grid = initialize_grid(@orders,
      :conditions => {:order_type => "b2c"}, :include => [:business, :keyclientorder, :user_logs],:order => 'created_at', :order_direction => 'desc')
     @orders_grid.with_resultset do |orders|
@@ -350,10 +305,21 @@ class OrdersController < ApplicationController
 
       order = Order.find(params[:orderid])
       @curr_order = order.id
-      curr_dtls_a = order.order_details.includes(:specification).where("specifications.sixnine_code = ? ",params[:tracking_number]).where(desc:nil)
-      curr_dtls_b = order.order_details.includes(:specification).where("specifications.sixnine_code = ? ",params[:tracking_number]).where.not(desc: "haspacked")
-      curr_dtls_c = curr_dtls_a + curr_dtls_b
-      curr_dtls = curr_dtls_c.first
+
+      curr_dtls = nil
+      order.order_details.each do |x|
+        if x.desc.blank? || ! x.desc.eql?('haspacked')
+          if x.specification.sixnine_code.eql?(@tracking_number) || x.relationship.barcode.eql?(@tracking_number) || x.relationship.external_code.eql?(@tracking_number)
+            curr_dtls = x
+            break
+          end
+        end
+      end
+
+      # curr_dtls_a = order.order_details.includes(:specification).where("specifications.sixnine_code = ? ",params[:tracking_number]).where(desc: nil)
+      # curr_dtls_b = order.order_details.includes(:specification).where("specifications.sixnine_code = ? ",params[:tracking_number]).where.not(desc: "haspacked")
+
+      # curr_dtls_c = curr_dtls_a + curr_dtls_b
       
       if curr_dtls.nil?
         @curr_dtl = -1
@@ -393,7 +359,7 @@ class OrdersController < ApplicationController
   def findprintindex
     status = ["waiting","spliting","printed","picking"]
     
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
+    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder, :order_details], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
      :order_direction => 'desc', :per_page => 15)
 
     @allcnt = {}
@@ -439,49 +405,6 @@ class OrdersController < ApplicationController
 
       @allcnt[key] = [order_sum,value,stock_sum]
     end
-
-
-
-    # @slorders = initialize_grid(@orders, :include => [:business, :keyclientorder], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status])
-
-    # #some wice_grad lazy do the resultset is [] without once call
-    # begin
-    #   @slorders.resultset
-    # rescue
-
-    # end
-    
-    # @selectorders=Order.where('order_type = ? and status in (?) and storage_id = ?',"b2c",status, current_storage.id)
-    # # @selectorders=Order.where(id: @slorders.resultset.limit(nil).to_ary)
-
-    # if !params[:grid].nil?
-    #   if !params[:grid][:f].nil?
-    #     if !params[:grid][:f]["businesses.name".to_sym].nil?
-    #       businessid=Business.where("name = ?",params[:grid][:f]["businesses.name".to_sym])
-    #       @selectorders=@selectorders.where(:business_id,businessid)
-    #     end
-
-    #     if !params[:grid][:f][:created_at].nil?
-    #       @selectorders=@selectorders.where(["orders.created_at >= ? and orders.created_at <= ?",params[:grid][:f][:created_at][:fr],params[:grid][:f][:created_at][:to] ])
-    #     end
-    #   end
-    # end
-    
-    # selorders = @selectorders
-    # @selectorders=@selectorders.to_ary
-    # @selectorders.each do |o|
-    #   o.order_details.each do |d|
-    #     product = [o.business_id,d.specification_id,d.supplier_id]
-    #     order_count = selorders.includes(:order_details).where("orders.business_id=? and order_details.specification_id=? and order_details.supplier_id=?",o.business_id,d.specification_id,d.supplier_id).count
-
-    #     if @allcnt.has_key?(product)
-    #       @allcnt[product][0]=@allcnt[product][0]+d.amount
-
-    #     else
-    #       @allcnt[product]=[d.amount,order_count]
-    #     end
-    #   end
-    # end
   end
 
   def pingan_b2c_import
@@ -1055,7 +978,7 @@ class OrdersController < ApplicationController
           # end
           # Order.update(order.id,is_shortage: is_shortage)
                   
-          @ids << order_id
+          @ids << order.id
         end          
       rescue => e
         if e.is_a? RuntimeError

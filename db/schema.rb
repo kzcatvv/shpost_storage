@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511051950) do
+ActiveRecord::Schema.define(version: 20150511080719) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -253,17 +253,17 @@ ActiveRecord::Schema.define(version: 20150511051950) do
   create_table "mobile_logs", force: true do |t|
     t.string   "status"
     t.string   "operate_type"
-    t.string   "request"
-    t.string   "response"
     t.string   "request_ip"
     t.string   "response_ip"
-    t.string   "request_params"
     t.integer  "user_id"
     t.integer  "storage_id"
     t.integer  "unit_id"
     t.integer  "mobile_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "request"
+    t.text     "response"
+    t.text     "request_params"
   end
 
   create_table "mobiles", force: true do |t|
@@ -364,9 +364,9 @@ ActiveRecord::Schema.define(version: 20150511051950) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"

@@ -10,6 +10,8 @@
       <th><%= model_class.human_attribute_name(:name) %></th>
       <th><%= model_class.human_attribute_name(:specification_id) %></th>
       <th>69码</th>
+      <th>SKU</th>
+      <th>第三方编码</th>
       <th><%= model_class.human_attribute_name(:amount) %></th>
       <th>实际数量</th>
     </tr>
@@ -17,9 +19,11 @@
   <tbody>
    <% if !@order_details.nil? %>
     <% @order_details.each do |orderdtl| %>
-      <%= content_tag(:tr,content_tag(:td, orderdtl.name )+
-        content_tag(:td, Specification.find(orderdtl.specification_id).name )+
-        content_tag(:td, Specification.find(orderdtl.specification_id).sixnine_code )+
+      <%= content_tag(:tr,content_tag(:td, orderdtl.specification.commodity.name )+
+        content_tag(:td, orderdtl.specification.name )+
+        content_tag(:td, orderdtl.specification.sixnine_code )+
+        content_tag(:td, orderdtl.relationship.barcode )+
+        content_tag(:td, orderdtl.relationship.external_code )+
         content_tag(:td, text_field_tag("dbam_#{orderdtl.id}", orderdtl.amount, disabled: true) )+
         content_tag(:td, text_field_tag("realam_#{orderdtl.id}", orderdtl.desc == 'haspacked' ? "1" : "0", disabled: true) ),id: "tr_#{orderdtl.id}" ) %>
 

@@ -93,7 +93,6 @@ class Stock < ActiveRecord::Base
 
     # in_stock.check_in_amount(amount)
 
-    move_stock.check!
     move_stock
   end
 
@@ -341,7 +340,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.warning_stocks(storage)
-    select(:relationship_id, 'sum(actual_amount) as actual_amount').in_storage(storage).normal.group(:relationship_id).having('sum(actual_amount) < (?)', Relationship.select(:warning_amt).where("relationships.id = stocks.relationship_id"))
+    in_storage(storage).normal.group(:relationship_id).having('sum(actual_amount) < (?)', Relationship.select(:warning_amt).where("relationships.id = stocks.relationship_id")).sum(:actual_amount)
   end
 
   def update_sn(sn, type)

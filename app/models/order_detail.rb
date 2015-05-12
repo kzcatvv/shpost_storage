@@ -10,7 +10,9 @@ class OrderDetail < ActiveRecord::Base
   after_save :change_order_total_weight
 
 	# validates_presence_of :name, :message => '不能为空'
-
+  def relationship
+    Relationship.find_relationship(specification, order.business, unit, supplier)
+  end
 
   def all_checked?
     self.amount.eql? self.checked_amount
