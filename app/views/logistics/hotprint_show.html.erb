@@ -83,13 +83,13 @@ LODOP.ADD_PRINT_TEXT(368,12,350,20,"Sender's signiture& Data Signed:            
 LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
 LODOP.SET_PRINT_STYLEA(0,"Bold",1);
 LODOP.ADD_PRINT_IMAGE(1,99,80,25,"<img border='0' src='<%=asset_path("gjwish.png")%>' />");
-LODOP.ADD_PRINT_TEXT(240,236,47,67,"11.11\n");
-LODOP.ADD_PRINT_TEXT(241,292,71,66,"22.22\n");
+LODOP.ADD_PRINT_TEXT(240,236,47,67,wg);
+LODOP.ADD_PRINT_TEXT(241,292,71,66,pr);
 LODOP.ADD_PRINT_TEXT(33,215,145,20,'<%= eorder.customer_name %>');
 LODOP.ADD_PRINT_TEXT(4,327,37,25,'<%= eorder.country_code %>');
 LODOP.SET_PRINT_STYLEA(0,"FontSize",10);
 LODOP.SET_PRINT_STYLEA(0,"Bold",1);
-  
+
   //LODOP.PRINT_DESIGN();
   //LODOP.PREVIEW();  
   LODOP.PRINT(); 
