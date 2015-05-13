@@ -114,7 +114,7 @@ class OrdersController < ApplicationController
     @orders = Order.where("order_type = 'b2c' and keyclientorder_id is not null").joins("LEFT JOIN keyclientorders ON orders.keyclientorder_id = keyclientorders.id").where("keyclientorders.user_id = ? and keyclientorders.status='waiting'", current_user)
     if @orders.empty?
       @orders = Order.where(" order_type = ? and status = ? ","b2c","waiting").joins("LEFT JOIN order_details ON order_details.order_id = orders.id").order("order_details.specification_id")
-      Order.find_stock(@orders, true, '0')
+      find_stock(@orders, true, '0')
     
     else
       @keycorder=Keyclientorder.where(keyclient_name: "auto",user: current_user,status: "waiting").order('batch_no').first
@@ -674,7 +674,7 @@ class OrdersController < ApplicationController
       # if checkbox_all.eql? '0'
         respond_to do |format|
           format.xls {   
-            send_data(exportorders_xls_content_for(Order.find_stock(orders,false,checkbox_all)),  
+            send_data(exportorders_xls_content_for(find_stock(orders,false,checkbox_all)),  
                 :type => "text/excel;charset=utf-8; header=present",  
                 :filename => "Orders_#{current_storage.no}_#{Time.now.to_i}.xls")  
           }  
@@ -1053,6 +1053,8 @@ class OrdersController < ApplicationController
     2.upto(instance.last_row) do |line|
       begin
         row = instance.row(line)
+
+        order = nil
 
         # orderarr << row
         business_order_id = to_string(row[0])
