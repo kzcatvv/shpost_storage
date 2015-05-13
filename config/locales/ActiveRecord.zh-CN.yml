@@ -575,6 +575,7 @@ zh-CN:
         out_at: "出库时间"
         business_order_id: "外部订单号"
         country_code: "国家代码"
+        country: "国家"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
