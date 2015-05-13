@@ -23,8 +23,6 @@
       window[func]();
       //hot_gnxb();
     <% elsif @transport_type=='gjxbp' %>
-      // var func = "hot_" + '<%= @logistic.print_format %>';
-      // window[func]();
       LODOP.PRINT_INITA("0.8mm","1.1mm","232.8mm","160.1mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,1000,1500,"hgjxbp");
 LODOP.ADD_PRINT_IMAGE(1,7,92,34,"<img border='0' src='<%=asset_path("gjlogo.png")%>' />");
@@ -72,8 +70,8 @@ LODOP.ADD_PRINT_LINE(308,7,307,367,0,1);
 LODOP.ADD_PRINT_LINE(330,6,329,366,0,1);
 LODOP.ADD_PRINT_TEXT(241,7,221,66,content);
 LODOP.ADD_PRINT_TEXT(308,12,352,20,'Total Gross Weight (Kg)                 <%= allwg%>    <%= allpr%>');
-LODOP.ADD_PRINT_LINE(218,288,368,289,0,1);
-LODOP.ADD_PRINT_LINE(218,234,368,235,0,1);
+LODOP.ADD_PRINT_LINE(218,288,328,289,0,1);
+LODOP.ADD_PRINT_LINE(218,234,328,235,0,1);
 LODOP.ADD_PRINT_TEXT(330,11,354,37,"I certify that the particulars given in this declaration are correct and this item does not contain any dangerous articles prohibited by legislation or by postal or customers regulations.");
 LODOP.SET_PRINT_STYLEA(0,"FontSize",7);
 LODOP.ADD_PRINT_LINE(174,6,173,366,0,1);
@@ -96,8 +94,6 @@ LODOP.SET_PRINT_STYLEA(0,"Bold",1);
   //LODOP.PREVIEW();  
   LODOP.PRINT(); 
     <% elsif @transport_type=='gjxbg' %>
-      // var func = "hot_" + '<%= @logistic.print_format %>';
-      // window[func]();
       LODOP.PRINT_INITA("0.8mm","1.1mm","232.8mm","160.1mm","tracking");
 LODOP.SET_PRINT_PAGESIZE(1,1000,1500,"hgjxbg");
 LODOP.ADD_PRINT_IMAGE(4,0,92,30,"<img border='0' src='<%=asset_path("gjlogo.png")%>' />");
