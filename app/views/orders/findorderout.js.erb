@@ -28,6 +28,12 @@ else{
         //alert($(tddbid).val()+"+"+$(tdraid).val());
         if ( parseInt( $(tddbid).val() ) > parseInt( $(tdraid).val() ) )
         {
+           $.ajax({
+                     type : 'GET',
+                     url : '/orders/setstlogchkamt/',
+                     data: { orderid: $('#orderid').val() },
+                     dataType : 'script'
+                    });
            $(tdraid).val(parseInt($(tdraid).val())+1);
            //alert($(tdraid).val());
         }
