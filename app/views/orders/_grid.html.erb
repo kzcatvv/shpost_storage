@@ -83,7 +83,7 @@
       order.transport_type_name
     end
 
-   g.column name: model_class.human_attribute_name(:status), attribute: 'status', html: {style: 'width:10%;'}, detach_with_id: :status_show_filter,custom_filter: Order::STATUS_SHOW.invert do |order| 
+   g.column name: model_class.human_attribute_name(:status), attribute: 'status', html: {style: 'width:10%;'}, detach_with_id: :status_show_filter,custom_filter: Order::STATUS_SHOW_INDEX.invert do |order| 
       order.status_name
     end
 
@@ -108,7 +108,7 @@
 
     g.column name: model_class.human_attribute_name(:business_order_id), attribute: 'business_order_id', html: {style: 'width:10%;'},filter_type: :range, detach_with_id: :business_order_id_filter
 
-    g.column name: model_class.human_attribute_name(:country_code), attribute: 'country_code', html: {style: 'width:10%;'},filter_type: :range, detach_with_id: :country_code_filter
+    g.column name: model_class.human_attribute_name(:country), attribute: 'country', html: {style: 'width:10%;'}, detach_with_id: :country_filter
 
     # g.column name: model_class.human_attribute_name(:is_shortage), attribute: 'is_shortage', html: {style: 'width:10%;'}, detach_with_id: :is_shortage_filter,custom_filter: Order::SHORTAGE_TYPE.invert do |order| 
     #   order.shortage_type_name

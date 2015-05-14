@@ -428,13 +428,8 @@ class OrdersController < ApplicationController
           end
         end
 
-        if !params_f[:country_code].blank?
-          if !params_f[:country_code][:fr].blank?
-            selectorders=selectorders.where("orders.country_code >= ?",params_f[:country_code][:fr])
-          end
-          if !params_f[:country_code][:to].blank?
-            selectorders=selectorders.where("orders.country_code <= ?",params_f[:country_code][:to])
-          end
+        if !params_f[:country].blank?
+          selectorders=selectorders.where("orders.country = ?",params_f[:country])
         end
 
         if !params_f["keyclientorders.batch_no".to_sym].blank?
