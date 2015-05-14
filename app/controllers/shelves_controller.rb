@@ -46,6 +46,10 @@ class ShelvesController < ApplicationController
   # GET /shelves
   # GET /shelves.json
   def index
+    @storage=current_storage
+    if !@storage.need_pick
+      @shelves=@shelves.where("shelf_type!='pick'")
+    end
     @shelves_grid = initialize_grid(@shelves,
       :order => 'shelves.id',
       :order_direction => 'desc',
@@ -59,10 +63,12 @@ class ShelvesController < ApplicationController
 
   # GET /shelves/new
   def new
+    @storage=current_storage
   end
 
   # GET /shelves/1/edit
   def edit
+    @storage=current_storage
   end
 
   # POST /shelves

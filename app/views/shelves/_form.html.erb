@@ -3,7 +3,13 @@
   <div class="control-group">
     <%= f.label :area, :class => 'control-label' %>
     <div class="controls">
-      <%= f.select(:area_id, Area.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+      <%  if !@storage.need_pick
+            areas= Area.accessible_by(current_ability).where("area_type!='pick'") 
+          else
+            areas= Area.all
+          end
+      %>
+      <%= f.select(:area_id, areas.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
     </div>
   </div>
   <div class="control-group">

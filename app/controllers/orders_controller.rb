@@ -931,23 +931,34 @@ class OrdersController < ApplicationController
         row = instance.row(line)
 
         business_order_id = to_string(row[0])
-        tracking_number = to_string(row[1])
-        transport_type = to_string(row[2])
-        total_weight = row[3].to_f 
-        pingan_ordertime = to_string(row[4])
-        customer_unit = to_string(row[5])
-        customer_name = to_string(row[6])
-        customer_address = to_string(row[7])
-        customer_postcode = to_string(row[8]) 
-        province = to_string(row[9])
-        city = to_string(row[10]) 
-        county = to_string(row[11])
-        customer_tel = to_string(row[12])
-        customer_phone = to_string(row[13])
-        business_no = to_string(row[14])
-        business_name = to_string(row[15])
-        batch_no = to_string(row[16])
-        business_trans_no = to_string(row[17])
+        batch_no = to_string(row[1])
+        business_trans_no = to_string(row[2])
+        tracking_number = to_string(row[3])
+        transport_type = to_string(row[4])
+        total_weight = row[5].to_f 
+        pingan_ordertime = to_string(row[6])
+        customer_unit = to_string(row[7])
+        customer_name = to_string(row[8])
+        customer_address = to_string(row[9])
+        customer_postcode = to_string(row[10])
+        country = to_string(row[11])
+        province = to_string(row[12])
+        city = to_string(row[13]) 
+        county = to_string(row[14])
+        customer_tel = to_string(row[15])
+        customer_phone = to_string(row[16])
+        business_no = to_string(row[17])
+        business_name = to_string(row[18])
+        send_name = to_string(row[21])
+        send_province = to_string(row[22])
+        send_city = to_string(row[23])
+        send_addr = to_string(row[24])
+        send_mobile = to_string(row[25])
+        local_name = to_string(row[26])
+        local_country = to_string(row[27])
+        local_province = to_string(row[28])
+        local_city = to_string(row[29])
+        local_addr = to_string(row[30])
 
         if batch_no.blank?
           raise "缺少外部订单号" if business_order_id.blank?
@@ -980,7 +991,8 @@ class OrdersController < ApplicationController
         raise "物流单号和物流供应商需完整" if transport_single(transport_type,tracking_number)
 
         if ! transport_type.blank? && ! tracking_number.blank?
-          transport_type = to_transport_type(transport_type)
+          logistic = find_logistic(transport_type)
+          transport_type = logistic.blank?? nil:logistic.print_format
 
           raise "物流供应商错误" if transport_type.blank?
            
@@ -996,7 +1008,8 @@ class OrdersController < ApplicationController
         end
 
         if order.blank? 
-          order = Order.create! order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, 
+          order = Order.create!(order_type: 'b2c',business_order_id: business_order_id, tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode,
+            country: country,
             province: province, 
             city: city, 
             county: county, customer_tel: customer_tel, 
@@ -1006,7 +1019,18 @@ class OrdersController < ApplicationController
             storage_id: current_storage.id, 
             status: status, 
             keyclientorder: keyclientorder, 
-            user_id: current_user.id
+            user_id: current_user.id,
+            send_name: send_name,
+            send_province: send_province,
+            send_city: send_city,
+            send_addr: send_addr,
+            send_mobile: send_mobile,
+            local_name: local_name,
+            local_country: local_country,
+            local_province: local_province,
+            local_city: local_city,
+            local_addr: local_addr,
+            logistic: logistic)
 
           # ords[0] = order
           # if find_has_stock(ords,false).blank?
@@ -1018,7 +1042,18 @@ class OrdersController < ApplicationController
                     
           @ids << order.id
         else
-          order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, keyclientorder: keyclientorder, user_id: current_user.id
+          order.update!(tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, country: country, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, keyclientorder: keyclientorder, user_id: current_user.id,
+            send_name: send_name,
+            send_province: send_province,
+            send_city: send_city,
+            send_addr: send_addr,
+            send_mobile: send_mobile,
+            local_name: local_name,
+            local_country: local_country,
+            local_province: local_province,
+            local_city: local_city,
+            local_addr: local_addr,
+            logistic: logistic)
 
           order.order_details.destroy_all
         
@@ -1166,7 +1201,7 @@ class OrdersController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def order_params
-    params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:province,:city,:county,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id)
+    params.require(:order).permit(:no,:order_type, :need_invoice ,:customer_name,:customer_unit ,:customer_tel,:customer_phone,:province,:city,:county,:customer_address,:customer_postcode,:customer_email,:total_weight,:total_price ,:total_amount,:transport_type,:transport_price,:pay_type,:status,:buyer_desc,:seller_desc,:business_id,:unit_id,:storage_id,:keyclientorder_id,:logistic_id)
   end
 
   def b2c_xls_content_for(objs)  
@@ -1315,14 +1350,15 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 订单流水号 子订单号 状态 商品信息}  
+    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地名称 当地国家 当地省 当地市 当地地址}  
     count_row = 1
     objs.each do |obj|
       if obj.is_shortage.eql? 'yes'
         red = Spreadsheet::Format.new :color => :red
         sheet1.row(count_row).default_format = red  
       end
-      transport_type = obj.transport_type_name
+      logistic = Logistic.find_by(id:obj.logistic_id) if !obj.logistic_id.blank?
+      transport_type = logistic.blank?? "":logistic.name
       
       if obj.business_trans_no.blank?
         # 原始订单
@@ -1349,26 +1385,37 @@ def exportorders_xls_content_for(objs)
       end
 
       sheet1[count_row,0]=business_order_id
-      sheet1[count_row,1]=obj.tracking_number.to_s
-      sheet1[count_row,2]=transport_type
-      sheet1[count_row,3]=obj.total_weight
-      sheet1[count_row,4]=obj.pingan_ordertime
-      sheet1[count_row,5]=obj.customer_unit
-      sheet1[count_row,6]=obj.customer_name
-      sheet1[count_row,7]=obj.customer_address
-      sheet1[count_row,8]=obj.customer_postcode
-      sheet1[count_row,9]=obj. province
-      sheet1[count_row,10]=obj.city
-      sheet1[count_row,11]=obj.county
-      sheet1[count_row,12]=obj.customer_tel
-      sheet1[count_row,13]=obj.customer_phone
-      sheet1[count_row,14]=obj.business.no
-      sheet1[count_row,15]=obj.business.name
-      sheet1[count_row,16]=obj.batch_no
-      sheet1[count_row,17]=business_trans_no
-      sheet1[count_row,18]=obj.status_name
-      sheet1[count_row,19]=all_name[0,all_name.size-1]
-    
+      sheet1[count_row,1]=obj.batch_no
+      sheet1[count_row,2]=business_trans_no
+      sheet1[count_row,3]=obj.tracking_number.to_s
+      sheet1[count_row,4]=transport_type
+      sheet1[count_row,5]=obj.total_weight
+      sheet1[count_row,6]=obj.pingan_ordertime
+      sheet1[count_row,7]=obj.customer_unit
+      sheet1[count_row,8]=obj.customer_name
+      sheet1[count_row,9]=obj.customer_address
+      sheet1[count_row,10]=obj.customer_postcode
+      sheet1[count_row,11]=obj.country
+      sheet1[count_row,12]=obj.province
+      sheet1[count_row,13]=obj.city
+      sheet1[count_row,14]=obj.county
+      sheet1[count_row,15]=obj.customer_tel
+      sheet1[count_row,16]=obj.customer_phone
+      sheet1[count_row,17]=obj.business.no
+      sheet1[count_row,18]=obj.business.name
+      sheet1[count_row,19]=obj.status_name
+      sheet1[count_row,20]=all_name[0,all_name.size-1]
+      sheet1[count_row,21]=obj.send_name
+      sheet1[count_row,22]=obj.send_province
+      sheet1[count_row,23]=obj.send_city
+      sheet1[count_row,24]=obj.send_addr
+      sheet1[count_row,25]=obj.send_mobile
+      sheet1[count_row,26]=obj.local_name
+      sheet1[count_row,27]=obj.local_country
+      sheet1[count_row,28]=obj.local_province
+      sheet1[count_row,29]=obj.local_city
+      sheet1[count_row,30]=obj.local_addr
+
       count_row += 1
     end  
 
@@ -1639,7 +1686,7 @@ def exportorders_xls_content_for(objs)
     red = Spreadsheet::Format.new :color => :red
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 订单流水号 子订单号 状态 商品信息}  
+    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地名称 当地国家 当地省 当地市 当地地址}  
     count_row = 1
     obj1.each do |obj|
       sheet1[count_row,0]=obj[0]
@@ -1663,7 +1710,18 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,18]=obj[18]
       sheet1[count_row,19]=obj[19]
       sheet1[count_row,20]=obj[20]
-
+      sheet1[count_row,21]=obj[21]
+      sheet1[count_row,22]=obj[22]
+      sheet1[count_row,23]=obj[23]
+      sheet1[count_row,24]=obj[24]
+      sheet1[count_row,25]=obj[25]
+      sheet1[count_row,26]=obj[26]
+      sheet1[count_row,27]=obj[27]
+      sheet1[count_row,28]=obj[28]
+      sheet1[count_row,29]=obj[29]
+      sheet1[count_row,30]=obj[30]
+      sheet1[count_row,31]=obj[31]
+      
       count_row += 1
     end  
 
@@ -1765,24 +1823,26 @@ def exportorders_xls_content_for(objs)
   end
 
 
-  def to_transport_type(transport_type)
-    case transport_type
-      when "同城速递","tcsd","TCSD","同城小包","tcxb","TCXB"
-        tran_type = 'tcsd'
-      when "国内小包","gnxb","GNXB"
-        tran_type = 'gnxb'  
-      when "EMS","ems"
-        tran_type = 'ems'
-      when "天天快递","ttkd","TTKD"
-        tran_type = 'ttkd'
-      when "百世汇通","bsht","BSHT"
-        tran_type = 'bsht'
-      when "其他","qt","QT"
-        tran_type = 'qt'
-      else
-        tran_type = nil
-    end
-    return tran_type
+  def find_logistic(transport_type)
+    # case transport_type
+    #   when "同城速递","tcsd","TCSD","同城小包","tcxb","TCXB"
+    #     tran_type = 'tcsd'
+    #   when "国内小包","gnxb","GNXB"
+    #     tran_type = 'gnxb'  
+    #   when "EMS","ems"
+    #     tran_type = 'ems'
+    #   when "天天快递","ttkd","TTKD"
+    #     tran_type = 'ttkd'
+    #   when "百世汇通","bsht","BSHT"
+    #     tran_type = 'bsht'
+    #   when "其他","qt","QT"
+    #     tran_type = 'qt'
+    #   else
+    #     tran_type = nil
+    # end
+    logistic = Logistic.find_by(name:transport_type)
+    logistic ||= Logistic.find_by(print_format:transport_type.downcase)
+    return logistic.blank?? nil:logistic
   end
 
   def transport_single(trantype,tracknumber)

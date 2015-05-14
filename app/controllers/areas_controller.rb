@@ -9,6 +9,10 @@ class AreasController < ApplicationController
   # GET /areas
   # GET /areas.json
   def index
+    @storage=current_storage
+    if !@storage.need_pick
+      @areas=@areas.where("area_type!='pick'")
+    end
     @areas_grid = initialize_grid(@areas)
   end
 

@@ -30,6 +30,12 @@
       <%= f.text_field :end_no, :class => 'text_field' %>
     </div>
   </div>
+  <div class="control-group">
+    <%= f.label :storage_no, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :storage_no, :class => 'text_field' %>
+    </div>
+  </div>
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
             sequence_nos_path, :class => 'btn btn-default' %>

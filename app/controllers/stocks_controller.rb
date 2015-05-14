@@ -4,6 +4,10 @@ class StocksController < ApplicationController
   # GET /stocks
   # GET /stocks.json
   def index
+    @storage = current_storage
+    if !@storage.need_pick
+      @stocks = @stocks.includes(:shelf).where("shelves.shelf_type!='pick'")
+    end
     @stocks_grid = initialize_grid(@stocks,
       :order => 'stocks.id',
       :order_direction => 'desc',

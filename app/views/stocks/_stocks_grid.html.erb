@@ -24,8 +24,14 @@
       stock.business.try :name
     end
 
-    g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE.invert do |stock|
-      stock.shelf.shelf_type_name
+    if @storage.need_pick
+      g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE.invert do |stock|
+        stock.shelf.shelf_type_name
+      end
+    else
+      g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE_NOPICK.invert do |stock|
+        stock.shelf.shelf_type_name
+      end
     end
 
     g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |stock|

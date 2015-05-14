@@ -575,6 +575,7 @@ zh-CN:
         out_at: "出库时间"
         business_order_id: "外部订单号"
         country_code: "国家代码"
+
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -790,8 +791,9 @@ zh-CN:
         unit_id: "所属单位"
         storage_id: "所属仓库"
         logistic_id: "物流商"
-        start_no: "起始号"
+        start_no: "当前号"
         end_no: "终止号"
+        storage_no: "仓库号"
   menu:
     permission:
       name: "权限管理"

@@ -34,6 +34,8 @@
 
     g.column name: model_class.human_attribute_name(:end_no), attribute: 'end_no'
 
+    g.column name: model_class.human_attribute_name(:storage_no), attribute: 'storage_no'
+
     g.column do |sequence_no|
       ActiveSupport::SafeBuffer.new << 
         (link_to t('.edit', :default => t("helpers.links.edit")), edit_sequence_no_path(sequence_no), :class => 'btn btn-xs btn-primary' if can? :update, sequence_no) << ' ' <<

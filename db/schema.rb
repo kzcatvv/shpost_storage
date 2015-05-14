@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511080719) do
+ActiveRecord::Schema.define(version: 20150513073327) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -475,8 +475,9 @@ ActiveRecord::Schema.define(version: 20150511080719) do
     t.integer "unit_id"
     t.integer "storage_id"
     t.integer "logistic_id"
-    t.string  "start_no"
-    t.string  "end_no"
+    t.integer "start_no",    limit: 255
+    t.integer "end_no",      limit: 255
+    t.string  "storage_no"
   end
 
   create_table "sequences", force: true do |t|

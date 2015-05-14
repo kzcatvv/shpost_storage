@@ -99,3 +99,7 @@ logistic1 = Logistic.create(name: "国际小包平",print_format: "gjxbp", is_ge
 logistic2 = Logistic.create(name: "国际小包挂",print_format: "gjxbg", is_getnum: true, is_default: false, wl_no: "WL0002" )
 logistic3 = Logistic.create(name: "国内小包",print_format: "gnxb", is_getnum: true, is_default: false, wl_no: "WL0003" )
 logistic4 = Logistic.create(name: "天天快递",print_format: "ttkd", is_getnum: true, is_default: false, wl_no: "WL0004" )
+logistic5 = Logistic.create(name: "EMS",print_format: "ems", is_getnum: true, is_default: false, wl_no: "WL0005" )
+logistic6 = Logistic.create(name: "百世汇通",print_format: "bsht", is_getnum: true, is_default: false, wl_no: "WL0006" )
+logistic7 = Logistic.create(name: "同城速递",print_format: "tcsd", is_getnum: true, is_default: false, wl_no: "WL0007" )
+logistic8 = Logistic.create(name: "其他",print_format: "qt", is_getnum: true, is_default: false, wl_no: "WL0008" )
