@@ -358,10 +358,19 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","spliting","printed","picking"]
-    
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder, :order_details], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
-     :order_direction => 'desc', :per_page => 15)
+    @sku = params[:sku].blank? ? @sku : params[:sku]
+    orders = @orders
+    if @sku.blank? || @sku.eql?('0')
+      orders = @orders.includes(:order_details).order('order_details.specification_id')
+    end
+    @orders_grid = initialize_grid(orders, 
+      :include => [:business, :keyclientorder, :order_details], 
+      :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],
+      # :order => 'order_details.specification_id',
+      # :order_direction => 'asc', 
+      :per_page => 15)
 
+    
     @allcnt = {}
 
     @orders_grid.with_resultset do |orders|
