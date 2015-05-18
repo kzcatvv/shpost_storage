@@ -13,10 +13,8 @@
 <div>
   <div class="findprintindex-btns">
     <% if can? :stockout, Order %>
-
-    <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
-                  "/keyclientorders/" + @orders_grid.current_page_records.first.try(:keyclientorder_id).to_s + "/stockout" ,
-                  :class => 'btn btn-primary', disabled: (@orders_grid.current_page_records.first.try(:keyclientorder_id).blank? ? true : false) %>
+      <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
+                  "/orders/stockout" , :class => 'btn btn-primary' %>
     <% end %>
 
     <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
@@ -75,6 +73,11 @@
     <div>
       <span>国家:</span>
       <%= grid_filter(@orders_grid, :country_filter)%>
+    </div>
+
+    <div>
+      <span>面单已打印:</span>
+      <%= grid_filter(@orders_grid, :is_printed_filter)%>
     </div>
 
     <div>

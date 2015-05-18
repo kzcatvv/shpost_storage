@@ -145,7 +145,7 @@ ShpostStorage::Application.routes.draw do
         get 'b2cfind69code'
         get 'b2csplitanorder'
         get 'b2csettrackingnumber'
-        
+        get 'stockout'
       end
 
     member do
