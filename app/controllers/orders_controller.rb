@@ -358,9 +358,9 @@ class OrdersController < ApplicationController
 
   def findprintindex
     status = ["waiting","spliting","printed","picking"]
-    @sku = params[:sku].blank? ? @sku : params[:sku]
+    @sku = params[:sku].blank? ? 'false' : params[:sku]
     orders = @orders
-    if @sku.blank? || @sku.eql?('0')
+    if !@sku.blank? && @sku.eql?('true')
       orders = @orders.includes(:order_details).order('order_details.specification_id')
     end
     @orders_grid = initialize_grid(orders, 
