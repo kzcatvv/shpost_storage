@@ -339,6 +339,11 @@ class OrdersController < ApplicationController
       else
         @curr_order = order.id
         @order = order
+        if @order.is_printed
+          @ispd=1
+        else
+          @ispd=0
+        end
         @order_details = order.order_details
         @curr_dtl = 0
         @dtl_cnt = order.order_details.count
@@ -391,10 +396,15 @@ class OrdersController < ApplicationController
   end
 
   def setorallweight
-    if !params[:orweight].nil?
-      @order=Order.find(params[:orderid])
-      allweight=params[:orweight]
-      @order.update(total_weight: allweight)
+    @order=Order.find(params[:orderid])
+    if @order.is_printed
+      @isptd=1
+      if !params[:orweight].nil?
+        allweight=params[:orweight]
+        @order.update(total_weight: allweight)
+      end
+    else
+      @isptd=0
     end
     respond_to do |format|
       format.js 
