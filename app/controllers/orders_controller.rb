@@ -1033,7 +1033,7 @@ class OrdersController < ApplicationController
                     
           @ids << order.id
         else
-          order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, keyclientorder: keyclientorder, user_id: current_user.id
+          order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, user_id: current_user.id, is_printed: is_printed
 
           order.order_details.destroy_all
         
