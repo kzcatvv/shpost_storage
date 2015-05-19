@@ -1036,6 +1036,8 @@ class OrdersController < ApplicationController
         local_addr = to_string(row[30])
         is_printed = false
         status = Order::STATUS[:waiting]
+        virtual = to_string(row[31])
+        virtual = "0" if virtual.blank?
 
         if batch_no.blank?
           raise "缺少外部订单号" if business_order_id.blank?
@@ -1095,7 +1097,7 @@ class OrdersController < ApplicationController
             unit_id: current_user.unit.id, 
             storage_id: current_storage.id, 
             status: status, 
-            keyclientorder: keyclientorder, 
+            # keyclientorder: keyclientorder, 
             user_id: current_user.id,
             send_name: send_name,
             send_province: send_province,
@@ -1108,7 +1110,8 @@ class OrdersController < ApplicationController
             local_city: local_city,
             local_addr: local_addr,
             logistic: logistic,
-            is_printed: is_printed)
+            is_printed: is_printed,
+            virtual: virtual)
 
           # ords[0] = order
           # if find_has_stock(ords,false).blank?
@@ -1120,7 +1123,10 @@ class OrdersController < ApplicationController
                     
           @ids << order.id
         else
-          order.update!(tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, country: country, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, keyclientorder: keyclientorder, user_id: current_user.id,
+          order.update!(tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, country: country, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, 
+            # status: status, 
+            # keyclientorder: keyclientorder,
+            user_id: current_user.id,
             send_name: send_name,
             send_province: send_province,
             send_city: send_city,
@@ -1132,7 +1138,8 @@ class OrdersController < ApplicationController
             local_city: local_city,
             local_addr: local_addr,
             logistic: logistic, 
-            is_printed: is_printed)
+            is_printed: is_printed,
+            virtual: virtual)
 
           if !params[:business_select].blank?
             order.order_details.destroy_all
@@ -1181,6 +1188,8 @@ class OrdersController < ApplicationController
         business_no = to_string(row[6])
         business_name = to_string(row[7])
         batch_no = to_string(row[8])
+        defective = to_string(row[9])
+        defective = "0" if defective.blank?
 
         if ! supplier_no.blank?
           supplier = Supplier.accessible_by(current_ability).find_by(no: supplier_no)
@@ -1252,9 +1261,9 @@ class OrdersController < ApplicationController
         # end     
 
         if order_detail.blank? 
-          OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order
+          OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order, defective: defective
         else
-          order_detail.update!(amount: order_detail.amount + amount, business_deliver_no: sub_order_id)
+          order_detail.update!(amount: order_detail.amount + amount, business_deliver_no: sub_order_id,defective: defective)
         end
 
         # order.update!(business_trans_no: business_trans_no)
@@ -1431,7 +1440,7 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地收件人名称 当地国家 当地省 当地市 当地地址}  
+    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地收件人名称 当地国家 当地省 当地市 当地地址 是否虚拟}  
     count_row = 1
     objs.each do |obj|
       if obj.is_shortage.eql? 'yes'
@@ -1496,6 +1505,7 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,28]=obj.local_province
       sheet1[count_row,29]=obj.local_city
       sheet1[count_row,30]=obj.local_addr
+      sheet1[count_row,31]=obj.virtual_name
 
       count_row += 1
     end  
@@ -1503,7 +1513,7 @@ def exportorders_xls_content_for(objs)
     sheet2 = book.create_worksheet :name => "OrderDetails"
     detail_row = 0
     sheet2.row(detail_row).default_format = blue 
-    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户编号 商户名称 订单流水号}
+    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户编号 商户名称 订单流水号 是否残次品}
     detail_row = detail_row + 1
     objs.each do |obj|
       obj_id = obj.id
@@ -1558,6 +1568,7 @@ def exportorders_xls_content_for(objs)
         sheet2[detail_row,6]=obj.business.no
         sheet2[detail_row,7]=obj.business.name
         sheet2[detail_row,8]=order_detail.order.batch_no
+        sheet2[detail_row,9]=order_detail.defective_name
         
         detail_row += 1
       end
@@ -1767,7 +1778,7 @@ def exportorders_xls_content_for(objs)
     red = Spreadsheet::Format.new :color => :red
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地收件人名称 当地国家 当地省 当地市 当地地址}  
+    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地收件人名称 当地国家 当地省 当地市 当地地址 是否虚拟}  
     count_row = 1
     obj1.each do |obj|
       sheet1[count_row,0]=obj[0]
@@ -1802,6 +1813,7 @@ def exportorders_xls_content_for(objs)
       sheet1[count_row,29]=obj[29]
       sheet1[count_row,30]=obj[30]
       sheet1[count_row,31]=obj[31]
+      sheet1[count_row,32]=obj[32]
       
       count_row += 1
     end  
@@ -1809,7 +1821,7 @@ def exportorders_xls_content_for(objs)
     sheet2 = book.create_worksheet :name => "OrderDetails"
     detail_row = 0
     sheet2.row(detail_row).default_format = blue 
-    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户编号 商户名称 订单流水号}
+    sheet2.row(detail_row).concat %w{订单号(外部) 子订单号 SKU/第三方编码/69码 供应商编号 数量 商品名称 商户编号 商户名称 订单流水号 是否残次品}
     detail_row = detail_row + 1
     obj2.each do |obj|
       # obj_id = obj.id
@@ -1864,6 +1876,7 @@ def exportorders_xls_content_for(objs)
         sheet2[detail_row,7]=obj[7]
         sheet2[detail_row,8]=obj[8]
         sheet2[detail_row,9]=obj[9]
+        sheet2[detail_row,10]=obj[10]
         
         detail_row += 1
       # end
