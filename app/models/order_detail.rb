@@ -9,6 +9,12 @@ class OrderDetail < ActiveRecord::Base
   after_save :change_order_total_amount
   after_save :change_order_total_weight
 
+  DEFECTIVE = { 0=> '非残次品', 1=> '残次品'}
+
+  def defective_name
+    defective.blank? ? "" : self.class.human_attribute_name("defective_#{defective}")
+  end
+
 	# validates_presence_of :name, :message => '不能为空'
   def relationship
     Relationship.find_relationship(specification, order.business, unit, supplier)

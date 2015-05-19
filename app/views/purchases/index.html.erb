@@ -30,12 +30,17 @@
 
     end
 
+    g.column name: model_class.human_attribute_name(:virtual), attribute: 'virtual',custom_filter: Purchase::VIRTUAL.map {|k, v| [model_class.human_attribute_name("virtual_#{k}"), v]} do |purchase| 
+      purchase.virtual_name
+
+    end
+
 
 
     g.column do |purchase|
       ActiveSupport::SafeBuffer.new << 
       (link_to t('.edit', :default => t("helpers.links.edit")), edit_purchase_path(purchase), :class => 'btn btn-xs btn-primary' if can? :update, purchase) << ' ' <<
-      (link_to t('.purchase_details', :default => t("helpers.links.purchase_details")),purchase_purchase_details_path(purchase), :class => 'btn btn-xs btn-info' if can? :purchase_detail, purchase) << ' ' <<
+      (link_to t('.purchase_details', :default => t("helpers.links.purchase_details")),purchase_purchase_details_path(purchase), :class => 'btn btn-xs btn-info' ) << ' ' <<
       (link_to t('.stock_in_purchase', :default => t("helpers.links.stock_in_purchase")), stock_in_purchase_path(purchase), method: :get, :class => 'btn btn-xs btn-primary' if can? :stock_in, purchase) << ' ' <<
       # (link_to t('.check_purchase', :default => t("helpers.links.check_purchase")), check_purchase_path(purchase), method: :patch, :class => 'btn btn-xs btn-primary' if can? :check, purchase) << ' ' <<
       (link_to t('.scan', :default => '逐件扫描'), scan_purchase_path(purchase), :method => :get, :class => 'btn btn-xs btn-primary' if can? :update, purchase) << ' ' <<

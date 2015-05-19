@@ -11,8 +11,8 @@
       stock.specification.try :all_name
     end
 
-    g.column name:  'sku', attribute: 'sku', model: 'Specification' do |stock|
-      stock.specification.try :sku
+    g.column name:  'sku', attribute: 'barcode', model: 'Relationship' do |stock|
+      stock.relationship.try :barcode
     end
 
     g.column name: model_class.human_attribute_name(:batch_no), attribute: 'batch_no'
@@ -24,16 +24,10 @@
       stock.business.try :name
     end
 
-    if @storage.need_pick
-      g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE.invert do |stock|
+    g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE.invert do |stock|
         stock.shelf.shelf_type_name
       end
-    else
-      g.column name: '货架类型', model: 'Shelf', attribute: 'shelf_type', custom_filter: Shelf::SHELF_TYPE_NOPICK.invert do |stock|
-        stock.shelf.shelf_type_name
-      end
-    end
-
+    
     g.column name: model_class.human_attribute_name(:supplier_id), attribute: 'name', model: 'Supplier' do |stock|
       stock.supplier.try :name
     end

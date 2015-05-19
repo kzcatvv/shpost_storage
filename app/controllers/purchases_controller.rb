@@ -32,9 +32,11 @@ class PurchasesController < ApplicationController
   # POST /purchasees.json
   def create
    # @purchase = Purchatimese.new(purchase_params)
+   
     @purchase.unit = current_user.unit
     @purchase.status = Purchase::STATUS[:opened]
     @purchase.storage = current_storage
+    @purchase.virtual = params[:checkbox][:virtual]
 
     respond_to do |format|
       if @purchase.save
@@ -52,6 +54,8 @@ class PurchasesController < ApplicationController
   def update
     respond_to do |format|
       if @purchase.update(purchase_params)
+        @purchase.virtual = params[:checkbox][:virtual]
+        @purchase.save
         format.html { redirect_to @purchase, notice: I18n.t('controller.update_success_notice', model: '采购单')  }
         format.json { head :no_content }
       else
@@ -74,7 +78,7 @@ class PurchasesController < ApplicationController
   # PATCH /specifications/1
   def stock_in
     #@stock_logs = []
-      
+    @purchase  
     Stock.purchase_stock_in(@purchase, current_user)
 
     @stock_logs = @purchase.stock_logs

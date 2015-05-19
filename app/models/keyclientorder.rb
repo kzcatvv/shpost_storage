@@ -107,8 +107,10 @@ class Keyclientorder < ActiveRecord::Base
   end
 
   def waiting_amounts
-    sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
-    sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    sum_stock_logs = self.stock_logs.includes(:keyclientorderdetail).group("stock_logs.specification_id").group("stock_logs.supplier_id").group("stock_logs.business_id").group("keyclientorderdetails.defective").sum("stock_logs.amount")
+    sum_amount = self.details.group(:specification_id, :supplier_id, :business_id, :defective).sum(:amount)
+    # sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    # sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
 
     compare_sum_amount(sum_amount, sum_stock_logs)
 
@@ -116,7 +118,7 @@ class Keyclientorder < ActiveRecord::Base
     if ! sum_amount.blank? && ! sum_stock_logs.blank?
       sum_stock_logs_without_supplier = {}
       sum_stock_logs.each do |x, amount|
-        sum_stock_logs_without_supplier[[x[0], nil, x[2]]] = amount
+        sum_stock_logs_without_supplier[[x[0], nil, x[2], x[3]]] = amount
       end
       compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
     end

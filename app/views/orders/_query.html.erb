@@ -71,7 +71,7 @@
                        # without buffer only the last tag will appear
                        buffer = content_tag(:b,"订单商品明细")
                        order.order_details.each do |odl|
-                        buffer += content_tag(:p,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s)
+                        buffer += content_tag(:p,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s+"  "+odl.defective_name)
                        end
                       raw buffer
                        
@@ -137,6 +137,11 @@
 
     g.column name: model_class.human_attribute_name(:is_split), attribute: 'is_split', filter_type: :boolean do |order| 
       order.parent_type_name
+    end
+
+    g.column name: model_class.human_attribute_name(:virtual), attribute: 'virtual', custom_filter: Order::VIRTUAL.map {|k, v| [model_class.human_attribute_name("virtual_#{k}"), v]} do |order| 
+      order.virtual_name
+
     end
    
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at' do |order|

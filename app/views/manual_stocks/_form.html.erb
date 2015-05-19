@@ -12,6 +12,12 @@
       <%= f.select(:business_id, Business.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
     </div>
   </div>
+
+  <div class="control-group">
+    <%= f.label :virtual, :class => 'control-label' %> 
+    <div class="controls">
+      <%= check_box("checkbox","virtual")%>虚拟</div>
+  </div>
   <div class="control-group">
     <%= f.label :desc, :class => 'control-label' %>
     <div class="controls">

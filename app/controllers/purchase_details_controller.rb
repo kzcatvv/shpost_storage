@@ -30,6 +30,7 @@ class PurchaseDetailsController < ApplicationController
   def create
    # @purchase_detail = PurchaseDetail.new(purchase_detail_params)
    @purchase_detail.status = PurchaseDetail::STATUS[:waiting]
+   @purchase_detail.defective = params[:checkbox][:defective]
     respond_to do |format|
       if @purchase_detail.save
         format.html { redirect_to purchase_purchase_detail_path(@purchase,@purchase_detail), notice: I18n.t('controller.create_success_notice', model: '采购单明细') }
@@ -46,6 +47,8 @@ class PurchaseDetailsController < ApplicationController
   def update
     respond_to do |format|
       if @purchase_detail.update(purchase_detail_params)
+        @purchase_detail.defective = params[:checkbox][:defective]
+        @purchase_detail.save
         format.html { redirect_to purchase_purchase_detail_path(@purchase,@purchase_detail), notice: I18n.t('controller.update_success_notice', model: '采购单明细')  }
         format.json { head :no_content }
       else

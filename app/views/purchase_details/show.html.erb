@@ -28,6 +28,9 @@
   <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
   <dd><%= @purchase_detail.status_name %></dd>
 
+  <dt><strong><%= model_class.human_attribute_name(:defective) %>:</strong></dt>
+  <dd><%= @purchase_detail.defective_name %></dd>
+
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

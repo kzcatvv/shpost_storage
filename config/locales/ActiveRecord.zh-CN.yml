@@ -576,6 +576,9 @@ zh-CN:
         business_order_id: "外部订单号"
         country_code: "国家代码"
         country: "国家"
+        virtual: "是否虚拟"
+        virtual_1: "虚拟"
+        virtual_0: "非虚拟"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        
@@ -585,6 +588,9 @@ zh-CN:
         supplier_id: "供应商"     
         order_id: "订单编号"
         desc: "备注"
+        defective: "是否残次品"
+        defective_1: "残次品"
+        defective_0: "非残次品"
       purchase:
         "no": "编号"
         name: "名称"
@@ -596,6 +602,9 @@ zh-CN:
         status: "状态"
         status_opened: "开放"
         status_closed: "已关闭"
+        virtual: "是否虚拟"
+        virtual_1: "虚拟"
+        virtual_0: "非虚拟"
       purchase_detail:
         name: "名称"
         purchase_id: "采购单编号"
@@ -611,6 +620,9 @@ zh-CN:
         status: "状态"
         status_waiting: "处理中"
         status_stock_in: "完成入库"
+        defective: "是否残次品"
+        defective_1: "残次品"
+        defective_0: "非残次品"
       purchase_arrival:
         arrived_amount: "到货数量"
         expiration_date: "保质期"
@@ -625,6 +637,9 @@ zh-CN:
         status: "状态"
         status_opened: "开放"
         status_closed: "已关闭"
+        virtual: "是否虚拟"
+        virtual_1: "虚拟"
+        virtual_0: "非虚拟"
       manual_stock_detail:
         name: "名称"
         manual_stock_id: "出库单编号"
@@ -635,6 +650,9 @@ zh-CN:
         status: "状态"
         status_waiting: "处理中"
         status_stock_out: "完成出库"
+        defective: "是否残次品"
+        defective_1: "残次品"
+        defective_0: "非残次品"
       area:
         name: "区域名称"
         current_storage: "当前仓库"
@@ -891,6 +909,9 @@ zh-CN:
         manual_stock:
           name: "批量出库管理"
           link: "/manual_stocks"
+        query_inoutlogs:
+          name: "出入库日志查询"
+          link: "/stock_logs/query_inoutlogs"
     business:
       name: "订单管理"
       needrole:

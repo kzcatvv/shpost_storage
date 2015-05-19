@@ -4,13 +4,15 @@
 <%- model_class = Order -%>
 <div class="page-header">
   <h1><%=t '.title', :default => [:'helpers.titles.stock_out', '%{model} 批量出库'], :model => model_class.model_name.human.titleize %></h1>
-  <div style="float:right">   
-      <a href="javascript:stockout_preview()" class='btn btn-primary' >打印出库单</a>
+  <div style="float:right">  
+    <% if !@manual_stock.status.eql?"closed" %> 
       <%= link_to t('.check', :default => t("helpers.links.check_manual_stock")),
                   check_manual_stock_url(),
                   method: :patch,
-                  :class => 'btn btn-primary' %>
+                  :class => 'btn btn-primary'%>
+      <a href="javascript:stockout_preview()" class='btn btn-primary' >打印出库单</a>
       <a href="javascript:void(0);", id='manual_assign', class='btn btn-primary' >出库单分配</a>
+    <% end %>
   </div>
 
 </div>

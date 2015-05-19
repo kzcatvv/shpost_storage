@@ -2,12 +2,10 @@
 <div class="page-header">
   <h1><%=@manual_stock.name%>-<%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-    <% if can? :index, ManualStockDetail %>
-      <%= link_to t('.back', :default => t("helpers.links.back")),
+    <%= link_to t('.back', :default => t("helpers.links.back")),
                  manual_stocks_path,
                   :class => 'btn btn-primary' %>
-    <% end %>
-    <% if can? :new, ManualStockDetail %>
+    <% if !@manual_stock.status.eql?"closed" %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
                  new_manual_stock_manual_stock_detail_path(@manual_stock),
                   :class => 'btn btn-primary' %>
@@ -42,6 +40,11 @@
 
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: ManualStockDetail::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |manual_stock_detail| 
       manual_stock_detail.status_name
+
+    end
+
+    g.column name: model_class.human_attribute_name(:defective), attribute: 'defective',custom_filter: ManualStockDetail::DEFECTIVE.map {|k, v| [model_class.human_attribute_name("defective#{k}"), v]} do |manual_stock_detail| 
+      manual_stock_detail.defective_name
 
     end
 

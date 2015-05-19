@@ -69,11 +69,7 @@
 
 
   <div style="float:right">
-    <% if can? :new, Stock %>
-      <%= link_to t('.new', :default => t("helpers.links.new")),
-                   "javascript:void(0)", onclick: "keyclientorder_stock_add()",
-                    :class => 'btn btn-primary' %>
-    <% end %>
+    <%= link_to t('.new', :default => t("helpers.links.new")),"javascript:void(0)", onclick: "keyclientorder_stock_add()",:class => 'btn btn-primary' %>
   </div>
 
 

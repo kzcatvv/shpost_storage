@@ -33,6 +33,11 @@
       <%= f.text_field :amount, :class => 'text_field' %>
     </div>
   </div>
+  <div class="control-group">
+    <%= f.label :defective, :class => 'control-label' %> 
+    <div class="controls">
+      <%= check_box("checkbox","defective")%>残次品</div>
+  </div>
  
   <div class="control-group">
     <%= f.label :desc, :class => 'control-label' %>

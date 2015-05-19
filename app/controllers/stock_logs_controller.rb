@@ -287,6 +287,96 @@ class StockLogsController < ApplicationController
     render json: {id: @stock_log.id, total_amount: total_amount, amount: @stock_log.amount}
   end
 
+  def query_inoutlogs
+    @inoutlogs_hash = {}
+    @temp_hash = {}
+    @stocklogs=StockLog.all
+    operation=["in","out"]
+    key_last=[]
+    key_new=[]
+    @start_date=DateTime
+    @end_date=DateTime
+
+    whereQuery = "storages.id=? and stock_logs.operation_type in (?)"
+    
+    if RailsEnv.is_oracle?
+      date_condition = "to_char(stock_logs.created_at,'yyyymmdd')"
+    else
+      date_condition = "strftime('%Y%m%d',stock_logs.created_at)"
+    end
+    time=DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d').to_s
+
+    
+    if params[:sp_start_date].blank? or params[:sp_start_date]["sp_start_date"].blank?
+      @start_date = 1.month.ago
+    else 
+      @start_date = Date.civil(params[:sp_start_date]["sp_start_date"].split(/-|\//)[0].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[1].to_i,params[:sp_start_date]["sp_start_date"].split(/-|\//)[2].to_i)
+    end
+    
+    if params[:sp_end_date].blank? or params[:sp_end_date]["sp_end_date"].blank?
+      @end_date = to_date(time.split(/-|\//)[0],time.split(/-|\//)[1],time.split(/-|\//)[2])
+    else
+      @end_date = Date.civil(params[:sp_end_date]["sp_end_date"].split(/-|\//)[0].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[1].to_i,params[:sp_end_date]["sp_end_date"].split(/-|\//)[2].to_i)
+    end
+    
+    @stocklogs=@stocklogs.accessible_by(current_ability).where("stock_logs.created_at>=? and stock_logs.created_at<=?",@start_date,(@end_date+1))
+        
+    if !RailsEnv.is_oracle?    
+      @temp_hash = @stocklogs.includes(:storage).where(whereQuery,current_storage.id,operation).group(:specification_id).group(:business_id).group(:supplier_id).group(date_condition).group(:operation_type).order(created_at: :desc).sum(:amount)
+    else
+      @temp_hash = @stocklogs.includes(:storage).where(whereQuery,current_storage.id,operation).group(:specification_id).group(:business_id).group(:supplier_id).group(date_condition).group(:operation_type).order("to_char(stock_logs.created_at,'yyyymmdd') desc").sum(:amount)
+    end
+
+    key_last[0] = ""
+    key_last[1] = ""
+    key_last[2] = ""
+    key_last[3] = ""
+    @temp_hash.each do |key,value|
+      if !key[0].blank? and !key[1].blank? and !key[2].blank? and !key[3].blank?
+        if key[0].eql?key_last[0] and key[1].eql?key_last[1] and key[2].eql?key_last[2] and key[3].eql?key_last[3]
+          if key[4].eql?"in"
+            @inoutlogs_hash[key_last][0]=value
+          else
+            @inoutlogs_hash[key_last][1]=value
+          end
+        else
+          key_new = [key[0],key[1],key[2],key[3]]
+          if key[4].eql?"in"
+            @inoutlogs_hash[key_new]=[value,0]
+          else
+            @inoutlogs_hash[key_new]=[0,value]
+          end
+        end
+        key_last = [key[0],key[1],key[2],key[3]]
+      end
+    end
+    
+  end
+
+  def query_inoutlog_details
+    key0=params[:key0]
+    key1=params[:key1]
+    key2=params[:key2]
+    key3=params[:key3]
+    operation=["in","out"]
+
+    if RailsEnv.is_oracle?
+      date_condition = "to_char(stock_logs.created_at,'yyyymmdd')"
+    else
+      date_condition = "strftime('%Y%m%d',stock_logs.created_at)"
+    end
+
+    @stock_logs = StockLog.accessible_by(current_ability).where("stock_logs.specification_id=? and stock_logs.business_id=? and stock_logs.supplier_id=? and "+date_condition+"=? and stock_logs.operation_type in (?)",key0,key1,key2,key3,operation)
+
+    @stock_logs_grid = initialize_grid(@stock_logs,
+      :order => 'stock_logs.created_at',
+      :order_direction => 'desc')
+  end
+
+  def to_date(year,month,day)
+      date = Date.civil(year.to_i,month.to_i,day.to_i)
+      return date
+  end
 
   def load_params
     @stock_log = StockLog.find(params[:id]) if !params[:id].blank?

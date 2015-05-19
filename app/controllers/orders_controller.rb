@@ -128,7 +128,7 @@ class OrdersController < ApplicationController
     orders.update_all(is_shortage: 'no')
     orders_changed = false
     order_details_hash.each do |key, sum|
-      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage,is_broken=false)
       if orders_changed
         sum = orders.includes(:order_details).where(is_shortage: 'no').where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).sum(:amount)
       end
@@ -204,7 +204,9 @@ class OrdersController < ApplicationController
         Rails.logger.info "specification:" + d.specification_id.to_s
         Rails.logger.info "supplier:" + d.supplier_id.to_s
         Rails.logger.info "storage:" + current_storage.id.to_s
-        allamount = Stock.total_stock_in_storage(d.specification, d.supplier, o.business, current_storage)
+        is_broken=true if d.defective.eql?"1"
+        is_broken=false if d.defective.eql?"0"
+        allamount = Stock.total_stock_in_storage(d.specification, d.supplier, o.business, current_storage,is_broken)
         Rails.logger.info "allamount:" + allamount.to_s
         if allcnt.has_key?(product)
           if allcnt[product][0]-allcnt[product][1]-d.amount >= 0
@@ -448,7 +450,7 @@ class OrdersController < ApplicationController
         next
       end
       order_sum = @allcnt[key]
-      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage,is_broken=false)
 
       @allcnt[key] = [order_sum,value,stock_sum]
     end
@@ -1345,7 +1347,7 @@ def exportorders_xls_content_for(objs)
     blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地名称 当地国家 当地省 当地市 当地地址}  
+    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地收件人名称 当地国家 当地省 当地市 当地地址}  
     count_row = 1
     objs.each do |obj|
       if obj.is_shortage.eql? 'yes'
@@ -1681,7 +1683,7 @@ def exportorders_xls_content_for(objs)
     red = Spreadsheet::Format.new :color => :red
     sheet1.row(0).default_format = blue  
 
-    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地名称 当地国家 当地省 当地市 当地地址}  
+    sheet1.row(0).concat %w{订单号(外部) 订单流水号 子订单号 物流单号 物流供应商 重量(g) 下单时间 客户单位 收件客户 收件详细地址 收货邮编 收件国家 收件省 收件市 收件县区 收件人联系电话 收货手机 商户编号 商户名称 状态 商品信息 寄件客户 寄件省 寄件市 寄件地址 寄件人电话 当地收件人名称 当地国家 当地省 当地市 当地地址}  
     count_row = 1
     obj1.each do |obj|
       sheet1[count_row,0]=obj[0]

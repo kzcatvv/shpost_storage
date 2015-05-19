@@ -42,7 +42,7 @@ class Shelf < ActiveRecord::Base
     Shelf.includes(:area).where(area_id: storage.areas,shelf_type: 'pick').order("priority_level ASC")
   end
 
-  def self.get_empty_shelf(storage, is_broken = false)
+  def self.get_empty_shelf(storage, is_broken)
     # prior.first
     shelves = in_storage(storage).empty.prior
     if ! is_broken
@@ -58,7 +58,7 @@ class Shelf < ActiveRecord::Base
     # prior.first
   end
   
-  def self.get_default_shelf(storage, is_broken = false)
+  def self.get_default_shelf(storage, is_broken)
     shelves = in_storage(storage).prior
     if ! is_broken
       shelves.normal.first

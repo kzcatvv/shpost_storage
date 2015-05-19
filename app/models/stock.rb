@@ -32,7 +32,10 @@ class Stock < ActiveRecord::Base
       next if arrival.purchase_detail.specification.blank?
 
       while arrival.waiting_amount > 0
-        stock = Stock.get_available_stock_in_storage(arrival.purchase_detail.specification, arrival.purchase_detail.supplier, purchase.business, arrival.expiration_date.blank? ? nil : arrival.batch_no, purchase.storage, false)
+        is_broken=false if arrival.purchase_detail.defective.eql?"0"
+        is_broken=true if arrival.purchase_detail.defective.eql?"1"
+        
+        stock = Stock.get_available_stock_in_storage(arrival.purchase_detail.specification, arrival.purchase_detail.supplier, purchase.business, arrival.expiration_date.blank? ? nil : arrival.batch_no, purchase.storage, is_broken)
         
         stock_in_amount = stock.stock_in_amount(arrival.waiting_amount)
 
@@ -123,7 +126,13 @@ class Stock < ActiveRecord::Base
   def self.stock_out(order, operation_user = nil)
     order.waiting_amounts.each do |x, amount|
       if amount > 0
-        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage).to_ary
+        if !x[3].blank?
+          is_broken=true if x[3].eql?"1"
+          is_broken=false if x[3].eql?"0"
+        else
+          is_broken=nil
+        end
+        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage,is_broken).to_ary
 
         stocks_in_storage.each do |stock|
           next if stock.on_shelf_amount <= 0
@@ -169,7 +178,7 @@ class Stock < ActiveRecord::Base
 
         end
 
-        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage).to_ary
+        stocks_in_storage = Stock.find_stocks_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage,is_broken=false).to_ary
 
         stocks_in_storage.each do |stock|
           out_amount = stock.stock_out_amount(amount)
@@ -193,7 +202,13 @@ class Stock < ActiveRecord::Base
 
   def self.is_enough_stock?(order)
     order.waiting_amounts.each do |x, amount|
-      total_amount = total_stock_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage)
+      if !x[3].blank?
+        is_broken=true if x[3].eql?"1"
+        is_broken=false if x[3].eql?"0"
+      else
+        is_broken=nil
+      end
+      total_amount = total_stock_in_storage(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), order.storage,is_broken)
 
       if total_amount < amount
         return false
@@ -202,7 +217,7 @@ class Stock < ActiveRecord::Base
     return true
   end
 
-  def self.get_available_stock_in_storage(specification, supplier, business, batch_no, storage, is_broken = false)
+  def self.get_available_stock_in_storage(specification, supplier, business, batch_no, storage, is_broken)
     #find same stock to use
     stocks_in_storage_with_batch_no = find_stocks_in_storage(specification, supplier, business, storage, is_broken).with_batch_no(batch_no)
     stocks_in_storage_with_batch_no.each do |stock|
@@ -246,7 +261,7 @@ class Stock < ActiveRecord::Base
     in_storage(storage).find_stocks(specification, supplier, business, false).available.prior.first
   end
 
-  def self.find_stocks_in_storage(specification, supplier, business, storage, is_broken = false)
+  def self.find_stocks_in_storage(specification, supplier, business, storage, is_broken)
     in_storage(storage).find_stocks(specification, supplier, business, is_broken).expiration_date_first.available.prior
   end
 
@@ -263,8 +278,8 @@ class Stock < ActiveRecord::Base
     # + StockLog.virtual_amount_in_unit(specification, supplier, business, unit)
   end
 
-  def self.total_stock_in_storage(specification, supplier, business, storage)
-    in_storage(storage).find_stocks(specification, supplier, business, false).sum(:actual_amount)
+  def self.total_stock_in_storage(specification, supplier, business, storage, is_broken)
+    in_storage(storage).find_stocks(specification, supplier, business, is_broken).sum(:actual_amount)
      # +  StockLog.virtual_amount_in_storage(specification, supplier, business, storage)
   end
 
@@ -366,7 +381,7 @@ class Stock < ActiveRecord::Base
     sum(:virtual_amount)
   end
 
-  def self.find_stocks(specification, supplier, business, is_broken = nil)
+  def self.find_stocks(specification, supplier, business, is_broken)
     conditions = not_empty
 
     if ! specification.blank?
