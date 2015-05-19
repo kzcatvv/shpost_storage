@@ -67,6 +67,14 @@ class Order < ActiveRecord::Base
      end
    end
 
+  def is_printed_name
+    if is_printed
+      name = "是"
+    else
+      name = "否"
+    end
+  end
+
   def checked_amount
     self.stock_logs.where("operation <> 'order_return'").to_a.sum{|x| x.checked? ? x.amount : 0}
   end

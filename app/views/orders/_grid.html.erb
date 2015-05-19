@@ -103,7 +103,9 @@
       order.keyclientorder.try :batch_no
     end
 
-    g.column name: model_class.human_attribute_name(:is_printed), attribute: 'is_printed', html: {style: 'width:10%;'}, detach_with_id: :is_printed_filter
+    g.column name: model_class.human_attribute_name(:is_printed), attribute: 'is_printed', html: {style: 'width:10%;'}, detach_with_id: :is_printed_filter do |order|
+      order.is_printed_name
+    end
 
     g.column name: model_class.human_attribute_name(:business_order_id), attribute: 'business_order_id', html: {style: 'width:10%;'},filter_type: :range, detach_with_id: :business_order_id_filter
 
