@@ -489,6 +489,10 @@ class OrdersController < ApplicationController
         if !params_f["keyclientorders.batch_no".to_sym].blank?
           selectorders=selectorders.where("keyclientorders.batch_no = ?", params_f["keyclientorders.batch_no".to_sym])
         end
+        
+        if !params_f[:is_printed].blank?
+          selectorders=selectorders.where(is_printed: (params_f[:is_printed][0].eql?('t') ? true : false))
+        end
       end
     end
 
