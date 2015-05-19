@@ -14,13 +14,13 @@
 <div id="outorders">
   <%= render :partial => 'orders/packout_forms' %>
 </div>
-
+<% if @needpick %>
 <%= check_box_tag 'allow_weight', 'alwg', false %>是否称重
 <div id="gd_wg">
    <%= label_tag 'wgname', '重量:', class: 'control-group' %>
    <%= text_field_tag 'goods_weight', nil, class: "controls"%>
 </div>
-
+<% end %>
 <div>
 <ul id="ulmenu">
    <li><a href="/orders/packaging_index" onclick="displayScore(this); return false;">未包装</a><li>

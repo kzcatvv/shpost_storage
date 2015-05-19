@@ -79,7 +79,7 @@ class LogisticsController < ApplicationController
             @order=Order.find(num)
             @order.transport_type=@logistic.print_format
             @order.tracking_number=numary[i]
-            @order.status='printed'
+            @order.is_printed=true
             if params[:flag]=='filter'
                 @order.keyclientorder_id=@keycorder.id
             end
