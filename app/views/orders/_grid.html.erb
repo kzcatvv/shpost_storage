@@ -116,11 +116,12 @@
 
     g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number', html: {style: 'width:10%;'}, filter_type: :range, detach_with_id: :tracking_number_filter
 
-    # g.column name: '波次批次号', model: 'Keyclientorder', attribute: 'batch_no' do |order|
-    #     order.keyclientorder.blank? ? "" : order.keyclientorder.batch_no
-    # end
     g.column name: model_class.human_attribute_name(:keyclientorder_id), attribute: 'batch_no', html: {style: 'width:10%;'}, detach_with_id: :keyclientorder_filter, model: 'Keyclientorder' do |order|
       order.keyclientorder.try :batch_no
+    end
+
+    g.column name: model_class.human_attribute_name(:is_printed), attribute: 'is_printed', html: {style: 'width:10%;'}, detach_with_id: :is_printed_filter do |order|
+      order.is_printed_name
     end
 
     g.column name: model_class.human_attribute_name(:business_order_id), attribute: 'business_order_id', html: {style: 'width:10%;'},filter_type: :range, detach_with_id: :business_order_id_filter

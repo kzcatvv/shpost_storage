@@ -71,19 +71,31 @@ class LogisticsController < ApplicationController
         @logistic = Logistic.find(params[:transport_type])
         @transport_type=@logistic.print_format
         @ids=params[:oid].split(",").map(&:to_i)
-        numberSize = @ids.size
-
-        numary=@logistic.getMailNum(numberSize,current_storage)
-        if !numary.nil?
-          @ids.each_with_index do |num,i|
-            @order=Order.find(num)
-            @order.transport_type=@logistic.print_format
-            @order.tracking_number=numary[i]
-            @order.status='printed'
-            if params[:flag]=='filter'
-                @order.keyclientorder_id=@keycorder.id
+        @ods=Order.where(id: @ids)
+        @needgetnum=@ods.where(tracking_number: nil)
+        @nonedgetnum=@ods.where.not(tracking_number: nil)
+        numberSize = @needgetnum.size
+        if numberSize > 0
+          numary=@logistic.getMailNum(numberSize,current_storage)
+          if !numary.nil?
+            @needgetnum.each_with_index do |odr,i|
+              odr.transport_type=@logistic.print_format
+              odr.tracking_number=numary[i]
+              odr.is_printed=true
+              if params[:flag]=='filter'
+                  odr.keyclientorder_id=@keycorder.id
+              end
+              odr.save
             end
-            @order.save
+          end
+        else
+          @nonedgetnum.each do |nodr|
+            nodr.transport_type=@logistic.print_format
+            nodr.is_printed=true
+              if params[:flag]=='filter'
+                  nodr.keyclientorder_id=@keycorder.id
+              end
+            nodr.save
           end
         end
         # rq=@logistic.getMailNum('信息局',@logistic.param_val1,@logistic.param_val2,numberSize)

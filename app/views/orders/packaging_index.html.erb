@@ -43,8 +43,8 @@
 <body>
 <%- model_class = Order -%>
 
-<%= grid(@orders_grid, show_filters: :no) do |g|
-    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
+<%= grid(@orders_grid, show_filters: :barcode) do |g|
+    g.column name: model_class.human_attribute_name(:barcode), attribute: 'barcode'
 
     
     g.column name: model_class.human_attribute_name(:status), attribute: 'status' do |order| 
@@ -57,6 +57,8 @@
     end
 
     g.column name: model_class.human_attribute_name(:tracking_number), attribute: 'tracking_number'
+
+    g.column name: model_class.human_attribute_name(:is_printed), attribute: 'is_printed'
 
     g.column name: '订单商品明细' do |order|
       od=content_tag(:tr,content_tag(:td," "))

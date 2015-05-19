@@ -29,7 +29,7 @@ class Order < ActiveRecord::Base
 
   STATUS_SHOW = { waiting: '待处理',spliting: '拆单中', splited: '已拆单', printed: '已打印', picking: '正在拣货', checked: '已审核', packed: '已包装', delivering: '正在寄送中', delivered: '已寄达', declined: '拒收', returned: '退回', cancel: '取消' }
 
-  STATUS_SHOW_INDEX = { waiting: '待处理',spliting: '拆单中', splited: '已拆单', printed: '已打印', picking: '正在拣货'}
+  STATUS_SHOW_INDEX = { waiting: '待处理',spliting: '拆单中', printed: '已打印'}
 
   # TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城小包', ems: 'EMS', ttkd: '天天快递', bsht: '百世汇通', qt: '其他'}
   TRANSPORT_TYPE = Logistic.pluck(:print_format,:name).to_h
@@ -69,6 +69,14 @@ class Order < ActiveRecord::Base
 
   def virtual_name
     virtual.blank? ? "" : self.class.human_attribute_name("virtual_#{virtual}")
+  end
+
+  def is_printed_name
+    if is_printed
+      name = "是"
+    else
+      name = "否"
+    end
   end
 
   def checked_amount

@@ -1,4 +1,4 @@
-<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0 style="display:none"> 
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
   <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
 </object>
 <%- model_class = Order -%>
@@ -13,10 +13,8 @@
 <div>
   <div class="findprintindex-btns">
     <% if can? :stockout, Order %>
-
-    <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
-                  "/keyclientorders/" + @orders_grid.current_page_records.first.try(:keyclientorder_id).to_s + "/stockout" ,
-                  :class => 'btn btn-primary', disabled: (@orders_grid.current_page_records.first.try(:keyclientorder_id).blank? ? true : false) %>
+      <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
+                  "/orders/stockout" , :class => 'btn btn-primary' %>
     <% end %>
 
     <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
@@ -77,6 +75,18 @@
       <%= grid_filter(@orders_grid, :country_filter)%>
     </div>
 
+    <div>
+      <span>面单已打印:</span>
+      <%= grid_filter(@orders_grid, :is_printed_filter)%>
+    </div>
+
+    <div>
+      <%= form_tag(findprintindex_orders_path, id: 'skufm', method:  :get) do %>
+      <%= check_box("checkbox","sku", onclick: "window.location.href='findprintindex?sku='+this.checked", checked: @sku.blank? ? false : (@sku.eql?('false') ? false : true))%>sku优先
+
+      <% end -%>
+    </div>
+
     <button class="wg-external-submit-button" data-grid-name="grid">递交</button>
     <button class="wg-external-reset-button" data-grid-name="grid">重置</button>
     
@@ -84,7 +94,6 @@
 </div>
 <div class="clearfix"></div> 
 <%= render_grid(@orders_grid)%>
-
 
 <div>
 <p>订单明细汇总</p>
@@ -117,8 +126,10 @@
 </div>
 <script language="javascript" type="text/javascript"> 
 function pick_preview(){
+    alert("aaaa");
     LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));  
     LODOP.PRINT_INIT("打印配货单");
+    alert("bbb");
     <% @orders_grid.all_pages_records.each do |order| %>
     LODOP.SET_PRINT_PAGESIZE(1,"210mm","297mm","");
     LODOP.PRINT_INIT("打印配货单");

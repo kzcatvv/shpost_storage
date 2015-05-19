@@ -1,0 +1,8 @@
+var ispd = <%= @isptd %>;
+
+if (ispd == 0){
+	selfAlert("该订单还未打印,请先打印",3000);
+}else{
+	$('#_tracking_number').val("")
+	$('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
+}

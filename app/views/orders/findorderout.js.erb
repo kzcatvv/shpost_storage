@@ -1,5 +1,6 @@
 var oid = <%= @curr_order %>;
 var id = <%= @curr_dtl %>;
+var np = <%= @needpick %>
 
 if (oid == 0){
     if (id == 0){
@@ -12,7 +13,11 @@ if (oid == 0){
 else{
   if (id == 0){
       $('#_tracking_number').val("<%= @tracking_number%>")
-      $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms",:object => @curr_order)) %> "); 
+      $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms",:object => @curr_order)) %> ");
+      var ipd =  <%= @ispd %>;
+      if (ipd == 0){
+        selfAlert("该订单还未打印,请记得打印面单",3000);
+      }
   }else if(id == -1){
 
       selfAlert("该订单中无此69码的商品",3000);
@@ -22,18 +27,23 @@ else{
       var tdraid = "#realam_"+<%= @curr_dtl %>;
       var tddbid = "#dbam_"+<%= @curr_dtl %>;
       var trid = "#tr_"+<%= @curr_dtl %>;
+      var odid = <%= @curr_dtl %>;
       
       if ( parseInt( $(tddbid).val() ) != parseInt( $(tdraid).val() ) )
       {
         //alert($(tddbid).val()+"+"+$(tdraid).val());
         if ( parseInt( $(tddbid).val() ) > parseInt( $(tdraid).val() ) )
         {
-           $.ajax({
+          if (np)
+          {
+            $.ajax({
                      type : 'GET',
                      url : '/orders/setstlogchkamt/',
-                     data: { orderid: $('#orderid').val() },
+                     data: { orderid: $('#orderid').val(),ordtlid: odid },
                      dataType : 'script'
                     });
+          }
+           
            $(tdraid).val(parseInt($(tdraid).val())+1);
            //alert($(tdraid).val());
         }
@@ -53,9 +63,17 @@ else{
                      data: { orderid: $('#orderid').val() },
                      dataType : 'script'
                     });
-             $('#_tracking_number').val("")
-             $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
-             selfAlert("该面单的商品已全部扫描完成",3000);
+             
+             if (np)
+             {
+               $('#goods_weight').val("")
+               $("#goods_weight").focus();
+             }else{
+               $('#_tracking_number').val("")
+               $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
+               selfAlert("该面单的商品已全部扫描完成",3000);
+             }
+             
            }
 
            

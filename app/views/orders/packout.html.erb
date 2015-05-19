@@ -7,17 +7,20 @@
 </div>
 
 <div>
-   <%= label_tag 'name', '扫描面单号或69码:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls"%><%= content_tag(:p, "注意:请先扫面单号再扫69码") %>
+   <%= label_tag 'name', '扫描面单号或订单条码或69码:', class: 'control-group' %><%= text_field_tag 'tracking_number', nil, class: "controls"%><%= content_tag(:p, "注意:请先扫面单号或订单条码再扫69码") %>
    <%= %>
 </div>
 面单号: <%= text_field_tag '_tracking_number', nil, class: "controls", readonly: true%>
 <div id="outorders">
   <%= render :partial => 'orders/packout_forms' %>
 </div>
-
-
-
-
+<% if @needpick %>
+<%= check_box_tag 'allow_weight', 'alwg', false %>是否称重
+<div id="gd_wg">
+   <%= label_tag 'wgname', '重量:', class: 'control-group' %>
+   <%= text_field_tag 'goods_weight', nil, class: "controls"%>
+</div>
+<% end %>
 <div>
 <ul id="ulmenu">
    <li><a href="/orders/packaging_index" onclick="displayScore(this); return false;">未包装</a><li>
@@ -35,6 +38,22 @@
 
 
 <script language="javascript" type="text/javascript"> 
+
+$(document).ready(function(){
+ $("#gd_wg").hide();
+ $("#allow_weight").click(function() { 
+      if ($("#allow_weight").is(':checked') == true) { 
+        $("#gd_wg").show();
+        $("#goods_weight").focus();
+      } 
+      else { 
+        $("#gd_wg").hide();
+        } 
+  })
+
+
+
+})
 
 
 function displayScore(_this){

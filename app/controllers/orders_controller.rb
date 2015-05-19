@@ -290,6 +290,7 @@ class OrdersController < ApplicationController
   end
 
   def packout
+    @needpick = current_storage.need_pick
     @order_details=[]
     @curr_order=""
     @orders = Order.where("storage_id = ?", current_storage.id)
@@ -298,6 +299,7 @@ class OrdersController < ApplicationController
   end
 
   def findorderout
+    @needpick = current_storage.need_pick
     @_tracking_number = params[:_tracking_number]
     @tracking_number = params[:tracking_number]
 
@@ -332,12 +334,18 @@ class OrdersController < ApplicationController
         end
       end 
     else
-      order = Order.where(tracking_number: @tracking_number, status: "checked").first
+      order = Order.where(" (tracking_number=? or barcode=?) and status=?",@tracking_number,@tracking_number,"checked").first
       if order.nil?
         @curr_order = 0
         @curr_dtl = 0
       else
         @curr_order = order.id
+        @order = order
+        if @order.is_printed
+          @ispd=1
+        else
+          @ispd=0
+        end
         @order_details = order.order_details
         @curr_dtl = 0
         @dtl_cnt = order.order_details.count
@@ -355,15 +363,71 @@ class OrdersController < ApplicationController
 
   def setoutstatus
     @order=Order.find(params[:orderid])
+    if current_storage.need_pick
+      @keyclientorder=@order.keyclientorder
+      @keyclientorder.pickoutcheck!(@order)
+    end
     @order.update_attribute(:status, "packed")
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def setstlogchkamt 
+    if current_storage.need_pick
+      @order=Order.find(params[:orderid])
+      @ordtl=OrderDetail.find(params[:ordtlid])
+      @relationship=Relationship.where("business_id=? and supplier_id=? and specification_id=?",@order.business_id,@ordtl.supplier_id,@ordtl.specification_id).first
+      @keyclientorder=@order.keyclientorder
+      @stock_logs=@keyclientorder.stock_logs.where(operation: 'b2c_pick_out')
+      allchkamt=@stock_logs.where(relationship: @relationship).sum(:check_amount)
+      allamt=@stock_logs.where(relationship: @relationship).sum(:amount)
+      if allamt > allchkamt
+        @stock_logs.where(relationship: @relationship).each do |stock_log|
+          if stock_log.amount > stock_log.check_amount
+            setchkamt = stock_log.check_amount + 1
+            stock_log.check_amount = setchkamt
+            stock_log.save
+          end
+        end
+      end
+    end
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def setorallweight
+    @order=Order.find(params[:orderid])
+    if @order.is_printed
+      @isptd=1
+      if !params[:orweight].nil?
+        allweight=params[:orweight]
+        @order.update(total_weight: allweight)
+      end
+    else
+      @isptd=0
+    end
+    respond_to do |format|
+      format.js 
+    end
   end
 
   def findprintindex
-    status = ["waiting","spliting","printed","picking"]
-    
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder, :order_details], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
-     :order_direction => 'desc', :per_page => 15)
+    status = Order::STATUS_SHOW_INDEX.keys
+    @sku = params[:sku].blank? ? 'false' : params[:sku]
+    orders = @orders
+    if !@sku.blank? && @sku.eql?('true')
+      orders = @orders.includes(:order_details).order('order_details.specification_id')
+    end
+    @orders_grid = initialize_grid(orders, 
+      :include => [:business, :keyclientorder, :order_details], 
+      :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],
+      # :order => 'order_details.specification_id',
+      # :order_direction => 'asc', 
+      :per_page => 15)
 
+    
     @allcnt = {}
 
     @orders_grid.with_resultset do |orders|
@@ -437,6 +501,10 @@ class OrdersController < ApplicationController
         if !params_f["keyclientorders.batch_no".to_sym].blank?
           selectorders=selectorders.where("keyclientorders.batch_no = ?", params_f["keyclientorders.batch_no".to_sym])
         end
+
+        if !params_f[:is_printed].blank?
+          selectorders=selectorders.where(is_printed: (params_f[:is_printed][0].eql?('t') ? true : false))
+        end
       end
     end
 
@@ -453,6 +521,14 @@ class OrdersController < ApplicationController
       stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage,is_broken=false)
 
       @allcnt[key] = [order_sum,value,stock_sum]
+    end
+  end
+
+  def stockout
+    Keyclientorder.transaction do
+      keyclientorder = bind_keyclientorder
+      @@orders_export.update_all(keyclientorder_id: keyclientorder.id)
+      redirect_to stockout_keyclientorder_url(keyclientorder)
     end
   end
 
@@ -886,7 +962,9 @@ class OrdersController < ApplicationController
 
             @ids = extract_orders(instance)
 
-            extract_order_details(instance)
+            if @import_type.eql?('standard')
+              extract_order_details(instance)
+            end
 
             if ! @error_orders.blank? || ! @error_order_details.blank?
               flash_message << "部分订单导入失败！"
@@ -956,6 +1034,8 @@ class OrdersController < ApplicationController
         local_province = to_string(row[28])
         local_city = to_string(row[29])
         local_addr = to_string(row[30])
+        is_printed = false
+        status = Order::STATUS[:waiting]
 
         if batch_no.blank?
           raise "缺少外部订单号" if business_order_id.blank?
@@ -993,15 +1073,15 @@ class OrdersController < ApplicationController
 
           raise "物流供应商错误" if transport_type.blank?
            
-          status = Order::STATUS[:printed]
-
-          if @keyclientorder.blank?
-            @keyclientorder = bind_keyclientorder
-          end
-          keyclientorder = @keyclientorder
-        else
-          status = Order::STATUS[:waiting]
-          keyclientorder = nil
+          # status = Order::STATUS[:printed]
+          is_printed = true
+          # if @keyclientorder.blank?
+          #   @keyclientorder = bind_keyclientorder
+          # end
+          # keyclientorder = @keyclientorder
+        # else
+          # status = Order::STATUS[:waiting]
+          # keyclientorder = nil
         end
 
         if order.blank? 
@@ -1027,7 +1107,8 @@ class OrdersController < ApplicationController
             local_province: local_province,
             local_city: local_city,
             local_addr: local_addr,
-            logistic: logistic)
+            logistic: logistic,
+            is_printed: is_printed)
 
           # ords[0] = order
           # if find_has_stock(ords,false).blank?
@@ -1050,9 +1131,12 @@ class OrdersController < ApplicationController
             local_province: local_province,
             local_city: local_city,
             local_addr: local_addr,
-            logistic: logistic)
+            logistic: logistic, 
+            is_printed: is_printed)
 
-          order.order_details.destroy_all
+          if !params[:business_select].blank?
+            order.order_details.destroy_all
+          end
         
           # ords[0] = order
           # if find_has_stock(ords,false).blank?
@@ -1562,7 +1646,7 @@ def exportorders_xls_content_for(objs)
 
   def bind_keyclientorder()
     # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    Keyclientorder.create(keyclient_name: "面单信息回馈 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", unit_id: current_user.unit_id, storage_id: current_storage.id, user: current_user, status: Order::STATUS[:printed])
+    Keyclientorder.create(keyclient_name: "订单波次 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", unit_id: current_user.unit_id, storage_id: current_storage.id, user: current_user, status: Order::STATUS[:printed])
   end
 
   def add_text(index,content)

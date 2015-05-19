@@ -267,6 +267,7 @@ class KeyclientordersController < ApplicationController
     rescue Exception => e
       Rails.logger.error e.backtrace
       flash[:alert] = e.message
+      @keyclientorder.delete
       redirect_to '/orders/findprintindex'
       # raise ActiveRecord::Rollback
     end
