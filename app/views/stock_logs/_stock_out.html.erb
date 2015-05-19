@@ -84,7 +84,7 @@
       <% stocklogs = @manual_stock.stock_logs%>
     <% else %>
       <% if @keyclientorder.storage.need_pick %>
-        <% stocklogs = @keyclientorder.stock_logs.where(" operation_type='out' ")%>
+        <% stocklogs = @keyclientorder.stock_logs.where(operation_type: 'out', operation: 'b2c_stock_out')%>
       <% else %>
         <% stocklogs = @keyclientorder.stock_logs%>
       <% end %>
