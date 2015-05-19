@@ -499,6 +499,10 @@ class OrdersController < ApplicationController
         if !params_f["keyclientorders.batch_no".to_sym].blank?
           selectorders=selectorders.where("keyclientorders.batch_no = ?", params_f["keyclientorders.batch_no".to_sym])
         end
+
+        if !params_f[:is_printed].blank?
+          selectorders=selectorders.where(is_printed: (params_f[:is_printed][0].eql?('t') ? true : false))
+        end
       end
     end
 
@@ -956,7 +960,9 @@ class OrdersController < ApplicationController
 
             @ids = extract_orders(instance)
 
-            extract_order_details(instance)
+            if @import_type.eql?('standard')
+              extract_order_details(instance)
+            end
 
             if ! @error_orders.blank? || ! @error_order_details.blank?
               flash_message << "部分订单导入失败！"
@@ -1090,7 +1096,9 @@ class OrdersController < ApplicationController
         else
           order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, user_id: current_user.id, is_printed: is_printed
 
-          order.order_details.destroy_all
+          if !params[:business_select].blank?
+            order.order_details.destroy_all
+          end
         
           # ords[0] = order
           # if find_has_stock(ords,false).blank?
