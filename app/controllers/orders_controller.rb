@@ -946,7 +946,9 @@ class OrdersController < ApplicationController
 
             @ids = extract_orders(instance)
 
-            extract_order_details(instance)
+            if @import_type.eql?('standard')
+              extract_order_details(instance)
+            end
 
             if ! @error_orders.blank? || ! @error_order_details.blank?
               flash_message << "部分订单导入失败！"
