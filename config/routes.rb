@@ -148,6 +148,7 @@ ShpostStorage::Application.routes.draw do
         get 'b2csettrackingnumber'
         get 'setstlogchkamt'
         get 'setorallweight'
+        get 'stockout'
       end
 
     member do

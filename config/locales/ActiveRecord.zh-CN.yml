@@ -546,6 +546,7 @@ zh-CN:
         business_id: "所属商户"
         storage_id: "所属仓库"
         keyclientorder_id: "大客户订单编号"
+        is_printed: "面单已打印"
         is_shortage: "是否缺货"
         created_at: "创建时间"
         type_b2b: "大客户订单"
@@ -575,6 +576,7 @@ zh-CN:
         out_at: "出库时间"
         business_order_id: "外部订单号"
         country_code: "国家代码"
+        country: "国家"
       order_detail:
         name: "商品名称"
         specification_id: "商品规格"        

@@ -402,11 +402,20 @@ class OrdersController < ApplicationController
   end
 
   def findprintindex
-    status = ["waiting","spliting","printed","picking"]
-    
-    @orders_grid = initialize_grid(@orders, :include => [:business, :keyclientorder, :order_details], :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],:order => 'orders.keyclientorder_id',
-     :order_direction => 'desc', :per_page => 15)
+    status = Order::STATUS_SHOW_INDEX.keys
+    @sku = params[:sku].blank? ? 'false' : params[:sku]
+    orders = @orders
+    if !@sku.blank? && @sku.eql?('true')
+      orders = @orders.includes(:order_details).order('order_details.specification_id')
+    end
+    @orders_grid = initialize_grid(orders, 
+      :include => [:business, :keyclientorder, :order_details], 
+      :conditions => ['orders.order_type = ? and orders.status in (?) ',"b2c",status],
+      # :order => 'order_details.specification_id',
+      # :order_direction => 'asc', 
+      :per_page => 15)
 
+    
     @allcnt = {}
 
     @orders_grid.with_resultset do |orders|
@@ -473,13 +482,8 @@ class OrdersController < ApplicationController
           end
         end
 
-        if !params_f[:country_code].blank?
-          if !params_f[:country_code][:fr].blank?
-            selectorders=selectorders.where("orders.country_code >= ?",params_f[:country_code][:fr])
-          end
-          if !params_f[:country_code][:to].blank?
-            selectorders=selectorders.where("orders.country_code <= ?",params_f[:country_code][:to])
-          end
+        if !params_f[:country].blank?
+          selectorders=selectorders.where("orders.country = ?",params_f[:country])
         end
 
         if !params_f["keyclientorders.batch_no".to_sym].blank?
@@ -501,6 +505,14 @@ class OrdersController < ApplicationController
       stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
 
       @allcnt[key] = [order_sum,value,stock_sum]
+    end
+  end
+
+  def stockout
+    Keyclientorder.transaction do
+      keyclientorder = bind_keyclientorder
+      @@orders_export.update_all(keyclientorder_id: keyclientorder.id)
+      redirect_to stockout_keyclientorder_url(keyclientorder)
     end
   end
 
@@ -993,6 +1005,8 @@ class OrdersController < ApplicationController
         business_name = to_string(row[15])
         batch_no = to_string(row[16])
         business_trans_no = to_string(row[17])
+        is_printed = false
+        status = Order::STATUS[:waiting]
 
         if batch_no.blank?
           raise "缺少外部订单号" if business_order_id.blank?
@@ -1029,15 +1043,15 @@ class OrdersController < ApplicationController
 
           raise "物流供应商错误" if transport_type.blank?
            
-          status = Order::STATUS[:printed]
-
-          if @keyclientorder.blank?
-            @keyclientorder = bind_keyclientorder
-          end
-          keyclientorder = @keyclientorder
-        else
-          status = Order::STATUS[:waiting]
-          keyclientorder = nil
+          # status = Order::STATUS[:printed]
+          is_printed = true
+          # if @keyclientorder.blank?
+          #   @keyclientorder = bind_keyclientorder
+          # end
+          # keyclientorder = @keyclientorder
+        # else
+          # status = Order::STATUS[:waiting]
+          # keyclientorder = nil
         end
 
         if order.blank? 
@@ -1050,8 +1064,9 @@ class OrdersController < ApplicationController
             unit_id: current_user.unit.id, 
             storage_id: current_storage.id, 
             status: status, 
-            keyclientorder: keyclientorder, 
-            user_id: current_user.id
+            # keyclientorder: keyclientorder, 
+            user_id: current_user.id,
+            is_printed: is_printed
 
           # ords[0] = order
           # if find_has_stock(ords,false).blank?
@@ -1563,7 +1578,7 @@ def exportorders_xls_content_for(objs)
 
   def bind_keyclientorder()
     # batch_no = time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+Keyclientorder.count.to_s.rjust(5,'0')
-    Keyclientorder.create(keyclient_name: "面单信息回馈 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", unit_id: current_user.unit_id, storage_id: current_storage.id, user: current_user, status: Order::STATUS[:printed])
+    Keyclientorder.create(keyclient_name: "订单波次 #{DateTime.parse(Time.now.to_s).strftime('%Y-%m-%d %H:%M:%S').to_s}", unit_id: current_user.unit_id, storage_id: current_storage.id, user: current_user, status: Order::STATUS[:printed])
   end
 
   def add_text(index,content)
