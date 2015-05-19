@@ -85,15 +85,8 @@ class Keyclientorder < ActiveRecord::Base
     end
   end
 
-  def pickcheck!
-    self.stock_logs.where(operation_type: 'out').each do |sl|
-      insl = sl.pick
-      outsl = self.stock_logs.create(stock: insl.stock, user: insl.user, operation: StockLog::OPERATION[:b2c_pick_out], status: StockLog::STATUS[:waiting], amount: insl.amount, operation_type: StockLog::OPERATION_TYPE[:out])
-    end
+  def pickcheck!    
     self.stock_logs.where(operation: 'b2c_stock_out').each do |x|
-      x.check!
-    end
-    self.stock_logs.where(operation: 'b2c_pick_out').each do |x|
       x.check!
     end
     if self.pick_waiting_amounts.blank?
@@ -103,6 +96,22 @@ class Keyclientorder < ActiveRecord::Base
     end
     if self.order_checked?
       self.update(status: STATUS[:checked])
+    end
+    self.stock_logs.where(operation_type: 'out').each do |sl|
+      insl = sl.pick
+      outsl = self.stock_logs.create(stock: insl.stock, user: insl.user, operation: StockLog::OPERATION[:b2c_pick_out], status: StockLog::STATUS[:waiting], amount: insl.amount, operation_type: StockLog::OPERATION_TYPE[:out])
+    end
+  end
+
+  def pickoutcheck!(order)
+    order.order_details.each do |od|
+      @relationship=Relationship.where("business_id=? and supplier_id=? and specification_id=?",order.business_id,od.supplier_id,od.specification_id).first
+      @stock_logs = self.stock_logs.where(operation: 'b2c_pick_out',relationship: @relationship)
+      if @stock_logs.sum(:amount) == @stock_logs.sum(:check_amount)
+        @stock_logs.each do |x|
+          x.check!
+        end
+      end
     end
   end
 
