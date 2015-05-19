@@ -948,7 +948,7 @@ class OrdersController < ApplicationController
             @error_orders = []
             @error_order_details = []
 
-            @ids = extract_orders(instance)
+            @ids = extract_orders(instance, type)
 
             if @import_type.eql?('standard')
               extract_order_details(instance)
@@ -984,7 +984,7 @@ class OrdersController < ApplicationController
 
   private
 
-  def extract_orders(instance)
+  def extract_orders(instance, type)
     #Orders
     instance.default_sheet = instance.sheets.first
 
@@ -1038,7 +1038,9 @@ class OrdersController < ApplicationController
         end
 
         if ! order.blank?
-          raise "订单已处理" if ! order.status.eql?(Order::STATUS[:waiting]) && ! order.status.eql?(Order::STATUS[:printed])
+          if type == 1
+            raise "订单已处理" if ! order.status.eql?(Order::STATUS[:waiting])
+          end
         end
 
         #Tracking info
@@ -1084,9 +1086,25 @@ class OrdersController < ApplicationController
                     
           @ids << order.id
         else
-          order.update! tracking_number: tracking_number, transport_type: transport_type, total_weight: total_weight, pingan_ordertime: pingan_ordertime, customer_unit: customer_unit, customer_name: customer_name, customer_address: customer_address, customer_postcode: customer_postcode, province: province, city: city, county: county, customer_tel: customer_tel, customer_phone: customer_phone, status: status, user_id: current_user.id, is_printed: is_printed
+          order.update! tracking_number: tracking_number, 
+            transport_type: transport_type, 
+            total_weight: total_weight, 
+            pingan_ordertime: pingan_ordertime, 
+            customer_unit: customer_unit, 
+            customer_name: customer_name, 
+            customer_address: customer_address, 
+            customer_postcode: customer_postcode, 
+            province: province, 
+            city: city, 
+            county: county, 
+            customer_tel: customer_tel, 
+            customer_phone: customer_phone, 
+            # 面单回馈不需要改变订单状态
+            # status: status, 
+            user_id: current_user.id, 
+            is_printed: is_printed
 
-          if !params[:business_select].blank?
+          if type == 1
             order.order_details.destroy_all
           end
         

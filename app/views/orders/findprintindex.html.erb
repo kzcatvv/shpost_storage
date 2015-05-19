@@ -14,7 +14,7 @@
   <div class="findprintindex-btns">
     <% if can? :stockout, Order %>
       <%= link_to t('.stockout', :default => t("helpers.links.stockout")),
-                  "/orders/stockout" , :class => 'btn btn-primary' %>
+                  "/orders/stockout" , :data => { :confirm => t('wice_grid.stock_out_confirmation', :default => t("helpers.links.confirm", :default => '确定生成出库单?')) }, :class => 'btn btn-primary' %>
     <% end %>
 
     <a href="javascript:pick_preview()" class='btn btn-primary' >打印配货单</a>
