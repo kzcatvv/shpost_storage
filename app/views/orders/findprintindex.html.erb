@@ -1,4 +1,4 @@
-<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0 style="display:none"> 
+<object id="LODOP_OB" classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" width=0 height=0> 
   <embed id="LODOP_EM" type="application/x-print-lodop" width=0 height=0 pluginspage="install_lodop.exe"></embed>
 </object>
 <%- model_class = Order -%>
@@ -126,8 +126,10 @@
 </div>
 <script language="javascript" type="text/javascript"> 
 function pick_preview(){
+    alert("aaaa");
     LODOP=getLodop(document.getElementById('LODOP_OB'),document.getElementById('LODOP_EM'));  
     LODOP.PRINT_INIT("打印配货单");
+    alert("bbb");
     <% @orders_grid.all_pages_records.each do |order| %>
     LODOP.SET_PRINT_PAGESIZE(1,"210mm","297mm","");
     LODOP.PRINT_INIT("打印配货单");
