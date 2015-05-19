@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511080719) do
+ActiveRecord::Schema.define(version: 20150513060945) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20150511080719) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+    t.string   "english_name"
     t.string   "name_en"
   end
 
@@ -364,9 +365,9 @@ ActiveRecord::Schema.define(version: 20150511080719) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
-    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
+    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -523,6 +524,7 @@ ActiveRecord::Schema.define(version: 20150511080719) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
+    t.string   "english_name"
     t.string   "name_en"
     t.float    "price"
   end
@@ -557,6 +559,7 @@ ActiveRecord::Schema.define(version: 20150511080719) do
     t.integer  "pick_id"
     t.integer  "relationship_id"
     t.string   "sn"
+    t.integer  "check_amount",            default: 0
   end
 
   create_table "stock_mons", force: true do |t|

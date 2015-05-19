@@ -10,13 +10,13 @@ class InventoriesController < ApplicationController
 
   def new
     @area = Area.where("storage_id = ?",current_storage.id)
-    @areas_grid = initialize_grid(Area,
+    @areas_grid = initialize_grid(Area,:name => 'g1',
       :conditions => {:storage_id => current_storage.id})
 
-    @businesses_grid = initialize_grid(Business,
+    @businesses_grid = initialize_grid(Business,:name => 'g2',
       :conditions => {:unit_id => current_storage.unit.id})
 
-    @relationships_grid = initialize_grid(Relationship,
+    @relationships_grid = initialize_grid(Relationship,:name => 'g3',
       :include => [:business,:supplier],
       :conditions => {"businesses.unit_id" => current_storage.unit.id,
                       "suppliers.unit_id" => current_storage.unit.id})
@@ -24,21 +24,30 @@ class InventoriesController < ApplicationController
 
   def edit
     @area = Area.where("storage_id = ?",current_storage.id)
-    @areas_grid = initialize_grid(Area,
+    @areas_grid = initialize_grid(Area,:name => 'g1',
       :conditions => {:storage_id => current_storage.id})
 
-    @businesses_grid = initialize_grid(Business,
+    @businesses_grid = initialize_grid(Business,:name => 'g2',
       :conditions => {:unit_id => current_storage.unit.id})
 
-    @relationships_grid = initialize_grid(Relationship,
+    @relationships_grid = initialize_grid(Relationship,:name => 'g3',
       :include => [:business,:supplier],
       :conditions => {"businesses.unit_id" => current_storage.unit.id,
                       "suppliers.unit_id" => current_storage.unit.id})
   end
 
   def create
-    ds = params[:grid][:selected]
-    @inventory.inv_type_dtl = ds.join(",")
+    if !params[:g1].nil?
+      areads = params[:g1][:selected]
+    end
+    if !params[:g2].nil?
+      goodds = params[:g2][:selected]
+    end
+    if !params[:g3].nil?
+      goodds = params[:g3][:selected]
+    end
+    @inventory.inv_type_dtl = areads.join(",")
+    @inventory.goods_inv_dtl = goodds.join(",")
     @inventory.status = "opened"
     respond_to do |format|
       if @inventory.save
@@ -52,8 +61,17 @@ class InventoriesController < ApplicationController
   end
 
   def update
-    ds = params[:grid][:selected]
-    @inventory.inv_type_dtl = ds.join(",")
+    if !params[:g1].nil?
+      areads = params[:g1][:selected]
+    end
+    if !params[:g2].nil?
+      goodds = params[:g2][:selected]
+    end
+    if !params[:g3].nil?
+      goodds = params[:g3][:selected]
+    end
+    @inventory.inv_type_dtl = areads.join(",")
+    @inventory.goods_inv_dtl = goodds.join(",")
 
     respond_to do |format|
       if @inventory.update(inventory_params)
@@ -76,13 +94,18 @@ class InventoriesController < ApplicationController
 
   def inventorydetail
     @inventoryid = @inventory.id
+    @stocks =  Stock.includes(:storage).where("storages.id = ? ",current_storage.id)
     if @inventory.status == "opened"
-      if @inventory.inv_type == "byshelf"
-        shelves=@inventory.inv_type_dtl.split(",")
-        @stocks = Stock.where("shelf_id in (?)",shelves)
-      elsif @inventory.inv_type == "byrel"
-        rels = @inventory.inv_type_dtl.split(",")
-        @stocks = Stock.where("relationship_id in (?)",rels)
+      if @inventory.inv_type == "byarea"
+        areas=@inventory.inv_type_dtl.split(",")
+        @stocks = @stocks.includes(:area).where("areas.id in (?)",areas)
+      end
+      if @inventory.goods_inv_type == "bybusiness"
+        bus = @inventory.goods_inv_dtl.split(",")
+        @stocks = @stocks.where("business_id in (?)",bus)
+      elsif @inventory.goods_inv_type == "byrel"
+        rels = @inventory.goods_inv_dtl.split(",")
+        @stocks = @stocks.where("relationship_id in (?)",rels)
       end
 
       @stocks.each do |stock|

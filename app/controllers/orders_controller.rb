@@ -288,6 +288,7 @@ class OrdersController < ApplicationController
   end
 
   def packout
+    @needpick = current_storage.need_pick
     @order_details=[]
     @curr_order=""
     @orders = Order.where("storage_id = ?", current_storage.id)
@@ -296,6 +297,7 @@ class OrdersController < ApplicationController
   end
 
   def findorderout
+    @needpick = current_storage.need_pick
     @_tracking_number = params[:_tracking_number]
     @tracking_number = params[:tracking_number]
 
@@ -330,12 +332,13 @@ class OrdersController < ApplicationController
         end
       end 
     else
-      order = Order.where(tracking_number: @tracking_number, status: "checked").first
+      order = Order.where(" (tracking_number=? or barcode=?) and status=?",@tracking_number,@tracking_number,"checked").first
       if order.nil?
         @curr_order = 0
         @curr_dtl = 0
       else
         @curr_order = order.id
+        @order = order
         @order_details = order.order_details
         @curr_dtl = 0
         @dtl_cnt = order.order_details.count
@@ -353,7 +356,49 @@ class OrdersController < ApplicationController
 
   def setoutstatus
     @order=Order.find(params[:orderid])
+    if current_storage.need_pick
+      @keyclientorder=@order.keyclientorder
+      @keyclientorder.pickoutcheck!(@order)
+    end
     @order.update_attribute(:status, "packed")
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def setstlogchkamt 
+    if current_storage.need_pick
+      @order=Order.find(params[:orderid])
+      @ordtl=OrderDetail.find(params[:ordtlid])
+      @relationship=Relationship.where("business_id=? and supplier_id=? and specification_id=?",@order.business_id,@ordtl.supplier_id,@ordtl.specification_id).first
+      @keyclientorder=@order.keyclientorder
+      @stock_logs=@keyclientorder.stock_logs.where(operation: 'b2c_pick_out')
+      allchkamt=@stock_logs.where(relationship: @relationship).sum(:check_amount)
+      allamt=@stock_logs.where(relationship: @relationship).sum(:amount)
+      if allamt > allchkamt
+        @stock_logs.where(relationship: @relationship).each do |stock_log|
+          if stock_log.amount > stock_log.check_amount
+            setchkamt = stock_log.check_amount + 1
+            stock_log.check_amount = setchkamt
+            stock_log.save
+          end
+        end
+      end
+    end
+    respond_to do |format|
+      format.js 
+    end
+  end
+
+  def setorallweight
+    if !params[:orweight].nil?
+      @order=Order.find(params[:orderid])
+      allweight=params[:orweight]
+      @order.update(total_weight: allweight)
+    end
+    respond_to do |format|
+      format.js 
+    end
   end
 
   def findprintindex

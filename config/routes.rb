@@ -5,6 +5,7 @@ ShpostStorage::Application.routes.draw do
   resources :logistics do
     collection do
       get 'hotprint_ready'
+      get 'hotprint_show'
       post 'hotprint_show'
     end
   end
@@ -145,6 +146,8 @@ ShpostStorage::Application.routes.draw do
         get 'b2cfind69code'
         get 'b2csplitanorder'
         get 'b2csettrackingnumber'
+        get 'setstlogchkamt'
+        get 'setorallweight'
         get 'stockout'
       end
 

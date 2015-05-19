@@ -1,5 +1,6 @@
 var oid = <%= @curr_order %>;
 var id = <%= @curr_dtl %>;
+var np = <%= @needpick %>
 
 if (oid == 0){
     if (id == 0){
@@ -22,18 +23,23 @@ else{
       var tdraid = "#realam_"+<%= @curr_dtl %>;
       var tddbid = "#dbam_"+<%= @curr_dtl %>;
       var trid = "#tr_"+<%= @curr_dtl %>;
+      var odid = <%= @curr_dtl %>;
       
       if ( parseInt( $(tddbid).val() ) != parseInt( $(tdraid).val() ) )
       {
         //alert($(tddbid).val()+"+"+$(tdraid).val());
         if ( parseInt( $(tddbid).val() ) > parseInt( $(tdraid).val() ) )
         {
-           $.ajax({
+          if (np)
+          {
+            $.ajax({
                      type : 'GET',
                      url : '/orders/setstlogchkamt/',
-                     data: { orderid: $('#orderid').val() },
+                     data: { orderid: $('#orderid').val(),ordtlid: odid },
                      dataType : 'script'
                     });
+          }
+           
            $(tdraid).val(parseInt($(tdraid).val())+1);
            //alert($(tdraid).val());
         }
@@ -54,8 +60,14 @@ else{
                      dataType : 'script'
                     });
              $('#_tracking_number').val("")
-             $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
-             selfAlert("该面单的商品已全部扫描完成",3000);
+             if (np)
+             {
+
+             }else{
+               $('#outorders').html(" <%= escape_javascript(render(:partial => "orders/packout_forms")) %> ");
+               selfAlert("该面单的商品已全部扫描完成",3000);
+             }
+             
            }
 
            
