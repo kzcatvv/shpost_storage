@@ -357,7 +357,6 @@ class OrdersController < ApplicationController
         end
       end
     end
-    binding.pry
     respond_to do |format|
       format.js 
     end
