@@ -81,6 +81,11 @@
     </div>
 
     <div>
+      <span>是否虚拟:</span>
+      <%= grid_filter(@orders_grid, :virtual_filter)%>
+    </div>
+
+    <div>
       <%= form_tag(findprintindex_orders_path, id: 'skufm', method:  :get) do %>
       <%= check_box("checkbox","sku", onclick: "window.location.href='findprintindex?sku='+this.checked", checked: @sku.blank? ? false : (@sku.eql?('false') ? false : true))%>sku优先
 
