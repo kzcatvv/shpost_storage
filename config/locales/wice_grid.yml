@@ -35,6 +35,7 @@ en:
     saved_query_panel_title: Saved Queries
     save_query_button_label: Save the state of filters
     saved_query_deletion_confirmation: Are you sure?
+    stock_out_confirmation: Are you sure?
     saved_query_deletion_link_title: Delete query
     saved_query_link_title: Load query
     validates_uniqueness_error: A query with this name already exists
@@ -492,6 +493,7 @@ zh-CN:
     saved_query_panel_title: 查询存储
     save_query_button_label: 储存查询状态
     saved_query_deletion_confirmation: 确定删除？
+    stock_out_confirmation: 确定生成出库单？
     saved_query_deletion_link_title: 删除查询
     saved_query_link_title: 读取查询
     validates_uniqueness_error: 已存在相同名称的查询

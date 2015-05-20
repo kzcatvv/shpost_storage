@@ -251,7 +251,7 @@ class KeyclientordersController < ApplicationController
       if needpick
         Stock.pick_stock_out(@keyclientorder,current_storage, current_user)
 
-        @stock_logs = @keyclientorder.stock_logs.where(" operation_type = 'out' ")
+        @stock_logs = @keyclientorder.stock_logs.where(operation_type: 'out', operation: 'b2c_stock_out')
       else
 
         Stock.order_stock_out(@keyclientorder, current_user)
