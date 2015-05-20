@@ -62,14 +62,14 @@ pr='';
 <% eorder.order_details.each do |j| %>
 <% allwg = allwg + (j.weight.nil? ? j.specification.weight : j.weight) * j.amount %>
 <% allpr = allpr + (j.price.nil? ? j.specification.price : j.price) * j.amount %>
-content=content+'<%= j.name.nil? ? j.specification.commodity.english_name : j.name %>\n'
-wg=wg+'<%= j.weight.nil? ? j.specification.weight : j.weight %>\n'
+content=content+'<%= j.specification.commodity.english_name.nil? ? j.name : j.specification.commodity.english_name %>\n'
+wg=wg+'<%= j.weight.nil? ? j.specification.weight/1000 : j.weight/1000 %>\n'
 pr=pr+'<%= j.price.nil? ? j.specification.price : j.price %>\n'
 <% end %>
 LODOP.ADD_PRINT_LINE(308,7,307,367,0,1);
 LODOP.ADD_PRINT_LINE(330,6,329,366,0,1);
 LODOP.ADD_PRINT_TEXT(241,7,221,66,content);
-LODOP.ADD_PRINT_TEXT(308,12,352,20,"Total Gross Weight (Kg)                 <%= allwg%>    <%= allpr%>");
+LODOP.ADD_PRINT_TEXT(308,12,352,20,"Total Gross Weight (Kg)                 <%= allwg/1000%>    <%= allpr%>");
 LODOP.ADD_PRINT_LINE(218,288,328,289,0,1);
 LODOP.ADD_PRINT_LINE(218,234,328,235,0,1);
 LODOP.ADD_PRINT_TEXT(330,11,354,37,"I certify that the particulars given in this declaration are correct and this item does not contain any dangerous articles prohibited by legislation or by postal or customers regulations.");
@@ -139,12 +139,12 @@ pr='';
 <% eorder.order_details.each do |j| %>
 <% allwg = allwg + (j.weight.nil? ? j.specification.weight : j.weight) * j.amount %>
 <% allpr = allpr + (j.price.nil? ? j.specification.price : j.price) * j.amount %>
-content=content+'<%= j.name.nil? ? j.specification.commodity.english_name : j.name %>\n'
-wg=wg+'<%= j.weight.nil? ? j.specification.weight : j.weight %>\n'
+content=content+'<%= j.specification.commodity.english_name.nil? ? j.name : j.specification.commodity.english_name %>\n'
+wg=wg+'<%= j.weight.nil? ? j.specification.weight/1000 : j.weight/1000 %>\n'
 pr=pr+'<%= j.price.nil? ? j.specification.price : j.price %>\n'
 <% end %>
 LODOP.ADD_PRINT_TEXT(232,3,226,59,content);
-LODOP.ADD_PRINT_TEXT(296,3,356,20,"Total Gross Weight (Kg)                 <%= allwg %>    <%= allpr%>");
+LODOP.ADD_PRINT_TEXT(296,3,356,20,"Total Gross Weight (Kg)                 <%= allwg/1000 %>    <%= allpr%>");
 LODOP.ADD_PRINT_LINE(210,282,315,283,0,1);
 LODOP.ADD_PRINT_LINE(210,232,315,233,0,1);
 LODOP.ADD_PRINT_TEXT(319,2,358,38,"I certify that the particulars given in this declaration are correct and this item does not contain any dangerous articles prohibited by legislation or by postal or customers regulations.");
