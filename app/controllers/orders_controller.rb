@@ -1232,7 +1232,7 @@ class OrdersController < ApplicationController
         # end     
 
         if order_detail.blank? 
-          OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order
+          OrderDetail.create! batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order
         else
           order_detail.update!(amount: order_detail.amount + amount, business_deliver_no: sub_order_id)
         end
