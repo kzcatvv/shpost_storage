@@ -146,7 +146,7 @@ class Stock < ActiveRecord::Base
 
   def self.pick_stock_out(order,cur_storage, operation_user = nil)
     i=0
-    order.waiting_amounts.each do |x, amount|
+    order.pick_waiting_amounts.each do |x, amount|
       if amount > 0
         stocks_in_shelf_type = Stock.find_stocks_in_shelf_type(Specification.find(x[0]), x[1].blank? ? nil : Supplier.find(x[1]), Business.find(x[2]), "pick", cur_storage,false)
         if stocks_in_shelf_type.count > 0
