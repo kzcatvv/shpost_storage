@@ -300,6 +300,7 @@ class OrdersController < ApplicationController
 
   def findorderout
     @needpick = current_storage.need_pick
+    @ispd=1
     @_tracking_number = params[:_tracking_number]
     @tracking_number = params[:tracking_number]
 
@@ -356,6 +357,7 @@ class OrdersController < ApplicationController
         end
       end
     end
+    binding.pry
     respond_to do |format|
       format.js 
     end
@@ -1188,6 +1190,7 @@ class OrdersController < ApplicationController
         sku_extcode_69code = to_string(row[2])
         supplier_no = to_string(row[3])
         amount = to_string(row[4]).to_i
+        s_name = to_string(row[5])
         business_no = to_string(row[6])
         business_name = to_string(row[7])
         batch_no = to_string(row[8])
@@ -1264,7 +1267,7 @@ class OrdersController < ApplicationController
         # end     
 
         if order_detail.blank? 
-          OrderDetail.create! name: relationship.specification.name, batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order, defective: defective
+          OrderDetail.create! name: (s_name.blank? ? '' : s_name), batch_no: batch_no, specification: relationship.specification, amount: amount, supplier: relationship.supplier, business_deliver_no: sub_order_id, order: order, defective: defective
         else
           order_detail.update!(amount: order_detail.amount + amount, business_deliver_no: sub_order_id,defective: defective)
         end
