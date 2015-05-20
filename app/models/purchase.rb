@@ -13,9 +13,15 @@ class Purchase < ActiveRecord::Base
 	# validates_presence_of :no, :name, message: '不能为空'
 
   STATUS = { opened: 'opened', closed: 'closed'}
+  VIRTUAL = { 0=> '非虚拟', 1=> '虚拟'}
 
   def status_name
     status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
+  end
+
+
+  def virtual_name
+    virtual.blank? ? "" : self.class.human_attribute_name("virtual_#{virtual}")
   end
 
   def close
@@ -50,6 +56,15 @@ class Purchase < ActiveRecord::Base
       end
     end
     return true
+  end
+
+  def has_checked?
+    self.purchase_details.each do |x|
+      if x.has_checked?
+        return true
+      end
+    end
+    return false
   end
 
   def closed?

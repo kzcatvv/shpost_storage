@@ -59,6 +59,20 @@ class StoragesController < ApplicationController
   # PATCH/PUT /storages/1.json
   def update
     respond_to do |format|
+      if !@storage.need_pick
+        @storage.areas do |a|
+          if a.area_type=="pick"
+            a.area_type = "normal"
+            a.save
+            a.shelves do |s|
+              if s.shelf_type=="pick"
+                s.shelf_type="normal"
+                s.save
+              end
+            end
+          end
+        end
+      end
       if @storage.update(storage_params)
         format.html { redirect_to unit_storage_path(@unit,@storage), notice: I18n.t('controller.update_success_notice', model: '仓库') }
         format.json { head :no_content }

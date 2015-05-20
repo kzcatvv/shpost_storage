@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150518030454) do
+ActiveRecord::Schema.define(version: 20150519065635) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -51,7 +51,6 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
-    t.string   "english_name"
     t.string   "name_en"
   end
 
@@ -189,6 +188,7 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.string   "batch_no"
     t.integer  "supplier_id"
     t.integer  "business_id"
+    t.string   "defective",         default: "0"
   end
 
   create_table "keyclientorders", force: true do |t|
@@ -208,6 +208,7 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.string   "barcode"
     t.string   "no"
     t.string   "order_type",     default: "b2c"
+    t.string   "virtual",        default: "0"
   end
 
   create_table "logistics", force: true do |t|
@@ -236,6 +237,8 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.integer  "specification_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "defctive",         default: "0"
+    t.string   "defective",        default: "0"
   end
 
   create_table "manual_stocks", force: true do |t|
@@ -249,6 +252,7 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "barcode"
+    t.string   "virtual",     default: "0"
   end
 
   create_table "mobile_logs", force: true do |t|
@@ -294,7 +298,7 @@ ActiveRecord::Schema.define(version: 20150518030454) do
   end
 
   create_table "order_details", force: true do |t|
-    t.string   "name",                default: "", null: false
+    t.string   "name",                default: "",  null: false
     t.integer  "specification_id"
     t.integer  "amount"
     t.float    "price"
@@ -308,6 +312,8 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.string   "is_shortage"
     t.string   "from_country"
     t.float    "weight"
+    t.string   "defctive",            default: "0"
+    t.string   "defective",           default: "0"
   end
 
   create_table "order_details_stock_logs", id: false, force: true do |t|
@@ -365,9 +371,9 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
+    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
-    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -401,6 +407,7 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.string   "send_name"
     t.string   "send_zip"
     t.string   "send_mobile"
+    t.string   "virtual",                        default: "0"
     t.boolean  "is_printed",                     default: false
   end
 
@@ -421,7 +428,7 @@ ActiveRecord::Schema.define(version: 20150518030454) do
   end
 
   create_table "purchase_details", force: true do |t|
-    t.string   "name",                         default: "", null: false
+    t.string   "name",                         default: "",  null: false
     t.integer  "purchase_id"
     t.integer  "supplier_id"
     t.integer  "specification_id"
@@ -433,10 +440,12 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "defctive",                     default: "0"
+    t.string   "defective",                    default: "0"
   end
 
   create_table "purchases", force: true do |t|
-    t.string   "no",          default: "", null: false
+    t.string   "no",          default: "",  null: false
     t.integer  "unit_id"
     t.integer  "business_id"
     t.integer  "amount"
@@ -445,9 +454,10 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "name",        default: "", null: false
+    t.string   "name",        default: "",  null: false
     t.integer  "storage_id"
     t.string   "barcode"
+    t.string   "virtual",     default: "0"
   end
 
   create_table "relationships", force: true do |t|
@@ -477,8 +487,9 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.integer "unit_id"
     t.integer "storage_id"
     t.integer "logistic_id"
-    t.string  "start_no"
-    t.string  "end_no"
+    t.integer "start_no",    limit: 255
+    t.integer "end_no",      limit: 255
+    t.string  "storage_no"
   end
 
   create_table "sequences", force: true do |t|
@@ -525,7 +536,6 @@ ActiveRecord::Schema.define(version: 20150518030454) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
-    t.string   "english_name"
     t.string   "name_en"
     t.float    "price"
   end

@@ -4,10 +4,14 @@ class StocksController < ApplicationController
   # GET /stocks
   # GET /stocks.json
   def index
+    # @storage = current_storage
+    # if !@storage.need_pick
+    #   @stocks = @stocks.includes(:shelf).where("shelves.shelf_type!='pick'")
+    # end
     @stocks_grid = initialize_grid(@stocks,
       :order => 'stocks.id',
       :order_direction => 'desc',
-      include: [:shelf, :specification, :business, :supplier],
+      include: [:shelf, :specification, :business, :supplier, :relationship],
       :name => 'stocks',
       :enable_export_to_csv => true,
       :csv_file_name => 'stocks')
@@ -183,6 +187,7 @@ class StocksController < ApplicationController
     @area_code=params[:area_code]
     @is_zero=params[:is_zero]
     zerostocks=[]
+    resls=[]
 
     if !params[:ex_code].blank?
       @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
@@ -255,13 +260,32 @@ class StocksController < ApplicationController
         zerostockstemp.each do |s|
           zerostocks << s.relationship_id
         end
+        zerostocks1=zerostocks
 
         if @selrel.blank?
-          resls = Relationship.where(id: zerostocks)
-          @zerorels = Relationship.where.not(id: resls)
+          # resls = Relationship.where(id: zerostocks)
+          # @zerorels = Relationship.where.not(id: resls)
+          until zerostocks.blank? do
+            x = Relationship.where(id: zerostocks.pop(1000))
+            resls += x
+          end
+          
+          until zerostocks1.blank? do
+            x = Relationship.where.not(id: zerostocks1.pop(1000))
+            @zerorels += x
+          end
         else
-          resls = Relationship.where(id: zerostocks)
-          @zerorels = @selrels.where.not(id: resls)
+          # resls = Relationship.where(id: zerostocks)
+          # @zerorels = @selrels.where.not(id: resls)
+          until zerostocks.blank? do
+            x = Relationship.where(id: zerostocks.pop(1000))
+            resls += x
+          end
+
+          until zerostocks1.blank? do
+            x = @selrels.where.not(id: zerostocks1.pop(1000))
+            @zerorels += x
+          end
         end
       end
       
@@ -275,6 +299,7 @@ class StocksController < ApplicationController
     @selrels=[]
     @zerorels=""
     zerostocks=[]
+    resls=[]
 
     if !params[:ex_code].blank?
       @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
@@ -347,12 +372,31 @@ class StocksController < ApplicationController
         zerostockstemp.each do |s|
           zerostocks << s.relationship_id
         end
+        zerostocks1=zerostocks
         if @selrel.blank?
-          resls = Relationship.where(id: zerostocks)
-          @zerorels = Relationship.where.not(id: resls)
+          # resls = Relationship.where(id: zerostocks)
+          # @zerorels = Relationship.where.not(id: resls)
+          until zerostocks.blank? do
+            x = Relationship.where(id: zerostocks.pop(1000))
+            resls += x
+          end
+          
+          until zerostocks1.blank? do
+            x = Relationship.where.not(id: zerostocks1.pop(1000))
+            @zerorels += x
+          end
         else
-          resls = Relationship.where(id: zerostocks)
-          @zerorels = @selrels.where.not(id: resls)
+          # resls = Relationship.where(id: zerostocks)
+          # @zerorels = @selrels.where.not(id: resls)
+          until zerostocks.blank? do
+            x = Relationship.where(id: zerostocks.pop(1000))
+            resls += x
+          end
+
+          until zerostocks1.blank? do
+            x = @selrels.where.not(id: zerostocks1.pop(1000))
+            @zerorels += x
+          end
         end
       end
 

@@ -276,6 +276,8 @@ ShpostStorage::Application.routes.draw do
       post 'order_return_modify'
       post 'mod_stocklog_pickin_shelf'
       post 'inventory_modify'
+      get 'query_inoutlogs'
+      get 'query_inoutlog_details'
     end
   end
 

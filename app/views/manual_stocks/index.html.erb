@@ -26,10 +26,15 @@
 
     end
 
+    g.column name: model_class.human_attribute_name(:virtual), attribute: 'virtual',custom_filter: ManualStock::VIRTUAL.map {|k, v| [model_class.human_attribute_name("virtual_#{k}"), v]} do |manual_sotck| 
+      manual_sotck.virtual_name
+
+    end
+
     g.column do |manual_stock|
       ActiveSupport::SafeBuffer.new << 
       (link_to t('.edit', :default => t("helpers.links.edit")), edit_manual_stock_path(manual_stock), :class => 'btn btn-xs btn-primary' if can? :update, manual_stock) << ' ' <<
-      (link_to t('.manual_stock_details', :default => t("helpers.links.manual_stock_details")),manual_stock_manual_stock_details_path(manual_stock), :class => 'btn btn-xs btn-info' if can? :manual_stock_detail, manual_stock) << ' ' <<
+      (link_to t('.manual_stock_details', :default => t("helpers.links.manual_stock_details")),manual_stock_manual_stock_details_path(manual_stock), :class => 'btn btn-xs btn-info' ) << ' ' <<
       (link_to t('.stock_out_manual_stock', :default => t("helpers.links.stock_out_manual_stock")), stock_out_manual_stock_path(manual_stock), method: :get, :class => 'btn btn-xs btn-primary' if can? :stock_out, manual_stock) << ' ' <<
       (link_to t('.check_manual_stock', :default => t("helpers.links.check_manual_stock")), check_manual_stock_path(manual_stock), method: :patch, :class => 'btn btn-xs btn-primary' if can? :check, manual_stock) << ' ' <<
       (link_to t('.scan', :default => '逐件扫描'), scan_manual_stock_path(manual_stock), :method => :get, :class => 'btn btn-xs btn-primary' if can? :update, manual_stock) << ' ' <<

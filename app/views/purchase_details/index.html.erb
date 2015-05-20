@@ -2,12 +2,10 @@
 <div class="page-header">
   <h1><%=@purchase.name%>-<%=t '.title', :default => model_class.model_name.human%></h1>
   <div style="float:right">
-    <% if can? :index, PurchaseDetail %>
-      <%= link_to t('.back', :default => t("helpers.links.back")),
+    <%= link_to t('.back', :default => t("helpers.links.back")),
                  purchases_path,
                   :class => 'btn btn-primary' %>
-    <% end %>
-    <% if can? :new, PurchaseDetail %>
+    <% if !@purchase.status.eql?"closed" %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
                  new_purchase_purchase_detail_path(@purchase),
                   :class => 'btn btn-primary' %>
@@ -47,6 +45,11 @@
 
     g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: PurchaseDetail::STATUS.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |purchase_detail| 
       purchase_detail.status_name
+
+    end
+
+    g.column name: model_class.human_attribute_name(:defective), attribute: 'defective',custom_filter: PurchaseDetail::DEFECTIVE.map {|k, v| [model_class.human_attribute_name("defective#{k}"), v]} do |purchase_detail| 
+      purchase_detail.defective_name
 
     end
 

@@ -13,9 +13,14 @@ class PurchaseDetail < ActiveRecord::Base
   validates_numericality_of :amount, only_integer: true # 必須是整數  
 
   STATUS = {waiting: 'waiting', stock_in: 'stock_in'}
+  DEFECTIVE = { 0=> '非残次品', 1=> '残次品'}
 
   def status_name
     status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
+  end
+
+  def defective_name
+    defective.blank? ? "" : self.class.human_attribute_name("defective_#{defective}")
   end
 
   def stock_in?
@@ -40,6 +45,10 @@ class PurchaseDetail < ActiveRecord::Base
 
   def checked_amount
     self.purchase.stock_logs.where(business_id: self.purchase.business_id, supplier_id: self.supplier_id, specification_id: self.specification_id).to_a.sum{|x| x.checked? ? x.amount : 0}
+  end
+
+  def has_checked?
+    self.checked_amount>0
   end
 
   # def set_batch_no

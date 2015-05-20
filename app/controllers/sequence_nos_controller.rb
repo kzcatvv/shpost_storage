@@ -56,6 +56,6 @@ class SequenceNosController < ApplicationController
     end
 
     def sequence_no_params
-      params.require(:sequence_no).permit(:unit_id, :storage_id, :logistic_id, :start_no, :end_no)
+      params.require(:sequence_no).permit(:unit_id, :storage_id, :logistic_id, :start_no, :end_no, :storage_no)
     end
 end

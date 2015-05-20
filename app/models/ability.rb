@@ -84,7 +84,7 @@ class Ability
         can :order_statistic_details, :orders
         can :manage, SequenceNo
         # can :manage,BusinessRelationship
-
+        
     elsif user.user?
         can :update, User, id: user.id
         can :read, UserLog, user: {id: user.id}
@@ -135,7 +135,7 @@ class Ability
         
         can :manage, PurchaseArrival, purchase_detail: {purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}}
 
-        can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
+        can [:read,:stock_in], Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
 
         can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
 
@@ -144,11 +144,16 @@ class Ability
         cannot :close, Purchase do |purchase|
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
+        
+        cannot :destroy, Purchase do |purchase|
+            (purchase.storage_id == storage.id)&& purchase.has_checked?
+        end
 
         cannot :update, PurchaseDetail do |purchase_detail|
             (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in])
         end
 
+        
         cannot :destroy, PurchaseDetail do |purchase_detail|
             (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in])
         end
@@ -157,12 +162,16 @@ class Ability
 
         can :manage, ManualStockDetail, manual_stock: {storage_id: storage.id, status: ManualStock::STATUS[:opened]}
 
-        can :read, ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:closed]
+        can [:read,:stock_out], ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:closed]
 
         can :read, ManualStockDetail, manual_stock: {storage_id: storage.id, status: ManualStock::STATUS[:closed]}
 
         cannot :close, ManualStock do |manual_stock|
             (manual_stock.storage_id == storage.id) && (manual_stock.status == ManualStock::STATUS[:opened]) && !manual_stock.can_close?
+        end
+     
+        cannot :destroy, ManualStock do |manual_stock|
+            (manual_stock.storage_id == storage.id)&& manual_stock.has_checked?
         end
 
         cannot :update, ManualStockDetail do |manual_stock_detail|
@@ -193,7 +202,14 @@ class Ability
         can :manage, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :manage, MoveStock, unit_id: user.unit_id
+        cannot :destroy, MoveStock do |move_stock|
+            (move_stock.storage_id == storage.id)&& move_stock.has_checked?
+        end
+
         can :manage, Inventory, unit_id: user.unit_id
+        cannot :destroy, Inventory do |inventory|
+            (inventory.storage_id == storage.id)&& inventory.has_checked?
+        end
         # can [:read, :getstock, :findstock], Stock, shelf: {area: {storage_id: storage.id}}
 
         # can :new, Stock, shelf: {area: {storage_id: storage.id}}
@@ -205,7 +221,10 @@ class Ability
         # can :removetr, StockLog, stock: {shelf: {area: {storage_id: storage.id}}}
         cannot :destroy, StockLog, status: "checked"
         cannot :split, StockLog, status: "checked"
-
+        cannot :destroy, StockLog do |stocklog|
+            stocklog.parent.status == Purchase::STATUS[:closed] if stocklog.parent
+        end
+        
         can :manage, OrderReturn, storage_id: storage.id, status: Purchase::STATUS[:opened]
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
@@ -234,6 +253,9 @@ class Ability
         can :move2bad, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :read, StockLog, shelf: {area: {storage_id: storage.id}}
+        cannot :destroy, StockLog do |stocklog|
+            stocklog.parent.status == Purchase::STATUS[:closed] if stocklog.parent
+        end
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
 
@@ -248,7 +270,7 @@ class Ability
 
         can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
 
-        can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
+        can [:read,:stock_in], Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
 
         can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
 
@@ -256,9 +278,16 @@ class Ability
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
 
+        cannot :destroy, Purchase do |purchase|
+            (purchase.storage_id == storage.id)&& purchase.has_checked?
+        end
+        
         can :read, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :read, StockLog, shelf: {area: {storage_id: storage.id}}
+        cannot :destroy, StockLog do |stocklog|
+            stocklog.parent.status == Purchase::STATUS[:closed] if stocklog.parent
+        end
 
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
         can [:read,:hotprint_ready,:hotprint_show], Logistic
@@ -283,7 +312,7 @@ class Ability
 
         can :manage, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:opened]}
 
-        can :read, Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
+        can [:read,:stock_in], Purchase, storage_id: storage.id, status: Purchase::STATUS[:closed]
 
         can :read, PurchaseDetail, purchase: {storage_id: storage.id, status: Purchase::STATUS[:closed]}
 
@@ -291,10 +320,14 @@ class Ability
             (purchase.storage_id == storage.id) && (purchase.status == Purchase::STATUS[:opened]) && !purchase.can_close?
         end
 
+        cannot :destroy, Purchase do |purchase|
+            (purchase.storage_id == storage.id)&& purchase.has_checked?
+        end
+        
         cannot :update, PurchaseDetail do |purchase_detail|
             (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in])
         end
-
+        
         cannot :destroy, PurchaseDetail do |purchase_detail|
             (purchase_detail.purchase.storage_id == storage.id) && (purchase_detail.status == PurchaseDetail::STATUS[:stock_in])
         end
@@ -303,12 +336,16 @@ class Ability
 
         can :manage, ManualStockDetail, manual_stock: {storage_id: storage.id, status: ManualStock::STATUS[:opened]}
 
-        can :read, ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:closed]
+        can [:read,:stock_out], ManualStock, storage_id: storage.id, status: ManualStock::STATUS[:closed]
 
         can :read, ManualStockDetail, manual_stock: {storage_id: storage.id, status: ManualStock::STATUS[:closed]}
 
         cannot :close, ManualStock do |manual_stock|
             (manual_stock.storage_id == storage.id) && (manual_stock.status == ManualStock::STATUS[:opened]) && !manual_stock.can_close?
+        end
+
+        cannot :destroy, ManualStock do |manual_stock|
+            (manual_stock.storage_id == storage.id)&& manual_stock.has_checked?
         end
 
         cannot :update, ManualStockDetail do |manual_stock_detail|
@@ -324,9 +361,20 @@ class Ability
         can :move2bad, Stock, shelf: {area: {storage_id: storage.id} }
 
         can :manage, MoveStock, unit_id: user.unit_id
-        can :read, StockLog, shelf: {area: {storage_id: storage.id}}
-        can :manage, Inventory, unit_id: user.unit_id
+        cannot :destroy, MoveStock do |move_stock|
+            (move_stock.storage_id == storage.id)&& move_stock.has_checked?
+        end
 
+        can :read, StockLog, shelf: {area: {storage_id: storage.id}}
+        cannot :destroy, StockLog do |stocklog|
+            stocklog.parent.status == Purchase::STATUS[:closed] if stocklog.parent
+        end
+
+        can :manage, Inventory, unit_id: user.unit_id
+        cannot :destroy, Inventory do |inventory|
+            (inventory.storage_id == storage.id)&& inventory.has_checked?
+        end
+        
         can :autocomplete_specification_name, Specification, commodity: {unit_id: user.unit_id}
         can [:read,:hotprint_ready,:hotprint_show], Logistic
     end

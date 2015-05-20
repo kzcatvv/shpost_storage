@@ -51,7 +51,7 @@
                     buffer += content_tag(:dd,order.total_amount,style: 'margin-left:80px;')
                     buffer += content_tag(:dt,"商品明细:",style: 'width:70px;')
                     order.order_details.each do |odl|
-                      buffer += content_tag(:dd,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s,style: 'margin-left:80px;')
+                      buffer += content_tag(:dd,Specification.find(odl.specification_id).all_name.to_s+" * "+odl.amount.to_s+"  "+odl.defective_name,style: 'margin-left:80px;')
                     end
                     raw buffer
                   end), colspan:3) +
@@ -67,7 +67,24 @@
                     buffer += content_tag(:dt,"备注:",style: 'width:70px;')
                     buffer += content_tag(:dd,(order.buyer_desc.nil? ? " " : order.buyer_desc)+(order.seller_desc.nil? ? " " : order.seller_desc),style: 'margin-left:80px;')
                     raw buffer
-                  end), colspan:2)
+                  end), colspan:2) + 
+                   content_tag(:td,
+                    content_tag(:div,
+                    content_tag(:dl, class: "dl-horizontal") do
+                      buffer = content_tag(:b,"用户日志明细")
+                       user_logs = order.user_logs
+                       if !order.keyclientorder.blank?
+                         user_logs_p = UserLog.where parent_id: order.keyclientorder.id
+                         user_logs = user_logs + user_logs_p
+                       end
+                       user_logs = user_logs.sort_by {|u| u.created_at} 
+                       
+                       user_logs.each do |ul|
+                        buffer += content_tag(:p,ul.user.name+"   "+ul.operation+"   "+ul.created_at.strftime('%Y-%m-%d %H:%M:%S').to_s)
+                       end
+                      raw buffer
+                       
+                   end), colspan:3)
          end
     end
 
@@ -118,6 +135,11 @@
     g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at', html: {style: 'width:10%;'}, detach_with_id: :created_at_filter do |order|
        # order.created_at.to_s(:db)
        DateTime.parse(order.created_at.to_s).strftime('%Y-%m-%d').to_s
+    end
+
+    g.column name: model_class.human_attribute_name(:virtual), attribute: 'virtual', html: {style: 'width:10%;'},custom_filter: Order::VIRTUAL.map {|k, v| [model_class.human_attribute_name("virtual_#{k}"), v]} do |order| 
+      order.virtual_name
+
     end
 
     

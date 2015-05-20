@@ -29,6 +29,15 @@ class MoveStock < ActiveRecord::Base
     	return true
     end
 
+    def has_checked?
+      self.stock_logs.each do |x|
+          if x.checked?
+            return true
+          end
+      end
+      return false
+    end
+
   def has_waiting_stock_logs()
     x = self.stock_logs.where(status: "waiting").size
     if x == 0

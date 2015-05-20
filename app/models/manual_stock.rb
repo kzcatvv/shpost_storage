@@ -13,9 +13,14 @@ class ManualStock < ActiveRecord::Base
   # validates_presence_of :no, :name, message: '不能为空'
 
   STATUS = { opened: 'opened', closed: 'closed'}
+  VIRTUAL = { 0=> '非虚拟', 1=> '虚拟'}
 
   def status_name
     status.blank? ? "" : self.class.human_attribute_name("status_#{status}")
+  end
+
+  def virtual_name
+    virtual.blank? ? "" : self.class.human_attribute_name("virtual_#{virtual}")
   end
 
   def close
@@ -48,6 +53,15 @@ class ManualStock < ActiveRecord::Base
     return true
   end
 
+  def has_checked?
+    self.manual_stock_details.each do |x|
+      if x.has_checked?
+        return true
+      end
+    end
+    return false
+  end
+
   def closed?
     self.status.eql? STATUS[:closed]
   end
@@ -61,8 +75,11 @@ class ManualStock < ActiveRecord::Base
   end
 
   def waiting_amounts
-    sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
-    sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    sum_stock_logs = self.stock_logs.includes(:manual_stock_detail).group("stock_logs.specification_id").group("stock_logs.supplier_id").group("stock_logs.business_id").group("manual_stock_details.defective").sum("stock_logs.amount")
+    sum_amount = self.details.group(:specification_id, :supplier_id, :business_id, :defective).sum(:amount)
+
+    # sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
+    # sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
 
     compare_sum_amount(sum_amount, sum_stock_logs)
 
@@ -70,7 +87,7 @@ class ManualStock < ActiveRecord::Base
     if ! sum_amount.blank? && ! sum_stock_logs.blank?
       sum_stock_logs_without_supplier = {}
       sum_stock_logs.each do |x, amount|
-        sum_stock_logs_without_supplier[[x[0], nil, x[2]]] = amount
+        sum_stock_logs_without_supplier[[x[0], nil, x[2], x[3]]] = amount
       end
       compare_sum_amount(sum_amount, sum_stock_logs_without_supplier)
     end

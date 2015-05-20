@@ -428,6 +428,44 @@ function purchase_modify(current)
   });
 }
 
+function purchase_amount_modify(current)
+{
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_amount_"+id).val();
+  shelfid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_shelfid_"+id+"][type=hidden]").val();
+  arrivalid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_paid_"+id).val();
+
+  var x = param[3].substring(0,1)
+  if (x == "0") {
+    x = ""
+  } else {
+    x = param[3]
+  }
+  if (arrivalid == null) {
+    arrivalid = ""
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/purchase_modify",
+    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&arrival_id=" + arrivalid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+        if (jsonData.id != undefined) {
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"amount",""+jsonData.amount)
+          if (amount != jsonData.amount) {
+            alert("该明细最大可入库数量：" + jsonData.amount);
+          }
+        }
+      }
+    }
+  });
+}
+
 
 // function addTr(slid,index)
 // {
@@ -585,7 +623,7 @@ function  ajaxstocklogs(){
     } else {
       $("p#"+this.id).text($(this).val());
     }
-    purchase_modify(this);
+    purchase_amount_modify(this);
   });
 
   $("p[id^=stock_logs_msid]").unbind('click').click(
@@ -666,7 +704,7 @@ function  ajaxstocklogs(){
       $("p#"+this.id).text($(this).val());
     }
     
-    manual_stock_modify(this);
+    manual_stock_amount_modify(this);
   }
   );
 
@@ -747,7 +785,7 @@ function  ajaxstocklogs(){
       $("p#"+this.id).text($(this).val());
     }
     
-    keyclientorder_stock_modify(this);
+    keyclientorder_stock_amount_modify(this);
   }
   );
 
@@ -808,7 +846,7 @@ function  ajaxstocklogs(){
     } else {
       $("p#"+this.id).text($(this).val());
     }
-    order_return_modify(this);
+    order_return_amount_modify(this);
   });
 
   $("input[id^=stock_logs_pickshelf]").unbind('railsAutocomplete.select').bind('railsAutocomplete.select', function(event, data){
@@ -1170,7 +1208,69 @@ function manual_stock_modify(current){
   });
 }
 
+function manual_stock_amount_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_mamount_"+id).val();
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_mshelfid_"+id).val();
+  stid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_stid_"+id+"][type=hidden]").val();
+  // alert("id"+id+"stsockid"+stockid+"stid"+stid);
+  manualstockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_msid_"+id).val();
+  
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (manualstockid == null){
+    manualstockid = ""
+  }
 
+  if (stockid == null || stockid ==""){
+    if (stid != null){
+      stockid = stid
+    }
+    else {
+      stockid = ""
+    }
+  }
+  
+
+  if (amount == null){
+    amount = "0"
+  }
+  // alert("id"+id+" "+"stockid"+stockid+" "+"manualstockid"+manualstockid+" "+"amount"+amount);
+  
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/manual_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&manual_stock_id=" + manualstockid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        
+        // alert(data.responseText);
+        // var jdata = eval(jsonData.stocks);
+        // // alert(jdata);
+        if (jsonData.id != undefined){
+          
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"mamount",""+jsonData.amount)
+          
+          if (amount != jsonData.amount){
+            alert("该明细最大可出库数量：" + jsonData.amount);
+          }
+
+          
+        }
+      } 
+    }
+  });
+}
 
 function keyclientorder_stock_add() {
   var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
@@ -1348,6 +1448,73 @@ function keyclientorder_stock_modify(current){
   });
 }
 
+function keyclientorder_stock_amount_modify(current){
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_kamount_"+id).val();
+  stockid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_kshelfid_"+id).val();
+  ksid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_ksid_"+id).val();
+  kcoid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kcoid_"+id+"][type=hidden]").val();
+  kstid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_kstid_"+id+"][type=hidden]").val();
+  pshid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_pickshelf_"+id+"][type=hidden]").val();
+
+  x = param[3].substring(0,1)
+  if (x == "0"){
+    x = ""
+  }
+  else {
+    x = param[3]
+  }
+  
+  if (ksid == null){
+    ksid = ""
+  }
+
+  if (amount == null){
+    amount = "0"
+  }
+
+  if (stockid == null || stockid == ""){
+    if (kstid != null){
+      stockid = kstid
+    }
+    else {
+      stockid = ""
+    }
+  }
+
+  if (kcoid == null){
+    kcoid = ""
+  }
+
+  if (pshid == null){
+    pshid = ""
+  }
+  // alert(x+" "+stockid+" "+ksid+" "+kcoid);
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/keyclientorder_stock_modify",
+    data: "id=" + x + "&amount=" + amount + "&stock_id=" + stockid + "&keyclientorder_params=" + ksid + "&keyclientorder=" + kcoid + "&pickshelfid=" + pshid,
+    dataType: "json",
+    complete: function(data) {
+      if (data.success){
+        jsonData = eval("("+data.responseText+")");
+        
+        if (jsonData.id != undefined){
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"kamount",""+jsonData.amount)
+          
+          if (amount != jsonData.amount){
+            alert("该明细最大可出库数量：" + jsonData.amount);
+          }
+
+          
+        }
+      } 
+    }
+  });
+}
+
 
 function order_return_add() {
   var tr = $("tr[id^=stock_logs_id]").eq(0).clone();
@@ -1421,6 +1588,51 @@ function order_return_modify(current)
           tableset(jsonData.id,"oamount",""+jsonData.amount)
           tableset(jsonData.id,"actamount",""+jsonData.total_amount)
 
+          if (amount != jsonData.amount) {
+            alert("该明细最大可入库数量：" + jsonData.amount);
+          }
+          // tableset(param[3],"shelfid",shelfid)
+          // tableset(addid,"paid",jsonData.paid)
+          // tableset(addid,"status","处理中")
+        }
+      }
+    }
+  });
+}
+
+function order_return_amount_modify(current)
+{
+  param = current.id.split('_');
+  id = param[3];
+  amount = $("tr#stock_logs_id_"+id+">td>input#stock_logs_oamount_"+id).val();
+  shelfid = $("tr#stock_logs_id_"+id+">td>input[id=stock_logs_oshelfid_"+id+"][type=hidden]").val();
+  orid = $("tr#stock_logs_id_"+id+">td>select#stock_logs_orid_"+id).val();
+
+  var x = param[3].substring(0,1)
+  if (x == "0") {
+    x = ""
+  } else {
+    x = param[3]
+  }
+  if (orid == null) {
+    orid = ""
+  }
+  // alert("id"+id+"shelfid"+shelfid+"orid"+orid+"amount"+amount);
+
+  $.ajax({
+    type: "POST",
+    url: "/stock_logs/order_return_modify",
+    data: "id=" + x + "&amount=" + amount + "&shelf_id=" + shelfid + "&order_return_detail_id=" + orid,
+    dataType: "json",
+    complete: function(data) {
+      if(data.success){
+        var jsonData = eval("("+data.responseText+")");
+        // alert(data.responseText);
+        
+        if (jsonData.id != undefined) {
+          tableset(jsonData.id,"id",jsonData.id)
+          tableset(jsonData.id,"oamount",""+jsonData.amount)
+          
           if (amount != jsonData.amount) {
             alert("该明细最大可入库数量：" + jsonData.amount);
           }

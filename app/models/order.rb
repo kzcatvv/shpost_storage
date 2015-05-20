@@ -41,7 +41,7 @@ class Order < ActiveRecord::Base
 
   PARENT_TYPE = { true: '否', false: '是'}
 
-  
+  VIRTUAL = { 0=> '非虚拟', 1=> '虚拟'}
 
   def type_name
     order_type.blank? ? "" : self.class.human_attribute_name("order_type_#{order_type}")
@@ -65,7 +65,11 @@ class Order < ActiveRecord::Base
      else
         name = "否"
      end
-   end
+  end
+
+  def virtual_name
+    virtual.blank? ? "" : self.class.human_attribute_name("virtual_#{virtual}")
+  end
 
   def is_printed_name
     if is_printed
@@ -229,7 +233,7 @@ class Order < ActiveRecord::Base
     orders.update_all(is_shortage: 'no')
     orders_changed = false
     order_details_hash.each do |key, sum|
-      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage)
+      stock_sum = Stock.total_stock_in_storage(Specification.find(key[0]), key[1].blank? ? nil : Supplier.find(key[1]), Business.find(key[2]), current_storage,is_broken=false)
       if orders_changed
         sum = orders.includes(:order_details).where(is_shortage: 'no').where(order_details: {specification_id: key[0], supplier_id: key[1]}, business_id: key[2], storage_id: current_storage.id).sum(:amount)
       end

@@ -34,6 +34,7 @@ class ManualStocksController < ApplicationController
     @manual_stock.unit = current_user.unit
     @manual_stock.status = ManualStock::STATUS[:opened]
     @manual_stock.storage = current_storage
+    @manual_stock.virtual = params[:checkbox][:virtual]
     # @manual_stock.no=time.year.to_s+time.month.to_s.rjust(2,'0')+time.day.to_s.rjust(2,'0')+ManualStock.count.to_s.rjust(5,'0')
 
     respond_to do |format|
@@ -52,6 +53,8 @@ class ManualStocksController < ApplicationController
   def update
     respond_to do |format|
       if @manual_stock.update(manual_stock_params)
+        @purchase.virtual = params[:checkbox][:virtual]
+        @purchase.save
         format.html { redirect_to @manual_stock, notice: I18n.t('controller.update_success_notice', model: '出库单')  }
         format.json { head :no_content }
       else
@@ -73,6 +76,7 @@ class ManualStocksController < ApplicationController
 
   def stock_out
     # begin
+    @manual_stock
     Stock.manual_stock_stock_out(@manual_stock, current_user)
     @stock_logs = @manual_stock.stock_logs
     # @stock_logs_grid = initialize_grid(@manual_stock.stock_logs)

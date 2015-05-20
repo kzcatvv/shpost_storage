@@ -20,7 +20,11 @@
   <div class="control-group">
     <%= f.label :area_type, :class => 'control-label' %>
     <div class="controls">
+    <% if Storage.find_by(id:@area.storage_id).need_pick %>
     <%= f.select(:area_type, Area::AREA_TYPE.invert ) %>
+    <% else %>
+    <%= f.select(:area_type, Area::AREA_TYPE_NOPICK.invert ) %>
+    <% end %>
     </div>
   </div>
 

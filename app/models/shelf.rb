@@ -23,6 +23,7 @@ class Shelf < ActiveRecord::Base
 
   #BAD_TYPE = { yes: '是', no: '否' }
   SHELF_TYPE = {normal: '普通区', broken: '破损区', pick: '拣货区'}
+  SHELF_TYPE_NOPICK = {normal: '普通区', broken: '破损区'}
 
   PRIORITY_LEVEL = {1=>'1',2=>'2',3=>'3',4=>'4',5=>'5',6=>'6',7=>'7',8=>'8',9=>'9',10=>'10'}
   # def self.min_abs_pl(priority_level)
@@ -41,7 +42,7 @@ class Shelf < ActiveRecord::Base
     Shelf.includes(:area).where(area_id: storage.areas,shelf_type: 'pick').order("priority_level ASC")
   end
 
-  def self.get_empty_shelf(storage, is_broken = false)
+  def self.get_empty_shelf(storage, is_broken)
     # prior.first
     shelves = in_storage(storage).empty.prior
     if ! is_broken
@@ -57,7 +58,7 @@ class Shelf < ActiveRecord::Base
     # prior.first
   end
   
-  def self.get_default_shelf(storage, is_broken = false)
+  def self.get_default_shelf(storage, is_broken)
     shelves = in_storage(storage).prior
     if ! is_broken
       shelves.normal.first

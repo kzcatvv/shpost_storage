@@ -55,11 +55,13 @@
 </div>
 
   <div style="float:right">
-    <% if can? :new, Stock %>
+    <% if can? :new, StockLog %>
       <% if @purchase %>
-        <%= link_to t('.new', :default => t("helpers.links.new")),
+        <% if !@purchase.status.eql?"closed" %>
+          <%= link_to t('.new', :default => t("helpers.links.new")),
                    "javascript:void(0)", onclick: "add()",
                     :class => 'btn btn-primary' %>
+        <% end %>        
       <% end %>
     <% end %>
   </div>

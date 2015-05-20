@@ -238,7 +238,7 @@ class StandardInterface
 
       if ! relationship.blank?
         if !storage.blank?
-          amount = Stock.total_stock_in_storage(relationship.specification, relationship.supplier, business, storage)
+          amount = Stock.total_stock_in_storage(relationship.specification, relationship.supplier, business, storage,is_broken=false)
         else
           amount = Stock.total_stock_in_unit(relationship.specification, relationship.supplier, business, unit)
         end
