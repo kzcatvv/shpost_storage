@@ -298,6 +298,7 @@ class OrdersController < ApplicationController
 
   def findorderout
     @needpick = current_storage.need_pick
+    @ispd=1
     @_tracking_number = params[:_tracking_number]
     @tracking_number = params[:tracking_number]
 
@@ -354,6 +355,7 @@ class OrdersController < ApplicationController
         end
       end
     end
+    binding.pry
     respond_to do |format|
       format.js 
     end
