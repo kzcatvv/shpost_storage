@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150519065635) do
+ActiveRecord::Schema.define(version: 20150520062414) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -188,7 +188,6 @@ ActiveRecord::Schema.define(version: 20150519065635) do
     t.string   "batch_no"
     t.integer  "supplier_id"
     t.integer  "business_id"
-    t.string   "defective",         default: "0"
   end
 
   create_table "keyclientorders", force: true do |t|
@@ -208,7 +207,6 @@ ActiveRecord::Schema.define(version: 20150519065635) do
     t.string   "barcode"
     t.string   "no"
     t.string   "order_type",     default: "b2c"
-    t.string   "virtual",        default: "0"
   end
 
   create_table "logistics", force: true do |t|
@@ -298,7 +296,7 @@ ActiveRecord::Schema.define(version: 20150519065635) do
   end
 
   create_table "order_details", force: true do |t|
-    t.string   "name",                default: "",  null: false
+    t.string   "name",                default: ""
     t.integer  "specification_id"
     t.integer  "amount"
     t.float    "price"
