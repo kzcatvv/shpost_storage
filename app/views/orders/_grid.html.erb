@@ -137,7 +137,7 @@
        DateTime.parse(order.created_at.to_s).strftime('%Y-%m-%d').to_s
     end
 
-    g.column name: model_class.human_attribute_name(:virtual), attribute: 'virtual', html: {style: 'width:10%;'},custom_filter: Order::VIRTUAL.map {|k, v| [model_class.human_attribute_name("virtual_#{k}"), v]} do |order| 
+    g.column name: model_class.human_attribute_name(:virtual), attribute: 'virtual', html: {style: 'width:10%;'}, detach_with_id: :virtual_filter,custom_filter: Order::VIRTUAL.invert do |order|
       order.virtual_name
 
     end

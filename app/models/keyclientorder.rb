@@ -116,7 +116,7 @@ class Keyclientorder < ActiveRecord::Base
   end
 
   def waiting_amounts
-    sum_stock_logs = self.stock_logs.includes(:keyclientorderdetail).group("stock_logs.specification_id").group("stock_logs.supplier_id").group("stock_logs.business_id").group("keyclientorderdetails.defective").sum("stock_logs.amount")
+    sum_stock_logs = self.stock_logs.includes(:order_details).group("stock_logs.specification_id").group("stock_logs.supplier_id").group("stock_logs.business_id").group("order_details.defective").sum("stock_logs.amount")
     sum_amount = self.details.group(:specification_id, :supplier_id, :business_id, :defective).sum(:amount)
     # sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
     # sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
