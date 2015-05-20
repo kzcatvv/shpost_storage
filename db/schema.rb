@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150513060945) do
+ActiveRecord::Schema.define(version: 20150518030454) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -401,6 +401,7 @@ ActiveRecord::Schema.define(version: 20150513060945) do
     t.string   "send_name"
     t.string   "send_zip"
     t.string   "send_mobile"
+    t.boolean  "is_printed",                     default: false
   end
 
   create_table "orders_user_logs", id: false, force: true do |t|
