@@ -32,10 +32,8 @@ class Order < ActiveRecord::Base
   STATUS_SHOW_INDEX = { waiting: '待处理',spliting: '拆单中', printed: '已打印'}
 
   # TRANSPORT_TYPE= { gnxb: '国内小包', tcsd: '同城小包', ems: 'EMS', ttkd: '天天快递', bsht: '百世汇通', qt: '其他'}
-  TRANSPORT_TYPE = Logistic.pluck(:print_format,:name).to_h
 
-  TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', '同城小包'=>'tcsd', 'EMS'=>'ems', '天天快递'=>'ttkd', '百世汇通'=>'bsht', '其他'=>'qt'}
-
+  # TRANSPORT_TYPE_print= {'国内小包'=>'gnxb', '同城速递'=>'tcsd', '同城小包'=>'tcsd', 'EMS'=>'ems', '天天快递'=>'ttkd', '百世汇通'=>'bsht', '其他'=>'qt'}
 
   SHORTAGE_TYPE = { yes: '可能缺货', no: '可能有货' }
 
@@ -226,6 +224,10 @@ class Order < ActiveRecord::Base
     row << business_trans_no
     row << status
     row << nil
+  end
+
+  def self.transport_type
+    Logistic.pluck(:print_format,:name).to_h
   end
 
   def self.find_stock(orders,createKeyCilentOrderFlg,type='0')

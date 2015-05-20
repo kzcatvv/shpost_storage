@@ -22,7 +22,7 @@
 		<%= tag(:input, :type => "hidden", :name => request_forgery_protection_token.to_s, :value => form_authenticity_token) %>
          <h3>开始面单号：<input type=text name='start' id='start' /></h3> 
          <h3>结束面单号：<input type=text name='end' id='end' /></h3>
-         <h3>快递类型：<%= select_tag(:transport_type, options_for_select(Order::TRANSPORT_TYPE_print)) %></h3>
+         <h3>快递类型：<%= select_tag(:transport_type, options_for_select(Order.transport_type.invert)) %></h3>
          <input type=hidden id='id' name='id' value='<%= @keyclientorder.id%>'/>
          <br><br>
          <input type="submit" id='sub' value="打印面单" class='btn btn-primary'/> 
