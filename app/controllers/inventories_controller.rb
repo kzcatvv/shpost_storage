@@ -46,8 +46,12 @@ class InventoriesController < ApplicationController
     if !params[:g3].nil?
       goodds = params[:g3][:selected]
     end
-    @inventory.inv_type_dtl = areads.join(",")
-    @inventory.goods_inv_dtl = goodds.join(",")
+    if !areads.blank?
+      @inventory.inv_type_dtl = areads.join(",")
+    end
+    if !goodds.blank?
+      @inventory.goods_inv_dtl = goodds.join(",")
+    end
     @inventory.status = "opened"
     respond_to do |format|
       if @inventory.save
@@ -70,8 +74,12 @@ class InventoriesController < ApplicationController
     if !params[:g3].nil?
       goodds = params[:g3][:selected]
     end
-    @inventory.inv_type_dtl = areads.join(",")
-    @inventory.goods_inv_dtl = goodds.join(",")
+    if !areads.blank?
+      @inventory.inv_type_dtl = areads.join(",")
+    end
+    if !goodds.blank?
+      @inventory.goods_inv_dtl = goodds.join(",")
+    end
 
     respond_to do |format|
       if @inventory.update(inventory_params)
