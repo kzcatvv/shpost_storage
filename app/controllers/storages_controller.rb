@@ -69,6 +69,7 @@ class StoragesController < ApplicationController
                 s.shelf_type="normal"
                 s.save
               end
+            end
           end
         end
       end

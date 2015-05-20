@@ -187,6 +187,7 @@ class StocksController < ApplicationController
     @area_code=params[:area_code]
     @is_zero=params[:is_zero]
     zerostocks=[]
+    resls=[]
 
     if !params[:ex_code].blank?
       @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
@@ -298,6 +299,7 @@ class StocksController < ApplicationController
     @selrels=[]
     @zerorels=""
     zerostocks=[]
+    resls=[]
 
     if !params[:ex_code].blank?
       @stocks=@stocks.includes(:relationship).where("relationships.external_code=?",params[:ex_code]).accessible_by(current_ability)
