@@ -48,7 +48,7 @@ class ShelvesController < ApplicationController
   def index
     @storage=current_storage
     if !@storage.need_pick
-      @shelves=@shelves.where("shelf_type!='pick'")
+      @shelves=@shelves.where("shelf_type!='pick' or shelf_type is null")
     end
     @shelves_grid = initialize_grid(@shelves,
       :order => 'shelves.id',
