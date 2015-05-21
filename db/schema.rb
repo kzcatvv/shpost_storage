@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150520062414) do
+ActiveRecord::Schema.define(version: 20150521015426) do
 
   create_table "areas", force: true do |t|
     t.integer  "storage_id"
@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "unit_id"
+    t.string   "english_name"
     t.string   "name_en"
   end
 
@@ -235,7 +236,6 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.integer  "specification_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "defctive",         default: "0"
     t.string   "defective",        default: "0"
   end
 
@@ -310,7 +310,6 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.string   "is_shortage"
     t.string   "from_country"
     t.float    "weight"
-    t.string   "defctive",            default: "0"
     t.string   "defective",           default: "0"
   end
 
@@ -369,9 +368,9 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.integer  "unit_id"
     t.integer  "storage_id"
     t.integer  "keyclientorder_id"
-    t.string   "tracking_number"
     t.string   "province"
     t.string   "city"
+    t.string   "tracking_number"
     t.integer  "user_id"
     t.string   "is_shortage",                    default: "no"
     t.string   "business_order_id"
@@ -405,8 +404,8 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.string   "send_name"
     t.string   "send_zip"
     t.string   "send_mobile"
-    t.string   "virtual",                        default: "0"
     t.boolean  "is_printed",                     default: false
+    t.string   "virtual",                        default: "0"
   end
 
   create_table "orders_user_logs", id: false, force: true do |t|
@@ -438,7 +437,6 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "defctive",                     default: "0"
     t.string   "defective",                    default: "0"
   end
 
@@ -534,6 +532,7 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.string   "barcode"
     t.string   "no"
     t.boolean  "piece_to_piece"
+    t.string   "english_name"
     t.string   "name_en"
     t.float    "price"
   end
@@ -611,6 +610,7 @@ ActiveRecord::Schema.define(version: 20150520062414) do
     t.string   "tcbd_product_no"
     t.string   "no"
     t.boolean  "need_pick",       default: false
+    t.string   "return_unit",     default: "上海市邮政公司物流分公司"
   end
 
   create_table "suppliers", force: true do |t|
