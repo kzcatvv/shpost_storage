@@ -21,31 +21,45 @@ function CreateStockoutPage(){
     LODOP.PRINT_INIT("打印出库单");
     LODOP.SET_PRINT_STYLE("FontSize",18);
     LODOP.SET_PRINT_STYLE("Bold",1);
+    LODOP.SET_PRINT_STYLE("ItemType",1);
+    LODOP.ADD_PRINT_TEXT(30,"45%",260,39,"出库单");
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_TEXT(30,"75%",260,39,CurentTime(0,0));
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+    LODOP.ADD_PRINT_BARCODE(60,"35%",260,39,'128A','<%= @keyclientorder.barcode %>');
+    LODOP.SET_PRINT_STYLE("FontSize",12);
+    LODOP.SET_PRINT_STYLE("Bold",0);
+  
     LODOP.SET_PRINT_STYLE("ItemType",4);
-    LODOP.ADD_PRINT_TEXT(50,"45%",260,39,"出库单");
-    LODOP.SET_PRINT_STYLE("FontSize",12);
-    LODOP.SET_PRINT_STYLE("Bold",0);
-    LODOP.ADD_PRINT_TEXT(50,"75%",260,39,CurentTime(0,0));
-    LODOP.SET_PRINT_STYLE("FontSize",15);
-    LODOP.SET_PRINT_STYLE("Bold",1);
-    LODOP.ADD_PRINT_BARCODE(80,"35%",260,39,'128A','<%= @keyclientorder.barcode %>');
-    LODOP.SET_PRINT_STYLE("FontSize",12);
-    LODOP.SET_PRINT_STYLE("Bold",0);
-    h=150;
-    LODOP.ADD_PRINT_TEXT(h,"5%",260,25,"商品名称规格");
-    LODOP.ADD_PRINT_TEXT(h,"55%",260,25,"数量");
-    LODOP.ADD_PRINT_TEXT(h,"65%",260,25,"货架");
-    LODOP.ADD_PRINT_TEXT(h,"80%",260,25,"69码");
-    LODOP.SET_PRINT_STYLE("FontSize",12);
-    LODOP.SET_PRINT_STYLE("Bold",0);
+    tableHtml = "<table border='1' width='100%' style='border-collapse:collapse' bordercolor='#000000'>";
+    tableHtml = tableHtml + "<thead>";
+    tableHtml = tableHtml + "<tr>";
+    tableHtml = tableHtml + "<th style='width:50%'>商品名称规格</th>";
+    tableHtml = tableHtml + "<th style='width:10%'>数量</th>";
+    tableHtml = tableHtml + "<th style='width:20%'>货架</th>";
+    tableHtml = tableHtml + "<th style='width:20%'>69码</th>";
+    tableHtml = tableHtml + "</tr>";
+    tableHtml = tableHtml + "</thead>";
+    
+    tableHtml = tableHtml + "<tbody>";
     <% @stock_logs.map(&:id).each do |j| %>
-        h=h+42;
-        LODOP.ADD_PRINT_TEXT(h,"5%",340,25,'<%= StockLog.find(j).specification.full_title.gsub(/[\r\n]/,'') %>');
-        LODOP.ADD_PRINT_TEXT(h,"55%",260,25,'<%= StockLog.find(j).amount %>');
-        LODOP.ADD_PRINT_TEXT(h,"65%",260,25,'<%= StockLog.find(j).shelf.shelf_code %>');
-        LODOP.ADD_PRINT_TEXT(h,"80%",260,25,'<%= StockLog.find(j).specification.sixnine_code %>');
-        LODOP.ADD_PRINT_LINE(h,"5%",h,"95%",0,1);
-      <% end %>
-      
+      tableHtml = tableHtml + "<tr>";
+      tableHtml = tableHtml + "<td>" + "<%= StockLog.find(j).specification.full_title.gsub(/[\r\n]/,'') %>" + "</td>";
+      tableHtml = tableHtml + "<td>" + "<%= StockLog.find(j).amount %>" + "</td>";
+      tableHtml = tableHtml + "<td>" + "<%= StockLog.find(j).shelf.shelf_code %>" + "</td>";
+      tableHtml = tableHtml + "<td>" + "<%= StockLog.find(j).specification.sixnine_code %>" + "</td>";
+
+      tableHtml = tableHtml + "</tr>";
+      tableHtml = tableHtml + "</tbody>";
+    <% end %>
+    tableHtml = tableHtml + "</tbody>";
+    tableHtml = tableHtml + "</table>";
+    LODOP.ADD_PRINT_HTM(130,"3%",700,900,tableHtml);
+    LODOP.SET_PRINT_STYLE("ItemType",2);
+    LODOP.SET_PRINT_STYLE("Horient",1);
+    LODOP.SET_PRINT_STYLE("Vorient",1);
+    LODOP.ADD_PRINT_TEXT(550,"80%",100,39,"第#页/共&页");      
   };
 </script>
