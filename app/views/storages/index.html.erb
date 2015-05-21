@@ -25,6 +25,8 @@
       storage.need_pick_name
     end
 
+    g.column name: model_class.human_attribute_name(:return_unit), attribute: 'return_unit'
+
     g.column do |storage|
       ActiveSupport::SafeBuffer.new << 
        (link_to t('.edit', :default => t("helpers.links.edit")), edit_storage_path(storage), :class => 'btn btn-xs btn-primary' if can? :update, storage) << ' ' <<

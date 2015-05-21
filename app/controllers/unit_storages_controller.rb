@@ -84,7 +84,7 @@ class UnitStoragesController < ApplicationController
    #   params.require(:storage).permit( :user_id, :storage_id, :storage)
    #end
     def storage_params
-      params.require(:storage).permit(:name, :desc, :default_storage, :address, :phone, :postcode, :no, :tcbd_product_no, :need_pick)
+      params.require(:storage).permit(:name, :desc, :default_storage, :address, :phone, :postcode, :no, :tcbd_product_no, :need_pick, :return_unit)
     end
 
 end

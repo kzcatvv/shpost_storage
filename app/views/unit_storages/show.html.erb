@@ -20,6 +20,8 @@
   <dd><%= @storage.tcbd_product_no %></dd>
   <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
   <dd><%= Unit.find(@storage.unit_id).name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:return_unit) %>:</strong></dt>
+  <dd><%= @storage.return_unit %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
