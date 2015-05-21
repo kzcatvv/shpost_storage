@@ -267,7 +267,7 @@ class Stock < ActiveRecord::Base
   end
 
   def self.find_stocks_in_shelf(specification, supplier, business, shelf)
-    in_shelf(shelf).find_stocks(specification, supplier, business).expiration_date_first.available.prior
+    in_shelf(shelf).find_stocks(specification, supplier, business, false).expiration_date_first.available.prior
   end
 
   def self.find_stocks_in_shelf_type(specification, supplier, business, shelf_type,storage, is_broken = false)

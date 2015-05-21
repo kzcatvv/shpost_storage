@@ -46,8 +46,8 @@
           <%= text_field_tag("stock_logs[][md_amount]", stock_log.amount, id: "md_amount_#{stock_log.id}",disabled: true) %>
         </td>
         <td>
-          <%= text_field_tag("stock_logs[][md_shelf_id]", stock_log.pick_in.stock.shelf.shelf_code, id: "md_shelf_#{stock_log.id}", 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code",disabled: true)%>
-          <%= hidden_field_tag("stock_logs[][md_shelf_id]", stock_log.pick_in.stock.shelf.id, id: "md_shelf_#{stock_log.id}") %>
+          <%= text_field_tag("stock_logs[][md_shelf_id]", stock_log.pick.stock.shelf.shelf_code, id: "md_shelf_#{stock_log.id}", 'data-autocomplete' => "/shelves/autocomplete_shelf_shelf_code",disabled: true)%>
+          <%= hidden_field_tag("stock_logs[][md_shelf_id]", stock_log.pick.stock.shelf.id, id: "md_shelf_#{stock_log.id}") %>
         </td>
         <% end -%>
         <% if @move_stock.status != "moved" %>

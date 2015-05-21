@@ -220,9 +220,9 @@ class StockLogsController < ApplicationController
         @stock_log.parent.stock_logs.where(stock: @stock_log.stock).where(operation_type: ['in','out']).delete_all
         @stock_log.update(user: current_user ,stock: @orgstock, batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date)
         if Integer(params[:amount]) > @orgstock.actual_amount
-          @stock_log_dtl = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: (Integer(params[:amount]) - @orgstock.actual_amount) )
+          @stock_log_dtl = @stock_log.parent.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:in], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: (Integer(params[:amount]) - @orgstock.actual_amount) )
         elsif Integer(params[:amount]) < @orgstock.actual_amount
-          @stock_log_dtl = @inventory.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:out], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: ( @orgstock.actual_amount - Integer(params[:amount]) ) )
+          @stock_log_dtl = @stock_log.parent.stock_logs.create(user: current_user ,stock: @orgstock,status: StockLog::STATUS[:waiting], operation: StockLog::OPERATION[:inventory], operation_type: StockLog::OPERATION_TYPE[:out], batch_no: @orgstock.batch_no, expiration_date: @orgstock.expiration_date, amount: ( @orgstock.actual_amount - Integer(params[:amount]) ) )
         end
       end
 

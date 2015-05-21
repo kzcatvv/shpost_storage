@@ -94,7 +94,8 @@ LODOP.ADD_PRINT_TEXT(201,105,259,20,'<%= eorder.storage.return_unit %>');
 LODOP.ADD_PRINT_LINE(221,7,222,367,0,1);
 
   //LODOP.PRINT_DESIGN();
-  //LODOP.PREVIEW();  
+  //LODOP.PREVIEW();
+  LODOP.SELECT_PRINTER();  
   LODOP.PRINT(); 
     <% elsif @transport_type=='gjxbg' %>
       LODOP.PRINT_INITA("0.8mm","1.1mm","232.8mm","160.1mm","tracking");
@@ -167,7 +168,8 @@ LODOP.ADD_PRINT_TEXT(189,99,259,20,'<%= eorder.storage.return_unit %>');
 LODOP.ADD_PRINT_LINE(209,2,210,362,0,1);
 
   //LODOP.PRINT_DESIGN();
-  //LODOP.PREVIEW();  
+  //LODOP.PREVIEW(); 
+  LODOP.SELECT_PRINTER(); 
   LODOP.PRINT();
     <% elsif @transport_type=='ems' %>
 LODOP.PRINT_INITA("0mm","0mm","230.2mm","127.3mm","tracking");
