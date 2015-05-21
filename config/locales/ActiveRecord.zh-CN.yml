@@ -417,6 +417,7 @@ zh-CN:
         default_storage_true: "是"
         default_storage_false: "否"
         need_pick: "是否需要二次拣货"
+        return_unit: "退件单位"
       role:
         user_id: "用户"
         storage_id: "仓库"
