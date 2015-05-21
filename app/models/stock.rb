@@ -124,6 +124,7 @@ class Stock < ActiveRecord::Base
 
 
   def self.stock_out(order, operation_user = nil)
+    # binding.pry
     order.waiting_amounts.each do |x, amount|
       if amount > 0
         if !x[3].blank?

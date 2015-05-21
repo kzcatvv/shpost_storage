@@ -105,7 +105,7 @@
 
     g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone'
 
-    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type',custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
+    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type',custom_filter: Order.transport_type.invert do |order| 
       order.transport_type_name
     end
 

@@ -24,7 +24,7 @@
          <h3>结束面单号：<input type=text name='end' id='end' /></h3>
          <input type=hidden id='id' name='id' value='<%= @ids%>'/>
          <input type=hidden id='flag' name='flag' value='<%= @flag%>'/>
-         <h3>快递类型：<%= select_tag(:transport_type, options_for_select(Order::TRANSPORT_TYPE_print)) %></h3>
+         <h3>快递类型：<%= select_tag(:transport_type, options_for_select(Order.transport_type.invert)) %></h3>
          <br><br>
          <input type="submit" id='sub' value="打印面单" class='btn btn-primary'/> 
     </form>

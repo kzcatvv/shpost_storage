@@ -96,7 +96,7 @@
 
     # g.column name: model_class.human_attribute_name(:customer_phone), attribute: 'customer_phone', detach_with_id: :customer_phone_filter
 
-    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type', html: {style: 'width:10%;'}, detach_with_id: :transport_type_filter,custom_filter: Order::TRANSPORT_TYPE.invert do |order| 
+    g.column name: model_class.human_attribute_name(:transport_type), attribute: 'transport_type', html: {style: 'width:10%;'}, detach_with_id: :transport_type_filter,custom_filter: Order.transport_type.invert do |order| 
       order.transport_type_name
     end
 

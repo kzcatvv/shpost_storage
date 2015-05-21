@@ -11,7 +11,7 @@ class AreasController < ApplicationController
   def index
     @storage=current_storage
     if !@storage.need_pick
-      @areas=@areas.where("area_type!='pick'")
+      @areas=@areas.where("area_type!='pick' or area_type is null")
     end
     @areas_grid = initialize_grid(@areas)
   end
