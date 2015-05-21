@@ -116,7 +116,35 @@ class Keyclientorder < ActiveRecord::Base
   end
 
   def waiting_amounts
-    sum_stock_logs = self.stock_logs.includes(:order_details).group("stock_logs.specification_id").group("stock_logs.supplier_id").group("stock_logs.business_id").group("order_details.defective").sum("stock_logs.amount")
+    # sum_stock_logs = self.stock_logs.includes(:order_details).group("stock_logs.specification_id").group("stock_logs.supplier_id").group("stock_logs.business_id").group("order_details.defective").sum("stock_logs.amount")
+    sum_stock_logs={}
+    sum_stock_logs_hash = self.stock_logs.includes(:shelf).where("shelves.shelf_type = 'normal' or shelves.shelf_type is null or shelves.shelf_type = 'broken'").group("stock_logs.specification_id").group("stock_logs.supplier_id").group("stock_logs.business_id").group("shelves.shelf_type").order("stock_logs.specification_id,stock_logs.supplier_id,stock_logs.business_id").sum("stock_logs.amount")
+
+    key_new=[]
+    key_last=[]
+    key_last[0] = ""
+    key_last[1] = ""
+    key_last[2] = ""
+    sum_stock_logs_hash.each do |key,value|
+      if key[3].eql?"broken"
+        key_new=[key[0],key[1],key[2],"1"]
+        sum_stock_logs[key_new]=value
+      else
+        key_new=[key[0],key[1],key[2],"0"]
+        if key[0]==key_last[0] and key[1]==key_last[1] and key[2]==key_last[2]
+          if sum_stock_logs[key_new].blank?
+            sum_stock_logs[key_new] = value
+          else
+            sum_stock_logs[key_new]+=value
+          end
+        else
+          sum_stock_logs[key_new]=value
+        end
+      end
+      key_last=[key[0],key[1],key[2]]
+    end
+
+    
     sum_amount = self.details.group(:specification_id, :supplier_id, :business_id, :defective).sum(:amount)
     # sum_stock_logs = self.stock_logs.group(:specification_id, :supplier_id, :business_id).sum(:amount)
     # sum_amount = self.details.group(:specification_id, :supplier_id, :business_id).sum(:amount)
